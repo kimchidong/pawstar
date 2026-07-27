@@ -1,0 +1,10 @@
+__pycache__/
+
+logs/
+*.log
+
+# User uploaded profile pictures
+static/image/profile/
+static/image/paw/
+static/image/temp/
+
