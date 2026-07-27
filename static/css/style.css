@@ -1280,3 +1280,26 @@ body {
 .btn-save-profile i {
     font-size: 1.05rem;
 }
+
+/* Logout Profile Button Styling */
+.btn-logout-profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 24px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-logout-profile:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}

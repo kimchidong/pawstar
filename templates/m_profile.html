@@ -30,10 +30,15 @@
         </div>
     </div>
 
-    <!-- 프로필 수정 버튼 -->
-    <button type="button" class="m-btn-submit" id="mBtnOpenProfileModal" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);">
-        ✏️ 프로필 정보 수정
-    </button>
+    <!-- 프로필 수정 및 로그아웃 버튼 -->
+    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+        <button type="button" class="m-btn-submit" id="mBtnOpenProfileModal" style="flex: 1; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);">
+            ✏️ 프로필 정보 수정
+        </button>
+        <a href="/logout" class="m-btn-submit" style="width: auto; padding: 0.85rem 1.1rem; background: #f1f5f9; border: 1px solid var(--border-light); color: var(--text-secondary); text-decoration: none; text-align: center;">
+            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+        </a>
+    </div>
 </div>
 
 <!-- 내 펫 출전 자랑작 -->
@@ -244,6 +249,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    // 모바일 30분 비활동 클라이언트 자동 로그아웃 타임아웃
+    let idleTimer;
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function() {
+            alert('⏰ 30분 동안 이용이 없어 자동 로그아웃되었습니다.');
+            window.location.href = '/logout';
+        }, THIRTY_MINUTES);
+    }
+
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+        document.addEventListener(evt, resetIdleTimer, false);
+    });
+    resetIdleTimer();
 });
 </script>
 

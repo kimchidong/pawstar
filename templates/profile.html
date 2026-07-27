@@ -11,10 +11,16 @@
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <h2 style="font-size: 1.8rem; font-weight: 800;" id="currentNickname">{{ user.nickname }}</h2>
                 </div>
-                <!-- 프로필 정보 수정 버튼 -->
-                <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
-                    <i class="fa-solid fa-pen-to-square"></i> 프로필 정보 수정
-                </button>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <!-- 프로필 정보 수정 버튼 -->
+                    <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
+                        <i class="fa-solid fa-pen-to-square"></i> 프로필 정보 수정
+                    </button>
+                    <!-- 로그아웃 버튼 -->
+                    <a href="/logout" class="btn-logout-profile" id="btnLogoutProfile" title="로그아웃 (브라우저 닫기/30분 미이용시 자동로그아웃)">
+                        <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                    </a>
+                </div>
             </div>
 
             <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;" id="currentBio">
@@ -322,6 +328,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    // 30분 비활동 클라이언트 자동 로그아웃 타임아웃 (30분 = 1800초 = 1,800,000ms)
+    let idleTimer;
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function() {
+            alert('⏰ 30분 동안 웹 서비스 이용이 없어 안전하게 자동 로그아웃되었습니다.');
+            window.location.href = '/logout';
+        }, THIRTY_MINUTES);
+    }
+
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+        document.addEventListener(evt, resetIdleTimer, false);
+    });
+    resetIdleTimer();
 });
 </script>
 

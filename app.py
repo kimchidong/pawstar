@@ -7,12 +7,33 @@ import os
 import datetime
 import uuid
 import shutil
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from services.contest_service import service
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pawstar_secret_key_2026'
+
+# 브라우저 닫을 시 세션 쿠키 소멸 & 30분 비활동 시 자동 로그아웃 설정 (plamodelshop 방식)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+@app.before_request
+def check_session_timeout():
+    """ 30분 동안 웹 서비스 이용(요청)이 없거나 세션 만료 시 자동 로그아웃 처리 """
+    # 브라우저 닫힘(Session Cookie) & 30분 미활동 체킹
+    now_ts = datetime.datetime.now().timestamp()
+    last_act = session.get('last_activity')
+
+    if session.get('user_id') and last_act:
+        # 30분(1800초) 이상 비활동일 경우 자동 로그아웃
+        if now_ts - last_act > 1800:
+            session.clear()
+            session['logged_out_reason'] = 'timeout'
+        else:
+            session['last_activity'] = now_ts
+    elif session.get('user_id'):
+        session['last_activity'] = now_ts
 
 def finalize_temp_profile_image(avatar_icon):
     """
@@ -63,13 +84,44 @@ def finalize_temp_profile_image(avatar_icon):
 
 @app.context_processor
 def inject_global_vars():
-    """ 템플릿 전역에서 사용할 기본 정보 전달 """
-    profile_data = service.get_user_profile('user1')
+    """ 템플릿 전역에서 사용할 기본 정보 전달 (로그아웃 세션 상태 판별) """
+    if session.get('logged_out'):
+        current_user = None
+    else:
+        # 로그인 기본 세션 유지
+        if 'user_id' not in session:
+            session['user_id'] = 'user1'
+            session['last_activity'] = datetime.datetime.now().timestamp()
+        profile_data = service.get_user_profile(session.get('user_id', 'user1'))
+        current_user = profile_data.get('user_info', {})
+
     return {
         'contests': service.get_contests(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
-        'current_user': profile_data.get('user_info', {})
+        'current_user': current_user,
+        'is_logged_in': bool(current_user)
     }
+
+# --- 로그인 / 로그아웃 라우트 ---
+
+@app.route('/logout')
+@app.route('/api/logout', methods=['GET', 'POST'])
+def logout():
+    """ 사용자 로그아웃 처리 (세션 소멸 및 초기화) """
+    session.clear()
+    session['logged_out'] = True
+    if request.is_json or request.path.startswith('/api'):
+        return jsonify({'success': True, 'message': '로그아웃되었습니다.'})
+    return redirect(url_for('index'))
+
+@app.route('/login')
+def login():
+    """ 데모용 로그인 처리 (재로그인) """
+    session.clear()
+    session['user_id'] = 'user1'
+    session['last_activity'] = datetime.datetime.now().timestamp()
+    return redirect(url_for('profile'))
+
 
 def is_mobile_user_agent():
     """ 클라이언트 User-Agent를 판별하여 모바일 기기 접속 여부 반환 """
