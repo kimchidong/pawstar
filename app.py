@@ -64,9 +64,11 @@ def finalize_temp_profile_image(avatar_icon):
 @app.context_processor
 def inject_global_vars():
     """ 템플릿 전역에서 사용할 기본 정보 전달 """
+    profile_data = service.get_user_profile('user1')
     return {
         'contests': service.get_contests(),
-        'app_slogan': '반려동물도 스타가 될 수 있다.'
+        'app_slogan': '반려동물도 스타가 될 수 있다.',
+        'current_user': profile_data.get('user_info', {})
     }
 
 def is_mobile_user_agent():
