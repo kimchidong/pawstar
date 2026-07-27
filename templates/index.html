@@ -85,11 +85,11 @@
                 
                 <!-- 랭킹 배지 -->
                 {% if loop.index == 1 and sort_type == 'popular' %}
-                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-crown"></i> 1위 (슈퍼스타 후보)</div>
+                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-crown"></i> 1위 후보</div>
                 {% elif loop.index == 2 and sort_type == 'popular' %}
-                    <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 (라이징스타 후보)</div>
+                    <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>
                 {% elif loop.index == 3 and sort_type == 'popular' %}
-                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-award"></i> 3위 (브라이트스타 후보)</div>
+                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-award"></i> 3위 후보</div>
                 {% endif %}
             </div>
 
