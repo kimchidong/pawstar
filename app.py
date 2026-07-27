@@ -3,11 +3,63 @@ Paw Star - Python Flask Web Application
 슬로건: "반려동물도 스타가 될 수 있다."
 """
 
+import os
+import datetime
+import uuid
+import shutil
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from werkzeug.utils import secure_filename
 from services.contest_service import service
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pawstar_secret_key_2026'
+
+def finalize_temp_profile_image(avatar_icon):
+    """
+    /static/image/temp/profile/ 경로에 있는 임시 프로필 이미지를
+    영구 저장 디렉터리 /static/image/profile/{YYYY}/{MM}/ 로 이동합니다. (plamodelshop 동일 구조)
+    """
+    if not avatar_icon or not isinstance(avatar_icon, str) or not (avatar_icon.startswith("/static/image/temp/profile/") or avatar_icon.startswith("/static/image/temp/")):
+        return avatar_icon
+
+    now = datetime.datetime.now()
+    year_str = now.strftime("%Y")
+    month_str = now.strftime("%m")
+    
+    perm_dir = os.path.join(app.root_path, 'static', 'image', 'profile', year_str, month_str)
+    temp_dir = os.path.join(app.root_path, 'static', 'image', 'temp', 'profile')
+
+    filename = os.path.basename(avatar_icon)
+    clean_name = filename[5:] if filename.startswith("temp_") else filename
+    perm_filename = f"profile_{clean_name}" if not clean_name.startswith("profile_") else clean_name
+
+    src_file = os.path.join(temp_dir, filename)
+    if not os.path.exists(src_file):
+        old_temp = os.path.join(app.root_path, 'static', 'image', 'temp', filename)
+        if os.path.exists(old_temp):
+            src_file = old_temp
+
+    if not os.path.exists(perm_dir):
+        os.makedirs(perm_dir, exist_ok=True)
+
+    dest_file = os.path.join(perm_dir, perm_filename)
+    if os.path.exists(src_file):
+        shutil.move(src_file, dest_file)
+
+    thumb_filename = filename.replace(".webp", "_thumb.webp")
+    perm_thumb_filename = perm_filename.replace(".webp", "_thumb.webp")
+    src_thumb = os.path.join(temp_dir, thumb_filename)
+    if not os.path.exists(src_thumb):
+        old_thumb = os.path.join(app.root_path, 'static', 'image', 'temp', thumb_filename)
+        if os.path.exists(old_thumb):
+            src_thumb = old_thumb
+
+    dest_thumb = os.path.join(perm_dir, perm_thumb_filename)
+    if os.path.exists(src_thumb):
+        shutil.move(src_thumb, dest_thumb)
+
+    return f"/static/image/profile/{year_str}/{month_str}/{perm_filename}"
+
 
 @app.context_processor
 def inject_global_vars():
@@ -81,7 +133,55 @@ def profile():
         my_awards=profile_data['my_awards']
     )
 
-# 4-1. 프로필 수정 API
+# 4-1. 프로필 이미지 임시 업로드 API (plamodelshop 호환)
+@app.route('/upload/profile', methods=['POST'])
+def upload_profile():
+    if 'profile_img' not in request.files:
+        return jsonify({"success": False, "message": "업로드할 파일이 존재하지 않습니다."}), 400
+    file = request.files['profile_img']
+    if file.filename == '':
+        return jsonify({"success": False, "message": "선택된 파일이 없습니다."}), 400
+    
+    if file:
+        now = datetime.datetime.now()
+        temp_dir = os.path.join(app.root_path, 'static', 'image', 'temp', 'profile')
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir, exist_ok=True)
+            
+        filename = secure_filename(file.filename)
+        base, ext = os.path.splitext(filename)
+        unique_name = f"temp_profile_{int(now.timestamp())}_{uuid.uuid4().hex[:8]}.webp"
+        
+        file_path = os.path.join(temp_dir, unique_name)
+        try:
+            from PIL import Image
+            image = Image.open(file.stream)
+            if image.mode in ("RGBA", "P"):
+                image = image.convert("RGBA")
+            
+            # 1. 원본 이미지 리사이징 (Max 600x600)
+            main_image = image.copy()
+            main_image.thumbnail((600, 600), getattr(Image, 'Resampling', Image).LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
+            main_image.save(file_path, "WEBP", quality=90)
+
+            # 2. 썸네일 리사이징 (Max 120x120)
+            thumb_path = file_path.replace(".webp", "_thumb.webp")
+            thumb_image = image.copy()
+            thumb_image.thumbnail((120, 120), getattr(Image, 'Resampling', Image).LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
+            thumb_image.save(thumb_path, "WEBP", quality=85)
+        except Exception as err:
+            print(f"[PIL Warning] PIL image processing fallback: {err}")
+            file.seek(0)
+            file.save(file_path)
+            thumb_path = file_path.replace(".webp", "_thumb.webp")
+            file.seek(0)
+            file.save(thumb_path)
+
+        
+        web_url = f"/static/image/temp/profile/{unique_name}"
+        return jsonify({"success": True, "url": web_url})
+
+# 4-2. 프로필 수정 API
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
     data = request.json or {}
@@ -90,8 +190,13 @@ def api_profile_update():
     bio = data.get('bio')
     profile_img = data.get('profile_img')
 
+    # 임시 저장 디렉터리에 있는 경우 최종 static/image/profile/YYYY/MM 디렉터리로 이동
+    if profile_img:
+        profile_img = finalize_temp_profile_image(profile_img)
+
     updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, bio=bio, profile_img=profile_img)
     return jsonify({'success': True, 'message': '프로필 정보가 수정되었습니다.', 'data': updated_user})
+
 
 # 5. 배치 & 관리자 (회차 종료 및 수상자 선정 배치 시뮬레이션)
 @app.route('/admin')

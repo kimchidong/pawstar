@@ -569,7 +569,7 @@ body {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--accent-purple);
+    border: 1px solid var(--border-light);
 }
 
 .author-detail .nickname {
@@ -762,8 +762,8 @@ body {
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--accent-purple);
-    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .badge-tag {
