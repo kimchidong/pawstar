@@ -149,6 +149,69 @@ class PawStarService:
         for p in sample_posts:
             self.posts[p['post_id']] = p
 
+        # 123개 샘플 데이터 자동 팽창 세팅 (페이징 테스트용)
+        pet_templates = [
+            ('🐕 강아지', ['뽀삐', '초코', '해피', '몽이', '두부', '코코', '마루', '보리', '망고', '콩이'], 
+             ['스마일 천사', '산책 대장', '개구쟁이 일상', '세상에서 제일 귀여운 점프', '간식 보고 눈 똥그래진 순간'],
+             ['https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
+              'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
+              'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80']),
+            ('🐈 고양이', ['나비', '야옹이', '치즈', '까망이', '루시', '미유', '네로', '쿠키', '라떼', '모카'],
+             ['식빵 굽기의 정석', '박스 사수 작전', '캣타워 정상 정복', '애교 폭발 순간', '골골송 라이브'],
+             ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+              'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=800&q=80',
+              'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=800&q=80']),
+            ('🐹 햄스터', ['모찌', '볼빵이', '해바라기', '햄찌', '치즈볼', '모찌모찌'],
+             ['볼에 해바라기씨 20개 저장', '쳇바퀴 마라톤 선수', '쿨쿨 자는 모습', '야식 먹방 귀요미'],
+             ['https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80']),
+            ('🦜 앵무새', ['앵두', '파랑이', '피코', '체리', '날개'],
+             ['노래 부르는 흥부자', '주인 어깨 위 껌딱지', '반짝이는 눈망울 자랑', '화려한 깃털 자랑'],
+             ['https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80']),
+            ('🐾 기타', ['토토', '바니', '거북이', '도마뱀'],
+             ['당근 맛나게 뇸뇸', '느림의 미학 힐링', '귀여운 일상 컷'],
+             ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=800&q=80'])
+        ]
+
+        user_ids = ['user1', 'user2', 'user3', 'user4']
+        
+        # 총 123개 생성 (105 ~ 227 = 123개)
+        for idx in range(105, 228):
+            p_type, p_names, p_titles, p_imgs = pet_templates[idx % len(pet_templates)]
+            p_name = p_names[idx % len(p_names)]
+            p_title_prefix = p_titles[idx % len(p_titles)]
+            u_id = user_ids[idx % len(user_ids)]
+            img_url = p_imgs[idx % len(p_imgs)]
+            
+            # 생성 날짜 및 점수 무작위 부여
+            day_offset = (idx % 25) + 1
+            hour = (idx % 12) + 9
+            minute = (idx * 7) % 60
+            c_date = f"2026-07-{day_offset:02d} {hour:02d}:{minute:02d}:00"
+            
+            views = 100 + (idx * 17) % 800
+            likes = 20 + (idx * 11) % 200
+            comments = 5 + (idx * 3) % 50
+            shares = 1 + (idx * 2) % 20
+            calc_score = (views * 1) + (likes * 5) + (comments * 10) + (shares * 20)
+
+            self.posts[idx] = {
+                'post_id': idx,
+                'user_id': u_id,
+                'contest_id': 3, # 진행중 콘테스트
+                'pet_name': p_name,
+                'pet_type': p_type,
+                'title': f"{p_name}의 {p_title_prefix}! ({idx}호)",
+                'content': f"안녕하세요! 귀여운 {p_name}의 일상 자랑입니다. 많이 많이 응원해주세요 🐾",
+                'media_url': img_url,
+                'media_type': 'IMAGE',
+                'score': calc_score,
+                'view_count': views,
+                'like_count': likes,
+                'comment_count': comments,
+                'share_count': shares,
+                'created_at': c_date
+            }
+
         # 30일간의 POST_DAILY_STAT 데이터 시뮬레이션 생성
         today = datetime.now().date()
         for post_id in self.posts:
@@ -252,7 +315,7 @@ class PawStarService:
     def get_contest(self, contest_id):
         return self._attach_d_day(self.contests.get(int(contest_id)))
 
-    def get_posts(self, contest_id=3, sort_type='latest', search_query='', pet_type='all'):
+    def get_posts(self, contest_id=3, sort_type='latest', search_query='', pet_type='all', page=1, per_page=12):
         """
         sort_type:
         - 'latest': 최신 등록순 ORDER BY created_at DESC (기본값)
@@ -294,7 +357,21 @@ class PawStarService:
         elif sort_type == 'latest':
             result.sort(key=lambda x: x['created_at'], reverse=True)
 
-        return result
+        # 페이징 슬라이싱
+        total_count = len(result)
+        total_pages = max(1, (total_count + per_page - 1) // per_page)
+        page = max(1, min(page, total_pages))
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_posts = result[start_idx:end_idx]
+
+        return {
+            'posts': paginated_posts,
+            'page': page,
+            'per_page': per_page,
+            'total_count': total_count,
+            'total_pages': total_pages
+        }
 
     def _calculate_30day_trending_score(self, post_id):
         today = datetime.now().date()

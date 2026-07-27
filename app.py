@@ -24,14 +24,16 @@ def index():
     sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
+    page = request.args.get('page', 1, type=int)
 
     current_contest = service.get_contest(contest_id)
-    posts = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12)
 
     return render_template(
         'index.html',
         current_contest=current_contest,
-        posts=posts,
+        posts=paginated_res['posts'],
+        pagination=paginated_res,
         sort_type=sort_type,
         search_q=search_q,
         pet_type=pet_type
@@ -54,13 +56,15 @@ def hall_of_fame():
 @app.route('/trending')
 def trending():
     contest_id = request.args.get('contest_id', 3, type=int)
-    posts = service.get_posts(contest_id=contest_id, sort_type='trending')
+    page = request.args.get('page', 1, type=int)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10)
     current_contest = service.get_contest(contest_id)
 
     return render_template(
         'trending.html',
         current_contest=current_contest,
-        posts=posts
+        posts=paginated_res['posts'],
+        pagination=paginated_res
     )
 
 # 4. 프로필 (plamodelshop 회원관리 방식과 동일)

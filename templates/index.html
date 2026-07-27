@@ -139,6 +139,41 @@
     {% endfor %}
 </div>
 
+<!-- Pagination UI Control (페이지네이션 컨트롤) -->
+{% if pagination.total_pages > 1 %}
+<div class="pagination-wrapper">
+    <div class="pagination-info">
+        총 <strong>{{ "{:,}".format(pagination.total_count) }}</strong>개의 출전 작품 ({{ pagination.page }} / {{ pagination.total_pages }} 페이지)
+    </div>
+    <div class="pagination">
+        <!-- 이전 페이지 -->
+        {% if pagination.page > 1 %}
+            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page - 1 }}" class="page-link prev">
+                <i class="fa-solid fa-chevron-left"></i> 이전
+            </a>
+        {% endif %}
+
+        <!-- 페이지 번호 목록 -->
+        {% for p_num in range(1, pagination.total_pages + 1) %}
+            {% if p_num == pagination.page %}
+                <span class="page-link active">{{ p_num }}</span>
+            {% elif p_num <= 5 or p_num >= pagination.total_pages - 1 or (p_num >= pagination.page - 2 and p_num <= pagination.page + 2) %}
+                <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ p_num }}" class="page-link">{{ p_num }}</a>
+            {% elif p_num == 6 and pagination.page > 7 %}
+                <span class="page-ellipsis">...</span>
+            {% endif %}
+        {% endfor %}
+
+        <!-- 다음 페이지 -->
+        {% if pagination.page < pagination.total_pages %}
+            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page + 1 }}" class="page-link next">
+                다음 <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <!-- Score Evaluation Metric Guide (점수 평가방식 공개 안내 - 목록 하단 배치) -->
 <div class="score-metric-banner">
     <div class="metric-title">
