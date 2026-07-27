@@ -103,10 +103,15 @@ body {
 }
 
 .brand-text h1 {
-    font-size: 1.5rem;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: var(--text-primary);
+    font-family: 'Pacifico', 'Dancing Script', cursive;
+    font-size: 1.95rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.25));
+    line-height: 1.1;
 }
 
 .brand-text span {
