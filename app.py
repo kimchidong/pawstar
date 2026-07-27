@@ -54,7 +54,7 @@ def inject_global_vars():
         'contests': service.get_contests(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
-        'is_logged_in': True
+        'is_logged_in': not session.get('logged_out', False)
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
