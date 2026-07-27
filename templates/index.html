@@ -83,13 +83,13 @@
             <div class="card-media">
                 <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
                 
-                <!-- 랭킹 배지 -->
-                {% if loop.index == 1 and sort_type == 'popular' %}
-                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-crown"></i> 1위 후보</div>
-                {% elif loop.index == 2 and sort_type == 'popular' %}
+                <!-- 랭킹 배지 (실시간 점수 SCORE 기준 1~3위 게시물에 배지 표시) -->
+                {% if p.rank_candidate == 1 %}
+                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
+                {% elif p.rank_candidate == 2 %}
                     <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>
-                {% elif loop.index == 3 and sort_type == 'popular' %}
-                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-award"></i> 3위 후보</div>
+                {% elif p.rank_candidate == 3 %}
+                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>
                 {% endif %}
             </div>
 

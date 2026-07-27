@@ -349,6 +349,12 @@ class PawStarService:
             item['badges'] = user_info.get('badges', [])
             result.append(item)
 
+        # 실시간 Score 점수 기준 1위, 2위, 3위 후보 부여
+        score_sorted = sorted(result, key=lambda x: x['score'], reverse=True)
+        top_score_ids = {p['post_id']: i + 1 for i, p in enumerate(score_sorted[:3])}
+        for item in result:
+            item['rank_candidate'] = top_score_ids.get(item['post_id'])
+
         # 정렬 수행
         if sort_type == 'popular':
             result.sort(key=lambda x: x['score'], reverse=True)
