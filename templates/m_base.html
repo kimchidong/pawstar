@@ -52,7 +52,7 @@
         </a>
         <a href="/m/profile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
             {% if current_user and current_user.profile_img %}
-                <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: {{ '2px solid #ff6b00' if is_logged_in else '1px solid var(--border-light)' }};">
+                <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b00;">
             {% else %}
                 <i class="fa-solid fa-user-astronaut"></i>
             {% endif %}
@@ -136,7 +136,149 @@
         </div>
     </div>
 
+    <!-- 모바일 로그인 & 회원가입 바텀시트 모달 -->
+    <div class="m-modal-backdrop" id="mAuthModal">
+        <div class="m-modal-sheet" style="padding: 1.5rem 1.25rem;">
+            <div class="m-modal-header">
+                <h3 id="mAuthModalTitle">🔑 회원 로그인</h3>
+                <button type="button" class="btn-close" id="mBtnCloseAuth">&times;</button>
+            </div>
+
+            <!-- 탭 스위치 -->
+            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.2rem; margin-bottom: 1rem; border: 1px solid var(--border-light);">
+                <button type="button" id="mTabLoginBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: var(--gradient-brand); color: #fff;">로그인</button>
+                <button type="button" id="mTabRegisterBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: transparent; color: var(--text-secondary);">회원가입</button>
+            </div>
+
+            <!-- 로그인 폼 -->
+            <form id="mLoginForm">
+                <div class="m-form-group">
+                    <label>회원 아이디</label>
+                    <input type="text" id="mLoginUserId" class="m-form-control" placeholder="아이디 입력 (예: user1)" required>
+                </div>
+                <div class="m-form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="mLoginPassword" class="m-form-control" placeholder="비밀번호 입력 (기본: 1234)" required>
+                </div>
+                <button type="submit" class="m-btn-submit">🚀 로그인 하기</button>
+            </form>
+
+            <!-- 회원가입 폼 -->
+            <form id="mRegisterForm" style="display: none;">
+                <div class="m-form-group">
+                    <label>희망 아이디</label>
+                    <input type="text" id="mRegUserId" class="m-form-control" placeholder="아이디 입력" required>
+                </div>
+                <div class="m-form-group">
+                    <label>집사 닉네임</label>
+                    <input type="text" id="mRegNickname" class="m-form-control" placeholder="멋진 닉네임" required>
+                </div>
+                <div class="m-form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="mRegPassword" class="m-form-control" placeholder="비밀번호 입력" required>
+                </div>
+                <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">✨ 회원가입 시작하기</button>
+            </form>
+        </div>
+    </div>
+
     <!-- 모바일 전용 JS (m_main.js) -->
     <script src="{{ url_for('static', filename='js/m_main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mBtnOpenAuthNav = document.getElementById('mBtnOpenAuthNav');
+        const mAuthModal = document.getElementById('mAuthModal');
+        const mBtnCloseAuth = document.getElementById('mBtnCloseAuth');
+        const mTabLoginBtn = document.getElementById('mTabLoginBtn');
+        const mTabRegisterBtn = document.getElementById('mTabRegisterBtn');
+        const mLoginForm = document.getElementById('mLoginForm');
+        const mRegisterForm = document.getElementById('mRegisterForm');
+        const mAuthModalTitle = document.getElementById('mAuthModalTitle');
+
+        if (mBtnOpenAuthNav && mAuthModal) {
+            mBtnOpenAuthNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                mAuthModal.classList.add('active');
+            });
+        }
+
+        if (mBtnCloseAuth && mAuthModal) {
+            mBtnCloseAuth.addEventListener('click', function() {
+                mAuthModal.classList.remove('active');
+            });
+        }
+
+        if (mTabLoginBtn && mTabRegisterBtn) {
+            mTabLoginBtn.addEventListener('click', function() {
+                mTabLoginBtn.style.background = 'var(--gradient-brand)';
+                mTabLoginBtn.style.color = '#fff';
+                mTabRegisterBtn.style.background = 'transparent';
+                mTabRegisterBtn.style.color = 'var(--text-secondary)';
+                mLoginForm.style.display = 'block';
+                mRegisterForm.style.display = 'none';
+                mAuthModalTitle.textContent = '🔑 회원 로그인';
+            });
+
+            mTabRegisterBtn.addEventListener('click', function() {
+                mTabRegisterBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                mTabRegisterBtn.style.color = '#fff';
+                mTabLoginBtn.style.background = 'transparent';
+                mTabLoginBtn.style.color = 'var(--text-secondary)';
+                mRegisterForm.style.display = 'block';
+                mLoginForm.style.display = 'none';
+                mAuthModalTitle.textContent = '✨ 신규 회원가입';
+            });
+        }
+
+        // 모바일 로그인 제출
+        if (mLoginForm) {
+            mLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('mLoginUserId').value.trim();
+                const password = document.getElementById('mLoginPassword').value.trim();
+
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user_id, password: password })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('로그인 실패: ' + data.message);
+                    }
+                });
+            });
+        }
+
+        // 모바일 회원가입 제출
+        if (mRegisterForm) {
+            mRegisterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('mRegUserId').value.trim();
+                const nickname = document.getElementById('mRegNickname').value.trim();
+                const password = document.getElementById('mRegPassword').value.trim();
+
+                fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user_id, nickname: nickname, password: password })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('회원가입 실패: ' + data.message);
+                    }
+                });
+            });
+        }
+    });
+    </script>
 </body>
 </html>

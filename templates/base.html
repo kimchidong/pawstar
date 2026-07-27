@@ -37,7 +37,7 @@
                 <li class="nav-item">
                     <a href="/profile" class="{{ 'active' if request.path == '/profile' }}">
                         {% if current_user and current_user.profile_img %}
-                            <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: {{ '2px solid #ff6b00' if is_logged_in else '1px solid var(--border-light)' }}; vertical-align: middle;">
+                            <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b00; vertical-align: middle;">
                         {% else %}
                             <i class="fa-solid fa-user-astronaut"></i>
                         {% endif %}
@@ -230,7 +230,193 @@
         </div>
     </div>
 
+    <!-- 회원가입 & 로그인 레이어 팝업 모달 (Auth Modal - plamodelshop 호환) -->
+    <div class="modal-backdrop" id="authModal">
+        <div class="modal-content" style="max-width: 440px; padding: 2rem;">
+            <div class="modal-header" style="margin-bottom: 1rem;">
+                <h3 id="authModalTitle">🔑 회원 로그인</h3>
+                <button type="button" class="btn-close" id="btnCloseAuthModal">&times;</button>
+            </div>
+
+            <!-- 탭 스위치 (로그인 / 회원가입) -->
+            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.25rem; margin-bottom: 1.25rem; border: 1px solid var(--border-light);">
+                <button type="button" id="tabLoginBtn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.9rem; cursor: pointer; background: var(--gradient-brand); color: #fff;">로그인</button>
+                <button type="button" id="tabRegisterBtn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.9rem; cursor: pointer; background: transparent; color: var(--text-secondary);">회원가입</button>
+            </div>
+
+            <!-- 1. 로그인 폼 -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>회원 아이디</label>
+                    <input type="text" id="loginUserId" class="form-control" placeholder="아이디 입력 (예: user1)" required>
+                </div>
+                <div class="form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="비밀번호 입력 (기본: 1234)" required>
+                </div>
+                <button type="submit" class="btn-save-profile" style="margin-top: 1rem;">
+                    🚀 로그인 하기
+                </button>
+            </form>
+
+            <!-- 2. 회원가입 폼 -->
+            <form id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label>희망 아이디</label>
+                    <input type="text" id="regUserId" class="form-control" placeholder="아이디 입력" required>
+                </div>
+                <div class="form-group">
+                    <label>집사 닉네임</label>
+                    <input type="text" id="regNickname" class="form-control" placeholder="멋진 닉네임" required>
+                </div>
+                <div class="form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="regPassword" class="form-control" placeholder="비밀번호 입력" required>
+                </div>
+                <div class="form-group">
+                    <label>프로필 이미지 (선택)</label>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
+                        <img id="regProfilePreview" src="/static/image/profile/default_profile.png" alt="미리보기" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;">
+                        <div style="flex: 1;">
+                            <input type="file" id="regProfileFile" class="form-control" accept="image/*" style="font-size: 0.8rem;">
+                            <input type="hidden" id="regProfileImg" value="">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-save-profile" style="margin-top: 1rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                    ✨ 회원가입 및 시작하기
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnOpenAuth = document.getElementById('btnOpenAuthModal');
+        const authModal = document.getElementById('authModal');
+        const btnCloseAuth = document.getElementById('btnCloseAuthModal');
+        const tabLoginBtn = document.getElementById('tabLoginBtn');
+        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const authModalTitle = document.getElementById('authModalTitle');
+
+        if (btnOpenAuth && authModal) {
+            btnOpenAuth.addEventListener('click', function(e) {
+                e.preventDefault();
+                authModal.classList.add('show');
+            });
+        }
+
+        if (btnCloseAuth && authModal) {
+            btnCloseAuth.addEventListener('click', function() {
+                authModal.classList.remove('show');
+            });
+        }
+
+        if (tabLoginBtn && tabRegisterBtn) {
+            tabLoginBtn.addEventListener('click', function() {
+                tabLoginBtn.style.background = 'var(--gradient-brand)';
+                tabLoginBtn.style.color = '#fff';
+                tabRegisterBtn.style.background = 'transparent';
+                tabRegisterBtn.style.color = 'var(--text-secondary)';
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                authModalTitle.textContent = '🔑 회원 로그인';
+            });
+
+            tabRegisterBtn.addEventListener('click', function() {
+                tabRegisterBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                tabRegisterBtn.style.color = '#fff';
+                tabLoginBtn.style.background = 'transparent';
+                tabLoginBtn.style.color = 'var(--text-secondary)';
+                registerForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                authModalTitle.textContent = '✨ 신규 회원가입';
+            });
+        }
+
+        // 회원가입 프로필 이미지 업로드
+        const regProfileFile = document.getElementById('regProfileFile');
+        if (regProfileFile) {
+            regProfileFile.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('profile_img', file);
+
+                fetch('/upload/profile', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('regProfileImg').value = data.url;
+                        document.getElementById('regProfilePreview').src = data.url;
+                    }
+                });
+            });
+        }
+
+        // 로그인 제출
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('loginUserId').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user_id, password: password })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('로그인 실패: ' + data.message);
+                    }
+                });
+            });
+        }
+
+        // 회원가입 제출
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('regUserId').value.trim();
+                const nickname = document.getElementById('regNickname').value.trim();
+                const password = document.getElementById('regPassword').value.trim();
+                const profile_img = document.getElementById('regProfileImg').value.trim();
+
+                fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        nickname: nickname,
+                        password: password,
+                        profile_img: profile_img
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('회원가입 실패: ' + data.message);
+                    }
+                });
+            });
+        }
+    });
+    </script>
 </body>
 </html>

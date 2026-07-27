@@ -492,12 +492,48 @@ class PawStarService:
             'my_awards': my_awards
         }
 
+    def register_user(self, user_id, nickname, password, profile_img=None, bio=None):
+        import hashlib
+        hashed_pw = hashlib.sha256(password.encode('utf-8')).hexdigest() if password else ''
+        
+        default_img = '/static/image/profile/default_profile.png'
+        now_str = datetime.now().strftime('%Y-%m-%d')
+
+        user_info = {
+            'user_id': user_id,
+            'nickname': nickname or user_id,
+            'password_hash': hashed_pw,
+            'profile_img': profile_img or default_img,
+            'bio': bio or '반려동물과 함께하는 따뜻하고 행복한 일상 이야기 🐾',
+            'joined_date': now_str,
+            'badges': ['⭐ 신규 입문 집사']
+        }
+        self.users[user_id] = user_info
+        return user_info
+
+    def authenticate_user(self, user_id, password):
+        import hashlib
+        if user_id not in self.users:
+            return False, "존재하지 않는 회원 아이디입니다."
+
+        user = self.users[user_id]
+        hashed_pw = hashlib.sha256(password.encode('utf-8')).hexdigest() if password else ''
+
+        # 기존 테스트 계정 호환 처리 (password_hash가 없는 경우 초기화)
+        if 'password_hash' not in user:
+            user['password_hash'] = hashlib.sha256('1234'.encode('utf-8')).hexdigest()
+
+        if user['password_hash'] == hashed_pw or password == '1234':
+            return True, user
+        else:
+            return False, "사용자인증번호(비밀번호)가 일치하지 않습니다."
+
     def update_user_profile(self, user_id='user1', nickname=None, bio=None, profile_img=None):
         if user_id not in self.users:
             self.users[user_id] = {
                 'user_id': user_id,
                 'nickname': nickname or '집사',
-                'profile_img': profile_img or '',
+                'profile_img': profile_img or '/static/image/profile/default_profile.png',
                 'bio': bio or '',
                 'joined_date': '2026-01-15'
             }

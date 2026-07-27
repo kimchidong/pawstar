@@ -14,78 +14,39 @@ from services.contest_service import service
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pawstar_secret_key_2026'
 
-# 브라우저 닫을 시 세션 쿠키 소멸 & 30분 비활동 시 자동 로그아웃 설정 (plamodelshop 방식)
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
-app.config['SESSION_COOKIE_HTTPONLY'] = True
+import random
 
 @app.before_request
 def check_session_timeout():
     """ 30분 동안 웹 서비스 이용(요청)이 없거나 세션 만료 시 자동 로그아웃 처리 """
-    # 브라우저 닫힘(Session Cookie) & 30분 미활동 체킹
     now_ts = datetime.datetime.now().timestamp()
     last_act = session.get('last_activity')
 
     if session.get('user_id') and last_act:
-        # 30분(1800초) 이상 비활동일 경우 자동 로그아웃
         if now_ts - last_act > 1800:
             session.clear()
             session['logged_out_reason'] = 'timeout'
         else:
             session['last_activity'] = now_ts
-    elif session.get('user_id'):
-        session['last_activity'] = now_ts
 
-def finalize_temp_profile_image(avatar_icon):
-    """
-    /static/image/temp/profile/ 경로에 있는 임시 프로필 이미지를
-    영구 저장 디렉터리 /static/image/profile/{YYYY}/{MM}/ 로 이동합니다. (plamodelshop 동일 구조)
-    """
-    if not avatar_icon or not isinstance(avatar_icon, str) or not (avatar_icon.startswith("/static/image/temp/profile/") or avatar_icon.startswith("/static/image/temp/")):
-        return avatar_icon
-
-    now = datetime.datetime.now()
-    year_str = now.strftime("%Y")
-    month_str = now.strftime("%m")
-    
-    perm_dir = os.path.join(app.root_path, 'static', 'image', 'profile', year_str, month_str)
-    temp_dir = os.path.join(app.root_path, 'static', 'image', 'temp', 'profile')
-
-    filename = os.path.basename(avatar_icon)
-    clean_name = filename[5:] if filename.startswith("temp_") else filename
-    perm_filename = f"profile_{clean_name}" if not clean_name.startswith("profile_") else clean_name
-
-    src_file = os.path.join(temp_dir, filename)
-    if not os.path.exists(src_file):
-        old_temp = os.path.join(app.root_path, 'static', 'image', 'temp', filename)
-        if os.path.exists(old_temp):
-            src_file = old_temp
-
-    if not os.path.exists(perm_dir):
-        os.makedirs(perm_dir, exist_ok=True)
-
-    dest_file = os.path.join(perm_dir, perm_filename)
-    if os.path.exists(src_file):
-        shutil.move(src_file, dest_file)
-
-    thumb_filename = filename.replace(".webp", "_thumb.webp")
-    perm_thumb_filename = perm_filename.replace(".webp", "_thumb.webp")
-    src_thumb = os.path.join(temp_dir, thumb_filename)
-    if not os.path.exists(src_thumb):
-        old_thumb = os.path.join(app.root_path, 'static', 'image', 'temp', thumb_filename)
-        if os.path.exists(old_thumb):
-            src_thumb = old_thumb
-
-    dest_thumb = os.path.join(perm_dir, perm_thumb_filename)
-    if os.path.exists(src_thumb):
-        shutil.move(src_thumb, dest_thumb)
-
-    return f"/static/image/profile/{year_str}/{month_str}/{perm_filename}"
-
+def ensure_auto_user():
+    """ 사이트 최초 접근 시 UUID 아이디 자동 생성 및 무작위 닉네임 자동 회원가입 """
+    if 'user_id' not in session or session.get('logged_out'):
+        auto_uuid = f"user_{uuid.uuid4().hex[:8]}"
+        nick_prefixes = ['행복한', '귀여운', '사랑스러운', '미소지음', '심쿵', '따스한', '신난', '포근한']
+        nick_animals = ['집사', '뽀삐집사', '냥이집사', '모찌집사', '앵두집사', '반려인', '마스터']
+        random_nick = f"{random.choice(nick_prefixes)} {random.choice(nick_animals)} {random.randint(100, 999)}"
+        
+        service.register_user(auto_uuid, random_nick, '1234', '/static/image/profile/default_profile.png')
+        session['user_id'] = auto_uuid
+        session['last_activity'] = datetime.datetime.now().timestamp()
+        session.pop('logged_out', None)
+    return session.get('user_id')
 
 @app.context_processor
 def inject_global_vars():
-    """ 템플릿 전역에서 사용할 기본 회원 프로필 정보 전달 (로그아웃 후에도 프로필 이미지 및 닉네임 상시 유효 유지) """
-    user_id = session.get('user_id', 'user1')
+    """ 템플릿 전역에서 사용할 기본 회원 프로필 정보 전달 """
+    user_id = ensure_auto_user()
     profile_data = service.get_user_profile(user_id)
     current_user = profile_data.get('user_info', {})
 
@@ -93,7 +54,7 @@ def inject_global_vars():
         'contests': service.get_contests(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
-        'is_logged_in': not session.get('logged_out', False)
+        'is_logged_in': True
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
@@ -101,21 +62,62 @@ def inject_global_vars():
 @app.route('/logout')
 @app.route('/api/logout', methods=['GET', 'POST'])
 def logout():
-    """ 사용자 로그아웃 처리 (세션 초기화 및 기본 프로필 유지) """
+    """ 사용자 로그아웃 처리 """
     session.clear()
-    session['user_id'] = 'user1'
     session['logged_out'] = True
     if request.is_json or request.path.startswith('/api'):
-        return jsonify({'success': True, 'message': '로그아웃되었습니다.'})
+        return jsonify({'success': True, 'message': '성공적으로 로그아웃되었습니다.'})
     return redirect(url_for('index'))
 
-@app.route('/login')
-def login():
-    """ 데모용 로그인 처리 (재로그인) """
+@app.route('/api/auth/login', methods=['POST'])
+def api_auth_login():
+    """ 로그인 API (user_id & password) """
+    data = request.json or {}
+    user_id = data.get('user_id', '').strip()
+    password = data.get('password', '').strip()
+
+    if not user_id or not password:
+        return jsonify({'success': False, 'message': '아이디와 사용자인증번호(비밀번호)를 모두 입력해주세요.'}), 400
+
+    success, result = service.authenticate_user(user_id, password)
+    if success:
+        session.clear()
+        session['user_id'] = user_id
+        session['last_activity'] = datetime.datetime.now().timestamp()
+        session.pop('logged_out', None)
+        return jsonify({'success': True, 'message': f'{result["nickname"]}님 환영합니다!', 'user': result})
+    else:
+        return jsonify({'success': False, 'message': result}), 401
+
+@app.route('/api/auth/register', methods=['POST'])
+def api_auth_register():
+    """ 회원가입 및 즉시 로그인 API """
+    data = request.json or {}
+    user_id = data.get('user_id', '').strip()
+    nickname = data.get('nickname', '').strip()
+    password = data.get('password', '').strip()
+    profile_img = data.get('profile_img', '').strip()
+    bio = data.get('bio', '').strip()
+
+    if not user_id or not nickname or not password:
+        return jsonify({'success': False, 'message': '아이디, 닉네임, 사용자인증번호(비밀번호)는 필수 입력 사항입니다.'}), 400
+
+    if user_id in service.users:
+        return jsonify({'success': False, 'message': '이미 사용 중인 아이디입니다.'}), 400
+
+    # 임시 이미지 디렉터리에 있으면 최종 static/image/profile/YYYY/MM 으로 이동
+    if profile_img:
+        profile_img = finalize_temp_profile_image(profile_img)
+
+    new_user = service.register_user(user_id, nickname, password, profile_img, bio)
+
     session.clear()
-    session['user_id'] = 'user1'
+    session['user_id'] = user_id
     session['last_activity'] = datetime.datetime.now().timestamp()
-    return redirect(url_for('profile'))
+    session.pop('logged_out', None)
+
+    return jsonify({'success': True, 'message': '회원가입이 완료되었습니다!', 'user': new_user})
+
 
 
 def is_mobile_user_agent():
