@@ -460,7 +460,6 @@ class PawStarService:
         user_info = self.users.get(user_id, {
             'user_id': user_id,
             'nickname': '귀여운집사',
-            'email': 'pet_lover@pawstar.com',
             'profile_img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
             'bio': '세상 모든 반려동물은 사랑입니다 🐾 매일매일 심쿵!',
             'joined_date': '2026-01-15',

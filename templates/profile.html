@@ -10,9 +10,6 @@
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <h2 style="font-size: 1.8rem; font-weight: 800;" id="currentNickname">{{ user.nickname }}</h2>
-                    <span style="font-size: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-light); padding: 0.25rem 0.75rem; border-radius: 20px; color: var(--accent-purple); font-weight: 700;">
-                        ID: {{ user.user_id }}
-                    </span>
                 </div>
                 <!-- 프로필 정보 수정 버튼 -->
                 <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
@@ -25,8 +22,7 @@
             </p>
 
             <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                <span><i class="fa-regular fa-envelope"></i> {{ user.email or 'pet_lover@pawstar.com' }}</span>
-                <span><i class="fa-regular fa-calendar"></i> 가입일: {{ user.joined_date or '2026-01-15' }}</span>
+                <span><i class="fa-regular fa-calendar"></i> 최초방문일: {{ user.joined_date or '2026-01-15' }}</span>
             </div>
 
             <!-- 보유 배지 목록 -->
@@ -167,9 +163,7 @@
                     <div style="flex: 1;">
                         <input type="file" id="editProfileFile" class="form-control" accept="image/*">
                         <input type="hidden" id="editProfileImg" value="{{ user.profile_img }}">
-                        <div id="uploadStatusText" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
-                            📷 파일 선택 시 임시 저장(static/image/temp/profile)됩니다.
-                        </div>
+                        <div id="uploadStatusText" style="font-size: 0.8rem; margin-top: 0.35rem;"></div>
                     </div>
                 </div>
             </div>
@@ -240,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     profileImgInput.value = data.url;
                     previewImg.src = data.url;
                     statusText.style.color = '#10b981';
-                    statusText.innerHTML = '✨ 임시 업로드 완료 (저장 시 static/image/profile/YYYY/MM 으로 이동)';
+                    statusText.innerHTML = '✨ 이미지 선택 완료';
                 } else {
                     statusText.style.color = '#ef4444';
                     statusText.textContent = '❌ 업로드 실패: ' + (data.message || '오류 발생');
