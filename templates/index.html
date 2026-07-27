@@ -91,11 +91,6 @@
                 {% elif loop.index == 3 and sort_type == 'popular' %}
                     <div class="rank-ribbon rank-3"><i class="fa-solid fa-award"></i> 3위 (브라이트스타 후보)</div>
                 {% endif %}
-
-                <!-- 실시간 Score 표시 -->
-                <div class="score-badge">
-                    <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
-                </div>
             </div>
 
             <div class="card-body">
@@ -104,6 +99,11 @@
                     <div class="author-detail">
                         <div class="nickname">{{ p.user_nickname }}</div>
                         <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
+                    </div>
+
+                    <!-- 총점 (작성자 우측에 자연스럽게 배치) -->
+                    <div class="card-total-score">
+                        <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
                     </div>
                 </div>
 
