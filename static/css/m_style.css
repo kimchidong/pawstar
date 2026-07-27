@@ -49,6 +49,7 @@ body.m-body {
     padding-bottom: calc(var(--bottom-nav-height) + 1rem);
     width: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* 모바일 전용 헤더 */

@@ -52,16 +52,42 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-y: scroll;
+    min-width: 1280px;
+}
+
 body {
     font-family: 'Outfit', 'Noto Sans KR', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
+    min-width: 1280px;
     background-image: 
         radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.06) 0%, transparent 45%),
         radial-gradient(circle at 90% 90%, rgba(225, 29, 72, 0.05) 0%, transparent 45%);
     background-attachment: fixed;
     line-height: 1.6;
+}
+
+/* 브라우저 스크롤바 선명 커스텀 디자인 */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 5px;
+    border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
 }
 
 /* Header & Nav (Light Clean) */
