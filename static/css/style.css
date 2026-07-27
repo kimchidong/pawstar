@@ -256,11 +256,11 @@ body {
     text-shadow: 0 0 10px rgba(254, 240, 138, 0.4);
 }
 
-/* Score Evaluation Metric Guide Banner */
+/* Score Evaluation Metric Guide Banner (Bottom of Post Grid) */
 .score-metric-banner {
     max-width: 1280px;
-    margin: -0.5rem auto 1.5rem auto;
-    padding: 0.85rem 1.5rem;
+    margin: 1.5rem auto 3.5rem auto;
+    padding: 0.9rem 1.5rem;
     background: #ffffff;
     border: 1px solid var(--border-light);
     border-left: 4px solid var(--accent-purple);
