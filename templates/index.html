@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Contest Hero Banner -->
+<div class="contest-hero">
+    <div class="hero-content">
+        <div class="contest-badge">
+            <i class="fa-solid fa-sparkles"></i> {{ current_contest.status }} 콘테스트
+        </div>
+        <h2>{{ current_contest.title }}</h2>
+        <p>{{ current_contest.description }}</p>
+        
+        <div class="contest-meta">
+            <div class="meta-item">
+                <span class="label">시작일</span>
+                <span class="value">{{ current_contest.start_date }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">종료일</span>
+                <span class="value">{{ current_contest.end_date }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">실시간 혜택</span>
+                <span class="value" style="color: var(--accent-gold);">🥇 1위 슈퍼스타 50만원</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter & Search Bar -->
+<div class="filter-bar">
+    <div class="contest-select-group">
+        <label><i class="fa-solid fa-calendar-days"></i> 회차 선택:</label>
+        <select id="contestSelect" class="select-custom">
+            {% for c in contests %}
+                <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
+                    {{ c.title }} ({{ c.status }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- 정렬 탭: 최신등록순, 인기순, 최근 급상승 -->
+    <div class="tab-sort-group">
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
+            <i class="fa-solid fa-fire"></i> 인기순
+        </a>
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=trending&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'trending' }}">
+            <i class="fa-solid fa-bolt"></i> 최근 급상승
+        </a>
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
+            <i class="fa-solid fa-clock"></i> 최신등록순
+        </a>
+    </div>
+
+    <!-- 검색창 -->
+    <div class="search-box">
+        <form method="GET" action="/">
+            <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
+            <input type="hidden" name="sort" value="{{ sort_type }}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" value="{{ search_q }}" placeholder="아이 이름 또는 제목 검색...">
+        </form>
+    </div>
+</div>
+
+<!-- Post Cards Grid -->
+<div class="posts-grid">
+    {% for p in posts %}
+        <div class="post-card" id="post-card-{{ p.post_id }}">
+            <div class="card-media">
+                <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                
+                <!-- 랭킹 배지 -->
+                {% if loop.index == 1 and sort_type == 'popular' %}
+                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-crown"></i> 1위 (슈퍼스타 후보)</div>
+                {% elif loop.index == 2 and sort_type == 'popular' %}
+                    <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 (라이징스타 후보)</div>
+                {% elif loop.index == 3 and sort_type == 'popular' %}
+                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-award"></i> 3위 (브라이트스타 후보)</div>
+                {% endif %}
+
+                <!-- 실시간 Score 표시 -->
+                <div class="score-badge">
+                    <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="author-info">
+                    <img src="{{ p.user_profile }}" class="author-img" alt="profile">
+                    <div class="author-detail">
+                        <div class="nickname">{{ p.user_nickname }}</div>
+                        <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
+                    </div>
+                </div>
+
+                <h3 class="post-title">{{ p.title }}</h3>
+                <p class="post-desc">{{ p.content }}</p>
+
+                <!-- 점수 증가 액션 버튼들 (조회+1, 좋아요+5, 댓글+10, 공유+20) -->
+                <div class="card-actions">
+                    <button type="button" class="action-btn btn-view" onclick="triggerEvent({{ p.post_id }}, 'view')" title="조회수 +1점">
+                        <i class="fa-regular fa-eye"></i>
+                        <span class="view-count">{{ p.view_count }}</span>
+                        <span class="score-plus">+1점</span>
+                    </button>
+                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" title="좋아요 +5점">
+                        <i class="fa-solid fa-heart"></i>
+                        <span class="like-count">{{ p.like_count }}</span>
+                        <span class="score-plus">+5점</span>
+                    </button>
+                    <button type="button" class="action-btn btn-comment" onclick="triggerEvent({{ p.post_id }}, 'comment')" title="댓글 +10점">
+                        <i class="fa-regular fa-comment"></i>
+                        <span class="comment-count">{{ p.comment_count }}</span>
+                        <span class="score-plus">+10점</span>
+                    </button>
+                    <button type="button" class="action-btn btn-share" onclick="triggerEvent({{ p.post_id }}, 'share')" title="공유유입 +20점">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span class="share-count">{{ p.share_count }}</span>
+                        <span class="score-plus">+20점</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-muted);">
+            <i class="fa-solid fa-paw" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p>등록된 게시물이 없거나 검색 결과가 없습니다.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

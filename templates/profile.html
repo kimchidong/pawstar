@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width: 1000px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Profile Card Header -->
+    <div class="profile-card">
+        <img src="{{ user.profile_img }}" class="profile-avatar" alt="user profile">
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.8rem; font-weight: 800;">{{ user.nickname }}</h2>
+                <span style="font-size: 0.8rem; background: var(--bg-glass); border: 1px solid var(--border-glass); padding: 0.2rem 0.6rem; border-radius: 12px; color: var(--accent-gold);">
+                    ID: {{ user.user_id }}
+                </span>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">{{ user.bio }}</p>
+
+            <!-- 보유 배지 목록 (확장성: 배지 시스템 및 수상 이력) -->
+            <div>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">보유 수상 배지 & 칭호</span>
+                {% for b in user.badges %}
+                    <span class="badge-tag">{{ b }}</span>
+                {% else %}
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">아직 획득한 배지가 없습니다.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 내가 출전시킨 자랑 게시물 -->
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-paw" style="color: var(--accent-gold);"></i> 내 펫 출전 게시물 ({{ my_posts|length }})
+    </h3>
+
+    <div class="posts-grid">
+        {% for p in my_posts %}
+            <div class="post-card" id="post-card-{{ p.post_id }}">
+                <div class="card-media">
+                    <img src="{{ p.media_url }}" alt="{{ p.title }}">
+                    <div class="score-badge">
+                        <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="pet-tag" style="margin-bottom: 0.3rem;">{{ p.pet_type }} {{ p.pet_name }}</div>
+                    <h4 class="post-title">{{ p.title }}</h4>
+                    <p class="post-desc">{{ p.content }}</p>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: auto;">
+                        등록일: {{ p.created_at }}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); grid-column: 1 / -1;">아직 등록된 게시물이 없습니다.</p>
+        {% endfor %}
+    </div>
+
+    <!-- 역대 수상 기록 (CONTEST_WINNER) -->
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin: 2rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> 역대 수상 기록 ({{ my_awards|length }})
+    </h3>
+    
+    <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1rem;">
+        {% for a in my_awards %}
+            <div style="padding: 0.8rem; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-weight: 800; color: var(--accent-gold);">제{{ a.contest_id }}회 콘테스트</span> - 
+                    <span style="font-weight: 700;">{{ a.award_type }}</span>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">수상작: {{ a.post_title }}</div>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 700;">
+                    {{ a.prize_name }}
+                </div>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 1rem;">아직 수상 기록이 없습니다.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
