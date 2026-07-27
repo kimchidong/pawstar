@@ -55,7 +55,7 @@ class PawStarService:
             'start_date': '2026-07-01',
             'end_date': '2026-07-31',
             'status': '진행중',
-            'description': '여름맞이 심쿵 반려동물 자랑대회 🏖️ 최고의 귀염둥이를 뽑아주세요!'
+            'description': '세상에서 가장 사랑스러운 우리 아이의 심쿵 모먼트! 🌟 대한민국 대표 펫 스타에 도전하세요!'
         }
         self.contests[2] = {
             'contest_id': 2,
@@ -63,7 +63,7 @@ class PawStarService:
             'start_date': '2026-06-01',
             'end_date': '2026-06-30',
             'status': '종료',
-            'description': '6월 귀여움 폭발 콘테스트 🌟'
+            'description': '매일이 매력 폭발! 최고의 펫 스타를 가리는 콘테스트 🌟'
         }
         self.contests[1] = {
             'contest_id': 1,
