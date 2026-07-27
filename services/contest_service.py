@@ -252,7 +252,7 @@ class PawStarService:
     def get_contest(self, contest_id):
         return self._attach_d_day(self.contests.get(int(contest_id)))
 
-    def get_posts(self, contest_id=3, sort_type='latest', search_query=''):
+    def get_posts(self, contest_id=3, sort_type='latest', search_query='', pet_type='all'):
         """
         sort_type:
         - 'latest': 최신 등록순 ORDER BY created_at DESC (기본값)
@@ -261,6 +261,10 @@ class PawStarService:
         """
         contest_id = int(contest_id)
         filtered = [p for p in self.posts.values() if p['contest_id'] == contest_id]
+
+        # 동물 종류 필터링
+        if pet_type and pet_type != 'all':
+            filtered = [p for p in filtered if pet_type in p['pet_type'] or p['pet_type'] == pet_type]
 
         if search_query:
             q = search_query.lower()

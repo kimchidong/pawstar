@@ -19,6 +19,17 @@ function initEventHandlers() {
         });
     }
 
+    // 동물 종류 선택 변경 이벤트
+    const petTypeSelect = document.getElementById('petTypeSelect');
+    if (petTypeSelect) {
+        petTypeSelect.addEventListener('change', (e) => {
+            const petType = e.target.value;
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('pet_type', petType);
+            window.location.href = currentUrl.toString();
+        });
+    }
+
     // 모달 제어
     const modalBackdrop = document.getElementById('uploadModal');
     const openBtn = document.getElementById('btnOpenModal');

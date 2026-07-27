@@ -30,14 +30,24 @@
 
 <!-- Filter & Search Bar -->
 <div class="filter-bar">
-    <!-- 1. 회차 선택 (좌측) -->
+    <!-- 1. 회차 선택 & 동물종류 선택 (좌측) -->
     <div class="contest-select-group">
-        <select id="contestSelect" class="select-custom">
+        <select id="contestSelect" class="select-custom" title="콘테스트 회차 선택">
             {% for c in contests %}
                 <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
                     {{ c.title }} ({{ c.status }})
                 </option>
             {% endfor %}
+        </select>
+
+        <!-- 동물 종류 콤보 박스 -->
+        <select id="petTypeSelect" class="select-custom" title="동물 종류 선택">
+            <option value="all" {{ 'selected' if pet_type == 'all' }}>🐾 전체 동물</option>
+            <option value="🐕 강아지" {{ 'selected' if pet_type == '🐕 강아지' }}>🐕 강아지</option>
+            <option value="🐈 고양이" {{ 'selected' if pet_type == '🐈 고양이' }}>🐈 고양이</option>
+            <option value="🐹 햄스터" {{ 'selected' if pet_type == '🐹 햄스터' }}>🐹 햄스터</option>
+            <option value="🦜 앵무새" {{ 'selected' if pet_type == '🦜 앵무새' }}>🦜 앵무새</option>
+            <option value="기타" {{ 'selected' if pet_type == '기타' }}>🐾 기타</option>
         </select>
     </div>
 
@@ -46,6 +56,7 @@
         <form method="GET" action="/">
             <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
             <input type="hidden" name="sort" value="{{ sort_type }}">
+            <input type="hidden" name="pet_type" value="{{ pet_type }}">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" name="q" value="{{ search_q }}" placeholder="아이 이름 또는 제목 검색...">
         </form>
@@ -53,13 +64,13 @@
 
     <!-- 3. 정렬 탭 (우측: 최신등록순, 인기순, 최근 급상승) -->
     <div class="tab-sort-group">
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
             <i class="fa-solid fa-clock"></i> 최신등록순
         </a>
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
             <i class="fa-solid fa-fire"></i> 인기순
         </a>
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=trending&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'trending' }}">
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=trending&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'trending' }}">
             <i class="fa-solid fa-bolt"></i> 최근 급상승
         </a>
     </div>

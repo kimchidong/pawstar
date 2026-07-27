@@ -23,16 +23,18 @@ def index():
     contest_id = request.args.get('contest_id', 3, type=int)
     sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
+    pet_type = request.args.get('pet_type', 'all')
 
     current_contest = service.get_contest(contest_id)
-    posts = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q)
+    posts = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type)
 
     return render_template(
         'index.html',
         current_contest=current_contest,
         posts=posts,
         sort_type=sort_type,
-        search_q=search_q
+        search_q=search_q,
+        pet_type=pet_type
     )
 
 # 2. 명예의 전당 (Hall of Fame)
