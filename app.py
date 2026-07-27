@@ -21,7 +21,7 @@ def inject_global_vars():
 @app.route('/')
 def index():
     contest_id = request.args.get('contest_id', 3, type=int)
-    sort_type = request.args.get('sort', 'popular') # popular, trending, latest
+    sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
 
     current_contest = service.get_contest(contest_id)

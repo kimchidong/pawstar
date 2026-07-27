@@ -43,14 +43,14 @@
 
     <!-- 정렬 탭: 최신등록순, 인기순, 최근 급상승 -->
     <div class="tab-sort-group">
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
+            <i class="fa-solid fa-clock"></i> 최신등록순
+        </a>
         <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
             <i class="fa-solid fa-fire"></i> 인기순
         </a>
         <a href="?contest_id={{ current_contest.contest_id }}&sort=trending&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'trending' }}">
             <i class="fa-solid fa-bolt"></i> 최근 급상승
-        </a>
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
-            <i class="fa-solid fa-clock"></i> 최신등록순
         </a>
     </div>
 

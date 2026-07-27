@@ -233,12 +233,12 @@ class PawStarService:
     def get_contest(self, contest_id):
         return self.contests.get(int(contest_id))
 
-    def get_posts(self, contest_id=3, sort_type='popular', search_query=''):
+    def get_posts(self, contest_id=3, sort_type='latest', search_query=''):
         """
         sort_type:
+        - 'latest': 최신 등록순 ORDER BY created_at DESC (기본값)
         - 'popular': 인기순 ORDER BY score DESC
         - 'trending': 최근 급상승 (30일 일별 통계 점수 합산)
-        - 'latest': 최신 등록순 ORDER BY created_at DESC
         """
         contest_id = int(contest_id)
         filtered = [p for p in self.posts.values() if p['contest_id'] == contest_id]
