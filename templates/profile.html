@@ -157,9 +157,9 @@
                 <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required>
             </div>
             <div class="form-group">
-                <label>프로필 이미지 (파일 업로드)</label>
+                <label>프로필 이미지</label>
                 <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
-                    <img id="editProfilePreview" src="{{ user.profile_img }}" alt="미리보기" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0; background: var(--bg-primary);">
+                    <img id="editProfilePreview" src="{{ user.profile_img }}" alt="미리보기" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0; background: var(--bg-primary);">
                     <div style="flex: 1;">
                         <input type="file" id="editProfileFile" class="form-control" accept="image/*">
                         <input type="hidden" id="editProfileImg" value="{{ user.profile_img }}">
@@ -168,7 +168,12 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>한줄 소개 (Bio)</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <label style="margin-bottom: 0;">한줄 소개</label>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">
+                        <strong id="bioByteCount" style="color: var(--accent-purple); font-weight: 700;">0</strong> / <span id="bioMaxBytes">200</span> Bytes
+                    </span>
+                </div>
                 <textarea id="editBio" class="form-control" rows="3" placeholder="우리 아이 소개 및 자기소개">{{ user.bio }}</textarea>
             </div>
             <button type="submit" class="btn-save-profile" id="btnSaveProfile">
@@ -247,6 +252,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusText.textContent = '❌ 업로드 중 오류가 발생했습니다.';
             });
         });
+    }
+
+    // editBio 실시간 바이트 계산 및 제한 로직
+    const bioInput = document.getElementById('editBio');
+    const bioByteCount = document.getElementById('bioByteCount');
+    const MAX_BIO_BYTES = 200;
+
+    function getByteLength(str) {
+        return new TextEncoder().encode(str).length;
+    }
+
+    function updateBioByteCount() {
+        if (!bioInput || !bioByteCount) return;
+        let text = bioInput.value;
+        let bytes = getByteLength(text);
+
+        if (bytes > MAX_BIO_BYTES) {
+            while (getByteLength(text) > MAX_BIO_BYTES) {
+                text = text.slice(0, -1);
+            }
+            bioInput.value = text;
+            bytes = getByteLength(text);
+        }
+
+        bioByteCount.textContent = bytes;
+    }
+
+    if (bioInput) {
+        bioInput.addEventListener('input', updateBioByteCount);
+        if (btnOpen) {
+            btnOpen.addEventListener('click', updateBioByteCount);
+        }
+        updateBioByteCount();
     }
 
     // 프로필 정보 수정 폼 제출

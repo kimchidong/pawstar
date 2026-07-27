@@ -758,8 +758,8 @@ body {
 }
 
 .profile-avatar {
-    width: 140px;
-    height: 140px;
+    width: 175px;
+    height: 175px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--border-light);
@@ -825,7 +825,8 @@ body {
     padding: 0.75rem 1rem;
     border-radius: var(--radius-sm);
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 400;
+    font-family: inherit;
     outline: none;
 }
 .form-control:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
