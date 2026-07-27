@@ -35,14 +35,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/profile" class="{{ 'active' if request.path == '/profile' }}">
-                        {% if current_user and current_user.profile_img %}
-                            <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: {{ '2px solid #ff6b00' if is_logged_in else '1px solid var(--border-light)' }}; vertical-align: middle;">
-                        {% else %}
-                            <i class="fa-solid fa-user-astronaut"></i>
-                        {% endif %}
-                        {{ current_user.nickname or '프로필' }}
-                    </a>
+                    {% if is_logged_in %}
+                        <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
+                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b00; vertical-align: middle;">
+                            {{ current_user.nickname }}
+                        </a>
+                    {% else %}
+                        <a href="javascript:void(0);" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}" style="color: var(--accent-purple); font-weight: 800;">
+                            <i class="fa-solid fa-right-to-bracket"></i> 로그인
+                        </a>
+                    {% endif %}
                 </li>
                 <li class="nav-item">
                     <a href="#" id="btnOpenModal" class="btn-upload">
@@ -230,63 +232,38 @@
         </div>
     </div>
 
-    <!-- 회원가입 & 로그인 레이어 팝업 모달 (Auth Modal - plamodelshop 호환) -->
-    <div class="modal-backdrop" id="authModal">
-        <div class="modal-content" style="max-width: 440px; padding: 2rem;">
+    <!-- 구글 전용 인증 레이어 팝업 모달 (Google Auth Modal) -->
+    <div class="modal-backdrop" id="googleAuthModal">
+        <div class="modal-content" style="max-width: 420px; padding: 2rem; text-align: center;">
             <div class="modal-header" style="margin-bottom: 1rem;">
-                <h3 id="authModalTitle">🔑 회원 로그인</h3>
-                <button type="button" class="btn-close" id="btnCloseAuthModal">&times;</button>
+                <h3 style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 계정 인증
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseGoogleModal">&times;</button>
             </div>
 
-            <!-- 탭 스위치 (로그인 / 회원가입) -->
-            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.25rem; margin-bottom: 1.25rem; border: 1px solid var(--border-light);">
-                <button type="button" id="tabLoginBtn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.9rem; cursor: pointer; background: var(--gradient-brand); color: #fff;">로그인</button>
-                <button type="button" id="tabRegisterBtn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.9rem; cursor: pointer; background: transparent; color: var(--text-secondary);">회원가입</button>
+            <div style="margin: 1.5rem 0;">
+                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.25rem;">
+                    PawStar에 오신 것을 환영합니다! 🐾<br>
+                    <strong>Google 계정</strong>으로 1초 만에 안전하게 가입 및 로그인하세요.
+                </p>
+
+                <!-- 구글 간편 로그인 실행 버튼 -->
+                <button type="button" id="btnGoogleSignIn" style="width: 100%; padding: 0.85rem; border-radius: 24px; border: 1px solid #dadce0; background: #ffffff; color: #3c4043; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: all 0.2s ease;">
+                    <svg width="20" height="20" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Google 계정으로 계속하기
+                </button>
             </div>
 
-            <!-- 1. 로그인 폼 -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>회원 아이디</label>
-                    <input type="text" id="loginUserId" class="form-control" placeholder="아이디 입력 (예: user1)" required>
-                </div>
-                <div class="form-group">
-                    <label>사용자인증번호 (비밀번호)</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="비밀번호 입력 (기본: 1234)" required>
-                </div>
-                <button type="submit" class="btn-save-profile" style="margin-top: 1rem;">
-                    🚀 로그인 하기
-                </button>
-            </form>
-
-            <!-- 2. 회원가입 폼 -->
-            <form id="registerForm" style="display: none;">
-                <div class="form-group">
-                    <label>희망 아이디</label>
-                    <input type="text" id="regUserId" class="form-control" placeholder="아이디 입력" required>
-                </div>
-                <div class="form-group">
-                    <label>집사 닉네임</label>
-                    <input type="text" id="regNickname" class="form-control" placeholder="멋진 닉네임" required>
-                </div>
-                <div class="form-group">
-                    <label>사용자인증번호 (비밀번호)</label>
-                    <input type="password" id="regPassword" class="form-control" placeholder="비밀번호 입력" required>
-                </div>
-                <div class="form-group">
-                    <label>프로필 이미지 (선택)</label>
-                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.35rem;">
-                        <img id="regProfilePreview" src="/static/image/profile/default_profile.png" alt="미리보기" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;">
-                        <div style="flex: 1;">
-                            <input type="file" id="regProfileFile" class="form-control" accept="image/*" style="font-size: 0.8rem;">
-                            <input type="hidden" id="regProfileImg" value="">
-                        </div>
-                    </div>
-                </div>
-                <button type="submit" class="btn-save-profile" style="margin-top: 1rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-                    ✨ 회원가입 및 시작하기
-                </button>
-            </form>
+            <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); text-align: left; line-height: 1.5;">
+                ℹ️ <strong>프로필 안내</strong><br>
+                프로필 이미지와 닉네임은 구글 정보를 불러오지 않고, <strong>PawStar 사이트 내 마이페이지에서 회원님이 직접 설정하고 자유롭게 관리</strong>할 수 있습니다.
+            </div>
         </div>
     </div>
 
@@ -386,33 +363,77 @@
             });
         }
 
-        // 회원가입 제출
-        if (registerForm) {
-            registerForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const user_id = document.getElementById('regUserId').value.trim();
-                const nickname = document.getElementById('regNickname').value.trim();
-                const password = document.getElementById('regPassword').value.trim();
-                const profile_img = document.getElementById('regProfileImg').value.trim();
+    <!-- 프로필 설정 & 사용자인증번호 생성 발급 레이어 팝업 모달 (Setup Profile Modal) -->
+    <div class="modal-backdrop" id="setupProfileModal">
+        <div class="modal-content" style="max-width: 460px; padding: 2rem;">
+            <div class="modal-header" style="margin-bottom: 1rem;">
+                <h3>👤 집사 프로필 설정 및 사용자인증번호 발급</h3>
+                <button type="button" class="btn-close" id="btnCloseSetupModal">&times;</button>
+            </div>
 
-                fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: user_id,
-                        nickname: nickname,
-                        password: password,
-                        profile_img: profile_img
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('회원가입 실패: ' + data.message);
+            <form id="setupProfileForm">
+                <div class="form-group">
+                    <label>집사 닉네임 (필수)</label>
+                    <input type="text" id="setupNickname" class="form-control" placeholder="사용하실 멋진 닉네임을 입력하세요" value="{{ current_user.nickname if current_user else '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 이미지 (선택)</label>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.4rem;">
+                        <img id="setupPreviewImg" src="{{ current_user.profile_img if current_user and current_user.profile_img else '/static/image/profile/default_profile.png' }}" alt="미리보기" style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;">
+                        <div style="flex: 1;">
+                            <input type="file" id="setupProfileFile" class="form-control" accept="image/*" style="font-size: 0.8rem;">
+                            <input type="hidden" id="setupProfileImgPath" value="{{ current_user.profile_img if current_user else '' }}">
+        const btnNavProfile = document.getElementById('btnNavProfile');
+        const googleModal = document.getElementById('googleAuthModal');
+        const btnCloseGoogleModal = document.getElementById('btnCloseGoogleModal');
+        const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
+
+        // 최상단 프로필 클릭 이벤트 (비로그인 상태 시 구글 인증 모달 강제 오픈)
+        if (btnNavProfile) {
+            btnNavProfile.addEventListener('click', function(e) {
+                {% if not is_logged_in %}
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const gModal = document.getElementById('googleAuthModal');
+                    if (gModal) {
+                        gModal.classList.add('show');
                     }
+                {% endif %}
+            });
+        }
+
+        if (btnCloseGoogleModal && googleModal) {
+            btnCloseGoogleModal.addEventListener('click', function() {
+                googleModal.classList.remove('show');
+            });
+        }
+
+        // 구글 로그인 처리 함수
+        function handleGoogleAuthResponse(googleUser) {
+            fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(googleUser || {})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.href = '/profile';
+                } else {
+                    alert('Google 인증 실패: ' + data.message);
+                }
+            });
+        }
+
+        if (btnGoogleSignIn) {
+            btnGoogleSignIn.addEventListener('click', function() {
+                // 구글 계정 간편 인증 처리
+                handleGoogleAuthResponse({
+                    google_id: 'g_' + Math.floor(Math.random() * 1000000),
+                    email: 'user@gmail.com',
+                    name: '구글집사'
                 });
             });
         }

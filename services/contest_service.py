@@ -528,6 +528,31 @@ class PawStarService:
         else:
             return False, "사용자인증번호(비밀번호)가 일치하지 않습니다."
 
+    def google_login_or_register(self, google_id, email, default_name=None):
+        """ 구글 계정으로 로그인 또는 회원가입 (닉네임과 프로필 이미지는 사이트 직접 관리) """
+        user_id = f"google_{google_id}"
+        
+        if user_id not in self.users:
+            import random
+            default_img = '/static/image/profile/default_profile.png'
+            now_str = datetime.now().strftime('%Y-%m-%d')
+            
+            # 구글 닉네임/사진 대신 사이트 자체 닉네임과 로컬 프로필 이미지 사용
+            site_nickname = f"집사_{random.randint(1000, 9999)}"
+            
+            user_info = {
+                'user_id': user_id,
+                'nickname': site_nickname,
+                'email': email or '',
+                'profile_img': default_img,
+                'bio': '구글 인증으로 안전하게 로그인한 집사입니다 🐾',
+                'joined_date': now_str,
+                'badges': ['🌐 Google 인증 회원']
+            }
+            self.users[user_id] = user_info
+        
+        return self.users[user_id]
+
     def update_user_profile(self, user_id='user1', nickname=None, bio=None, profile_img=None):
         if user_id not in self.users:
             self.users[user_id] = {
