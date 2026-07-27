@@ -3,12 +3,13 @@
 {% block content %}
 
 <div style="max-width: 1280px; margin: 2rem auto; padding: 0 1rem;">
-    <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2)); border: 1px solid var(--accent-purple); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
-            <i class="fa-solid fa-bolt" style="font-size: 2.2rem; color: var(--accent-purple);"></i>
+    <!-- Trending Banner (Light Mode Warm Purple) -->
+    <div style="background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%); border: 1px solid #ddd6fe; border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-soft);">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fa-solid fa-bolt" style="font-size: 2.5rem; color: var(--accent-purple);"></i>
             <div>
-                <h2 style="font-size: 2rem; font-weight: 800;">최근 30일 급상승 랭킹</h2>
-                <p style="color: var(--text-secondary);">
+                <h2 style="font-size: 2rem; font-weight: 900; color: var(--text-primary);">최근 30일 급상승 랭킹</h2>
+                <p style="color: var(--text-secondary); font-weight: 500;">
                     POST_DAILY_STAT 일별 통계 기반 (최근 30일간 조회×1 + 좋아요×5 + 댓글×10 + 공유×20) 실시간 정밀 집계 랭킹입니다.
                 </p>
             </div>
@@ -18,8 +19,8 @@
     <!-- 랭킹 리스트 -->
     <div style="display: flex; flex-direction: column; gap: 1rem;">
         {% for p in posts %}
-            <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.25rem; display: flex; align-items: center; gap: 1.5rem; transition: var(--transition);" class="post-card">
-                <div style="font-size: 1.8rem; font-weight: 900; width: 45px; text-align: center; color: var(--accent-gold);">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; display: flex; align-items: center; gap: 1.5rem; transition: var(--transition); box-shadow: var(--shadow-soft);" class="post-card">
+                <div style="font-size: 1.8rem; font-weight: 900; width: 45px; text-align: center; color: var(--accent-purple);">
                     {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
                 </div>
 
@@ -27,11 +28,11 @@
 
                 <div style="flex: 1;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
-                        <span style="font-weight: 700; color: var(--accent-pink);">{{ p.pet_type }} {{ p.pet_name }}</span>
-                        <span style="font-size: 0.85rem; color: var(--text-muted);">| 집사: {{ p.user_nickname }}</span>
+                        <span style="font-weight: 800; color: var(--accent-pink);">{{ p.pet_type }} {{ p.pet_name }}</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">| 집사: {{ p.user_nickname }}</span>
                     </div>
-                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem;">{{ p.title }}</h3>
-                    <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary);">{{ p.title }}</h3>
+                    <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">
                         <span><i class="fa-regular fa-eye"></i> {{ p.view_count }}</span>
                         <span><i class="fa-solid fa-heart" style="color: var(--accent-pink);"></i> {{ p.like_count }}</span>
                         <span><i class="fa-regular fa-comment"></i> {{ p.comment_count }}</span>
@@ -40,11 +41,11 @@
                 </div>
 
                 <div style="text-align: right;">
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">최근 30일 급상승 점수</div>
-                    <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-purple);">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">최근 30일 급상승 점수</div>
+                    <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-purple);">
                         {{ "{:,}".format(p.trending_score) }} <span style="font-size: 0.9rem;">점</span>
                     </div>
-                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" style="display: inline-flex; flex-direction: row; gap: 0.3rem; margin-top: 0.5rem; background: var(--bg-glass); padding: 0.4rem 0.8rem; border-radius: 20px;">
+                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" style="display: inline-flex; flex-direction: row; gap: 0.3rem; margin-top: 0.5rem; background: #fff0f6; border-color: #fcc2d7; color: var(--accent-pink); padding: 0.4rem 0.8rem; border-radius: 20px;">
                         <i class="fa-solid fa-heart"></i> 응원하기 (+5)
                     </button>
                 </div>
