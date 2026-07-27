@@ -1090,8 +1090,102 @@ body {
     gap: 0.4rem;
 }
 
-.page-ellipsis {
-    padding: 0 0.4rem;
-    color: var(--text-muted);
-    font-weight: 700;
+/* Post Detail Layer Popup Modal Styling */
+.detail-modal-content {
+    max-width: 860px;
+    width: 92%;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    position: relative;
+    border: none;
+}
+
+.detail-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.detail-close:hover {
+    background: #ffffff;
+    transform: scale(1.1);
+}
+
+.detail-modal-body {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    min-height: 480px;
+}
+
+@media (max-width: 768px) {
+    .detail-modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.detail-media-container {
+    position: relative;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 350px;
+}
+
+.detail-media-container img {
+    width: 100%;
+    height: 100%;
+    max-height: 550px;
+    object-fit: cover;
+}
+
+.detail-rank-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+.detail-info-container {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+}
+
+.detail-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.detail-content {
+    font-size: 0.98rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    flex: 1;
+}
+
+.detail-actions {
+    margin-top: auto;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.25rem;
 }

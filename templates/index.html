@@ -79,7 +79,7 @@
 <!-- Post Cards Grid -->
 <div class="posts-grid">
     {% for p in posts %}
-        <div class="post-card" id="post-card-{{ p.post_id }}">
+        <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
             <div class="card-media">
                 <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
                 
@@ -112,19 +112,19 @@
 
                 <!-- 점수 증가 액션 버튼들 (조회, 좋아요, 댓글, 공유) -->
                 <div class="card-actions">
-                    <button type="button" class="action-btn btn-view" onclick="triggerEvent({{ p.post_id }}, 'view')" title="조회수">
+                    <button type="button" class="action-btn btn-view" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'view')" title="조회수">
                         <i class="fa-regular fa-eye"></i>
                         <span class="view-count">{{ p.view_count }}</span>
                     </button>
-                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" title="좋아요">
+                    <button type="button" class="action-btn btn-like" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'like')" title="좋아요">
                         <i class="fa-solid fa-heart"></i>
                         <span class="like-count">{{ p.like_count }}</span>
                     </button>
-                    <button type="button" class="action-btn btn-comment" onclick="triggerEvent({{ p.post_id }}, 'comment')" title="댓글">
+                    <button type="button" class="action-btn btn-comment" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'comment')" title="댓글">
                         <i class="fa-regular fa-comment"></i>
                         <span class="comment-count">{{ p.comment_count }}</span>
                     </button>
-                    <button type="button" class="action-btn btn-share" onclick="triggerEvent({{ p.post_id }}, 'share')" title="공유유입">
+                    <button type="button" class="action-btn btn-share" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'share')" title="공유유입">
                         <i class="fa-solid fa-share-nodes"></i>
                         <span class="share-count">{{ p.share_count }}</span>
                     </button>

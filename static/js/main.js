@@ -42,6 +42,18 @@ function initEventHandlers() {
         closeBtn.addEventListener('click', () => modalBackdrop.classList.remove('show'));
     }
 
+    // 상세 모달 닫기 제어
+    const detailModal = document.getElementById('postDetailModal');
+    const closeDetailBtn = document.getElementById('btnCloseDetailModal');
+    if (closeDetailBtn && detailModal) {
+        closeDetailBtn.addEventListener('click', () => detailModal.classList.remove('show'));
+    }
+    if (detailModal) {
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) detailModal.classList.remove('show');
+        });
+    }
+
     // 신규 등록 폼 제출
     const uploadForm = document.getElementById('uploadForm');
     if (uploadForm) {
@@ -123,6 +135,18 @@ async function triggerEvent(postId, eventType) {
                 if (shareNum) shareNum.textContent = data.share_count;
             }
 
+            // 모달 내부 수치 동기화 갱신
+            const detailScore = document.getElementById('detailScoreNum');
+            if (detailScore) detailScore.textContent = data.new_score.toLocaleString();
+            const dView = document.getElementById('detailViewCount');
+            if (dView) dView.textContent = data.view_count;
+            const dLike = document.getElementById('detailLikeCount');
+            if (dLike) dLike.textContent = data.like_count;
+            const dComment = document.getElementById('detailCommentCount');
+            if (dComment) dComment.textContent = data.comment_count;
+            const dShare = document.getElementById('detailShareCount');
+            if (dShare) dShare.textContent = data.share_count;
+
             const messages = {
                 'view': '조회수 +1 (Score +1)',
                 'like': '❤️ 좋아요! (Score +5)',
@@ -182,4 +206,81 @@ function showToast(message) {
         toast.style.transition = 'all 0.4s ease';
         setTimeout(() => toast.remove(), 400);
     }, 2500);
+}
+
+/**
+ * 게시물 상세 레이어 팝업 모달 띄우기
+ */
+function openDetailModal(post) {
+    const modal = document.getElementById('postDetailModal');
+    if (!modal || !post) return;
+
+    // 데이터 채우기
+    const imgEl = document.getElementById('detailImg');
+    if (imgEl) imgEl.src = post.media_url || '';
+
+    const authorImgEl = document.getElementById('detailAuthorImg');
+    if (authorImgEl) authorImgEl.src = post.user_profile || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+
+    const nicknameEl = document.getElementById('detailAuthorNickname');
+    if (nicknameEl) nicknameEl.textContent = post.user_nickname || '집사';
+
+    const petTagEl = document.getElementById('detailPetTag');
+    if (petTagEl) petTagEl.textContent = `${post.pet_type || ''} ${post.pet_name || ''}`;
+
+    const scoreNumEl = document.getElementById('detailScoreNum');
+    if (scoreNumEl) scoreNumEl.textContent = Number(post.score || 0).toLocaleString();
+
+    const titleEl = document.getElementById('detailTitle');
+    if (titleEl) titleEl.textContent = post.title || '';
+
+    const contentEl = document.getElementById('detailContent');
+    if (contentEl) contentEl.textContent = post.content || '';
+
+    const createdAtEl = document.getElementById('detailCreatedAt');
+    if (createdAtEl) createdAtEl.textContent = `등록일: ${post.created_at || '2026-07-28'}`;
+
+    const viewCountEl = document.getElementById('detailViewCount');
+    if (viewCountEl) viewCountEl.textContent = post.view_count || 0;
+
+    const likeCountEl = document.getElementById('detailLikeCount');
+    if (likeCountEl) likeCountEl.textContent = post.like_count || 0;
+
+    const commentCountEl = document.getElementById('detailCommentCount');
+    if (commentCountEl) commentCountEl.textContent = post.comment_count || 0;
+
+    const shareCountEl = document.getElementById('detailShareCount');
+    if (shareCountEl) shareCountEl.textContent = post.share_count || 0;
+
+    // 랭킹 배지 채우기
+    const badgeEl = document.getElementById('detailRankBadge');
+    if (badgeEl) {
+        if (post.rank_candidate === 1) {
+            badgeEl.innerHTML = '<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>';
+        } else if (post.rank_candidate === 2) {
+            badgeEl.innerHTML = '<div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>';
+        } else if (post.rank_candidate === 3) {
+            badgeEl.innerHTML = '<div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>';
+        } else {
+            badgeEl.innerHTML = '';
+        }
+    }
+
+    // 모달 내부 버튼 이벤트 바인딩
+    const btnView = document.getElementById('detailBtnView');
+    const btnLike = document.getElementById('detailBtnLike');
+    const btnComment = document.getElementById('detailBtnComment');
+    const btnShare = document.getElementById('detailBtnShare');
+
+    if (btnView) btnView.onclick = () => triggerEvent(post.post_id, 'view');
+    if (btnLike) btnLike.onclick = () => triggerEvent(post.post_id, 'like');
+    if (btnComment) btnComment.onclick = () => triggerEvent(post.post_id, 'comment');
+    if (btnShare) btnShare.onclick = () => triggerEvent(post.post_id, 'share');
+
+    modal.classList.add('show');
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('postDetailModal');
+    if (modal) modal.classList.remove('show');
 }

@@ -173,6 +173,58 @@
         </div>
     </div>
 
+    <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
+    <div class="modal-backdrop" id="postDetailModal">
+        <div class="modal-content detail-modal-content">
+            <button type="button" class="btn-close detail-close" id="btnCloseDetailModal">&times;</button>
+            <div class="detail-modal-body">
+                <div class="detail-media-container">
+                    <img id="detailImg" src="" alt="pet image">
+                    <div id="detailRankBadge" class="detail-rank-badge"></div>
+                </div>
+                <div class="detail-info-container">
+                    <div class="author-info" style="margin-bottom: 1rem;">
+                        <img id="detailAuthorImg" src="" class="author-img" alt="profile">
+                        <div class="author-detail">
+                            <div class="nickname" id="detailAuthorNickname">집사 닉네임</div>
+                            <div class="pet-tag" id="detailPetTag">🐕 강아지 뽀삐</div>
+                        </div>
+                        <div class="card-total-score">
+                            <i class="fa-solid fa-star"></i> <span id="detailScoreNum" class="score-num">0</span> 점
+                        </div>
+                    </div>
+
+                    <h2 class="detail-title" id="detailTitle">게시물 제목</h2>
+                    <p class="detail-content" id="detailContent">게시물 본문 내용이 이곳에 표시됩니다.</p>
+                    
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="detailCreatedAt">
+                        등록일: 2026-07-28
+                    </div>
+
+                    <!-- 실시간 액션 버튼 (모달 내부) -->
+                    <div class="card-actions detail-actions">
+                        <button type="button" class="action-btn btn-view" id="detailBtnView" title="조회수">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count" id="detailViewCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-like" id="detailBtnLike" title="좋아요">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="like-count" id="detailLikeCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-comment" id="detailBtnComment" title="댓글">
+                            <i class="fa-regular fa-comment"></i>
+                            <span class="comment-count" id="detailCommentCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-share" id="detailBtnShare" title="공유유입">
+                            <i class="fa-solid fa-share-nodes"></i>
+                            <span class="share-count" id="detailShareCount">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
