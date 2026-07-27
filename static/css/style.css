@@ -256,6 +256,52 @@ body {
     text-shadow: 0 0 10px rgba(254, 240, 138, 0.4);
 }
 
+/* Score Evaluation Metric Guide Banner */
+.score-metric-banner {
+    max-width: 1280px;
+    margin: -0.5rem auto 1.5rem auto;
+    padding: 0.85rem 1.5rem;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--accent-purple);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.metric-title {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.metric-items {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.metric-item {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    font-weight: 600;
+}
+
+.metric-item strong {
+    color: var(--accent-purple);
+}
+
 /* Filter Bar */
 .filter-bar {
     max-width: 1280px;
