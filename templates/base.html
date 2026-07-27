@@ -41,7 +41,7 @@
                         {% else %}
                             <i class="fa-solid fa-user-astronaut"></i>
                         {% endif %}
-                        프로필
+                        {{ current_user.nickname or '프로필' }}
                     </a>
                 </li>
                 <li class="nav-item">
