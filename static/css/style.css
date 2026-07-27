@@ -272,17 +272,16 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
-.contest-select-group {
+.filter-left-group {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex: 0 0 auto;
+    flex-wrap: wrap;
 }
 
-.contest-select-group label {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-secondary);
+.search-box {
+    position: relative;
+    width: 240px;
 }
 
 .select-custom {
