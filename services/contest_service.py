@@ -227,11 +227,30 @@ class PawStarService:
 
     # --- 조회 및 정렬 기능 ---
 
+    def _attach_d_day(self, contest):
+        if not contest:
+            return None
+        c = dict(contest)
+        try:
+            end_dt = datetime.strptime(c['end_date'], '%Y-%m-%d').date()
+            today = datetime.now().date()
+            diff = (end_dt - today).days
+            if diff > 0:
+                c['d_day_str'] = f"D-{diff}"
+            elif diff == 0:
+                c['d_day_str'] = "D-DAY"
+            else:
+                c['d_day_str'] = "종료됨"
+        except Exception:
+            c['d_day_str'] = "D-Day"
+        return c
+
     def get_contests(self):
-        return sorted(list(self.contests.values()), key=lambda x: x['contest_id'], reverse=True)
+        c_list = sorted(list(self.contests.values()), key=lambda x: x['contest_id'], reverse=True)
+        return [self._attach_d_day(c) for c in c_list]
 
     def get_contest(self, contest_id):
-        return self.contests.get(int(contest_id))
+        return self._attach_d_day(self.contests.get(int(contest_id)))
 
     def get_posts(self, contest_id=3, sort_type='latest', search_query=''):
         """
