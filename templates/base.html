@@ -53,6 +53,74 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- 1. 브랜드 영역 -->
+                <div class="footer-brand">
+                    <div class="footer-logo-title">Paw Star</div>
+                    <div class="footer-slogan">"{{ app_slogan }}"</div>
+                    <p class="footer-desc">
+                        Paw Star는 세상에서 가장 소중한 반려동물의 사랑스러운 순간을 공유하고, 매월 콘테스트를 통해 명예의 전당 펫 스타를 탄생시키는 대표 커뮤니티입니다.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn" title="Blog"><i class="fa-solid fa-blog"></i></a>
+                    </div>
+                </div>
+
+                <!-- 2. 메뉴 링크 -->
+                <div class="footer-col">
+                    <h4>바로가기</h4>
+                    <ul class="footer-links">
+                        <li><a href="/"><i class="fa-solid fa-angle-right"></i> 콘테스트 홈</a></li>
+                        <li><a href="/hall-of-fame"><i class="fa-solid fa-angle-right"></i> 명예의 전당</a></li>
+                        <li><a href="/profile"><i class="fa-solid fa-angle-right"></i> 마이 프로필</a></li>
+                        <li><a href="#" onclick="document.getElementById('btnOpenModal').click(); return false;"><i class="fa-solid fa-angle-right"></i> 펫 자랑하기</a></li>
+                    </ul>
+                </div>
+
+                <!-- 3. 카테고리 -->
+                <div class="footer-col">
+                    <h4>반려동물 카테고리</h4>
+                    <ul class="footer-links">
+                        <li><a href="/?pet_type=🐕 강아지">🐕 강아지 스타</a></li>
+                        <li><a href="/?pet_type=🐈 고양이">🐈 고양이 스타</a></li>
+                        <li><a href="/?pet_type=🐹 햄스터">🐹 햄스터 스타</a></li>
+                        <li><a href="/?pet_type=🦜 앵무새">🦜 앵무새 스타</a></li>
+                        <li><a href="/?pet_type=기타">🐾 기타 귀요미들</a></li>
+                    </ul>
+                </div>
+
+                <!-- 4. 시상 정보 -->
+                <div class="footer-col">
+                    <h4>Paw Star 트로피</h4>
+                    <div class="award-badges-mini">
+                        <div class="award-badge-item">🥇 <span>1위 슈퍼스타 (Super Star)</span></div>
+                        <div class="award-badge-item">🥈 <span>2위 라이징스타 (Rising Star)</span></div>
+                        <div class="award-badge-item">🥉 <span>3위 브라이트스타 (Bright Star)</span></div>
+                        <div class="award-badge-item">⭐ <span>급상승 루키스타 (Rookie Star)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 카피라이트 -->
+            <div class="footer-bottom">
+                <div>
+                    <span>Copyright ⓒ 2026 <strong>Paw Star</strong>. All rights reserved.</span>
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="#">개인정보처리방침</a>
+                    <a href="#">이용약관</a>
+                    <a href="#">고객센터</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <!-- 펫 자랑하기 모달 (Upload Modal) -->
     <div class="modal-backdrop" id="uploadModal">
         <div class="modal-content">
