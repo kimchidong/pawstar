@@ -30,8 +30,8 @@
 
 <!-- Filter & Search Bar -->
 <div class="filter-bar">
+    <!-- 1. 회차 선택 (좌측) -->
     <div class="contest-select-group">
-        <label><i class="fa-solid fa-calendar-days"></i> 회차 선택:</label>
         <select id="contestSelect" class="select-custom">
             {% for c in contests %}
                 <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
@@ -41,7 +41,17 @@
         </select>
     </div>
 
-    <!-- 정렬 탭: 최신등록순, 인기순, 최근 급상승 -->
+    <!-- 2. 검색창 (가운데) -->
+    <div class="search-box">
+        <form method="GET" action="/">
+            <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
+            <input type="hidden" name="sort" value="{{ sort_type }}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" value="{{ search_q }}" placeholder="아이 이름 또는 제목 검색...">
+        </form>
+    </div>
+
+    <!-- 3. 정렬 탭 (우측: 최신등록순, 인기순, 최근 급상승) -->
     <div class="tab-sort-group">
         <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
             <i class="fa-solid fa-clock"></i> 최신등록순
@@ -52,16 +62,6 @@
         <a href="?contest_id={{ current_contest.contest_id }}&sort=trending&q={{ search_q }}" class="sort-btn {{ 'active' if sort_type == 'trending' }}">
             <i class="fa-solid fa-bolt"></i> 최근 급상승
         </a>
-    </div>
-
-    <!-- 검색창 -->
-    <div class="search-box">
-        <form method="GET" action="/">
-            <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
-            <input type="hidden" name="sort" value="{{ sort_type }}">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" name="q" value="{{ search_q }}" placeholder="아이 이름 또는 제목 검색...">
-        </form>
     </div>
 </div>
 

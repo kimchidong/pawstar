@@ -276,6 +276,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex: 0 0 auto;
 }
 
 .contest-select-group label {
@@ -309,6 +310,7 @@ body {
     padding: 0.3rem;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-light);
+    flex: 0 0 auto;
 }
 
 .sort-btn {
