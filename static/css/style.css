@@ -78,7 +78,7 @@ body {
 }
 
 .nav-container {
-    max-width: 1280px;
+    width: 1280px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -165,7 +165,7 @@ body {
 
 /* Contest Hero Banner (Rich Violet Tone & Full Photo Fit) */
 .contest-hero {
-    max-width: 1280px;
+    width: 1280px;
     margin: 2rem auto;
     padding: 3rem 2.5rem;
     background: linear-gradient(135deg, rgba(30, 27, 75, 0.65), rgba(99, 102, 241, 0.55), rgba(236, 72, 153, 0.45)),
@@ -304,7 +304,7 @@ body {
 
 /* Filter Bar */
 .filter-bar {
-    max-width: 1280px;
+    width: 1280px;
     margin: 0 auto 2rem auto;
     display: flex;
     justify-content: space-between;
@@ -421,7 +421,7 @@ body {
 
 /* Post Cards Grid (Clean Bright White Cards) */
 .posts-grid {
-    max-width: 1280px;
+    width: 1280px;
     margin: 0 auto 3rem auto;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));

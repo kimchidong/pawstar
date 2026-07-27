@@ -1,0 +1,42 @@
+{% extends 'm_base.html' %}
+
+{% block content %}
+
+<div style="padding: 1rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <h2 style="font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 0.4rem;">
+            🔥 최근 급상승 스타
+        </h2>
+        <span style="font-size: 0.78rem; color: var(--text-muted);">실시간 랭킹</span>
+    </div>
+
+    <!-- 2열 피드 그리드 -->
+    <div class="m-feed-grid" style="padding: 0;">
+        {% for p in posts %}
+            <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+                <div class="m-card-thumb">
+                    <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <div class="m-card-badge" style="background: rgba(225, 29, 72, 0.85);">🔥 급상승 {{ loop.index }}위</div>
+                    <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
+                </div>
+                <div class="m-card-content">
+                    <div class="m-card-author">
+                        <img src="{{ p.user_profile }}" alt="profile">
+                        <span>{{ p.user_nickname }}</span>
+                    </div>
+                    <div class="m-card-title">{{ p.title }}</div>
+                    <div class="m-card-footer">
+                        <span>{{ p.pet_name }}</span>
+                        <span>❤️ {{ p.like_count }}</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                급상승 게시물이 없습니다.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

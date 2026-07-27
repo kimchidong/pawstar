@@ -1,0 +1,51 @@
+{% extends 'm_base.html' %}
+
+{% block content %}
+
+<!-- 모바일 히어로 배너 -->
+<div class="m-hero">
+    <div class="m-hero-badge">{{ current_contest.d_day_str if current_contest else 'D-DAY' }} | {{ current_contest.status if current_contest else '진행중' }}</div>
+    <h2>{{ current_contest.title if current_contest else 'Paw Star 콘테스트' }}</h2>
+    <p>{{ current_contest.description if current_contest else '대한민국 대표 펫 스타에 도전하세요!' }}</p>
+</div>
+
+<!-- 필터 스크롤바 -->
+<div class="m-filter-scroll">
+    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' }}">전체보기 🐾</a>
+    <a href="/m/?pet_type=🐕 강아지&sort={{ sort_type }}" class="m-chip {{ 'active' if '강아지' in pet_type }}">🐕 강아지</a>
+    <a href="/m/?pet_type=🐈 고양이&sort={{ sort_type }}" class="m-chip {{ 'active' if '고양이' in pet_type }}">🐈 고양이</a>
+    <a href="/m/?pet_type=🐹 햄스터&sort={{ sort_type }}" class="m-chip {{ 'active' if '햄스터' in pet_type }}">🐹 햄스터</a>
+    <a href="/m/?pet_type=🦜 앵무새&sort={{ sort_type }}" class="m-chip {{ 'active' if '앵무새' in pet_type }}">🦜 앵무새</a>
+</div>
+
+<!-- 2열 피드 그리드 -->
+<div class="m-feed-grid">
+    {% for p in posts %}
+        <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+            <div class="m-card-thumb">
+                <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                {% if p.rank_candidate %}
+                    <div class="m-card-badge">🏆 {{ p.rank_candidate }}위 후보</div>
+                {% endif %}
+                <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
+            </div>
+            <div class="m-card-content">
+                <div class="m-card-author">
+                    <img src="{{ p.user_profile }}" alt="profile">
+                    <span>{{ p.user_nickname }}</span>
+                </div>
+                <div class="m-card-title">{{ p.title }}</div>
+                <div class="m-card-footer">
+                    <span>{{ p.pet_name }}</span>
+                    <span>❤️ {{ p.like_count }}</span>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            등록된 출전 게시물이 없습니다.
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'm_base.html' %}
+
+{% block content %}
+
+<div style="padding: 1rem;">
+    <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 1rem;">⚙️ 모바일 관리자 / 배치</h2>
+
+    <div style="background: #fff; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); margin-bottom: 1rem;">
+        <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem;">회차 종료 시뮬레이션</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">선택 회차 종료 및 수상자를 자동 선정합니다.</p>
+
+        {% for c in contests %}
+            {% if c.status == '진행중' %}
+                <button type="button" class="m-btn-submit" onclick="closeContestMobile({{ c.contest_id }})" style="margin-bottom: 0.5rem;">
+                    🏁 제{{ c.contest_id }}회 콘테스트 종료 시뮬레이션 실행
+                </button>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function closeContestMobile(contestId) {
+    if(!confirm(`제${contestId}회 콘테스트를 종료하고 수상자를 선정하시겠습니까?`)) return;
+
+    fetch('/api/admin/close-contest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contest_id: contestId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            alert(data.message);
+            location.href = '/m/hall-of-fame';
+        } else {
+            alert('오류: ' + data.message);
+        }
+    });
+}
+</script>
+
+{% endblock %}

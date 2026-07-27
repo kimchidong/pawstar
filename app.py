@@ -69,9 +69,20 @@ def inject_global_vars():
         'app_slogan': '반려동물도 스타가 될 수 있다.'
     }
 
+def is_mobile_user_agent():
+    """ 클라이언트 User-Agent를 판별하여 모바일 기기 접속 여부 반환 """
+    ua = request.headers.get('User-Agent', '').lower()
+    mobile_keywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone', 'opera mini']
+    return any(k in ua for k in mobile_keywords)
+
+# --- PC 전용 라우트 (1280px 고정) ---
+
 # 1. 홈 (콘테스트 게시물 메인)
 @app.route('/')
 def index():
+    if is_mobile_user_agent() and not request.args.get('desktop'):
+        return redirect(url_for('m_index', **request.args))
+
     contest_id = request.args.get('contest_id', 3, type=int)
     sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
@@ -94,6 +105,9 @@ def index():
 # 2. 명예의 전당 (Hall of Fame)
 @app.route('/hall-of-fame')
 def hall_of_fame():
+    if is_mobile_user_agent() and not request.args.get('desktop'):
+        return redirect(url_for('m_hall_of_fame', **request.args))
+
     contest_id = request.args.get('contest_id', 2, type=int)
     current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
@@ -107,6 +121,9 @@ def hall_of_fame():
 # 3. 최근 급상승 메뉴
 @app.route('/trending')
 def trending():
+    if is_mobile_user_agent() and not request.args.get('desktop'):
+        return redirect(url_for('m_trending', **request.args))
+
     contest_id = request.args.get('contest_id', 3, type=int)
     page = request.args.get('page', 1, type=int)
     paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10)
@@ -122,6 +139,9 @@ def trending():
 # 4. 프로필 (plamodelshop 회원관리 방식과 동일)
 @app.route('/profile')
 def profile():
+    if is_mobile_user_agent() and not request.args.get('desktop'):
+        return redirect(url_for('m_profile', **request.args))
+
     user_id = request.args.get('user_id', 'user1')
     profile_data = service.get_user_profile(user_id)
 
@@ -132,6 +152,74 @@ def profile():
         my_posts=profile_data['my_posts'],
         my_awards=profile_data['my_awards']
     )
+
+# --- 모바일 전용 별도 라우트 (m_ 접두사 템플릿 독립 제공) ---
+
+@app.route('/m/')
+@app.route('/m')
+def m_index():
+    contest_id = request.args.get('contest_id', 3, type=int)
+    sort_type = request.args.get('sort', 'latest')
+    search_q = request.args.get('q', '')
+    pet_type = request.args.get('pet_type', 'all')
+    page = request.args.get('page', 1, type=int)
+
+    current_contest = service.get_contest(contest_id)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12)
+
+    return render_template(
+        'm_index.html',
+        current_contest=current_contest,
+        posts=paginated_res['posts'],
+        pagination=paginated_res,
+        sort_type=sort_type,
+        search_q=search_q,
+        pet_type=pet_type
+    )
+
+@app.route('/m/hall-of-fame')
+def m_hall_of_fame():
+    contest_id = request.args.get('contest_id', 2, type=int)
+    current_contest = service.get_contest(contest_id)
+    winners = service.get_hall_of_fame(contest_id=contest_id)
+
+    return render_template(
+        'm_hall_of_fame.html',
+        current_contest=current_contest,
+        winners=winners
+    )
+
+@app.route('/m/trending')
+def m_trending():
+    contest_id = request.args.get('contest_id', 3, type=int)
+    page = request.args.get('page', 1, type=int)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10)
+    current_contest = service.get_contest(contest_id)
+
+    return render_template(
+        'm_trending.html',
+        current_contest=current_contest,
+        posts=paginated_res['posts'],
+        pagination=paginated_res
+    )
+
+@app.route('/m/profile')
+def m_profile():
+    user_id = request.args.get('user_id', 'user1')
+    profile_data = service.get_user_profile(user_id)
+
+    return render_template(
+        'm_profile.html',
+        user=profile_data['user_info'],
+        stats=profile_data['stats'],
+        my_posts=profile_data['my_posts'],
+        my_awards=profile_data['my_awards']
+    )
+
+@app.route('/m/admin')
+def m_admin():
+    return render_template('m_admin.html', contests=service.get_contests(), winners=service.winners)
+
 
 # 4-1. 프로필 이미지 임시 업로드 API (plamodelshop 호환)
 @app.route('/upload/profile', methods=['POST'])
