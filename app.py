@@ -71,20 +71,27 @@ def trending():
 @app.route('/profile')
 def profile():
     user_id = request.args.get('user_id', 'user1')
-    user_info = service.users.get(user_id, service.users['user1'])
-    
-    # 사용자가 작성한 게시물
-    my_posts = [p for p in service.posts.values() if p['user_id'] == user_id]
-    
-    # 수상 이력
-    my_awards = [w for w in service.winners if w['user_id'] == user_id]
+    profile_data = service.get_user_profile(user_id)
 
     return render_template(
         'profile.html',
-        user=user_info,
-        my_posts=my_posts,
-        my_awards=my_awards
+        user=profile_data['user_info'],
+        stats=profile_data['stats'],
+        my_posts=profile_data['my_posts'],
+        my_awards=profile_data['my_awards']
     )
+
+# 4-1. 프로필 수정 API
+@app.route('/api/profile/update', methods=['POST'])
+def api_profile_update():
+    data = request.json or {}
+    user_id = data.get('user_id', 'user1')
+    nickname = data.get('nickname')
+    bio = data.get('bio')
+    profile_img = data.get('profile_img')
+
+    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, bio=bio, profile_img=profile_img)
+    return jsonify({'success': True, 'message': '프로필 정보가 수정되었습니다.', 'data': updated_user})
 
 # 5. 배치 & 관리자 (회차 종료 및 수상자 선정 배치 시뮬레이션)
 @app.route('/admin')

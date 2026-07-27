@@ -54,6 +54,57 @@ function initEventHandlers() {
         });
     }
 
+    // 프로필 수정 모달 제어 (plamodelshop 회원관리 로직과 동일)
+    const profileModal = document.getElementById('profileEditModal');
+    const btnOpenProfile = document.getElementById('btnOpenProfileModal');
+    const btnCloseProfile = document.getElementById('btnCloseProfileModal');
+    if (btnOpenProfile && profileModal) {
+        btnOpenProfile.addEventListener('click', () => profileModal.classList.add('show'));
+    }
+    if (btnCloseProfile && profileModal) {
+        btnCloseProfile.addEventListener('click', () => profileModal.classList.remove('show'));
+    }
+
+    // 프로필 정보 수정 AJAX 폼 제출
+    const profileEditForm = document.getElementById('profileEditForm');
+    if (profileEditForm) {
+        profileEditForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updateData = {
+                user_id: 'user1',
+                nickname: document.getElementById('editNickname').value,
+                profile_img: document.getElementById('editProfileImg').value,
+                bio: document.getElementById('editBio').value
+            };
+
+            try {
+                const response = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+                const res = await response.json();
+                if (res.success) {
+                    showToast('✨ 프로필 정보가 성공적으로 수정되었습니다!');
+                    profileModal.classList.remove('show');
+                    
+                    // DOM 실시간 갱신
+                    const currentNickname = document.getElementById('currentNickname');
+                    if (currentNickname) currentNickname.textContent = res.data.nickname;
+                    const currentBio = document.getElementById('currentBio');
+                    if (currentBio) currentBio.textContent = res.data.bio;
+                    const currentProfileImg = document.getElementById('currentProfileImg');
+                    if (currentProfileImg) currentProfileImg.src = res.data.profile_img;
+                } else {
+                    alert(res.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('프로필 수정 중 오류가 발생했습니다.');
+            }
+        });
+    }
+
     // 신규 등록 폼 제출
     const uploadForm = document.getElementById('uploadForm');
     if (uploadForm) {

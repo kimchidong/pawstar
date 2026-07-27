@@ -447,12 +447,70 @@ class PawStarService:
         return {
             'post_id': post_id,
             'new_score': post['score'],
-            'delta_score': delta_score,
             'view_count': post['view_count'],
             'like_count': post['like_count'],
             'comment_count': post['comment_count'],
             'share_count': post['share_count']
         }
+
+    def get_user_profile(self, user_id='user1'):
+        """
+        plamodelshop 회원 프로필 로직과 동일한 데이터 구조
+        """
+        user_info = self.users.get(user_id, {
+            'user_id': user_id,
+            'nickname': '귀여운집사',
+            'email': 'pet_lover@pawstar.com',
+            'profile_img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+            'bio': '세상 모든 반려동물은 사랑입니다 🐾 매일매일 심쿵!',
+            'joined_date': '2026-01-15',
+            'badges': ['🥇 슈퍼스타 1위 (제1회)', '🥈 라이징스타 (제2회)']
+        })
+
+        my_posts = [dict(p) for p in self.posts.values() if p['user_id'] == user_id]
+        my_posts.sort(key=lambda x: x['created_at'], reverse=True)
+
+        # 통계 계산
+        my_post_count = len(my_posts)
+        total_score = sum(p['score'] for p in my_posts)
+        total_likes = sum(p['like_count'] for p in my_posts)
+
+        my_awards = [w for w in self.winners if w['user_id'] == user_id]
+        award_count = len(my_awards)
+
+        stats = {
+            'my_post_count': my_post_count,
+            'total_score': total_score,
+            'total_likes': total_likes,
+            'award_count': award_count
+        }
+
+        return {
+            'user_info': user_info,
+            'stats': stats,
+            'my_posts': my_posts,
+            'my_awards': my_awards
+        }
+
+    def update_user_profile(self, user_id='user1', nickname=None, bio=None, profile_img=None):
+        if user_id not in self.users:
+            self.users[user_id] = {
+                'user_id': user_id,
+                'nickname': nickname or '집사',
+                'profile_img': profile_img or '',
+                'bio': bio or '',
+                'joined_date': '2026-01-15'
+            }
+        
+        user = self.users[user_id]
+        if nickname:
+            user['nickname'] = nickname
+        if bio is not None:
+            user['bio'] = bio
+        if profile_img:
+            user['profile_img'] = profile_img
+
+        return user
 
     def get_hall_of_fame(self, contest_id=2):
         """ 회차별 1~3위 (SUPER, RISING, BRIGHT) 및 급상승 1위 (ROOKIE) 조회 """
