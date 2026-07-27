@@ -110,27 +110,23 @@
                 <h3 class="post-title">{{ p.title }}</h3>
                 <p class="post-desc">{{ p.content }}</p>
 
-                <!-- 점수 증가 액션 버튼들 (조회+1, 좋아요+5, 댓글+10, 공유+20) -->
+                <!-- 점수 증가 액션 버튼들 (조회, 좋아요, 댓글, 공유) -->
                 <div class="card-actions">
-                    <button type="button" class="action-btn btn-view" onclick="triggerEvent({{ p.post_id }}, 'view')" title="조회수 +1점">
+                    <button type="button" class="action-btn btn-view" onclick="triggerEvent({{ p.post_id }}, 'view')" title="조회수">
                         <i class="fa-regular fa-eye"></i>
                         <span class="view-count">{{ p.view_count }}</span>
-                        <span class="score-plus">+1점</span>
                     </button>
-                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" title="좋아요 +5점">
+                    <button type="button" class="action-btn btn-like" onclick="triggerEvent({{ p.post_id }}, 'like')" title="좋아요">
                         <i class="fa-solid fa-heart"></i>
                         <span class="like-count">{{ p.like_count }}</span>
-                        <span class="score-plus">+5점</span>
                     </button>
-                    <button type="button" class="action-btn btn-comment" onclick="triggerEvent({{ p.post_id }}, 'comment')" title="댓글 +10점">
+                    <button type="button" class="action-btn btn-comment" onclick="triggerEvent({{ p.post_id }}, 'comment')" title="댓글">
                         <i class="fa-regular fa-comment"></i>
                         <span class="comment-count">{{ p.comment_count }}</span>
-                        <span class="score-plus">+10점</span>
                     </button>
-                    <button type="button" class="action-btn btn-share" onclick="triggerEvent({{ p.post_id }}, 'share')" title="공유유입 +20점">
+                    <button type="button" class="action-btn btn-share" onclick="triggerEvent({{ p.post_id }}, 'share')" title="공유유입">
                         <i class="fa-solid fa-share-nodes"></i>
                         <span class="share-count">{{ p.share_count }}</span>
-                        <span class="score-plus">+20점</span>
                     </button>
                 </div>
             </div>
