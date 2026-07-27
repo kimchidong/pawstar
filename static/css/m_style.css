@@ -354,9 +354,8 @@ body.m-body {
     height: 110px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #ff6b00;
+    border: 1px solid var(--border-light);
     margin: 0 auto 0.75rem auto;
-    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
 }
 
 .m-profile-name {

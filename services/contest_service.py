@@ -19,31 +19,32 @@ class PawStarService:
     def _init_mock_data(self):
         """ 초기 퍼블리싱 시연용 샘플 데이터 세팅 """
         # Users (plamodelshop 호환 구조)
+        DEFAULT_AVATAR = '/static/image/profile/default_profile.png'
         self.users['user1'] = {
             'user_id': 'user1',
             'nickname': '뽀삐아빠',
-            'profile_img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+            'profile_img': DEFAULT_AVATAR,
             'bio': '골든리트리버 뽀삐와 함께 살고 있습니다 🦮',
             'badges': ['🥇 1회 슈퍼스타', '⭐ 급상승 루키']
         }
         self.users['user2'] = {
             'user_id': 'user2',
             'nickname': '냥냥 집사',
-            'profile_img': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+            'profile_img': DEFAULT_AVATAR,
             'bio': '귀여운 아비시니안 나비의 일상 🐈',
             'badges': ['🥈 2회 라이징스타']
         }
         self.users['user3'] = {
             'user_id': 'user3',
             'nickname': '햄찌마스터',
-            'profile_img': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+            'profile_img': DEFAULT_AVATAR,
             'bio': '볼빵빵 햄찌 모찌 🐹',
             'badges': ['🥉 1회 브라이트스타']
         }
         self.users['user4'] = {
             'user_id': 'user4',
             'nickname': '앵두네',
-            'profile_img': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+            'profile_img': DEFAULT_AVATAR,
             'bio': '노래하는 모란앵무 앵두 🦜',
             'badges': ['⭐ 2회 루키스타']
         }
@@ -460,7 +461,7 @@ class PawStarService:
         user_info = self.users.get(user_id, {
             'user_id': user_id,
             'nickname': '귀여운집사',
-            'profile_img': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+            'profile_img': '/static/image/profile/default_profile.png',
             'bio': '세상 모든 반려동물은 사랑입니다 🐾 매일매일 심쿵!',
             'joined_date': '2026-01-15',
             'badges': ['🥇 슈퍼스타 1위 (제1회)', '🥈 라이징스타 (제2회)']

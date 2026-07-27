@@ -52,7 +52,7 @@
         </a>
         <a href="/m/profile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
             {% if current_user and current_user.profile_img %}
-                <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b00;">
+                <img src="{{ current_user.profile_img }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: {{ '2px solid #ff6b00' if is_logged_in else '1px solid var(--border-light)' }};">
             {% else %}
                 <i class="fa-solid fa-user-astronaut"></i>
             {% endif %}

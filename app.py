@@ -84,22 +84,16 @@ def finalize_temp_profile_image(avatar_icon):
 
 @app.context_processor
 def inject_global_vars():
-    """ 템플릿 전역에서 사용할 기본 정보 전달 (로그아웃 세션 상태 판별) """
-    if session.get('logged_out'):
-        current_user = None
-    else:
-        # 로그인 기본 세션 유지
-        if 'user_id' not in session:
-            session['user_id'] = 'user1'
-            session['last_activity'] = datetime.datetime.now().timestamp()
-        profile_data = service.get_user_profile(session.get('user_id', 'user1'))
-        current_user = profile_data.get('user_info', {})
+    """ 템플릿 전역에서 사용할 기본 회원 프로필 정보 전달 (로그아웃 후에도 프로필 이미지 및 닉네임 상시 유효 유지) """
+    user_id = session.get('user_id', 'user1')
+    profile_data = service.get_user_profile(user_id)
+    current_user = profile_data.get('user_info', {})
 
     return {
         'contests': service.get_contests(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
-        'is_logged_in': bool(current_user)
+        'is_logged_in': not session.get('logged_out', False)
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
@@ -107,8 +101,9 @@ def inject_global_vars():
 @app.route('/logout')
 @app.route('/api/logout', methods=['GET', 'POST'])
 def logout():
-    """ 사용자 로그아웃 처리 (세션 소멸 및 초기화) """
+    """ 사용자 로그아웃 처리 (세션 초기화 및 기본 프로필 유지) """
     session.clear()
+    session['user_id'] = 'user1'
     session['logged_out'] = True
     if request.is_json or request.path.startswith('/api'):
         return jsonify({'success': True, 'message': '로그아웃되었습니다.'})
