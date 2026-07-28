@@ -1,0 +1,70 @@
+{% extends 'm_base.html' %}
+
+{% block content %}
+
+<div style="padding: 1.25rem 1rem 2rem 1rem;">
+    <!-- 모바일 타이틀 카드 -->
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-md); padding: 1.5rem 1.25rem; color: #ffffff; margin-bottom: 1.25rem; box-shadow: var(--shadow-soft);">
+        <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 12px; font-weight: 800; font-size: 0.75rem; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-trophy" style="color: #fde047;"></i> CONTEST ENTRY
+        </div>
+        <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 0.35rem;">🐾 우리 아이 출전 신청</h2>
+        <p style="font-size: 0.85rem; opacity: 0.92; line-height: 1.4;">
+            사랑스러운 반려동물의 매력을 콘테스트에 당당히 자랑해보세요!
+        </p>
+    </div>
+
+    <!-- 출전 폼 카드 -->
+    <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft);">
+        <form method="POST" action="/m/upload">
+            <div class="m-form-group" style="margin-bottom: 1rem;">
+                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🏆 참가 회차</label>
+                <select name="contest_id" class="m-form-control" style="width: 100%; padding: 0.75rem; font-weight: 700;">
+                    {% for c in contests %}
+                        <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
+                            제{{ c.contest_id }}회: {{ c.title }} ({{ c.status }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                <div class="m-form-group">
+                    <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐶 아이 이름</label>
+                    <input type="text" name="pet_name" class="m-form-control" placeholder="아이 이름" required style="width: 100%; padding: 0.75rem;">
+                </div>
+                <div class="m-form-group">
+                    <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐾 동물 종류</label>
+                    <select name="pet_type" class="m-form-control" style="width: 100%; padding: 0.75rem; font-weight: 700;">
+                        <option value="🐕 강아지">🐕 강아지</option>
+                        <option value="🐈 고양이">🐈 고양이</option>
+                        <option value="🐹 햄스터">🐹 햄스터</option>
+                        <option value="🦜 앵무새">🦜 앵무새</option>
+                        <option value="기타">🐾 기타</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="m-form-group" style="margin-bottom: 1rem;">
+                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">✨ 자랑 제목</label>
+                <input type="text" name="title" class="m-form-control" placeholder="심쿵한 제목을 입력하세요!" required style="width: 100%; padding: 0.75rem;">
+            </div>
+
+            <div class="m-form-group" style="margin-bottom: 1rem;">
+                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🖼️ 사진/영상 URL</label>
+                <input type="url" name="media_url" class="m-form-control" placeholder="https://..." style="width: 100%; padding: 0.75rem;">
+            </div>
+
+            <div class="m-form-group" style="margin-bottom: 1.25rem;">
+                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">📝 소개글</label>
+                <textarea name="content" class="m-form-control" rows="4" placeholder="아이 소개 및 자랑할 이야기를 적어주세요!" style="width: 100%; padding: 0.75rem; font-family: inherit;"></textarea>
+            </div>
+
+            <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); width: 100%; padding: 0.9rem; font-weight: 900; font-size: 1rem; border-radius: var(--radius-md);">
+                <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

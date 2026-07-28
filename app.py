@@ -226,24 +226,47 @@ def api_auth_setup_profile():
         'user': new_user
     })
 
-# Load environment variables from .env file if available
+# Load environment variables from .env file directly if python-dotenv is not active
+def load_env_file():
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+    if os.path.exists(dotenv_path):
+        try:
+            with open(dotenv_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        k = k.strip()
+                        v = v.strip().strip("'\"")
+                        if k not in os.environ or not os.environ[k]:
+                            os.environ[k] = v
+        except Exception as e:
+            print(f"[Env Load Warning] {e}")
+
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
 
-GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '253326907225-2d7t3ics5u6ua4l9bo8hojseuq3u8pqk.apps.googleusercontent.com')
-GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
-GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8003/auth/google/callback')
+load_env_file()
+
+def get_google_config():
+    load_env_file()
+    client_id = os.environ.get('GOOGLE_CLIENT_ID', '253326907225-2d7t3ics5u6ua4l9bo8hojseuq3u8pqk.apps.googleusercontent.com')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8003/auth/google/callback')
+    return client_id, client_secret, redirect_uri
+
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI = get_google_config()
 
 @app.route('/auth/google')
 def auth_google_redirect():
     """ 팝업 창을 구글 공식 OAuth 2.0 Authorization Code 인증 페이지로 직접 리다이렉트 (response_type=code) """
-    redirect_uri = GOOGLE_REDIRECT_URI
+    client_id, client_secret, redirect_uri = get_google_config()
     google_auth_url = (
         f"https://accounts.google.com/o/oauth2/v2/auth?"
-        f"client_id={GOOGLE_CLIENT_ID}&"
+        f"client_id={client_id}&"
         f"redirect_uri={redirect_uri}&"
         f"response_type=code&"
         f"scope=email%20profile&"
@@ -264,13 +287,17 @@ def auth_google_callback():
     if not code:
         return render_template('google_callback.html', error=error or '인증 코드가 전송되지 않았습니다.')
 
+    client_id, client_secret, redirect_uri = get_google_config()
+    if not client_secret:
+        return render_template('google_callback.html', error='서버 환경 변수 GOOGLE_CLIENT_SECRET이 설정되지 않았습니다. .env 파일을 확인해주세요.')
+
     # 1. Google OAuth Token Endpoint로 GOOGLE_CLIENT_SECRET을 사용하여 Server-to-Server 검증 요청
     token_url = "https://oauth2.googleapis.com/token"
     token_payload = {
         'code': code,
-        'client_id': GOOGLE_CLIENT_ID,
-        'client_secret': GOOGLE_CLIENT_SECRET, # 서버에서 안전하게 Secret을 사용하여 구글 서버에 인증
-        'redirect_uri': GOOGLE_REDIRECT_URI,
+        'client_id': client_id,
+        'client_secret': client_secret, # 서버에서 안전하게 Secret을 사용하여 구글 서버에 인증
+        'redirect_uri': redirect_uri,
         'grant_type': 'authorization_code'
     }
 

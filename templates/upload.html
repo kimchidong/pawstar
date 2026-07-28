@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
+    <!-- 상단 페이지 타이틀 헤더 -->
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-lg); padding: 2.5rem 3rem; color: #ffffff; margin-bottom: 2rem; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.15; font-size: 15rem; color: #ffffff; pointer-events: none;">
+            <i class="fa-solid fa-paw"></i>
+        </div>
+        <div style="position: relative; z-index: 2;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 0.4rem 1.2rem; border-radius: 20px; font-weight: 800; font-size: 0.88rem; margin-bottom: 0.85rem;">
+                <i class="fa-solid fa-trophy" style="color: #fde047;"></i> PAWSTAR OFFICIAL CONTEST
+            </div>
+            <h1 style="font-size: 2.4rem; font-weight: 900; margin-bottom: 0.6rem;">🐾 우리 아이 콘테스트 출전 신청</h1>
+            <p style="font-size: 1.05rem; opacity: 0.92; font-weight: 500;">
+                귀엽고 사랑스러운 반려동물의 매력을 마음껏 자랑해보세요! 스타가 될 준비가 되었나요?
+            </p>
+        </div>
+    </div>
+
+    <!-- 출전 등록 메인 폼 카드 -->
+    <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
+        <form method="POST" action="/upload" id="postUploadForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2rem;">
+                <!-- 좌측 폼 컨트롤 그룹 -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- 1. 참가 콘테스트 회차 선택 -->
+                    <div class="form-group">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            🏆 참가 콘테스트 회차
+                        </label>
+                        <select name="contest_id" class="form-control" style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; font-size: 0.95rem; background: var(--bg-primary);">
+                            {% for c in contests %}
+                                <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
+                                    제{{ c.contest_id }}회: {{ c.title }} ({{ c.status }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 2. 아이 이름 & 동물 종류 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                                🐶 반려동물 이름
+                            </label>
+                            <input type="text" name="pet_name" class="form-control" placeholder="예: 뽀삐, 냥이" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                        </div>
+
+                        <div class="form-group">
+                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                                🐾 동물 종류
+                            </label>
+                            <select name="pet_type" class="form-control" style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
+                                <option value="🐕 강아지">🐕 강아지</option>
+                                <option value="🐈 고양이">🐈 고양이</option>
+                                <option value="🐹 햄스터">🐹 햄스터</option>
+                                <option value="🦜 앵무새">🦜 앵무새</option>
+                                <option value="기타">🐾 기타</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. 자랑 게시물 제목 -->
+                    <div class="form-group">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            ✨ 자랑 제목
+                        </label>
+                        <input type="text" name="title" class="form-control" placeholder="아이의 매력을 한눈에 보여줄 심쿵 제목을 입력하세요!" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                    </div>
+
+                    <!-- 4. 미디어 (이미지/동영상) URL -->
+                    <div class="form-group">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            🖼️ 대표 사진 또는 영상 URL
+                        </label>
+                        <input type="url" id="uploadMediaUrl" name="media_url" class="form-control" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 500;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; display: block;">
+                            * 미입력 시 고화질 예시 펫 사진이 자동으로 지정됩니다.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 우측: 미디어 미리보기 & 게시물 내용 -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- 미디어 미리보기 박스 -->
+                    <div class="form-group">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            👀 출전 미디어 미리보기
+                        </label>
+                        <div style="width: 100%; height: 210px; border-radius: var(--radius-md); border: 2px dashed var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                            <img id="uploadPreviewImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <!-- 내용 설명 -->
+                    <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            📝 자랑 내용 및 소개글
+                        </label>
+                        <textarea name="content" class="form-control" rows="5" placeholder="우리 아이의 성격, 장기, 좋아하는 음식이나 출전 포부를 적어주세요!" style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; font-family: inherit; resize: vertical;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 제출 버튼 영역 -->
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light);">
+                <a href="/" style="padding: 0.85rem 2rem; border-radius: 30px; background: #f1f5f9; color: var(--text-secondary); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    취소
+                </a>
+                <button type="submit" style="padding: 0.85rem 2.5rem; border-radius: 30px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); color: #ffffff; border: none; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35); transition: var(--transition); display: inline-flex; align-items: center; gap: 0.6rem;">
+                    <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료하기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputUrl = document.getElementById('uploadMediaUrl');
+    const previewImg = document.getElementById('uploadPreviewImg');
+
+    if (inputUrl && previewImg) {
+        inputUrl.addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val) {
+                previewImg.src = val;
+            } else {
+                previewImg.src = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80';
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}
