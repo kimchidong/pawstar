@@ -150,6 +150,16 @@ body.m-body {
     top: -12px;
 }
 
+.m-nav-item.m-nav-upload.active span {
+    color: var(--accent-purple);
+    font-weight: 800;
+}
+
+.m-nav-item.m-nav-upload.active .m-nav-upload-btn {
+    box-shadow: 0 0 0 3px var(--accent-purple), 0 6px 20px rgba(124, 58, 237, 0.5);
+    transform: scale(1.06);
+}
+
 .m-nav-upload-btn {
     width: 48px;
     height: 48px;
