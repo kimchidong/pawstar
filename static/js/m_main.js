@@ -4,28 +4,18 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. 모바일 자랑하기 모달 조작
+    // 1. 모바일 자랑하기 (/m/upload 전용 페이지 전환 적용)
     const mBtnUploadNav = document.getElementById('mBtnUploadNav');
     const mUploadModal = document.getElementById('mUploadModal');
     const mBtnCloseUpload = document.getElementById('mBtnCloseUpload');
 
-    if (mBtnUploadNav && mUploadModal) {
+    if (mBtnUploadNav) {
         mBtnUploadNav.addEventListener('click', function(e) {
-            e.preventDefault();
-            mUploadModal.classList.add('active');
-        });
-    }
-
-    if (mBtnCloseUpload && mUploadModal) {
-        mBtnCloseUpload.addEventListener('click', function() {
-            mUploadModal.classList.remove('active');
-        });
-    }
-
-    if (mUploadModal) {
-        mUploadModal.addEventListener('click', function(e) {
-            if (e.target === mUploadModal) {
-                mUploadModal.classList.remove('active');
+            if (!mUploadModal) {
+                window.location.href = '/m/upload';
+            } else {
+                e.preventDefault();
+                mUploadModal.classList.add('active');
             }
         });
     }

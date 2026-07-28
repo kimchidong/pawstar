@@ -7,6 +7,9 @@
     <div class="m-hero-badge">{{ current_contest.d_day_str if current_contest else 'D-DAY' }} | {{ current_contest.status if current_contest else '진행중' }}</div>
     <h2>{{ current_contest.title if current_contest else 'Paw Star 콘테스트' }}</h2>
     <p>{{ current_contest.description if current_contest else '대한민국 대표 펫 스타에 도전하세요!' }}</p>
+    <a href="/m/upload" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #ffffff; color: #4f46e5; font-weight: 800; font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; margin-top: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+        <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
+    </a>
 </div>
 
 <!-- 필터 스크롤바 -->

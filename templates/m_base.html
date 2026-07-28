@@ -40,7 +40,7 @@
             <i class="fa-solid fa-crown"></i>
             <span>명예전당</span>
         </a>
-        <a href="#" id="mBtnUploadNav" class="m-nav-item m-nav-upload">
+        <a href="/m/upload" class="m-nav-item m-nav-upload {{ 'active' if request.path == '/m/upload' }}">
             <div class="m-nav-upload-btn">
                 <i class="fa-solid fa-plus"></i>
             </div>
@@ -62,56 +62,6 @@
             </a>
         {% endif %}
     </nav>
-
-    <!-- 모바일 펫 자랑하기 모달 팝업 -->
-    <div class="m-modal-backdrop" id="mUploadModal">
-        <div class="m-modal-sheet">
-            <div class="m-modal-header">
-                <h3>🐾 우리 아이 자랑하기</h3>
-                <button type="button" class="btn-close" id="mBtnCloseUpload">&times;</button>
-            </div>
-            <form id="mUploadForm">
-                <div class="m-form-group">
-                    <label>참여 회차</label>
-                    <select id="mPostContestId" class="m-form-control">
-                        {% for c in contests %}
-                            {% if c.status == '진행중' %}
-                                <option value="{{ c.contest_id }}" selected>{{ c.title }}</option>
-                            {% else %}
-                                <option value="{{ c.contest_id }}">{{ c.title }} ({{ c.status }})</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="m-form-group">
-                    <label>이름 및 종</label>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="mPetName" class="m-form-control" placeholder="예: 뽀삐" required>
-                        <select id="mPetType" class="m-form-control" style="width: 120px;">
-                            <option value="🐕 강아지">🐕 강아지</option>
-                            <option value="🐈 고양이">🐈 고양이</option>
-                            <option value="🐹 햄스터">🐹 햄스터</option>
-                            <option value="🦜 앵무새">🦜 앵무새</option>
-                            <option value="🐾 기타">🐾 기타</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="m-form-group">
-                    <label>자랑 제목</label>
-                    <input type="text" id="mPostTitle" class="m-form-control" placeholder="심쿵 제목을 작성하세요" required>
-                </div>
-                <div class="m-form-group">
-                    <label>사진/영상 URL</label>
-                    <input type="url" id="mMediaUrl" class="m-form-control" placeholder="https://..." required>
-                </div>
-                <div class="m-form-group">
-                    <label>내용</label>
-                    <textarea id="mPostContent" class="m-form-control" rows="3" placeholder="아이의 매력을 공유해주세요!"></textarea>
-                </div>
-                <button type="submit" class="m-btn-submit">🚀 자랑하기 출전</button>
-            </form>
-        </div>
-    </div>
 
     <!-- 모바일 상세보기 모달 -->
     <div class="m-modal-backdrop" id="mDetailModal">

@@ -519,6 +519,54 @@ def m_profile():
 def m_admin():
     return render_template('m_admin.html', contests=service.get_contests(), winners=service.winners)
 
+# -------------------------------------------------------------
+# 출전 신청(펫 자랑하기) 전용 페이지 라우트
+# -------------------------------------------------------------
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_page():
+    if request.method == 'POST':
+        contest_id = request.form.get('contest_id', type=int) or 3
+        user_id = session.get('user_id') or 'user1'
+        pet_name = request.form.get('pet_name', '우리 아이')
+        pet_type = request.form.get('pet_type', '🐕 강아지')
+        title = request.form.get('title', '')
+        content = request.form.get('content', '')
+        media_url = request.form.get('media_url', '')
+
+        if not title:
+            return redirect('/upload')
+
+        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
+        return redirect('/profile')
+
+    contest_id = request.args.get('contest_id', 3, type=int)
+    current_contest = service.get_contest(contest_id)
+    contests = service.get_contests()
+    return render_template('upload.html', current_contest=current_contest, contests=contests)
+
+@app.route('/m/upload', methods=['GET', 'POST'])
+def m_upload_page():
+    if request.method == 'POST':
+        contest_id = request.form.get('contest_id', type=int) or 3
+        user_id = session.get('user_id') or 'user1'
+        pet_name = request.form.get('pet_name', '우리 아이')
+        pet_type = request.form.get('pet_type', '🐕 강아지')
+        title = request.form.get('title', '')
+        content = request.form.get('content', '')
+        media_url = request.form.get('media_url', '')
+
+        if not title:
+            return redirect('/m/upload')
+
+        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
+        return redirect('/m/profile')
+
+    contest_id = request.args.get('contest_id', 3, type=int)
+    current_contest = service.get_contest(contest_id)
+    contests = service.get_contests()
+    return render_template('m_upload.html', current_contest=current_contest, contests=contests)
+
+
 
 # 4-1. 프로필 이미지 임시 업로드 API (plamodelshop 호환)
 @app.route('/upload/profile', methods=['POST'])

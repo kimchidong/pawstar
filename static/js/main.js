@@ -30,13 +30,19 @@ function initEventHandlers() {
         });
     }
 
-    // 모달 제어
+    // 모달 제어 (/upload 전용 페이지 전환 적용)
     const modalBackdrop = document.getElementById('uploadModal');
     const openBtn = document.getElementById('btnOpenModal');
     const closeBtn = document.getElementById('btnCloseModal');
 
-    if (openBtn && modalBackdrop) {
-        openBtn.addEventListener('click', () => modalBackdrop.classList.add('show'));
+    if (openBtn) {
+        openBtn.addEventListener('click', (e) => {
+            if (!modalBackdrop) {
+                window.location.href = '/upload';
+            } else {
+                modalBackdrop.classList.add('show');
+            }
+        });
     }
     if (closeBtn && modalBackdrop) {
         closeBtn.addEventListener('click', () => modalBackdrop.classList.remove('show'));

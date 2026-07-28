@@ -128,57 +128,6 @@
         </div>
     </footer>
 
-    <!-- 펫 자랑하기 모달 (Upload Modal) -->
-    <div class="modal-backdrop" id="uploadModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🐾 우리 아이 자랑하기</h3>
-                <button type="button" class="btn-close" id="btnCloseModal">&times;</button>
-            </div>
-            <form id="uploadForm">
-                <div class="form-group">
-                    <label>참여 콘테스트 회차</label>
-                    <select id="postContestId" class="form-control">
-                        {% for c in contests %}
-                            {% if c.status == '진행중' %}
-                                <option value="{{ c.contest_id }}" selected>{{ c.title }} (진행중)</option>
-                            {% else %}
-                                <option value="{{ c.contest_id }}">{{ c.title }} ({{ c.status }})</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>반려동물 이름 및 종</label>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="petName" class="form-control" placeholder="예: 뽀삐" required>
-                        <select id="petType" class="form-control" style="width: 140px;">
-                            <option value="🐕 강아지">🐕 강아지</option>
-                            <option value="🐈 고양이">🐈 고양이</option>
-                            <option value="🐹 햄스터">🐹 햄스터</option>
-                            <option value="🦜 앵무새">🦜 앵무새</option>
-                            <option value="🐾 기타">🐾 기타</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>자랑 제목</label>
-                    <input type="text" id="postTitle" class="form-control" placeholder="심쿵 포인트가 담긴 제목" required>
-                </div>
-                <div class="form-group">
-                    <label>사진/영상 이미지 URL</label>
-                    <input type="url" id="mediaUrl" class="form-control" placeholder="https://images.unsplash.com/..." required>
-                </div>
-                <div class="form-group">
-                    <label>내용</label>
-                    <textarea id="postContent" class="form-control" rows="3" placeholder="우리 아이의 사랑스러운 귀염 모먼트를 알려주세요!"></textarea>
-                </div>
-                <button type="submit" class="btn-upload" style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); font-size: 1rem; cursor: pointer; margin-top: 1rem;">
-                    🚀 콘테스트 출전하기
-                </button>
-            </form>
-        </div>
-    </div>
 
     <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
     <div class="modal-backdrop" id="postDetailModal">
