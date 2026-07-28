@@ -1,0 +1,300 @@
+{% extends 'm_base.html' %}
+
+{% block content %}
+
+<!-- 모바일 프로필 카드 -->
+<div class="m-profile-card">
+    <img src="{{ user.profile_img }}" class="m-profile-avatar" id="mCurrentProfileImg" alt="profile">
+    <h2 class="m-profile-name" id="mCurrentNickname">{{ user.nickname }}</h2>
+    <p class="m-profile-bio" id="mCurrentBio">
+        {{ user.bio or '반려동물과 함께하는 따뜻하고 행복한 일상 이야기 🐾' }}
+    </p>
+
+    <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+        <div><i class="fa-regular fa-calendar"></i> 가입/방문일: {{ user.joined_date or '2026-01-15' }}</div>
+        {% if user.email %}
+            <div style="background: #f1f5f9; color: #334155; padding: 0.25rem 0.7rem; border-radius: 14px; font-weight: 700; font-size: 0.78rem; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 연동 계정: {{ user.email }}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 3종 통계 정보 -->
+    <div class="m-profile-stats">
+        <div class="m-stat-item">
+            <div>출전작</div>
+            <div>{{ stats.my_post_count }}개</div>
+        </div>
+        <div class="m-stat-item">
+            <div>누적 점수</div>
+            <div>{{ "{:,}".format(stats.total_score) }}점</div>
+        </div>
+        <div class="m-stat-item">
+            <div>받은 좋아요</div>
+            <div>{{ "{:,}".format(stats.total_likes) }}개</div>
+        </div>
+    </div>
+
+    <!-- 프로필 수정, 로그아웃 및 회원탈퇴 버튼 -->
+    <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="m-btn-submit" id="mBtnOpenProfileModal" style="flex: 1; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);">
+            ✏️ 프로필 정보 수정
+        </button>
+        <a href="/logout" class="m-btn-submit" style="width: auto; padding: 0.85rem 0.9rem; background: #f1f5f9; border: 1px solid var(--border-light); color: var(--text-secondary); text-decoration: none; text-align: center;">
+            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+        </a>
+        <button type="button" id="mBtnWithdrawUser" class="m-btn-submit" style="width: auto; padding: 0.85rem 0.9rem; background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; text-align: center; cursor: pointer;">
+            <i class="fa-solid fa-user-xmark"></i> 탈퇴
+        </button>
+    </div>
+</div>
+
+<!-- 내 펫 출전 자랑작 -->
+<div style="padding: 0 1rem 1.5rem 1rem;">
+    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.75rem;">
+        🐾 내 펫 출전작 ({{ my_posts|length }})
+    </h3>
+
+    <div class="m-feed-grid" style="padding: 0;">
+        {% for p in my_posts %}
+            <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+                <div class="m-card-thumb">
+                    <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
+                </div>
+                <div class="m-card-content">
+                    <div class="m-card-title">{{ p.title }}</div>
+                    <div class="m-card-footer">
+                        <span>{{ p.created_at[:10] }}</span>
+                        <span>❤️ {{ p.like_count }}</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); color: var(--text-muted);">
+                아직 출전한 자랑 게시물이 없습니다.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 모바일 프로필 수정 레이어 바텀시트 모달 -->
+<div class="m-modal-backdrop" id="mProfileEditModal">
+    <div class="m-modal-sheet">
+        <div class="m-modal-header">
+            <h3>✏️ 프로필 정보 수정</h3>
+            <button type="button" class="btn-close" id="mBtnCloseProfileModal">&times;</button>
+        </div>
+        <form id="mProfileEditForm">
+            <!-- 프로필 이미지 (상단 가운데 배치) -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.5rem 0 1rem 0; text-align: center;">
+                <img id="mEditProfilePreview" src="{{ user.profile_img }}" alt="프로필 이미지" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 0.35rem;">
+                <input type="hidden" id="mEditProfileImg" value="{{ user.profile_img }}">
+            </div>
+
+            <div class="m-form-group">
+                <label>집사 닉네임</label>
+                <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" required>
+            </div>
+
+            <div class="m-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <label style="margin-bottom: 0;">한줄 소개</label>
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">
+                        <strong id="mBioByteCount" style="color: var(--accent-purple); font-weight: 700;">0</strong> / <span id="mBioMaxBytes">200</span> Bytes
+                    </span>
+                </div>
+                <textarea id="mEditBio" class="m-form-control" rows="3" placeholder="우리 아이 소개 및 자기소개">{{ user.bio }}</textarea>
+            </div>
+
+            <button type="submit" class="m-btn-submit" id="mBtnSaveProfile">
+                <i class="fa-solid fa-check"></i> 수정사항 저장하기
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnOpen = document.getElementById('mBtnOpenProfileModal');
+    const btnClose = document.getElementById('mBtnCloseProfileModal');
+    const modal = document.getElementById('mProfileEditModal');
+    const fileInput = document.getElementById('mEditProfileFile');
+    const profileImgInput = document.getElementById('mEditProfileImg');
+    const previewImg = document.getElementById('mEditProfilePreview');
+    const statusText = document.getElementById('mUploadStatusText');
+    const editForm = document.getElementById('mProfileEditForm');
+    const btnSave = document.getElementById('mBtnSaveProfile');
+
+    if (btnOpen && modal) {
+        btnOpen.addEventListener('click', function() {
+            modal.classList.add('active');
+        });
+    }
+
+    if (btnClose && modal) {
+        btnClose.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+
+    // 모바일 임시 이미지 업로드 (/upload/profile)
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('profile_img', file);
+
+            statusText.style.color = 'var(--accent-purple)';
+            statusText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 업로드 중...';
+            btnSave.disabled = true;
+
+            fetch('/upload/profile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                btnSave.disabled = false;
+                if (data.success) {
+                    profileImgInput.value = data.url;
+                    previewImg.src = data.url;
+                    statusText.style.color = '#10b981';
+                    statusText.innerHTML = '✨ 이미지 선택 완료';
+                } else {
+                    statusText.style.color = '#ef4444';
+                    statusText.textContent = '❌ 업로드 실패';
+                }
+            })
+            .catch(err => {
+                btnSave.disabled = false;
+                console.error(err);
+                statusText.style.color = '#ef4444';
+                statusText.textContent = '❌ 업로드 오류';
+            });
+        });
+    }
+
+    // mEditBio 실시간 바이트 수 계산 및 제한 로직
+    const bioInput = document.getElementById('mEditBio');
+    const bioByteCount = document.getElementById('mBioByteCount');
+    const MAX_BIO_BYTES = 200;
+
+    function getByteLength(str) {
+        return new TextEncoder().encode(str).length;
+    }
+
+    function updateBioByteCount() {
+        if (!bioInput || !bioByteCount) return;
+        let text = bioInput.value;
+        let bytes = getByteLength(text);
+
+        if (bytes > MAX_BIO_BYTES) {
+            while (getByteLength(text) > MAX_BIO_BYTES) {
+                text = text.slice(0, -1);
+            }
+            bioInput.value = text;
+            bytes = getByteLength(text);
+        }
+
+        bioByteCount.textContent = bytes;
+    }
+
+    if (bioInput) {
+        bioInput.addEventListener('input', updateBioByteCount);
+        if (btnOpen) {
+            btnOpen.addEventListener('click', updateBioByteCount);
+        }
+        updateBioByteCount();
+    }
+
+    // 모바일 프로필 정보 수정 제출
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nickname = document.getElementById('mEditNickname').value.trim();
+            const bio = bioInput.value.trim();
+            const profile_img = profileImgInput.value;
+
+            fetch('/api/profile/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: '{{ user.user_id }}',
+                    nickname: nickname,
+                    bio: bio,
+                    profile_img: profile_img
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('프로필 정보가 수정되었습니다.');
+                    location.reload();
+                } else {
+                    alert('수정 실패: ' + (data.message || '오류 발생'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('프로필 수정 중 오류가 발생했습니다.');
+            });
+        });
+    }
+
+    // 모바일 회원 탈퇴 이벤트를 위한 버튼 바인딩
+    const mBtnWithdraw = document.getElementById('mBtnWithdrawUser');
+    if (mBtnWithdraw) {
+        mBtnWithdraw.addEventListener('click', function() {
+            const confirmMsg = "⚠️ 정말로 PawStar 회원에서 탈퇴하시겠습니까?\n\n[🔒 안전한 회원 탈퇴 처리 안내]\n• PawStar 내 회원 정보 및 자랑 게시물/수상 내역 삭제\n• Google 서버에 부여했던 계정 연동 및 접근 동의 권한 자동 철회";
+            if (confirm(confirmMsg)) {
+                fetch('/api/auth/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = '/m/';
+                    } else {
+                        alert('회원 탈퇴 실패: ' + (data.message || '오류 발생'));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('회원 탈퇴 요청 중 오류가 발생했습니다.');
+                });
+            }
+        });
+    }
+    // 모바일 30분 비활동 클라이언트 자동 로그아웃 타임아웃
+    let idleTimer;
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function() {
+            alert('⏰ 30분 동안 이용이 없어 자동 로그아웃되었습니다.');
+            window.location.href = '/logout';
+        }, THIRTY_MINUTES);
+    }
+
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+        document.addEventListener(evt, resetIdleTimer, false);
+    });
+    resetIdleTimer();
+});
+</script>
+
+{% endblock %}

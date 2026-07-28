@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Paw Star Mobile 🌟</title>
+    <!-- FontAwesome & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- 모바일 전용 CSS (m_style.css) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/m_style.css') }}">
+</head>
+<body class="m-body">
+
+    <!-- 모바일 탑 헤더 -->
+    <header class="m-header">
+        <a href="/m/" class="m-brand">
+            <i class="fa-solid fa-paw"></i>
+            <span>Paw Star</span>
+        </a>
+        <div class="m-header-actions">
+            <a href="/" class="m-btn-pc-switch" title="PC 버진으로 이동">
+                <i class="fa-solid fa-desktop"></i> PC버전
+            </a>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 모바일 하단 내비게이션 바 -->
+    <nav class="m-bottom-nav">
+        <a href="/m/" class="m-nav-item {{ 'active' if request.path == '/m/' or request.path == '/m' }}">
+            <i class="fa-solid fa-trophy"></i>
+            <span>콘테스트</span>
+        </a>
+        <a href="/m/hall-of-fame" class="m-nav-item {{ 'active' if request.path == '/m/hall-of-fame' }}">
+            <i class="fa-solid fa-crown"></i>
+            <span>명예전당</span>
+        </a>
+        <a href="#" id="mBtnUploadNav" class="m-nav-item m-nav-upload">
+            <div class="m-nav-upload-btn">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <span>자랑하기</span>
+        </a>
+        <a href="/m/trending" class="m-nav-item {{ 'active' if request.path == '/m/trending' }}">
+            <i class="fa-solid fa-fire"></i>
+            <span>급상승</span>
+        </a>
+        {% if is_logged_in %}
+            <a href="/m/profile" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
+                <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0;">
+                <span>{{ current_user.nickname }}</span>
+            </a>
+        {% else %}
+            <a href="javascript:void(0);" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
+                <i class="fa-solid fa-right-to-bracket" style="color: var(--accent-purple);"></i>
+                <span>로그인</span>
+            </a>
+        {% endif %}
+    </nav>
+
+    <!-- 모바일 펫 자랑하기 모달 팝업 -->
+    <div class="m-modal-backdrop" id="mUploadModal">
+        <div class="m-modal-sheet">
+            <div class="m-modal-header">
+                <h3>🐾 우리 아이 자랑하기</h3>
+                <button type="button" class="btn-close" id="mBtnCloseUpload">&times;</button>
+            </div>
+            <form id="mUploadForm">
+                <div class="m-form-group">
+                    <label>참여 회차</label>
+                    <select id="mPostContestId" class="m-form-control">
+                        {% for c in contests %}
+                            {% if c.status == '진행중' %}
+                                <option value="{{ c.contest_id }}" selected>{{ c.title }}</option>
+                            {% else %}
+                                <option value="{{ c.contest_id }}">{{ c.title }} ({{ c.status }})</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="m-form-group">
+                    <label>이름 및 종</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="mPetName" class="m-form-control" placeholder="예: 뽀삐" required>
+                        <select id="mPetType" class="m-form-control" style="width: 120px;">
+                            <option value="🐕 강아지">🐕 강아지</option>
+                            <option value="🐈 고양이">🐈 고양이</option>
+                            <option value="🐹 햄스터">🐹 햄스터</option>
+                            <option value="🦜 앵무새">🦜 앵무새</option>
+                            <option value="🐾 기타">🐾 기타</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="m-form-group">
+                    <label>자랑 제목</label>
+                    <input type="text" id="mPostTitle" class="m-form-control" placeholder="심쿵 제목을 작성하세요" required>
+                </div>
+                <div class="m-form-group">
+                    <label>사진/영상 URL</label>
+                    <input type="url" id="mMediaUrl" class="m-form-control" placeholder="https://..." required>
+                </div>
+                <div class="m-form-group">
+                    <label>내용</label>
+                    <textarea id="mPostContent" class="m-form-control" rows="3" placeholder="아이의 매력을 공유해주세요!"></textarea>
+                </div>
+                <button type="submit" class="m-btn-submit">🚀 자랑하기 출전</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 모바일 상세보기 모달 -->
+    <div class="m-modal-backdrop" id="mDetailModal">
+        <div class="m-modal-sheet" style="max-height: 95vh; padding: 1.25rem;">
+            <div class="m-modal-header" style="margin-bottom: 0.75rem;">
+                <h3 id="mDetailTitle">게시물 상세</h3>
+                <button type="button" class="btn-close" onclick="closeMobileDetailModal()">&times;</button>
+            </div>
+            <div style="width: 100%; aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem;">
+                <img id="mDetailImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <img id="mDetailAuthorImg" src="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);">
+                    <div>
+                        <div id="mDetailAuthorNickname" style="font-size: 0.85rem; font-weight: 800;">집사</div>
+                        <div id="mDetailPetTag" style="font-size: 0.75rem; color: var(--accent-pink); font-weight: 700;">강아지</div>
+                    </div>
+                </div>
+                <div style="background: #fffbeb; border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;">
+                    ⭐ <span id="mDetailScoreNum">0</span> 점
+                </div>
+            </div>
+            <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;"></p>
+        </div>
+    </div>
+
+    <!-- 모바일 로그인 & 회원가입 바텀시트 모달 -->
+    <div class="m-modal-backdrop" id="mAuthModal">
+        <div class="m-modal-sheet" style="padding: 1.5rem 1.25rem;">
+            <div class="m-modal-header">
+                <h3 id="mAuthModalTitle">🔑 회원 로그인</h3>
+                <button type="button" class="btn-close" id="mBtnCloseAuth">&times;</button>
+            </div>
+
+            <!-- 탭 스위치 -->
+            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.2rem; margin-bottom: 1rem; border: 1px solid var(--border-light);">
+                <button type="button" id="mTabLoginBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: var(--gradient-brand); color: #fff;">로그인</button>
+                <button type="button" id="mTabRegisterBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: transparent; color: var(--text-secondary);">회원가입</button>
+            </div>
+
+            <!-- 로그인 폼 -->
+            <form id="mLoginForm">
+                <div class="m-form-group">
+                    <label>회원 아이디</label>
+                    <input type="text" id="mLoginUserId" class="m-form-control" placeholder="아이디 입력 (예: user1)" required>
+                </div>
+                <div class="m-form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="mLoginPassword" class="m-form-control" placeholder="비밀번호 입력 (기본: 1234)" required>
+                </div>
+                <button type="submit" class="m-btn-submit">🚀 로그인 하기</button>
+            </form>
+
+            <!-- 회원가입 폼 -->
+            <form id="mRegisterForm" style="display: none;">
+                <div class="m-form-group">
+                    <label>희망 아이디</label>
+                    <input type="text" id="mRegUserId" class="m-form-control" placeholder="아이디 입력" required>
+                </div>
+                <div class="m-form-group">
+                    <label>집사 닉네임</label>
+                    <input type="text" id="mRegNickname" class="m-form-control" placeholder="멋진 닉네임" required>
+                </div>
+                <div class="m-form-group">
+                    <label>사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="mRegPassword" class="m-form-control" placeholder="비밀번호 입력" required>
+                </div>
+                <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">✨ 회원가입 시작하기</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 모바일 전용 JS (m_main.js) -->
+    <script src="{{ url_for('static', filename='js/m_main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mBtnOpenAuthNav = document.getElementById('mBtnOpenAuthNav');
+        const mAuthModal = document.getElementById('mAuthModal');
+        const mBtnCloseAuth = document.getElementById('mBtnCloseAuth');
+        const mTabLoginBtn = document.getElementById('mTabLoginBtn');
+        const mTabRegisterBtn = document.getElementById('mTabRegisterBtn');
+        const mLoginForm = document.getElementById('mLoginForm');
+        const mRegisterForm = document.getElementById('mRegisterForm');
+        const mAuthModalTitle = document.getElementById('mAuthModalTitle');
+
+        if (mBtnOpenAuthNav && mAuthModal) {
+            mBtnOpenAuthNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                mAuthModal.classList.add('active');
+            });
+        }
+
+        if (mBtnCloseAuth && mAuthModal) {
+            mBtnCloseAuth.addEventListener('click', function() {
+                mAuthModal.classList.remove('active');
+            });
+        }
+
+        if (mTabLoginBtn && mTabRegisterBtn) {
+            mTabLoginBtn.addEventListener('click', function() {
+                mTabLoginBtn.style.background = 'var(--gradient-brand)';
+                mTabLoginBtn.style.color = '#fff';
+                mTabRegisterBtn.style.background = 'transparent';
+                mTabRegisterBtn.style.color = 'var(--text-secondary)';
+                mLoginForm.style.display = 'block';
+                mRegisterForm.style.display = 'none';
+                mAuthModalTitle.textContent = '🔑 회원 로그인';
+            });
+
+            mTabRegisterBtn.addEventListener('click', function() {
+                mTabRegisterBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+                mTabRegisterBtn.style.color = '#fff';
+                mTabLoginBtn.style.background = 'transparent';
+                mTabLoginBtn.style.color = 'var(--text-secondary)';
+                mRegisterForm.style.display = 'block';
+                mLoginForm.style.display = 'none';
+                mAuthModalTitle.textContent = '✨ 신규 회원가입';
+            });
+        }
+
+        // 모바일 로그인 제출
+        if (mLoginForm) {
+            mLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user_id = document.getElementById('mLoginUserId').value.trim();
+                const password = document.getElementById('mLoginPassword').value.trim();
+
+    <!-- 모바일 구글 인증 전용 바텀시트 모달 -->
+    <div class="m-modal-backdrop" id="mGoogleAuthModal">
+        <div class="m-modal-sheet" style="padding: 1.5rem 1.25rem; text-align: center;">
+            <div class="m-modal-header">
+                <h3 style="display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 계정 인증
+                </h3>
+                <button type="button" class="btn-close" id="mBtnCloseGoogle">&times;</button>
+            </div>
+
+            <div style="margin: 1rem 0; text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.85rem;">
+                    <strong>Google 계정</strong>을 선택하고 서명하여 로그인하세요.
+                </p>
+
+                <!-- 1. Google 공식 로그인 인증 리다이렉트 (prompt=select_account 지정) -->
+                <a href="/auth/google" id="mBtnOfficialGoogleAuth" style="width: 100%; padding: 0.8rem; border-radius: 24px; border: 1px solid #dadce0; background: #ffffff; color: #3c4043; font-weight: 800; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 0.75rem; box-sizing: border-box;">
+                    <svg width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    🌐 Google 공식 계정 선택 창으로 이동
+                </a>
+
+                <div style="display: flex; align-items: center; margin: 0.75rem 0; color: var(--text-muted); font-size: 0.75rem;">
+                    <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+                    <span style="padding: 0 0.4rem;">또는 이메일 직접 선택</span>
+                    <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+                </div>
+
+                <!-- 2. 구글 이메일 직접 선택 폼 -->
+                <form id="mGoogleAuthForm" style="text-align: left;">
+                    <div class="m-form-group" style="margin-bottom: 0.6rem;">
+                        <div style="position: relative;">
+                            <input type="email" id="mGoogleEmailInput" class="m-form-control" placeholder="본인 구글 이메일 (예: name@gmail.com)" required style="padding-left: 2.2rem; font-weight: 700;">
+                            <i class="fa-brands fa-google" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #ea4335; font-size: 0.9rem;"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="m-btn-submit" style="padding: 0.65rem; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; font-weight: 800; font-size: 0.85rem;">
+                        ✨ 이 이메일 계정으로 즉시 인증
+                    </button>
+                </form>
+            </div>
+
+            <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.75rem; color: var(--text-muted); text-align: left; line-height: 1.4;">
+                ℹ️ 프로필 이미지와 닉네임은 <strong>PawStar 사이트 내 프로필 설정에서 회원님이 직접 변경 및 관리</strong>할 수 있습니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- 모바일 전용 JS (m_main.js) -->
+    <script src="{{ url_for('static', filename='js/m_main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mBtnNavProfile = document.getElementById('mBtnNavProfile');
+        const mGoogleModal = document.getElementById('mGoogleAuthModal');
+        const mBtnCloseGoogle = document.getElementById('mBtnCloseGoogle');
+        const mGoogleAuthForm = document.getElementById('mGoogleAuthForm');
+
+        function openMGoogleAuthWindow() {
+            const width = 440;
+            const height = 600;
+            const left = Math.max(0, (window.screen.width - width) / 2);
+            const top = Math.max(0, (window.screen.height - height) / 2);
+
+            const popup = window.open(
+                '/auth/google',
+                'GoogleSignInPopup',
+                `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+            );
+            if (popup) popup.focus();
+        }
+
+        if (mBtnNavProfile) {
+            mBtnNavProfile.addEventListener('click', function(e) {
+                {% if not is_logged_in %}
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openMGoogleAuthWindow();
+                {% endif %}
+            });
+        }
+
+        const mBtnOfficialGoogleAuth = document.getElementById('mBtnOfficialGoogleAuth');
+        if (mBtnOfficialGoogleAuth) {
+            mBtnOfficialGoogleAuth.addEventListener('click', function(e) {
+                e.preventDefault();
+                openMGoogleAuthWindow();
+            });
+        }
+
+        if (mBtnCloseGoogle && mGoogleModal) {
+            mBtnCloseGoogle.addEventListener('click', function() {
+                mGoogleModal.classList.remove('active');
+            });
+        }
+
+        if (mGoogleAuthForm) {
+            mGoogleAuthForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('mGoogleEmailInput').value.trim();
+                if (!email) return;
+
+                fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        google_id: 'g_' + Math.floor(Math.random() * 1000000),
+                        email: email,
+                        name: email.split('@')[0]
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.href = '/m/profile';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

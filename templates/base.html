@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paw Star - 반려동물도 스타가 될 수 있다 🌟</title>
+    <!-- FontAwesome icons & Google Script Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand-logo">
+                <i class="fa-solid fa-paw paw-icon"></i>
+                <div class="brand-text">
+                    <h1>Paw Star</h1>
+                    <span>"{{ app_slogan }}"</span>
+                </div>
+            </a>
+
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="/" class="{{ 'active' if request.path == '/' }}">
+                        <i class="fa-solid fa-trophy"></i> 콘테스트
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/hall-of-fame" class="{{ 'active' if request.path == '/hall-of-fame' }}">
+                        <i class="fa-solid fa-crown"></i> 명예의 전당
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% if is_logged_in %}
+                        <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
+                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; vertical-align: middle;">
+                            {{ current_user.nickname }}
+                        </a>
+                    {% else %}
+                        <a href="javascript:void(0);" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}" style="color: var(--accent-purple); font-weight: 800;">
+                            <i class="fa-solid fa-right-to-bracket"></i> 로그인
+                        </a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
+                    <a href="#" id="btnOpenModal" class="btn-upload">
+                        <i class="fa-solid fa-plus"></i> 펫 자랑하기
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Body -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- 1. 브랜드 영역 -->
+                <div class="footer-brand">
+                    <div class="footer-logo-title">Paw Star</div>
+                    <div class="footer-slogan">"{{ app_slogan }}"</div>
+                    <p class="footer-desc">
+                        Paw Star는 세상에서 가장 소중한 반려동물의 사랑스러운 순간을 공유하고, 매월 콘테스트를 통해 명예의 전당 펫 스타를 탄생시키는 대표 커뮤니티입니다.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn" title="Blog"><i class="fa-solid fa-blog"></i></a>
+                    </div>
+                </div>
+
+                <!-- 2. 메뉴 링크 -->
+                <div class="footer-col">
+                    <h4>바로가기</h4>
+                    <ul class="footer-links">
+                        <li><a href="/"><i class="fa-solid fa-angle-right"></i> 콘테스트 홈</a></li>
+                        <li><a href="/hall-of-fame"><i class="fa-solid fa-angle-right"></i> 명예의 전당</a></li>
+                        <li><a href="/profile"><i class="fa-solid fa-angle-right"></i> 마이 프로필</a></li>
+                        <li><a href="#" onclick="document.getElementById('btnOpenModal').click(); return false;"><i class="fa-solid fa-angle-right"></i> 펫 자랑하기</a></li>
+                    </ul>
+                </div>
+
+                <!-- 3. 카테고리 -->
+                <div class="footer-col">
+                    <h4>반려동물 카테고리</h4>
+                    <ul class="footer-links">
+                        <li><a href="/?pet_type=🐕 강아지">🐕 강아지 스타</a></li>
+                        <li><a href="/?pet_type=🐈 고양이">🐈 고양이 스타</a></li>
+                        <li><a href="/?pet_type=🐹 햄스터">🐹 햄스터 스타</a></li>
+                        <li><a href="/?pet_type=🦜 앵무새">🦜 앵무새 스타</a></li>
+                        <li><a href="/?pet_type=기타">🐾 기타 귀요미들</a></li>
+                    </ul>
+                </div>
+
+                <!-- 4. 점수 산정 방식 공개 & 시상 정보 -->
+                <div class="footer-col">
+                    <h4>점수 평가 방식 (공개)</h4>
+                    <div class="award-badges-mini">
+                        <div class="award-badge-item">👁️ <span>조회수: <strong>+1점</strong></span></div>
+                        <div class="award-badge-item">❤️ <span>좋아요: <strong>+5점</strong></span></div>
+                        <div class="award-badge-item">💬 <span>댓글: <strong>+10점</strong></span></div>
+                        <div class="award-badge-item">🚀 <span>공유 유입: <strong>+20점</strong></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 카피라이트 -->
+            <div class="footer-bottom">
+                <div>
+                    <span>Copyright ⓒ 2026 <strong>Paw Star</strong>. All rights reserved.</span>
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="#">개인정보처리방침</a>
+                    <a href="#">이용약관</a>
+                    <a href="#">고객센터</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 펫 자랑하기 모달 (Upload Modal) -->
+    <div class="modal-backdrop" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🐾 우리 아이 자랑하기</h3>
+                <button type="button" class="btn-close" id="btnCloseModal">&times;</button>
+            </div>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label>참여 콘테스트 회차</label>
+                    <select id="postContestId" class="form-control">
+                        {% for c in contests %}
+                            {% if c.status == '진행중' %}
+                                <option value="{{ c.contest_id }}" selected>{{ c.title }} (진행중)</option>
+                            {% else %}
+                                <option value="{{ c.contest_id }}">{{ c.title }} ({{ c.status }})</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>반려동물 이름 및 종</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="petName" class="form-control" placeholder="예: 뽀삐" required>
+                        <select id="petType" class="form-control" style="width: 140px;">
+                            <option value="🐕 강아지">🐕 강아지</option>
+                            <option value="🐈 고양이">🐈 고양이</option>
+                            <option value="🐹 햄스터">🐹 햄스터</option>
+                            <option value="🦜 앵무새">🦜 앵무새</option>
+                            <option value="🐾 기타">🐾 기타</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>자랑 제목</label>
+                    <input type="text" id="postTitle" class="form-control" placeholder="심쿵 포인트가 담긴 제목" required>
+                </div>
+                <div class="form-group">
+                    <label>사진/영상 이미지 URL</label>
+                    <input type="url" id="mediaUrl" class="form-control" placeholder="https://images.unsplash.com/..." required>
+                </div>
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea id="postContent" class="form-control" rows="3" placeholder="우리 아이의 사랑스러운 귀염 모먼트를 알려주세요!"></textarea>
+                </div>
+                <button type="submit" class="btn-upload" style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); font-size: 1rem; cursor: pointer; margin-top: 1rem;">
+                    🚀 콘테스트 출전하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
+    <div class="modal-backdrop" id="postDetailModal">
+        <div class="modal-content detail-modal-content">
+            <button type="button" class="btn-close detail-close" id="btnCloseDetailModal">&times;</button>
+            <div class="detail-modal-body">
+                <div class="detail-media-container">
+                    <img id="detailImg" src="" alt="pet image">
+                    <div id="detailRankBadge" class="detail-rank-badge"></div>
+                </div>
+                <div class="detail-info-container">
+                    <div class="author-info" style="margin-bottom: 1rem;">
+                        <img id="detailAuthorImg" src="" class="author-img" alt="profile">
+                        <div class="author-detail">
+                            <div class="nickname" id="detailAuthorNickname">집사 닉네임</div>
+                            <div class="pet-tag" id="detailPetTag">🐕 강아지 뽀삐</div>
+                        </div>
+                        <div class="card-total-score">
+                            <i class="fa-solid fa-star"></i> <span id="detailScoreNum" class="score-num">0</span> 점
+                        </div>
+                    </div>
+
+                    <h2 class="detail-title" id="detailTitle">게시물 제목</h2>
+                    <p class="detail-content" id="detailContent">게시물 본문 내용이 이곳에 표시됩니다.</p>
+                    
+                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="detailCreatedAt">
+                        등록일: 2026-07-28
+                    </div>
+
+                    <!-- 실시간 액션 버튼 (모달 내부) -->
+                    <div class="card-actions detail-actions">
+                        <button type="button" class="action-btn btn-view" id="detailBtnView" title="조회수">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count" id="detailViewCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-like" id="detailBtnLike" title="좋아요">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="like-count" id="detailLikeCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-comment" id="detailBtnComment" title="댓글">
+                            <i class="fa-regular fa-comment"></i>
+                            <span class="comment-count" id="detailCommentCount">0</span>
+                        </button>
+                        <button type="button" class="action-btn btn-share" id="detailBtnShare" title="공유유입">
+                            <i class="fa-solid fa-share-nodes"></i>
+                            <span class="share-count" id="detailShareCount">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구글 전용 인증 레이어 팝업 모달 (Google Auth Modal) -->
+    <div class="modal-backdrop" id="googleAuthModal">
+        <div class="modal-content" style="max-width: 420px; padding: 2rem; text-align: center;">
+            <div class="modal-header" style="margin-bottom: 1rem;">
+                <h3 style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 계정 인증
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseGoogleModal">&times;</button>
+            </div>
+
+            <div style="margin: 1.25rem 0; text-align: center;">
+                <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.25rem;">
+                    PawStar에 오신 것을 환영합니다! 🐾<br>
+                    <strong>Google 계정</strong>을 선택하고 서명하여 안전하게 로그인하세요.
+                </p>
+
+                <!-- 1. Google 공식 로그인 인증 리다이렉트 (prompt=select_account 지정) -->
+                <a href="/auth/google" id="btnOfficialGoogleAuth" style="width: 100%; padding: 0.85rem; border-radius: 24px; border: 1px solid #dadce0; background: #ffffff; color: #3c4043; font-weight: 800; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 0.75rem; box-sizing: border-radius: 24px; transition: all 0.2s ease;">
+                    <svg width="20" height="20" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    🌐 Google 공식 계정 선택 창으로 이동
+                </a>
+
+                <div style="display: flex; align-items: center; margin: 1rem 0; color: var(--text-muted); font-size: 0.8rem;">
+                    <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+                    <span style="padding: 0 0.5rem;">또는 계정 직접 선택/입력</span>
+                    <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+                </div>
+
+                <!-- 2. 구글 이메일 직접 선택 폼 -->
+                <form id="googleAuthForm" style="text-align: left;">
+                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                        <div style="position: relative;">
+                            <input type="email" id="googleEmailInput" class="form-control" placeholder="본인 구글 이메일 입력 (예: name@gmail.com)" required style="padding-left: 2.3rem; font-weight: 700;">
+                            <i class="fa-brands fa-google" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #ea4335;"></i>
+                        </div>
+                    </div>
+                    <button type="submit" style="width: 100%; padding: 0.7rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; font-weight: 800; font-size: 0.9rem; cursor: pointer;">
+                        ✨ 이 이메일 계정으로 즉시 인증
+                    </button>
+                </form>
+            </div>
+
+            <div style="background: #f8fafc; border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.78rem; color: var(--text-muted); text-align: left; line-height: 1.5;">
+                ℹ️ <strong>프로필 안내</strong><br>
+                프로필 이미지와 닉네임은 구글 정보를 불러오지 않고, <strong>PawStar 사이트 내 마이페이지에서 회원님이 직접 설정하고 자유롭게 관리</strong>할 수 있습니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnNavProfile = document.getElementById('btnNavProfile');
+        const googleModal = document.getElementById('googleAuthModal');
+        const btnCloseGoogleModal = document.getElementById('btnCloseGoogleModal');
+        const googleAuthForm = document.getElementById('googleAuthForm');
+
+        function openGoogleAuthWindow() {
+            const width = 480;
+            const height = 620;
+            const left = Math.max(0, (window.screen.width - width) / 2);
+            const top = Math.max(0, (window.screen.height - height) / 2);
+
+            const popup = window.open(
+                '/auth/google',
+                'GoogleSignInPopup',
+                `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+            );
+            if (popup) popup.focus();
+        }
+
+        // 최상단 프로필/로그인 버튼 클릭 시 바로 구글 팝업 창 오픈
+        if (btnNavProfile) {
+            btnNavProfile.addEventListener('click', function(e) {
+                {% if not is_logged_in %}
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openGoogleAuthWindow();
+                {% endif %}
+            });
+        }
+
+        const btnOfficialGoogleAuth = document.getElementById('btnOfficialGoogleAuth');
+        if (btnOfficialGoogleAuth) {
+            btnOfficialGoogleAuth.addEventListener('click', function(e) {
+                e.preventDefault();
+                openGoogleAuthWindow();
+            });
+        }
+
+        if (btnCloseGoogleModal && googleModal) {
+            btnCloseGoogleModal.addEventListener('click', function() {
+                googleModal.classList.remove('show');
+            });
+        }
+
+        // 구글 로그인 처리 함수
+        function handleGoogleAuthResponse(googleUser) {
+            fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(googleUser || {})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.href = '/profile';
+                } else {
+                    alert('Google 인증 실패: ' + data.message);
+                }
+            });
+        }
+
+        if (googleAuthForm) {
+            googleAuthForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('googleEmailInput').value.trim();
+                if (!email) return;
+
+                handleGoogleAuthResponse({
+                    google_id: 'g_' + Math.floor(Math.random() * 1000000),
+                    email: email,
+                    name: email.split('@')[0]
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>
