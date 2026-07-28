@@ -520,8 +520,40 @@ def m_admin():
     return render_template('m_admin.html', contests=service.get_contests(), winners=service.winners)
 
 # -------------------------------------------------------------
-# 출전 신청(펫 자랑하기) 전용 페이지 라우트
+# 출전 신청(펫 자랑하기) 파일 저장 도우미 & 전용 페이지 라우트
 # -------------------------------------------------------------
+def save_uploaded_media(file):
+    if not file or file.filename == '':
+        return None
+
+    upload_dir = os.path.join(app.root_path, 'static', 'image', 'post')
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir, exist_ok=True)
+
+    now = datetime.datetime.now()
+    filename = secure_filename(file.filename)
+    unique_name = f"post_{int(now.timestamp())}_{uuid.uuid4().hex[:8]}.webp"
+    file_path = os.path.join(upload_dir, unique_name)
+
+    try:
+        from PIL import Image
+        image = Image.open(file.stream)
+        if image.mode in ("RGBA", "P"):
+            image = image.convert("RGB")
+        elif image.mode != "RGB":
+            image = image.convert("RGB")
+
+        image.thumbnail((1280, 1280), getattr(Image, 'Resampling', Image).LANCZOS if hasattr(Image, 'Resampling') else Image.ANTIALIAS)
+        image.save(file_path, "WEBP", quality=90)
+    except Exception as err:
+        print(f"[Media Upload Warning] Fallback to raw save: {err}")
+        file.seek(0)
+        fallback_name = f"post_{int(now.timestamp())}_{filename if filename else 'photo.jpg'}"
+        file.save(os.path.join(upload_dir, fallback_name))
+        return f"/static/image/post/{fallback_name}"
+
+    return f"/static/image/post/{unique_name}"
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
     contests = service.get_contests()
@@ -534,7 +566,15 @@ def upload_page():
         pet_type = request.form.get('pet_type', '🐕 강아지')
         title = request.form.get('title', '')
         content = request.form.get('content', '')
-        media_url = request.form.get('media_url', '')
+        
+        media_url = ''
+        if 'media_file' in request.files and request.files['media_file'].filename != '':
+            uploaded_url = save_uploaded_media(request.files['media_file'])
+            if uploaded_url:
+                media_url = uploaded_url
+
+        if not media_url:
+            media_url = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80'
 
         if not title:
             return redirect('/upload')
@@ -556,7 +596,15 @@ def m_upload_page():
         pet_type = request.form.get('pet_type', '🐕 강아지')
         title = request.form.get('title', '')
         content = request.form.get('content', '')
-        media_url = request.form.get('media_url', '')
+        
+        media_url = ''
+        if 'media_file' in request.files and request.files['media_file'].filename != '':
+            uploaded_url = save_uploaded_media(request.files['media_file'])
+            if uploaded_url:
+                media_url = uploaded_url
+
+        if not media_url:
+            media_url = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80'
 
         if not title:
             return redirect('/m/upload')

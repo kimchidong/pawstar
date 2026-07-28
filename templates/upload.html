@@ -21,7 +21,7 @@
 
     <!-- 출전 등록 메인 폼 카드 -->
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
-        <form method="POST" action="/upload" id="postUploadForm">
+        <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2rem;">
                 <!-- 좌측 폼 컨트롤 그룹 -->
                 <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -70,14 +70,14 @@
                         <input type="text" name="title" class="form-control" placeholder="아이의 매력을 한눈에 보여줄 심쿵 제목을 입력하세요!" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                     </div>
 
-                    <!-- 4. 미디어 (이미지/동영상) URL -->
+                    <!-- 4. 파일 업로드 -->
                     <div class="form-group">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                            🖼️ 대표 사진 또는 영상 URL
+                            🖼️ 출전 사진 파일 첨부
                         </label>
-                        <input type="url" id="uploadMediaUrl" name="media_url" class="form-control" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 500;">
-                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; display: block;">
-                            * 미입력 시 고화질 예시 펫 사진이 자동으로 지정됩니다.
+                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600; background: var(--bg-primary);">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; display: block;">
+                            * JPG, PNG, WEBP 등 사랑스러운 펫 이미지를 첨부해주세요.
                         </span>
                     </div>
                 </div>
@@ -119,16 +119,18 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const inputUrl = document.getElementById('uploadMediaUrl');
+    const inputFile = document.getElementById('uploadMediaFile');
     const previewImg = document.getElementById('uploadPreviewImg');
 
-    if (inputUrl && previewImg) {
-        inputUrl.addEventListener('input', function() {
-            const val = this.value.trim();
-            if (val) {
-                previewImg.src = val;
-            } else {
-                previewImg.src = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80';
+    if (inputFile && previewImg) {
+        inputFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    previewImg.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         });
     }
