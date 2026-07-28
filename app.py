@@ -524,8 +524,11 @@ def m_admin():
 # -------------------------------------------------------------
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
+    contests = service.get_contests()
+    current_contest = next((c for c in contests if c.get('status') == '진행중'), contests[0] if contests else None)
+    
     if request.method == 'POST':
-        contest_id = request.form.get('contest_id', type=int) or 3
+        contest_id = current_contest['contest_id'] if current_contest else 3
         user_id = session.get('user_id') or 'user1'
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')
@@ -539,15 +542,15 @@ def upload_page():
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
         return redirect('/profile')
 
-    contest_id = request.args.get('contest_id', 3, type=int)
-    current_contest = service.get_contest(contest_id)
-    contests = service.get_contests()
     return render_template('upload.html', current_contest=current_contest, contests=contests)
 
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
+    contests = service.get_contests()
+    current_contest = next((c for c in contests if c.get('status') == '진행중'), contests[0] if contests else None)
+
     if request.method == 'POST':
-        contest_id = request.form.get('contest_id', type=int) or 3
+        contest_id = current_contest['contest_id'] if current_contest else 3
         user_id = session.get('user_id') or 'user1'
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')
@@ -561,9 +564,6 @@ def m_upload_page():
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
         return redirect('/m/profile')
 
-    contest_id = request.args.get('contest_id', 3, type=int)
-    current_contest = service.get_contest(contest_id)
-    contests = service.get_contests()
     return render_template('m_upload.html', current_contest=current_contest, contests=contests)
 
 
