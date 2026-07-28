@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<div style="max-width: 1100px; margin: 2rem auto; padding: 0 1rem;">
+<div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
     <!-- Profile Card Header (plamodelshop 방식 동일 구조) -->
     <div class="profile-card">
         <img src="{{ user.profile_img }}" class="profile-avatar" id="currentProfileImg" alt="user profile">
-        <div style="flex: 1;">
+        <div style="flex: 1; min-width: 0; word-break: break-word;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <h2 style="font-size: 1.8rem; font-weight: 800;" id="currentNickname">{{ user.nickname }}</h2>

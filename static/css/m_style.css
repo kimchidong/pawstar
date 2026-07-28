@@ -347,6 +347,11 @@ body.m-body {
     border: 1px solid var(--border-light);
     text-align: center;
     box-shadow: var(--shadow-soft);
+    box-sizing: border-box;
+    width: calc(100% - 2rem);
+    max-width: 100%;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 .m-profile-avatar {

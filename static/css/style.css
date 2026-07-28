@@ -771,7 +771,7 @@ body {
 
 /* Profile Page */
 .profile-card {
-    max-width: 900px;
+    width: 1280px;
     margin: 2rem auto;
     background: var(--bg-surface);
     border: 1px solid var(--border-light);
@@ -781,6 +781,14 @@ body {
     gap: 2.5rem;
     align-items: center;
     box-shadow: var(--shadow-card);
+    box-sizing: border-box;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.profile-card > div {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .profile-avatar {
