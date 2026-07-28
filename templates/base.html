@@ -41,7 +41,7 @@
                             {{ current_user.nickname }}
                         </a>
                     {% else %}
-                        <a href="javascript:void(0);" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}" style="color: var(--accent-purple); font-weight: 800;">
+                        <a href="javascript:void(0);" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
                             <i class="fa-solid fa-right-to-bracket"></i> 로그인
                         </a>
                     {% endif %}
