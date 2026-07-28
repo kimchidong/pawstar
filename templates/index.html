@@ -4,25 +4,47 @@
 
 <!-- Contest Hero Banner -->
 <div class="contest-hero">
-    <div class="hero-content">
-        <div class="contest-badge">
-            <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.status }} 콘테스트</span>
+    <div class="hero-overlay"></div>
+    <div class="hero-container">
+        <!-- 좌측: 타이틀 & 대형 슬로건 -->
+        <div class="hero-main-info">
+            <div class="contest-badge-live">
+                <span class="live-dot"></span>
+                <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.status }}</span>
+            </div>
+            <h2 class="hero-title">{{ current_contest.title }}</h2>
+            <p class="hero-desc">{{ current_contest.description }}</p>
+            
+            <div class="hero-actions">
+                <button type="button" class="btn-hero-cta" onclick="document.getElementById('btnOpenModal').click();">
+                    <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
+                </button>
+                <a href="/hall-of-fame" class="btn-hero-sec">
+                    <i class="fa-solid fa-crown"></i> 지난 명예의 전당
+                </a>
+            </div>
         </div>
-        <h2>{{ current_contest.title }}</h2>
-        <p>{{ current_contest.description }}</p>
-        
-        <div class="contest-meta">
-            <div class="meta-item">
-                <span class="label">시작일</span>
-                <span class="value">{{ current_contest.start_date }}</span>
+
+        <!-- 우측: 진행중 콘테스트 글래스모피즘 블록 (Glassmorphism Info Block) -->
+        <div class="hero-contest-card">
+            <div class="contest-card-badge">
+                <i class="fa-solid fa-trophy"></i> LIVE CONTEST
             </div>
-            <div class="meta-item">
-                <span class="label">종료일</span>
-                <span class="value">{{ current_contest.end_date }}</span>
+            
+            <div class="contest-time-grid">
+                <div class="time-box">
+                    <span class="time-label"><i class="fa-regular fa-calendar-check"></i> 시작일</span>
+                    <span class="time-val">{{ current_contest.start_date }}</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-label"><i class="fa-regular fa-calendar-xmark"></i> 종료일</span>
+                    <span class="time-val">{{ current_contest.end_date }}</span>
+                </div>
             </div>
-            <div class="meta-item">
-                <span class="label">마감까지</span>
-                <span class="value">{{ current_contest.d_day_str }}</span>
+
+            <div class="dday-highlight-box">
+                <div class="dday-label"><i class="fa-solid fa-hourglass-half"></i> 마감까지</div>
+                <div class="dday-badge-large">{{ current_contest.d_day_str }}</div>
             </div>
         </div>
     </div>
