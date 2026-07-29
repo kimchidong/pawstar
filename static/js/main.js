@@ -336,6 +336,9 @@ function openDetailModal(post) {
         }
     }
 
+    // 게시물 상세 팝업 오픈시 조회수 1회 자동 증가 (+1점)
+    triggerEvent(post.post_id, 'view');
+
     // 데이터 채우기
     const imgEl = document.getElementById('detailImg');
     if (imgEl) imgEl.src = post.media_url || '';

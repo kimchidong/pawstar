@@ -94,6 +94,10 @@ function openMobileDetailModal(postData) {
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
+    if (typeof triggerEvent === 'function') {
+        triggerEvent(postData.post_id, 'view');
+    }
+
     detailModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
