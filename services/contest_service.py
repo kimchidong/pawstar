@@ -572,6 +572,9 @@ class PawStarService:
         elif event_type == 'like':
             l_delta = 1
             post['like_count'] += 1
+        elif event_type == 'unlike':
+            l_delta = -1
+            post['like_count'] = max(0, post['like_count'] - 1)
         elif event_type == 'comment':
             c_delta = 1
             post['comment_count'] += 1
@@ -960,9 +963,9 @@ class PawStarService:
             'content': content,
             'media_url': media_url or 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
             'media_type': 'IMAGE',
-            'score': 10, # 신규 등록 기본 점수
-            'view_count': 1,
-            'like_count': 1,
+            'score': 0, # 신규 등록 기본 점수 (0점)
+            'view_count': 0,
+            'like_count': 0,
             'comment_count': 0,
             'share_count': 0,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')

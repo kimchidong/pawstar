@@ -696,7 +696,7 @@ def post_event():
     user_id = session.get('user_id')
     
     # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
-    if not user_id and event_type in ['like', 'comment', 'share']:
+    if not user_id and event_type in ['like', 'unlike', 'comment', 'share']:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 401
 
     res = service.trigger_event(post_id, event_type, user_id=user_id)

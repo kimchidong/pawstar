@@ -147,9 +147,14 @@
 
                     <h2 class="detail-title" id="detailTitle">게시물 제목</h2>
                     <p class="detail-content" id="detailContent">게시물 본문 내용이 이곳에 표시됩니다.</p>
-                    
-                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="detailCreatedAt">
-                        등록일: 2026-07-28
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
+                        <span style="font-size: 0.82rem; color: var(--text-muted);" id="detailCreatedAt">
+                            등록일: 2026-07-28
+                        </span>
+                        <!-- 우측 하트 좋아요 버튼 -->
+                        <button type="button" id="detailHeartLikeBtn" class="btn-heart-action" title="좋아요 누르기" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; cursor: pointer; transition: all 0.2s ease;">
+                            <i class="fa-regular fa-heart" id="detailHeartIcon"></i>
+                        </button>
                     </div>
 
                     <!-- 실시간 액션 버튼 (모달 내부) -->

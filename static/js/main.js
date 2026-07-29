@@ -229,6 +229,7 @@ async function triggerEvent(postId, eventType) {
         const messages = {
             'view': '조회수 +1 (Score +1)',
             'like': '❤️ 좋아요! (Score +5)',
+            'unlike': '🤍 좋아요 취소 (Score -5)',
             'comment': '💬 댓글 작성 (Score +10)',
             'share': '🚀 공유 유입 (Score +20)'
         };
@@ -349,18 +350,42 @@ function openDetailModal(post) {
         }
     }
 
-    // 모달 내부 버튼 이벤트 바인딩
-    const btnView = document.getElementById('detailBtnView');
+    // 모달 내부 버튼 이벤트 바인딩 & 좋아요 토글 처리
+    const heartBtn = document.getElementById('detailHeartLikeBtn');
+    const heartIcon = document.getElementById('detailHeartIcon');
     const btnLike = document.getElementById('detailBtnLike');
+
+    let isLiked = false;
+
+    if (heartIcon) {
+        heartIcon.className = 'fa-regular fa-heart';
+        heartIcon.style.color = '#f43f5e';
+    }
+
+    const toggleLikeHandler = () => {
+        if (!isLiked) {
+            triggerEvent(post.post_id, 'like');
+            isLiked = true;
+            if (heartIcon) {
+                heartIcon.className = 'fa-solid fa-heart';
+                heartIcon.style.color = '#ef4444';
+            }
+        } else {
+            triggerEvent(post.post_id, 'unlike');
+            isLiked = false;
+            if (heartIcon) {
+                heartIcon.className = 'fa-regular fa-heart';
+                heartIcon.style.color = '#f43f5e';
+            }
+        }
+    };
+
+    if (heartBtn) heartBtn.onclick = toggleLikeHandler;
+    if (btnLike) btnLike.onclick = toggleLikeHandler;
+
+    const btnView = document.getElementById('detailBtnView');
     const btnComment = document.getElementById('detailBtnComment');
     const btnShare = document.getElementById('detailBtnShare');
-
-    if (btnView) {
-        btnView.onclick = () => {
-            showToast('현재 게시물의 누적 조회수입니다. 👁️', 'info');
-        };
-    }
-    if (btnLike) btnLike.onclick = () => triggerEvent(post.post_id, 'like');
     if (btnComment) {
         btnComment.onclick = () => {
             const inputEl = document.getElementById('detailCommentInput');
