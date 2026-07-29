@@ -686,25 +686,40 @@ def admin():
 @app.route('/api/post/event', methods=['POST'])
 def post_event():
     """ 실시간 점수 증가 API (조회 +1, 좋아요 +5, 댓글 +10, 공유 +20) """
-    data = request.get_json() or {}
-    post_id = data.get('post_id')
-    event_type = data.get('event_type') # view, like, comment, share
+    try:
+        data = request.get_json() or {}
+        post_id = data.get('post_id')
+        event_type = data.get('event_type') # view, like, comment, share
 
-    if not post_id or not event_type:
-        return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 400
+        if not post_id or not event_type:
+            return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 200
 
-    user_id = session.get('user_id')
-    
-    # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
-    if not user_id and event_type in ['like', 'unlike', 'comment', 'share']:
-        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 200
+        user_id = session.get('user_id')
+        
+        # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
+        if not user_id and event_type in ['like', 'unlike', 'comment', 'share']:
+            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 200
 
-    res = service.trigger_event(post_id, event_type, user_id=user_id)
-    if res:
-        if res.get('is_owner'):
-            return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 200
-        return jsonify({'success': True, 'data': res})
-    return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
+        res = service.trigger_event(post_id, event_type, user_id=user_id)
+        if res:
+            if res.get('is_owner'):
+                return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 200
+            return jsonify({'success': True, 'data': res})
+        return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 200
+    except Exception as e:
+        print("post_event 오류:", e)
+        return jsonify({'success': False, 'message': f'이벤트 처리 중 오류: {str(e)}'}), 200
+
+@app.route('/api/post/liked_status/<int:post_id>', methods=['GET'])
+def get_post_liked_status(post_id):
+    """ 특정 게시물에 대해 사용자가 좋아요를 눌렀는지 여부 조회 """
+    try:
+        user_id = session.get('user_id')
+        is_liked = service.is_user_liked(post_id, user_id)
+        return jsonify({'success': True, 'is_liked': is_liked})
+    except Exception as e:
+        print("liked_status 오류:", e)
+        return jsonify({'success': True, 'is_liked': False})
 
 @app.route('/api/comments/<int:post_id>', methods=['GET'])
 def get_comments(post_id):

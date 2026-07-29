@@ -218,6 +218,8 @@ class PawStarService:
             'status': '종료',
             'description': 'Paw Star 대망의 개막 1회 콘테스트 🎉'
         }
+        # 유저별 좋아요 누른 게시물 ID 집합 (user_id -> set of post_ids)
+        self.user_likes = {}
 
         # Posts for Contest #3 (진행중)
         sample_posts = [
@@ -572,9 +574,20 @@ class PawStarService:
         elif event_type == 'like':
             l_delta = 1
             post['like_count'] += 1
+            if user_id:
+                if not hasattr(self, 'user_likes') or self.user_likes is None:
+                    self.user_likes = {}
+                if user_id not in self.user_likes:
+                    self.user_likes[user_id] = set()
+                self.user_likes[user_id].add(post_id)
         elif event_type == 'unlike':
             l_delta = -1
             post['like_count'] = max(0, post['like_count'] - 1)
+            if user_id:
+                if not hasattr(self, 'user_likes') or self.user_likes is None:
+                    self.user_likes = {}
+                if user_id in self.user_likes:
+                    self.user_likes[user_id].discard(post_id)
         elif event_type == 'comment':
             c_delta = 1
             post['comment_count'] += 1
@@ -611,6 +624,18 @@ class PawStarService:
             'comment_count': post['comment_count'],
             'share_count': post['share_count']
         }
+
+    def is_user_liked(self, post_id, user_id):
+        """ 특정 유저가 게시물에 좋아요를 눌렀는지 여부 반환 """
+        try:
+            if not hasattr(self, 'user_likes') or self.user_likes is None:
+                self.user_likes = {}
+            if not user_id or user_id not in self.user_likes:
+                return False
+            liked_posts = self.user_likes.get(user_id, set())
+            return (int(post_id) in liked_posts) or (str(post_id) in liked_posts)
+        except Exception:
+            return False
 
     def get_user_profile(self, user_id='user1'):
         """

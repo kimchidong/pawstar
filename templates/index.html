@@ -133,23 +133,24 @@
                 <p class="post-desc">{{ p.content }}</p>
 
                 <!-- 점수 증가 액션 버튼들 (조회, 좋아요, 댓글, 공유) -->
-                <div class="card-actions">
-                    <button type="button" class="action-btn btn-view" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'view')" title="조회수">
+                <!-- 수치 표시 현황 (조회, 좋아요, 댓글, 공유) -->
+                <div class="card-actions" style="cursor: pointer;">
+                    <div class="action-btn btn-view" title="조회수">
                         <i class="fa-regular fa-eye"></i>
                         <span class="view-count">{{ p.view_count }}</span>
-                    </button>
-                    <button type="button" class="action-btn btn-like" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'like')" title="좋아요">
+                    </div>
+                    <div class="action-btn btn-like" title="좋아요">
                         <i class="fa-solid fa-heart"></i>
                         <span class="like-count">{{ p.like_count }}</span>
-                    </button>
-                    <button type="button" class="action-btn btn-comment" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'comment')" title="댓글">
+                    </div>
+                    <div class="action-btn btn-comment" title="댓글">
                         <i class="fa-regular fa-comment"></i>
                         <span class="comment-count">{{ p.comment_count }}</span>
-                    </button>
-                    <button type="button" class="action-btn btn-share" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'share')" title="공유유입">
+                    </div>
+                    <div class="action-btn btn-share" title="공유">
                         <i class="fa-solid fa-share-nodes"></i>
                         <span class="share-count">{{ p.share_count }}</span>
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>

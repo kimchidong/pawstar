@@ -169,6 +169,11 @@ async function triggerEvent(postId, eventType) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ post_id: postId, event_type: eventType })
         });
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            showToast('서버 응답 오류가 발생하였습니다.', 'error');
+            return false;
+        }
         const res = await response.json();
 
         if (!res.success) {
@@ -186,6 +191,17 @@ async function triggerEvent(postId, eventType) {
 
         const data = res.data;
         
+        // 전역 메모리 데이터 갱신
+        if (!window.postsDataStore) window.postsDataStore = {};
+        if (!window.postsDataStore[postId]) {
+            window.postsDataStore[postId] = {};
+        }
+        window.postsDataStore[postId].like_count = data.like_count;
+        window.postsDataStore[postId].score = data.new_score;
+        window.postsDataStore[postId].view_count = data.view_count;
+        window.postsDataStore[postId].comment_count = data.comment_count;
+        window.postsDataStore[postId].share_count = data.share_count;
+
         // UI Score 수치 갱신 & 카운터 갱신
         const card = document.getElementById(`post-card-${postId}`);
         if (card) {
@@ -289,12 +305,36 @@ function showToast(message) {
     }, 2500);
 }
 
+// 전역 post 데이터 레지스트리
+if (!window.postsDataStore) {
+    window.postsDataStore = {};
+}
+
 /**
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
 function openDetailModal(post) {
     const modal = document.getElementById('postDetailModal');
     if (!modal || !post) return;
+
+    // 최신 메모리 데이터 객체 동기화
+    if (!window.postsDataStore[post.post_id]) {
+        window.postsDataStore[post.post_id] = Object.assign({}, post);
+    }
+    post = window.postsDataStore[post.post_id];
+
+    // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정
+    const card = document.getElementById(`post-card-${post.post_id}`);
+    if (card) {
+        const cardLike = card.querySelector('.like-count');
+        const cardScore = card.querySelector('.score-num');
+        if (cardLike && cardLike.textContent !== '') {
+            post.like_count = parseInt(cardLike.textContent, 10) || post.like_count;
+        }
+        if (cardScore && cardScore.textContent !== '') {
+            post.score = parseInt(cardScore.textContent.replace(/,/g, ''), 10) || post.score;
+        }
+    }
 
     // 데이터 채우기
     const imgEl = document.getElementById('detailImg');
@@ -382,6 +422,25 @@ function openDetailModal(post) {
         heartIcon.className = 'fa-regular fa-heart';
         heartIcon.style.color = '#f43f5e';
     }
+
+    fetch(`/api/post/liked_status/${post.post_id}`)
+        .then(res => {
+            const contentType = res.headers.get('content-type') || '';
+            if (res.ok && contentType.includes('application/json')) {
+                return res.json();
+            }
+            return { success: false, is_liked: false };
+        })
+        .then(data => {
+            if (data && data.success && data.is_liked) {
+                isLiked = true;
+                if (heartIcon) {
+                    heartIcon.className = 'fa-solid fa-heart';
+                    heartIcon.style.color = '#ef4444';
+                }
+            }
+        })
+        .catch(err => console.error(err));
 
     const toggleLikeHandler = async () => {
         if (!isLiked) {
