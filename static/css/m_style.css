@@ -41,6 +41,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+a {
+    text-decoration: none;
+}
+
 body.m-body {
     font-family: 'Outfit', 'Noto Sans KR', sans-serif;
     background-color: var(--bg-primary);

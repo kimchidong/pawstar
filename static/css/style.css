@@ -52,6 +52,10 @@
     box-sizing: border-box;
 }
 
+a {
+    text-decoration: none;
+}
+
 html {
     overflow-y: scroll;
     min-width: 1280px;
@@ -302,11 +306,13 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
+    text-decoration: none;
 }
 
 .btn-hero-cta:hover {
     transform: translateY(-3px) scale(1.03);
     box-shadow: 0 12px 30px rgba(245, 158, 11, 0.55);
+    text-decoration: none;
 }
 
 .btn-hero-sec {
