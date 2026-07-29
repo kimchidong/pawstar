@@ -52,7 +52,7 @@
                         작품: {{ w.post_title }} | 집사: <strong>{{ w.user_nickname }}</strong>
                     </div>
                     <div style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 700;">
-                        🎁 {{ w.prize_name }}
+                        📊 {{ w.score_breakdown }} ({{ "{:,}".format(w.score) }} P)
                     </div>
                 </div>
             </div>

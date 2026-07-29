@@ -148,44 +148,44 @@ def seed_database():
         # 5. Contest Winners (역대 1회~5회 선정된 수상자 풍부한 데이터 총 30개)
         winners_data = [
             # 제5회 콘테스트 (6개)
-            (5, 113, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
-            (5, 114, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
-            (5, 115, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (5, 116, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
-            (5, 117, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
-            (5, 118, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+            (5, 113, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+            (5, 114, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+            (5, 115, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+            (5, 116, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+            (5, 117, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+            (5, 118, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
 
             # 제4회 콘테스트 (6개)
-            (4, 107, hash_id('user3'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
-            (4, 108, hash_id('user4'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
-            (4, 109, hash_id('user1'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (4, 110, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
-            (4, 111, hash_id('user3'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
-            (4, 112, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+            (4, 107, hash_id('user3'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+            (4, 108, hash_id('user4'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+            (4, 109, hash_id('user1'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+            (4, 110, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+            (4, 111, hash_id('user3'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+            (4, 112, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
 
             # 제3회 콘테스트 (6개)
-            (3, 105, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
-            (3, 106, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
-            (3, 119, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (3, 120, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
-            (3, 121, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
-            (3, 122, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+            (3, 105, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+            (3, 106, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+            (3, 119, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+            (3, 120, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+            (3, 121, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+            (3, 122, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
 
             # 제2회 콘테스트 (6개)
-            (2, 102, hash_id('user2'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
-            (2, 101, hash_id('user1'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
-            (2, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (2, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
-            (2, 123, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
-            (2, 124, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+            (2, 102, hash_id('user2'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+            (2, 101, hash_id('user1'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+            (2, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+            (2, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+            (2, 123, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+            (2, 124, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
 
             # 제1회 콘테스트 (6개)
-            (1, 101, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
-            (1, 102, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
-            (1, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (1, 125, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
-            (1, 126, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
-            (1, 127, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지')
+            (1, 101, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+            (1, 102, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+            (1, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+            (1, 125, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+            (1, 126, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+            (1, 127, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상')
         ]
         sql_winner = """INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
                         VALUES (%s, %s, %s, %s, %s)"""

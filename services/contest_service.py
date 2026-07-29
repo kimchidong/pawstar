@@ -798,6 +798,10 @@ class PawStarService:
                         COALESCE(p.POPUP_FILE_NAME, '3-101_popup.webp') as popup_file_name,
                         CONCAT(COALESCE(p.FILE_PATH, '/static/image/paw/2026/07/'), COALESCE(p.LIST_FILE_NAME, '3-101_list.webp')) as image_path,
                         COALESCE(p.SCORE, 0) as score,
+                        COALESCE(p.VIEW_COUNT, 0) as view_count,
+                        COALESCE(p.LIKE_COUNT, 0) as like_count,
+                        COALESCE(p.COMMENT_COUNT, 0) as comment_count,
+                        COALESCE(p.SHARE_COUNT, 0) as share_count,
                         COALESCE(u.NICKNAME, '우승집사') as user_nickname,
                         COALESCE(u.PROFILE_IMG, '/static/image/profile/default_profile.png') as user_profile
                     FROM CONTEST_WINNER w
@@ -813,6 +817,10 @@ class PawStarService:
                 """, (int(contest_id),))
                 rows = cur.fetchall()
                 conn.close()
+                for r in rows:
+                    if r.get('prize_name') and '&' in r['prize_name']:
+                        r['prize_name'] = r['prize_name'].split('&')[0].strip()
+                    r['score_breakdown'] = f"👀 {r.get('view_count', 0):,} · ❤️ {r.get('like_count', 0):,} · 💬 {r.get('comment_count', 0):,} · 🔄 {r.get('share_count', 0):,}"
                 return rows
         except Exception as e:
             print("get_hall_of_fame DB error:", e)
