@@ -95,12 +95,14 @@ function openMobileDetailModal(postData) {
     loadMobileComments(postData.post_id);
 
     detailModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeMobileDetailModal() {
     const detailModal = document.getElementById('mDetailModal');
     if (detailModal) {
         detailModal.classList.remove('active');
+        document.body.style.overflow = '';
     }
 }
 

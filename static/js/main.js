@@ -62,11 +62,11 @@ function initEventHandlers() {
     const detailModal = document.getElementById('postDetailModal');
     const closeDetailBtn = document.getElementById('btnCloseDetailModal');
     if (closeDetailBtn && detailModal) {
-        closeDetailBtn.addEventListener('click', () => detailModal.classList.remove('show'));
+        closeDetailBtn.addEventListener('click', () => closeDetailModal());
     }
     if (detailModal) {
         detailModal.addEventListener('click', (e) => {
-            if (e.target === detailModal) detailModal.classList.remove('show');
+            if (e.target === detailModal) closeDetailModal();
         });
     }
 
@@ -350,11 +350,15 @@ function openDetailModal(post) {
     if (btnShare) btnShare.onclick = () => triggerEvent(post.post_id, 'share');
 
     modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeDetailModal() {
     const modal = document.getElementById('postDetailModal');
-    if (modal) modal.classList.remove('show');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
 }
 
 /**

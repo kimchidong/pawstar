@@ -1464,3 +1464,8 @@ body {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
+
+/* Modal Overscroll Contain */
+.modal-backdrop, .detail-modal-content, .detail-info-container, .m-modal-backdrop, .m-modal-sheet {
+    overscroll-behavior: contain;
+}
