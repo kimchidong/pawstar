@@ -721,7 +721,13 @@ def add_comment(post_id):
         else:
             user_nickname = data.get('nickname') or '익명 집사'
 
-        comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile)
+        comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile, user_id=user_id)
+        if comment is None:
+            return jsonify({
+                'success': False,
+                'message': event_res or '이미 이 게시물에 한줄 댓글을 작성하셨습니다.'
+            }), 400
+
         return jsonify({
             'success': True,
             'comment': comment,

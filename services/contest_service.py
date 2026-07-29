@@ -970,18 +970,47 @@ class PawStarService:
             self.posts[p_id]['comment_count'] = len(comments)
         return comments
 
-    def add_comment(self, post_id, user_nickname, content, user_profile=None):
-        """ 한줄 댓글 추가 및 10점 점수/댓글수 카운트 반영 """
+    def has_user_commented(self, post_id, user_id=None, user_nickname=None):
+        """ 동일 게시물에 회원이 이미 댓글을 작성했는지 확인 """
         try:
             p_id = int(post_id)
         except (ValueError, TypeError):
             p_id = 1
+        
+        for c in self.comments:
+            if c.get('post_id') == p_id:
+                if user_id and c.get('user_id') == user_id:
+                    return True
+                if user_nickname and c.get('user_nickname') == user_nickname:
+                    return True
+        return False
+
+    def add_comment(self, post_id, user_nickname, content, user_profile=None, user_id=None):
+        """ 한줄 댓글 추가 및 10점 점수/댓글수 카운트 반영 (동일 타겟당 1회 제한 / 본인 게시물 불가) """
+        try:
+            p_id = int(post_id)
+        except (ValueError, TypeError):
+            p_id = 1
+
+        # 1. 본인 게시물 댓글 작성 방지 체크
+        post = self.posts.get(p_id)
+        if post:
+            post_author_id = post.get('user_id')
+            post_author_nickname = post.get('user_nickname')
+            if (user_id and post_author_id and user_id == post_author_id) or \
+               (user_nickname and post_author_nickname and user_nickname == post_author_nickname):
+                return None, "본인이 작성한 게시물에는 한줄 댓글을 작성할 수 없습니다."
+
+        # 2. 동일 게시물 중복 작성 체크
+        if self.has_user_commented(p_id, user_id=user_id, user_nickname=user_nickname):
+            return None, "이미 이 게시물에 한줄 댓글을 작성하셨습니다. (1회 작성 가능)"
 
         new_comment_id = len(self.comments) + 1
         now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
         comment = {
             'comment_id': new_comment_id,
             'post_id': p_id,
+            'user_id': user_id or '',
             'user_nickname': user_nickname or '익명 집사',
             'user_profile': user_profile or '/static/image/profile/default_profile.png',
             'content': content,
