@@ -803,6 +803,51 @@ body {
 .action-btn.btn-comment:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
 .action-btn.btn-share:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
 
+/* 내가 영향력을 반영한 경우 각 아이콘 & 버튼에 전용 컬러 표시 (Active Color Theme) */
+.action-btn.btn-view.active, #detailBtnView.active {
+    background: #eff6ff !important;
+    border: 2px solid #3b82f6 !important;
+    color: #2563eb !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.action-btn.btn-view.active i, #detailBtnView.active i {
+    color: #2563eb !important;
+}
+
+.action-btn.btn-like.active, #detailBtnLike.active {
+    background: #fff1f2 !important;
+    border: 2px solid #f43f5e !important;
+    color: #e11d48 !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+}
+.action-btn.btn-like.active i, #detailBtnLike.active i {
+    color: #e11d48 !important;
+}
+
+.action-btn.btn-comment.active, #detailBtnComment.active {
+    background: #f5f3ff !important;
+    border: 2px solid #8b5cf6 !important;
+    color: #7c3aed !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+}
+.action-btn.btn-comment.active i, #detailBtnComment.active i {
+    color: #7c3aed !important;
+}
+
+.action-btn.btn-share.active, #detailBtnShare.active {
+    background: #ecfdf5 !important;
+    border: 2px solid #10b981 !important;
+    color: #059669 !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+.action-btn.btn-share.active i, #detailBtnShare.active i {
+    color: #059669 !important;
+}
+
 .action-btn .score-plus {
     font-size: 0.68rem;
     color: var(--text-muted);

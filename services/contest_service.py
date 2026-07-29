@@ -236,6 +236,10 @@ class PawStarService:
         self.user_likes = {}
         # 유저별 이미 조회를 완료한 게시물 ID 집합 (user_id -> set of post_ids)
         self.user_views = {}
+        # 유저별 댓글을 작성한 게시물 ID 집합
+        self.user_comments = {}
+        # 유저별 공유를 수행한 게시물 ID 집합
+        self.user_shares = {}
 
         # Posts for Contest #3 (진행중) 20개 샘플 데이터
         sample_posts = []
@@ -608,9 +612,21 @@ class PawStarService:
         elif event_type == 'comment':
             c_delta = 1
             post['comment_count'] += 1
+            if user_id:
+                if not hasattr(self, 'user_comments') or self.user_comments is None:
+                    self.user_comments = {}
+                if user_id not in self.user_comments:
+                    self.user_comments[user_id] = set()
+                self.user_comments[user_id].add(post_id)
         elif event_type == 'share':
             s_delta = 1
             post['share_count'] += 1
+            if user_id:
+                if not hasattr(self, 'user_shares') or self.user_shares is None:
+                    self.user_shares = {}
+                if user_id not in self.user_shares:
+                    self.user_shares[user_id] = set()
+                self.user_shares[user_id].add(post_id)
 
         delta_score = (v_delta * 1) + (l_delta * 5) + (c_delta * 10) + (s_delta * 20)
         post['score'] += delta_score
@@ -665,6 +681,42 @@ class PawStarService:
             'like_count': post['like_count'],
             'comment_count': post['comment_count'],
             'share_count': post['share_count']
+        }
+
+    def get_user_post_actions(self, post_id, user_id=None):
+        """ 특정 유저가 특정 게시물에 반영한 4가지 영향력 상태 (조회, 좋아요, 댓글, 공유) 반환 """
+        try:
+            pid = int(post_id)
+        except Exception:
+            pid = post_id
+        
+        if not user_id:
+            user_id = 'user1'
+
+        is_viewed = False
+        if hasattr(self, 'user_views') and user_id in self.user_views:
+            is_viewed = (pid in self.user_views[user_id]) or (str(pid) in self.user_views[user_id])
+
+        is_liked = False
+        if hasattr(self, 'user_likes') and user_id in self.user_likes:
+            is_liked = (pid in self.user_likes[user_id]) or (str(pid) in self.user_likes[user_id])
+
+        is_commented = False
+        user_nick = self.users.get(user_id, {}).get('nickname') if hasattr(self, 'users') else None
+        if any(c.get('post_id') == pid and (c.get('user_id') == user_id or (user_nick and c.get('user_nickname') == user_nick)) for c in getattr(self, 'comments', [])):
+            is_commented = True
+        elif hasattr(self, 'user_comments') and user_id in self.user_comments:
+            is_commented = (pid in self.user_comments[user_id]) or (str(pid) in self.user_comments[user_id])
+
+        is_shared = False
+        if hasattr(self, 'user_shares') and user_id in self.user_shares:
+            is_shared = (pid in self.user_shares[user_id]) or (str(pid) in self.user_shares[user_id])
+
+        return {
+            'is_viewed': is_viewed,
+            'is_liked': is_liked,
+            'is_commented': is_commented,
+            'is_shared': is_shared
         }
 
     def is_user_liked(self, post_id, user_id):

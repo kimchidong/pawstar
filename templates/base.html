@@ -158,20 +158,21 @@
                     </div>
 
                     <!-- 실시간 수치 현황 표시 영역 (단순 정보용) -->
-                    <div class="card-actions detail-actions" style="cursor: default;">
-                        <div class="action-btn btn-view" id="detailBtnView" style="cursor: default; pointer-events: none;" title="조회수">
+                    <!-- 실시간 수치 현황 표시 영역 (내가 반영한 영향력 아이콘 컬러 커스텀) -->
+                    <div class="card-actions detail-actions">
+                        <div class="action-btn btn-view" id="detailBtnView" title="조회수">
                             <i class="fa-regular fa-eye"></i>
                             <span class="view-count" id="detailViewCount">0</span>
                         </div>
-                        <div class="action-btn btn-like" id="detailBtnLike" style="cursor: default; pointer-events: none;" title="좋아요 수">
+                        <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수">
                             <i class="fa-solid fa-heart"></i>
                             <span class="like-count" id="detailLikeCount">0</span>
                         </div>
-                        <div class="action-btn btn-comment" id="detailBtnComment" style="cursor: default; pointer-events: none;" title="댓글 수">
+                        <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수">
                             <i class="fa-regular fa-comment"></i>
                             <span class="comment-count" id="detailCommentCount">0</span>
                         </div>
-                        <div class="action-btn btn-share" id="detailBtnShare" style="cursor: default; pointer-events: none;" title="공유 수">
+                        <div class="action-btn btn-share" id="detailBtnShare" onclick="handleShareClick()" style="cursor: pointer;" title="공유 유입">
                             <i class="fa-solid fa-share-nodes"></i>
                             <span class="share-count" id="detailShareCount">0</span>
                         </div>

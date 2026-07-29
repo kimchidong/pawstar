@@ -712,13 +712,25 @@ def post_event():
         print("post_event 오류:", e)
         return jsonify({'success': False, 'message': f'이벤트 처리 중 오류: {str(e)}'}), 200
 
+@app.route('/api/post/user_actions/<int:post_id>', methods=['GET'])
+def get_user_post_actions(post_id):
+    """ 특정 게시물에 대해 사용자가 4가지 영향력(조회, 좋아요, 댓글, 공유)을 반영했는지 여부 조회 """
+    try:
+        user_id = session.get('user_id') or 'user1'
+        actions = service.get_user_post_actions(post_id, user_id)
+        return jsonify({'success': True, 'actions': actions})
+    except Exception as e:
+        print("user_actions 오류:", e)
+        return jsonify({'success': True, 'actions': {'is_viewed': True, 'is_liked': False, 'is_commented': False, 'is_shared': False}})
+
 @app.route('/api/post/liked_status/<int:post_id>', methods=['GET'])
 def get_post_liked_status(post_id):
     """ 특정 게시물에 대해 사용자가 좋아요를 눌렀는지 여부 조회 """
     try:
         user_id = session.get('user_id')
         is_liked = service.is_user_liked(post_id, user_id)
-        return jsonify({'success': True, 'is_liked': is_liked})
+        actions = service.get_user_post_actions(post_id, user_id)
+        return jsonify({'success': True, 'is_liked': is_liked, 'actions': actions})
     except Exception as e:
         print("liked_status 오류:", e)
         return jsonify({'success': True, 'is_liked': False})

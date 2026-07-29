@@ -442,20 +442,47 @@ function openDetailModal(post) {
         heartIcon.style.color = '#f43f5e';
     }
 
-    fetch(`/api/post/liked_status/${post.post_id}`)
-        .then(res => {
-            const contentType = res.headers.get('content-type') || '';
-            if (res.ok && contentType.includes('application/json')) {
-                return res.json();
-            }
-            return { success: false, is_liked: false };
-        })
+    fetch(`/api/post/user_actions/${post.post_id}`)
+        .then(res => res.json())
         .then(data => {
-            if (data && data.success && data.is_liked) {
-                isLiked = true;
-                if (heartIcon) {
-                    heartIcon.className = 'fa-solid fa-heart';
-                    heartIcon.style.color = '#ef4444';
+            if (data && data.success && data.actions) {
+                const act = data.actions;
+                const btnView = document.getElementById('detailBtnView');
+                const btnLike = document.getElementById('detailBtnLike');
+                const btnComment = document.getElementById('detailBtnComment');
+                const btnShare = document.getElementById('detailBtnShare');
+
+                // 1. 조회수 버튼 (내가 조회 반영한 경우)
+                if (btnView) {
+                    btnView.classList.add('active'); // 모달을 연 순간 조회가 반영되므로 active 컬러 표시
+                }
+                // 2. 좋아요 버튼 (내가 좋아요 반영한 경우)
+                if (btnLike) {
+                    if (act.is_liked) {
+                        isLiked = true;
+                        btnLike.classList.add('active');
+                        if (heartIcon) {
+                            heartIcon.className = 'fa-solid fa-heart';
+                            heartIcon.style.color = '#e11d48';
+                        }
+                    } else {
+                        isLiked = false;
+                        btnLike.classList.remove('active');
+                        if (heartIcon) {
+                            heartIcon.className = 'fa-regular fa-heart';
+                            heartIcon.style.color = '#f43f5e';
+                        }
+                    }
+                }
+                // 3. 댓글 버튼 (내가 댓글 작성을 반영한 경우)
+                if (btnComment) {
+                    if (act.is_commented) btnComment.classList.add('active');
+                    else btnComment.classList.remove('active');
+                }
+                // 4. 공유 버튼 (내가 공유를 반영한 경우)
+                if (btnShare) {
+                    if (act.is_shared) btnShare.classList.add('active');
+                    else btnShare.classList.remove('active');
                 }
             }
         })
@@ -468,8 +495,9 @@ function openDetailModal(post) {
                 isLiked = true;
                 if (heartIcon) {
                     heartIcon.className = 'fa-solid fa-heart';
-                    heartIcon.style.color = '#ef4444';
+                    heartIcon.style.color = '#e11d48';
                 }
+                if (btnLike) btnLike.classList.add('active');
             }
         } else {
             const success = await triggerEvent(post.post_id, 'unlike');
@@ -479,11 +507,11 @@ function openDetailModal(post) {
                     heartIcon.className = 'fa-regular fa-heart';
                     heartIcon.style.color = '#f43f5e';
                 }
+                if (btnLike) btnLike.classList.remove('active');
             }
         }
     };
 
-    // 오직 우측 상단 하트 버튼에만 좋아요 토글 이벤트 연결
     if (heartBtn) heartBtn.onclick = toggleLikeHandler;
 
 
@@ -576,6 +604,12 @@ function submitDetailComment() {
         
         inputEl.value = '';
         showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
+        const btnComment = document.getElementById('detailBtnComment');
+        if (btnComment) {
+            btnComment.classList.add('active');
+            const icon = btnComment.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-comment';
+        }
         loadComments(window.currentDetailPostId);
         
         if (data.event_res) {
@@ -599,7 +633,17 @@ function submitDetailComment() {
     });
 }
 
+async function handleShareClick() {
+    if (!window.currentDetailPostId) return;
+    const btnShare = document.getElementById('detailBtnShare');
+    const success = await triggerEvent(window.currentDetailPostId, 'share');
+    if (btnShare) btnShare.classList.add('active');
+}
+
 // 전역 스코프 바인딩
 window.openDetailModal = openDetailModal;
 window.closeDetailModal = closeDetailModal;
+window.triggerEvent = triggerEvent;
 window.submitDetailComment = submitDetailComment;
+window.handleShareClick = handleShareClick;
+window.runAwardBatch = runAwardBatch;
