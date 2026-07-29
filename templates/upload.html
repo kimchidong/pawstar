@@ -22,11 +22,12 @@
     <!-- 출전 등록 메인 폼 카드 -->
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
         <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2rem;">
+            <!-- 상단: 2열 입력 폼 영역 -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
                 <!-- 좌측 폼 컨트롤 그룹 -->
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <!-- 1. 참가 콘테스트 회차 (현재 진행 회차 고정) -->
-                    <div class="form-group">
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <!-- 1. 참가 콘테스트 회차 -->
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             🏆 참가 콘테스트 회차
                         </label>
@@ -41,14 +42,14 @@
 
                     <!-- 2. 아이 이름 & 동물 종류 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐶 반려동물 이름
                             </label>
                             <input type="text" name="pet_name" class="form-control" placeholder="예: 뽀삐, 냥이" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐾 동물 종류
                             </label>
@@ -63,7 +64,7 @@
                     </div>
 
                     <!-- 3. 자랑 게시물 제목 -->
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             ✨ 자랑 제목
                         </label>
@@ -71,7 +72,7 @@
                     </div>
 
                     <!-- 4. 파일 업로드 -->
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             🖼️ 출전 사진 파일 첨부
                         </label>
@@ -82,24 +83,104 @@
                     </div>
                 </div>
 
-                <!-- 우측: 미디어 미리보기 & 게시물 내용 -->
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <!-- 미디어 미리보기 박스 -->
-                    <div class="form-group">
-                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                            👀 출전 미디어 미리보기
-                        </label>
-                        <div style="width: 100%; height: 210px; border-radius: var(--radius-md); border: 2px dashed var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
-                            <img id="uploadPreviewImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                    </div>
-
-                    <!-- 내용 설명 -->
-                    <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+                <!-- 우측: 자랑 내용 및 소개글 -->
+                <div style="display: flex; flex-direction: column;">
+                    <div class="form-group" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             📝 자랑 내용 및 소개글
                         </label>
-                        <textarea name="content" class="form-control" rows="5" placeholder="우리 아이의 성격, 장기, 좋아하는 음식이나 출전 포부를 적어주세요!" style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; font-family: inherit; resize: vertical;"></textarea>
+                        <textarea name="content" class="form-control" placeholder="우리 아이의 성격, 장기, 좋아하는 음식이나 출전 포부를 적어주세요!" style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 240px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단: 실시간 출전 미리보기 전폭(Full Width) 섹션 -->
+            <div class="form-group" style="margin-bottom: 2rem; border-top: 1px solid var(--border-light); padding-top: 2rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <div>
+                        <label style="font-weight: 900; font-size: 1.1rem; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            👀 출전 미리보기 <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">(실제 화면 크기 그대로)</span>
+                        </label>
+                    </div>
+                    <div class="preview-tabs" style="display: flex; gap: 0.5rem;">
+                        <button type="button" id="btnPreviewList" onclick="switchPreviewTab('list')" style="padding: 0.45rem 1.1rem; border-radius: 20px; border: 1px solid var(--border-light); font-weight: 800; font-size: 0.88rem; cursor: pointer; background: var(--gradient-brand); color: #ffffff; transition: var(--transition); box-shadow: 0 2px 8px rgba(79,70,229,0.25);">
+                            <i class="fa-solid fa-table-cells-large"></i> 목록 카드
+                        </button>
+                        <button type="button" id="btnPreviewModal" onclick="switchPreviewTab('modal')" style="padding: 0.45rem 1.1rem; border-radius: 20px; border: 1px solid var(--border-light); font-weight: 800; font-size: 0.88rem; cursor: pointer; background: #f1f5f9; color: var(--text-secondary); transition: var(--transition);">
+                            <i class="fa-solid fa-window-restore"></i> 클릭 팝업
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 미리보기 캔버스 (넉넉한 전폭 공간 제공으로 모달 깨짐 완전 방지) -->
+                <div style="background: var(--bg-primary); border: 2px dashed var(--border-light); border-radius: var(--radius-lg); padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 480px; width: 100%;">
+                    <!-- 1. 목록 카드 미리보기 (Feed List Card Preview) -->
+                    <div id="previewListContainer" style="width: 100%; max-width: 320px;">
+                        <div class="post-card" style="box-shadow: 0 12px 30px rgba(0,0,0,0.12); cursor: pointer;" onclick="switchPreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
+                            <div class="card-media">
+                                <img id="previewCardImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
+                                <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="author-info">
+                                    <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
+                                    <div class="author-detail">
+                                        <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                        <div class="pet-tag" id="previewCardPetTag">🐕 강아지 뽀삐</div>
+                                    </div>
+                                    <div class="card-total-score">
+                                        <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
+                                    </div>
+                                </div>
+                                <h3 class="post-title" id="previewCardTitle">자랑 제목이 여기에 표시됩니다</h3>
+                                <p class="post-desc" id="previewCardDesc">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                                <div class="card-actions">
+                                    <button type="button" class="action-btn btn-view"><i class="fa-regular fa-eye"></i> 0</button>
+                                    <button type="button" class="action-btn btn-like"><i class="fa-solid fa-heart"></i> 0</button>
+                                    <button type="button" class="action-btn btn-comment"><i class="fa-regular fa-comment"></i> 0</button>
+                                    <button type="button" class="action-btn btn-share"><i class="fa-solid fa-share-nodes"></i> 0</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                            💡 카드를 클릭하면 팝업 모달 미리보기로 전환됩니다.
+                        </div>
+                    </div>
+
+                    <!-- 2. 클릭 팝업 모달 미리보기 (Full Size Detail Modal Preview) -->
+                    <div id="previewModalContainer" style="width: 100%; max-width: 860px; display: none;">
+                        <div class="modal-content detail-modal-content" style="width: 100%; max-width: 860px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; background: #ffffff;">
+                            <div class="detail-modal-body" style="min-height: 420px;">
+                                <div class="detail-media-container" style="min-height: 320px;">
+                                    <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
+                                    <div class="detail-rank-badge">
+                                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
+                                    </div>
+                                </div>
+                                <div class="detail-info-container" style="padding: 2rem;">
+                                    <div>
+                                        <div class="author-info" style="margin-bottom: 1rem;">
+                                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
+                                            <div class="author-detail">
+                                                <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                                <div class="pet-tag" id="previewModalPetTag">🐕 강아지 뽀삐</div>
+                                            </div>
+                                            <div class="card-total-score">
+                                                <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
+                                            </div>
+                                        </div>
+                                        <h2 class="detail-title" id="previewModalTitle" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.6rem; color: var(--text-primary);">자랑 제목이 여기에 표시됩니다</h2>
+                                        <p class="detail-content" id="previewModalDesc" style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                                    </div>
+                                    <div class="card-actions" style="margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1rem;">
+                                        <button type="button" class="action-btn btn-view"><i class="fa-regular fa-eye"></i> 0</button>
+                                        <button type="button" class="action-btn btn-like"><i class="fa-solid fa-heart"></i> 0</button>
+                                        <button type="button" class="action-btn btn-comment"><i class="fa-regular fa-comment"></i> 0</button>
+                                        <button type="button" class="action-btn btn-share"><i class="fa-solid fa-share-nodes"></i> 0</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,22 +199,89 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const inputFile = document.getElementById('uploadMediaFile');
-    const previewImg = document.getElementById('uploadPreviewImg');
+function switchPreviewTab(tab) {
+    const btnList = document.getElementById('btnPreviewList');
+    const btnModal = document.getElementById('btnPreviewModal');
+    const containerList = document.getElementById('previewListContainer');
+    const containerModal = document.getElementById('previewModalContainer');
 
-    if (inputFile && previewImg) {
+    if (!btnList || !btnModal || !containerList || !containerModal) return;
+
+    if (tab === 'list') {
+        btnList.style.background = 'var(--gradient-brand)';
+        btnList.style.color = '#ffffff';
+        btnList.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
+        btnModal.style.background = '#f1f5f9';
+        btnModal.style.color = 'var(--text-secondary)';
+        btnModal.style.boxShadow = 'none';
+        containerList.style.display = 'block';
+        containerModal.style.display = 'none';
+    } else {
+        btnModal.style.background = 'var(--gradient-brand)';
+        btnModal.style.color = '#ffffff';
+        btnModal.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
+        btnList.style.background = '#f1f5f9';
+        btnList.style.color = 'var(--text-secondary)';
+        btnList.style.boxShadow = 'none';
+        containerList.style.display = 'none';
+        containerModal.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const inputPetName = document.querySelector('input[name="pet_name"]');
+    const selectPetType = document.querySelector('select[name="pet_type"]');
+    const inputTitle = document.querySelector('input[name="title"]');
+    const textareaContent = document.querySelector('textarea[name="content"]');
+    const inputFile = document.getElementById('uploadMediaFile');
+
+    function updatePreview() {
+        const petName = inputPetName ? inputPetName.value.trim() : '';
+        const petType = selectPetType ? selectPetType.value : '🐕 강아지';
+        const title = inputTitle ? inputTitle.value.trim() : '';
+        const content = textareaContent ? textareaContent.value.trim() : '';
+
+        const petTagText = `${petType} ${petName || '아이 이름'}`;
+        const titleText = title || '자랑 제목이 여기에 표시됩니다';
+        const descText = content || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
+
+        const previewCardPetTag = document.getElementById('previewCardPetTag');
+        const previewModalPetTag = document.getElementById('previewModalPetTag');
+        const previewCardTitle = document.getElementById('previewCardTitle');
+        const previewModalTitle = document.getElementById('previewModalTitle');
+        const previewCardDesc = document.getElementById('previewCardDesc');
+        const previewModalDesc = document.getElementById('previewModalDesc');
+
+        if (previewCardPetTag) previewCardPetTag.textContent = petTagText;
+        if (previewModalPetTag) previewModalPetTag.textContent = petTagText;
+        if (previewCardTitle) previewCardTitle.textContent = titleText;
+        if (previewModalTitle) previewModalTitle.textContent = titleText;
+        if (previewCardDesc) previewCardDesc.textContent = descText;
+        if (previewModalDesc) previewModalDesc.textContent = descText;
+    }
+
+    if (inputPetName) inputPetName.addEventListener('input', updatePreview);
+    if (selectPetType) selectPetType.addEventListener('change', updatePreview);
+    if (inputTitle) inputTitle.addEventListener('input', updatePreview);
+    if (textareaContent) textareaContent.addEventListener('input', updatePreview);
+
+    if (inputFile) {
         inputFile.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    previewImg.src = evt.target.result;
+                    const previewCardImg = document.getElementById('previewCardImg');
+                    const previewModalImg = document.getElementById('previewModalImg');
+                    if (previewCardImg) previewCardImg.src = evt.target.result;
+                    if (previewModalImg) previewModalImg.src = evt.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         });
     }
+
+    updatePreview();
 });
 </script>
 
