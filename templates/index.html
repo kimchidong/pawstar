@@ -103,7 +103,7 @@
     {% for p in posts %}
         <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
             <div class="card-media">
-                <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                <img src="{% if p.file_path and p.list_file_name %}{{ p.file_path }}{{ p.list_file_name }}{% else %}{{ p.image_path or p.media_url }}{% endif %}" alt="{{ p.title }}" loading="lazy">
                 
                 <!-- 랭킹 배지 (실시간 점수 SCORE 기준 1~3위 게시물에 배지 표시) -->
                 {% if p.rank_candidate == 1 %}

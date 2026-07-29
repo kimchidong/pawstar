@@ -82,7 +82,8 @@ function openMobileDetailModal(postData) {
     const detailModal = document.getElementById('mDetailModal');
     if (!detailModal) return;
 
-    document.getElementById('mDetailImg').src = postData.media_url || '';
+    const mPopupSrc = (postData.file_path || '') + (postData.popup_file_name || postData.list_file_name || postData.image_path || postData.media_url || '');
+    document.getElementById('mDetailImg').src = mPopupSrc;
     document.getElementById('mDetailAuthorImg').src = postData.user_profile || '';
     document.getElementById('mDetailAuthorNickname').textContent = postData.user_nickname || '집사';
     const mNameStr = (postData.pet_name && postData.pet_name !== '강아지' && postData.pet_name !== '우리 강아지' && postData.pet_name !== '아이 이름') ? ` ${postData.pet_name}` : '';

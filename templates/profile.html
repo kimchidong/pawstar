@@ -104,7 +104,7 @@
         {% for p in my_posts %}
             <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
-                    <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <img src="{{ p.image_path or p.media_url }}" alt="{{ p.title }}" loading="lazy">
                 </div>
                 <div class="card-body">
                     <div class="author-info">

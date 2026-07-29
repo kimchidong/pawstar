@@ -723,6 +723,71 @@ def get_post_liked_status(post_id):
         print("liked_status 오류:", e)
         return jsonify({'success': True, 'is_liked': False})
 
+def process_paw_images_dual(src_file_or_path, contest_id, post_id):
+    """
+    1. 임시 경로(static/image/temp/paw/)를 거쳐
+    2. 영구 폴더 /static/image/paw/YYYY/MM/ 생성
+    3. 목록용 파일(3-101_list.webp) 및 팝업용 파일(3-101_popup.webp) 2개 생성
+    4. 임시 파일 삭제 후 (file_path, list_file_name, popup_file_name) 반환
+    """
+    now = datetime.datetime.now()
+    yyyy = now.strftime('%Y')
+    mm = now.strftime('%m')
+    
+    file_path = f"/static/image/paw/{yyyy}/{mm}/"
+    perm_dir = os.path.join(PERM_PAW_BASE_DIR, yyyy, mm)
+    os.makedirs(perm_dir, exist_ok=True)
+
+    list_file_name = f"{contest_id}-{post_id}_list.webp"
+    popup_file_name = f"{contest_id}-{post_id}_popup.webp"
+
+    perm_list_path = os.path.join(perm_dir, list_file_name)
+    perm_popup_path = os.path.join(perm_dir, popup_file_name)
+
+    temp_filepath = None
+    src_img_path = None
+
+    if hasattr(src_file_or_path, 'save'):
+        temp_filename = f"temp_{uuid.uuid4().hex[:10]}.tmp"
+        temp_filepath = os.path.join(TEMP_PAW_DIR, temp_filename)
+        src_file_or_path.save(temp_filepath)
+        src_img_path = temp_filepath
+    elif isinstance(src_file_or_path, str):
+        fname = os.path.basename(src_file_or_path)
+        temp_filepath = os.path.join(TEMP_PAW_DIR, fname)
+        if os.path.exists(temp_filepath):
+            src_img_path = temp_filepath
+        elif os.path.exists(src_file_or_path):
+            src_img_path = src_file_or_path
+
+    try:
+        if src_img_path and os.path.exists(src_img_path):
+            with Image.open(src_img_path) as img:
+                if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+                    img_base = img.convert('RGBA')
+                else:
+                    img_base = img.convert('RGB')
+                
+                # 팝업용 고화질 WebP (1000px)
+                img_popup = img_base.copy()
+                img_popup.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
+                img_popup.save(perm_popup_path, 'WEBP', quality=90)
+
+                # 목록용 썸네일 WebP (500px)
+                img_list = img_base.copy()
+                img_list.thumbnail((500, 500), Image.Resampling.LANCZOS)
+                img_list.save(perm_list_path, 'WEBP', quality=85)
+    except Exception as e:
+        print("Dual WebP 생성 중 오류:", e)
+    finally:
+        if temp_filepath and os.path.exists(temp_filepath):
+            try:
+                os.remove(temp_filepath)
+            except Exception:
+                pass
+
+    return file_path, list_file_name, popup_file_name
+
 @app.route('/api/comments/<int:post_id>', methods=['GET'])
 def get_comments(post_id):
     """ 게시물 한줄 댓글 목록 조회 """
@@ -765,23 +830,86 @@ def add_comment(post_id):
         print("댓글 등록 오류:", e)
         return jsonify({'success': False, 'message': f'댓글 등록 중 오류: {str(e)}'}), 500
 
+from PIL import Image
+
+TEMP_PAW_DIR = os.path.join(app.root_path, 'static', 'image', 'temp', 'paw')
+PERM_PAW_BASE_DIR = os.path.join(app.root_path, 'static', 'image', 'paw')
+
+os.makedirs(TEMP_PAW_DIR, exist_ok=True)
+os.makedirs(PERM_PAW_BASE_DIR, exist_ok=True)
+
+@app.route('/api/post/upload-temp', methods=['POST'])
+def upload_temp_image():
+    """ 출전 신청 페이지에서 파일 선택 시 일단 임시 폴더(static/image/temp/paw/)에 임시 저장 """
+    try:
+        file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
+        if not file or not file.filename:
+            return jsonify({'success': False, 'message': '첨부된 이미지 파일이 없습니다.'}), 400
+
+        ext = os.path.splitext(secure_filename(file.filename))[1].lower()
+        if not ext or len(ext) > 5:
+            ext = '.jpg'
+        
+        temp_filename = f"temp_{uuid.uuid4().hex[:10]}{ext}"
+        temp_filepath = os.path.join(TEMP_PAW_DIR, temp_filename)
+        file.save(temp_filepath)
+
+        temp_url = f"/static/image/temp/paw/{temp_filename}"
+        return jsonify({
+            'success': True,
+            'temp_url': temp_url,
+            'temp_filename': temp_filename
+        })
+    except Exception as e:
+        print("임시 업로드 오류:", e)
+        return jsonify({'success': False, 'message': f'임시 업로드 실패: {str(e)}'}), 500
+
 @app.route('/api/post/create', methods=['POST'])
 def create_post():
-    """ 신규 자랑 게시물 등록 API """
-    data = request.get_json() or {}
-    contest_id = data.get('contest_id', 3)
-    user_id = data.get('user_id', 'user1')
-    pet_name = data.get('pet_name', '우리 아이')
-    pet_type = data.get('pet_type', '🐕 강아지')
-    title = data.get('title', '')
-    content = data.get('content', '')
-    media_url = data.get('media_url', '')
+    """ 신규 자랑 게시물 등록 API (목록용/팝업용 2개 WebP 생성 & 3개 컬럼 DB 저장) """
+    try:
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            title = request.form.get('title', '').strip()
+            content = request.form.get('content', '').strip()
+            pet_name = request.form.get('pet_name', '강아지').strip()
+            pet_type = request.form.get('pet_type', '🐕 강아지').strip()
+            contest_id = int(request.form.get('contest_id', 3))
+            user_id = session.get('user_id') or request.form.get('user_id', 'user1')
+            temp_filename = request.form.get('temp_filename') or request.form.get('temp_url')
+            file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
+        else:
+            data = request.get_json() or {}
+            contest_id = int(data.get('contest_id', 3))
+            user_id = session.get('user_id') or data.get('user_id', 'user1')
+            pet_name = data.get('pet_name', '강아지')
+            pet_type = data.get('pet_type', '🐕 강아지')
+            title = data.get('title', '')
+            content = data.get('content', '')
+            temp_filename = data.get('temp_filename') or data.get('temp_url')
+            file = None
 
-    if not title:
-        return jsonify({'success': False, 'message': '제목을 입력해주세요.'}), 400
+        if not title:
+            return jsonify({'success': False, 'message': '제목을 입력해주세요.'}), 400
 
-    new_post = service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
-    return jsonify({'success': True, 'post': new_post})
+        next_post_id = service.get_next_post_id()
+
+        src_target = temp_filename or file
+        if src_target:
+            file_path, list_file_name, popup_file_name = process_paw_images_dual(src_target, contest_id, next_post_id)
+        else:
+            now = datetime.datetime.now()
+            file_path = f"/static/image/paw/{now.strftime('%Y/%m')}/"
+            list_file_name = f"{contest_id}-{next_post_id}_list.webp"
+            popup_file_name = f"{contest_id}-{next_post_id}_popup.webp"
+
+        new_post = service.create_post(
+            contest_id, user_id, pet_name, pet_type, title, content, 
+            file_path, list_file_name, popup_file_name, force_post_id=next_post_id
+        )
+        return jsonify({'success': True, 'post': new_post})
+    except Exception as e:
+        print("게시물 등록 오류:", e)
+        return jsonify({'success': False, 'message': f'게시물 등록 중 오류가 발생했습니다: {str(e)}'}), 500
 
 @app.route('/api/admin/close-contest', methods=['POST'])
 def close_contest():

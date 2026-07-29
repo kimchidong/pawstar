@@ -15,7 +15,7 @@
         {% for p in posts %}
             <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
                 <div class="m-card-thumb">
-                    <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <img src="{{ p.image_path or p.media_url }}" alt="{{ p.title }}" loading="lazy">
                     <div class="m-card-badge" style="background: rgba(225, 29, 72, 0.85);">🔥 급상승 {{ loop.index }}위</div>
                     <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
                 </div>

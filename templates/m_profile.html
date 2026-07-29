@@ -59,7 +59,7 @@
         {% for p in my_posts %}
             <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
                 <div class="m-card-thumb">
-                    <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <img src="{{ p.image_path or p.media_url }}" alt="{{ p.title }}" loading="lazy">
                     <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
                 </div>
                 <div class="m-card-content">

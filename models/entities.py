@@ -32,7 +32,7 @@ class Contest:
         }
 
 class Post:
-    def __init__(self, post_id, user_id, contest_id, pet_name, pet_type, title, content, media_url, media_type='IMAGE'):
+    def __init__(self, post_id, user_id, contest_id, pet_name, pet_type, title, content, file_path, list_file_name, popup_file_name, media_type='IMAGE'):
         self.post_id = post_id
         self.user_id = user_id
         self.contest_id = contest_id
@@ -40,7 +40,9 @@ class Post:
         self.pet_type = pet_type # DOG, CAT, BIRD, etc.
         self.title = title
         self.content = content
-        self.media_url = media_url
+        self.file_path = file_path
+        self.list_file_name = list_file_name
+        self.popup_file_name = popup_file_name
         self.media_type = media_type
         self.score = 0
         self.view_count = 0

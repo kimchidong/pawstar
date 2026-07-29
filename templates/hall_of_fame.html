@@ -40,7 +40,7 @@
             <div class="crown-badge">🥈</div>
             <div class="winner-title-badge">라이징스타 (Rising Star)</div>
             {% if rising_star %}
-                <img src="{{ rising_star.media_url }}" class="winner-img" alt="Rising Star">
+                <img src="{{ rising_star.image_path or item.media_url }}" class="winner-img" alt="Rising Star">
                 <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ rising_star.pet_name }} ({{ rising_star.pet_type }})</h3>
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ rising_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.6rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
@@ -57,7 +57,7 @@
             <div class="crown-badge">🥇</div>
             <div class="winner-title-badge">슈퍼스타 (Super Star)</div>
             {% if super_star %}
-                <img src="{{ super_star.media_url }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
+                <img src="{{ super_star.image_path or item.media_url }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
                 <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">{{ super_star.pet_name }} ({{ super_star.pet_type }})</h3>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.3rem;">집사: {{ super_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.75rem; background: #fffbeb; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
@@ -74,7 +74,7 @@
             <div class="crown-badge">🥉</div>
             <div class="winner-title-badge">브라이트스타 (Bright Star)</div>
             {% if bright_star %}
-                <img src="{{ bright_star.media_url }}" class="winner-img" alt="Bright Star">
+                <img src="{{ bright_star.image_path or item.media_url }}" class="winner-img" alt="Bright Star">
                 <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ bright_star.pet_name }} ({{ bright_star.pet_type }})</h3>
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ bright_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.6rem; background: #fff7ed; border-radius: var(--radius-sm); border: 1px solid #ffedd5;">
@@ -100,7 +100,7 @@
             </p>
             {% if rookie_star %}
                 <div style="display: flex; align-items: center; gap: 1rem; background: #ffffff; padding: 0.9rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); box-shadow: var(--shadow-soft);">
-                    <img src="{{ rookie_star.media_url }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" alt="rookie">
+                    <img src="{{ rookie_star.image_path or item.media_url }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" alt="rookie">
                     <div>
                         <div style="font-weight: 800; color: var(--text-primary);">{{ rookie_star.pet_name }} (집사: {{ rookie_star.user_nickname }})</div>
                         <div style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 700;">{{ rookie_star.post_title }} (Score: {{ "{:,}".format(rookie_star.score) }})</div>

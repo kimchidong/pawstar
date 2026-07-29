@@ -40,6 +40,16 @@ class PawStarService:
 
         try:
             with conn.cursor() as cur:
+                # 0. POST 테이블 컬럼 자동 마이그레이션 (MEDIA_URL -> IMAGE_PATH)
+                try:
+                    cur.execute("SHOW COLUMNS FROM POST LIKE 'MEDIA_URL'")
+                    if cur.fetchone():
+                        cur.execute("ALTER TABLE POST CHANGE MEDIA_URL IMAGE_PATH VARCHAR(255) NOT NULL")
+                        conn.commit()
+                        print("DB DDL 실행 성공: POST 테이블 MEDIA_URL -> IMAGE_PATH 컬럼명 변경 완료")
+                except Exception as ex:
+                    print("DB DDL 마이그레이션 예외 통과:", ex)
+
                 # 1. USERS 테이블 데이터 가져오기
                 cur.execute("SELECT * FROM USERS")
                 db_users = cur.fetchall()
@@ -98,7 +108,9 @@ class PawStarService:
                             'pet_type': p['PET_TYPE'],
                             'title': p['TITLE'],
                             'content': p['CONTENT'] or '',
-                            'media_url': p['MEDIA_URL'],
+                            'file_path': p.get('FILE_PATH') or '/static/image/paw/2026/07/',
+                            'list_file_name': p.get('LIST_FILE_NAME') or f"3-{p['POST_ID']}_list.webp",
+                            'popup_file_name': p.get('POPUP_FILE_NAME') or f"3-{p['POST_ID']}_popup.webp",
                             'media_type': p['MEDIA_TYPE'],
                             'score': p['SCORE'],
                             'view_count': p['VIEW_COUNT'],
@@ -127,7 +139,7 @@ class PawStarService:
                 # 5. CONTEST_WINNER 테이블 데이터 가져오기
                 cur.execute("""
                     SELECT w.*, c.TITLE as CONTEST_TITLE, p.PET_NAME, p.PET_TYPE, p.TITLE as POST_TITLE, 
-                           p.MEDIA_URL, p.SCORE, u.NICKNAME as USER_NICKNAME, u.PROFILE_IMG as USER_PROFILE
+                           p.*, u.NICKNAME as USER_NICKNAME, u.PROFILE_IMG as USER_PROFILE
                     FROM CONTEST_WINNER w
                     JOIN CONTEST c ON w.CONTEST_ID = c.CONTEST_ID
                     JOIN POST p ON w.POST_ID = p.POST_ID
@@ -146,7 +158,9 @@ class PawStarService:
                             'pet_name': w['PET_NAME'],
                             'pet_type': w['PET_TYPE'],
                             'post_title': w['POST_TITLE'],
-                            'media_url': w['MEDIA_URL'],
+                            'file_path': w.get('FILE_PATH') or '/static/image/paw/2026/07/',
+                            'list_file_name': w.get('LIST_FILE_NAME') or f"3-{w['POST_ID']}_list.webp",
+                            'popup_file_name': w.get('POPUP_FILE_NAME') or f"3-{w['POST_ID']}_popup.webp",
                             'score': w['SCORE'],
                             'user_nickname': w['USER_NICKNAME'],
                             'user_profile': w['USER_PROFILE']
@@ -223,77 +237,53 @@ class PawStarService:
         # 유저별 이미 조회를 완료한 게시물 ID 집합 (user_id -> set of post_ids)
         self.user_views = {}
 
-        # Posts for Contest #3 (진행중)
-        sample_posts = [
-            {
-                'post_id': 101,
-                'user_id': 'user1',
-                'contest_id': 3,
-                'pet_name': '뽀삐',
-                'pet_type': '🐕 강아지',
-                'title': '웃는 모습이 너무 예쁜 우리 뽀삐 자랑해요!',
-                'content': '오늘 잔디밭 산책 다녀왔는데 기분이 너무 좋은지 햇살 아래서 천사처럼 웃네요 💕 다들 뽀삐 웃음 보고 힐링하세요!',
-                'media_url': 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
-                'media_type': 'IMAGE',
-                'score': 1580,
-                'view_count': 320,
-                'like_count': 112,
-                'comment_count': 40,
-                'share_count': 15,
-                'created_at': '2026-07-10 14:20:00'
-            },
-            {
-                'post_id': 102,
-                'user_id': 'user2',
-                'contest_id': 3,
-                'pet_name': '나비',
-                'pet_type': '🐈 고양이',
-                'title': '박스만 보면 일단 들어가고 보는 나비의 하루',
-                'content': '택배 박스 뜯자마자 식빵 굽기 완성! 이 굴뚝같은 귀여움 어쩌죠? 🐾',
-                'media_url': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
-                'media_type': 'IMAGE',
-                'score': 1420,
-                'view_count': 410,
-                'like_count': 90,
-                'comment_count': 32,
-                'share_count': 12,
-                'created_at': '2026-07-12 10:15:00'
-            },
-            {
-                'post_id': 103,
-                'user_id': 'user3',
-                'contest_id': 3,
-                'pet_name': '모찌',
-                'pet_type': '🐹 햄스터',
-                'title': '볼따구에 해바라기씨 10개 저장 성공!',
-                'content': '볼이 터질 것 같은 볼빵빵 모찌입니다. 귀여운 먹방 구경오세요~',
-                'media_url': 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80',
-                'media_type': 'IMAGE',
-                'score': 1890,
-                'view_count': 590,
-                'like_count': 130,
-                'comment_count': 45,
-                'share_count': 10,
-                'created_at': '2026-07-15 18:30:00'
-            },
-            {
-                'post_id': 104,
-                'user_id': 'user4',
-                'contest_id': 3,
-                'pet_name': '앵두',
-                'pet_type': '🦜 앵무새',
-                'title': '주인 껌딱지 앵두의 헤드뱅잉 장기자랑',
-                'content': '신나는 음악 틀어주면 박자에 맞춰서 날개를 흔드는 흥부자 앵두랍니다 🎶',
-                'media_url': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80',
-                'media_type': 'IMAGE',
-                'score': 1210,
-                'view_count': 260,
-                'like_count': 80,
-                'comment_count': 25,
-                'share_count': 15,
-                'created_at': '2026-07-18 09:00:00'
-            }
+        # Posts for Contest #3 (진행중) 20개 샘플 데이터
+        sample_posts = []
+        pet_meta_list = [
+            ("뽀삐", "🐕 강아지", "웃는 모습이 너무 예쁜 우리 뽀삐 자랑해요!", "오늘 잔디밭 산책 다녀왔는데 기분이 너무 좋은지 햇살 아래서 천사처럼 웃네요 💕"),
+            ("나비", "🐈 고양이", "박스만 보면 일단 들어가고 보는 나비의 하루", "택배 박스 뜯자마자 식빵 굽기 완성! 이 굴뚝같은 귀여움 어쩌죠? 🐾"),
+            ("모찌", "🐹 햄스터", "볼따구에 해바라기씨 10개 저장 성공!", "볼이 터질 것 같은 볼빵빵 모찌입니다. 귀여운 먹방 구경오세요~"),
+            ("앵두", "🦜 앵무새", "주인 껌딱지 앵두의 헤드뱅잉 장기자랑", "신나는 음악 틀어주면 박자에 맞춰서 날개를 흔드는 흥부자 앵두랍니다 🎶"),
+            ("초코", "🐕 강아지", "초코송이 귀를 가진 심쿵 푸들 초코", "복슬복슬 귀여운 초코! 털 깎고 더욱 귀여워졌어요~"),
+            ("라떼", "🐈 고양이", "라떼처럼 부드러운 털을 가진 오드아이 냥이", "눈동자 색깔이 오드아이로 매력 넘치는 고양이 라떼의 매력에 빠져보세요."),
+            ("해피", "🐕 강아지", "산책 가자는 말에 미소 짓는 해피", "산책 소리만 들으면 신나서 빙글빙글 도는 똥꼬발랄 해피입니다!"),
+            ("구름", "🐕 강아지", "하늘에서 내려온 솜사탕 구름이", "뽀송뽀송 뭉게구름 같은 우리 강아지 솜사탕처럼 달콤하죠?"),
+            ("망고", "🐈 고양이", "노랑노랑 망고의 따사로운 햇살 식빵", "창가 햇살 아래에서 졸고 있는 노란 애교쟁이 망고 자랑합니다."),
+            ("두부", "🐕 강아지", "말랑말랑 순두부 같은 미소 두부", "이름처럼 말랑하고 성격도 온순한 두부의 힐링 사진입니다."),
+            ("까미", "🐈 고양이", "검은 고양이 까미의 귀여운 젤리 공개", "분홍빛 젤리 발바닥이 매력 포인트! 귀여운 까미 자랑해요."),
+            ("보리", "🐕 강아지", "보리밭 산책왕 보리의 가을 나들이", "바람을 느끼는 멋진 가을 남자 보리의 산책 포즈!"),
+            ("콩이", "🐹 햄스터", "손바닥에 쏙 들어오는 귀요미 콩이", "작고 소중한 콩이의 앙증맞은 손 귀여움 폭발입니다."),
+            ("피코", "🦜 앵무새", "알록달록 예쁜 깃털 뽐내는 피코", "화려한 깃털 옷을 입고 인사하는 안녕 피코랍니다."),
+            ("마루", "🐕 강아지", "쇼파를 장악한 강아지 마루의 휴식", "사람처럼 쇼파에 기대어 TV 보는 귀여운 마루의 하루"),
+            ("코코", "🐈 고양이", "높은 곳을 좋아하는 탐험가 코코", "캣타워 최상층에서 아래를 내려다보는 멋진 코코의 모습"),
+            ("치즈", "🐈 고양이", "노란 치즈냥이의 골골송 라이브", "쓰다듬어주면 골골송을 부르는 최고 귀요미 치즈랍니다."),
+            ("단풍", "🐕 강아지", "단풍잎 밟으며 신난 가을 강아지", "낙엽 밟는 소리가 좋은지 뛰어다니는 단풍이 자랑해요!"),
+            ("모카", "🐕 강아지", "초롱초롱 인형 같은 눈망울 모카", "까만 콩 세 개 찍힌 것처럼 인형 같은 모카 사진 보세요."),
+            ("하늘", "🦜 앵무새", "파란 하늘 닮은 깃털 파랑이 하늘이", "청량한 파란색 깃털을 가진 사랑스러운 하늘이의 미소입니다.")
         ]
+
+        for i in range(1, 21):
+            pid = 100 + i
+            meta = pet_meta_list[i-1]
+            sample_posts.append({
+                'post_id': pid,
+                'user_id': f"user{(i % 6) + 1}",
+                'contest_id': 3,
+                'pet_name': meta[0],
+                'pet_type': meta[1],
+                'title': meta[2],
+                'content': meta[3],
+                'file_path': '/static/image/paw/2026/07/',
+                'list_file_name': f"3-{pid}_list.webp",
+                'popup_file_name': f"3-{pid}_popup.webp",
+                'media_type': 'IMAGE',
+                'score': 1000 + (20 - i) * 75,
+                'view_count': 200 + (20 - i) * 25,
+                'like_count': 60 + (20 - i) * 6,
+                'comment_count': 15 + (20 - i) * 2,
+                'share_count': 5 + (20 - i),
+                'created_at': '2026-07-28 12:00:00'
+            })
 
         for p in sample_posts:
             self.posts[p['post_id']] = p
@@ -351,7 +341,7 @@ class PawStarService:
                 'pet_type': p_type,
                 'title': f"{p_name}의 {p_title_prefix}! ({idx}호)",
                 'content': f"안녕하세요! 귀여운 {p_name}의 일상 자랑입니다. 많이 많이 응원해주세요 🐾",
-                'media_url': img_url,
+                'image_path': img_url,
                 'media_type': 'IMAGE',
                 'score': calc_score,
                 'view_count': views,
@@ -389,7 +379,7 @@ class PawStarService:
             'pet_name': '나비',
             'pet_type': '🐈 고양이',
             'post_title': '식빵 굽기 세계 챔피언 나비',
-            'media_url': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+            'image_path': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
             'score': 3450,
             'user_nickname': '냥냥 집사',
             'user_profile': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80'
@@ -403,7 +393,7 @@ class PawStarService:
             'pet_name': '뽀삐',
             'pet_type': '🐕 강아지',
             'post_title': '개구쟁이 뽀삐의 흙놀이 샷',
-            'media_url': 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
+            'image_path': 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
             'score': 2980,
             'user_nickname': '뽀삐아빠',
             'user_profile': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
@@ -417,7 +407,7 @@ class PawStarService:
             'pet_name': '모찌',
             'pet_type': '🐹 햄스터',
             'post_title': '쳇바퀴 100km 돌파 순간',
-            'media_url': 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80',
+            'image_path': 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80',
             'score': 2410,
             'user_nickname': '햄찌마스터',
             'user_profile': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'
@@ -431,7 +421,7 @@ class PawStarService:
             'pet_name': '앵두',
             'pet_type': '🦜 앵무새',
             'post_title': '하루만에 조회수 5천 돌파 앵두 댄스',
-            'media_url': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80',
+            'image_path': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80',
             'score': 2100,
             'user_nickname': '앵두네',
             'user_profile': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80'
@@ -471,6 +461,9 @@ class PawStarService:
         - 'popular': 인기순 ORDER BY score DESC
         - 'trending': 최근 급상승 (30일 일별 통계 점수 합산)
         """
+        # 언제나 실제 MySQL DB에서 최신 데이터 동기화 읽기
+        self.load_data_from_db()
+
         contest_id = int(contest_id)
         filtered = [p for p in self.posts.values() if p['contest_id'] == contest_id]
 
@@ -639,6 +632,31 @@ class PawStarService:
         stat_entry['like_count'] += l_delta
         stat_entry['comment_count'] += c_delta
         stat_entry['share_count'] += s_delta
+
+        # 실제 DB POST 테이블 및 POST_DAILY_STAT 에 수치 갱신 반영
+        conn = self.get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        UPDATE POST 
+                        SET SCORE = %s, VIEW_COUNT = %s, LIKE_COUNT = %s, COMMENT_COUNT = %s, SHARE_COUNT = %s 
+                        WHERE POST_ID = %s
+                    """, (post['score'], post['view_count'], post['like_count'], post['comment_count'], post['share_count'], post_id))
+
+                    cur.execute("""
+                        INSERT INTO POST_DAILY_STAT (POST_ID, STAT_DATE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE 
+                            VIEW_COUNT = VIEW_COUNT + VALUES(VIEW_COUNT),
+                            LIKE_COUNT = LIKE_COUNT + VALUES(LIKE_COUNT),
+                            COMMENT_COUNT = COMMENT_COUNT + VALUES(COMMENT_COUNT),
+                            SHARE_COUNT = SHARE_COUNT + VALUES(SHARE_COUNT)
+                    """, (post_id, today_str, max(0, v_delta), max(0, l_delta), max(0, c_delta), max(0, s_delta)))
+                    conn.commit()
+                conn.close()
+            except Exception as ex:
+                print("이벤트 DB 동기화 오류:", ex)
 
         return {
             'post_id': post_id,
@@ -922,7 +940,7 @@ class PawStarService:
                 'pet_name': p['pet_name'],
                 'pet_type': p['pet_type'],
                 'post_title': p['title'],
-                'media_url': p['media_url'],
+                'image_path': p.get('image_path') or p.get('media_url'),
                 'score': p['score'],
                 'user_nickname': u.get('nickname', ''),
                 'user_profile': u.get('profile_img', '')
@@ -943,7 +961,7 @@ class PawStarService:
                 'pet_name': p['pet_name'],
                 'pet_type': p['pet_type'],
                 'post_title': p['title'],
-                'media_url': p['media_url'],
+                'image_path': p.get('image_path') or p.get('media_url'),
                 'score': p['score'],
                 'user_nickname': u.get('nickname', ''),
                 'user_profile': u.get('profile_img', '')
@@ -964,7 +982,7 @@ class PawStarService:
                 'pet_name': p['pet_name'],
                 'pet_type': p['pet_type'],
                 'post_title': p['title'],
-                'media_url': p['media_url'],
+                'image_path': p.get('image_path') or p.get('media_url'),
                 'score': p['score'],
                 'user_nickname': u.get('nickname', ''),
                 'user_profile': u.get('profile_img', '')
@@ -990,7 +1008,7 @@ class PawStarService:
                 'pet_name': rookie_post['pet_name'],
                 'pet_type': rookie_post['pet_type'],
                 'post_title': rookie_post['title'],
-                'media_url': rookie_post['media_url'],
+                'image_path': rookie_post.get('image_path') or rookie_post.get('media_url'),
                 'score': rookie_post['score'],
                 'user_nickname': u.get('nickname', ''),
                 'user_profile': u.get('profile_img', '')
@@ -1000,27 +1018,41 @@ class PawStarService:
 
         return new_winners
 
-    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url):
-        post_id = max(self.posts.keys(), default=100) + 1
-        new_post = {
-            'post_id': post_id,
-            'user_id': user_id,
-            'contest_id': int(contest_id),
-            'pet_name': pet_name,
-            'pet_type': pet_type,
-            'title': title,
-            'content': content,
-            'media_url': media_url or 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
-            'media_type': 'IMAGE',
-            'score': 0, # 신규 등록 기본 점수 (0점)
-            'view_count': 0,
-            'like_count': 0,
-            'comment_count': 0,
-            'share_count': 0,
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        self.posts[post_id] = new_post
-        return new_post
+    def get_next_post_id(self):
+        """ 다음에 발급될 고유 post_id 반환 """
+        return max(self.posts.keys(), default=100) + 1
+
+    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, file_path, list_file_name, popup_file_name, force_post_id=None):
+        post_id = int(force_post_id) if force_post_id else self.get_next_post_id()
+        created_at_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # 100% 실제 MySQL DB POST 테이블에 INSERT 영구 저장
+        conn = self.get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    # 유저 존재 여부 확인 및 자동 생성 (FK Constraint 충돌 방지)
+                    cur.execute("SELECT USER_ID FROM USERS WHERE USER_ID = %s", (user_id,))
+                    if not cur.fetchone():
+                        cur.execute("INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG) VALUES (%s, %s, %s)",
+                                    (user_id, '회원 집사', '/static/image/profile/default_profile.png'))
+
+                    sql = """INSERT INTO POST (POST_ID, USER_ID, CONTEST_ID, PET_NAME, PET_TYPE, TITLE, CONTENT, FILE_PATH, LIST_FILE_NAME, POPUP_FILE_NAME, MEDIA_TYPE, SCORE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT, CREATED_AT)
+                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                    cur.execute(sql, (
+                        post_id, user_id, int(contest_id), pet_name, pet_type, title, content,
+                        file_path, list_file_name, popup_file_name, 'IMAGE',
+                        0, 0, 0, 0, 0, created_at_str
+                    ))
+                    conn.commit()
+                    print(f"MySQL DB POST 테이블 신규 레코드 #{post_id} 영구 저장 성공!")
+                conn.close()
+            except Exception as e:
+                print("MySQL DB POST 저장 중 오류:", e)
+
+        # DB 저장 직후 DB에서 최신 데이터 전체 재인출 및 동기화
+        self.load_data_from_db()
+        return self.posts.get(post_id)
 
     def get_comments_by_post(self, post_id):
         """ 특정 게시물의 댓글 목록 반환 및 실제 개수로 comment_count 동기화 """

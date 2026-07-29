@@ -185,19 +185,66 @@ document.addEventListener('DOMContentLoaded', function() {
     if (inputTitle) inputTitle.addEventListener('input', updateMobilePreview);
     if (textareaContent) textareaContent.addEventListener('input', updateMobilePreview);
 
+    let mCurrentTempFilename = '';
+
     if (inputFile) {
         inputFile.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const mPreviewCardImg = document.getElementById('mPreviewCardImg');
-                    const mPreviewModalImg = document.getElementById('mPreviewModalImg');
-                    if (mPreviewCardImg) mPreviewCardImg.src = evt.target.result;
-                    if (mPreviewModalImg) mPreviewModalImg.src = evt.target.result;
-                };
-                reader.readAsDataURL(file);
+                const tempFormData = new FormData();
+                tempFormData.append('media_file', file);
+                
+                fetch('/api/post/upload-temp', {
+                    method: 'POST',
+                    body: tempFormData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        mCurrentTempFilename = data.temp_filename;
+                        const mPreviewCardImg = document.getElementById('mPreviewCardImg');
+                        const mPreviewModalImg = document.getElementById('mPreviewModalImg');
+                        // static/image/temp/paw/ 경로 임시 이미지 URL로 미리보기 반영
+                        if (mPreviewCardImg) mPreviewCardImg.src = data.temp_url;
+                        if (mPreviewModalImg) mPreviewModalImg.src = data.temp_url;
+                    }
+                })
+                .catch(err => console.error('모바일 임시 업로드 실패:', err));
             }
+        });
+    }
+
+    const mUploadForm = document.getElementById('mPostUploadForm') || document.querySelector('form');
+    if (mUploadForm) {
+        mUploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('mUploadMediaFile') || document.querySelector('input[type="file"]');
+            if (!mCurrentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
+                alert('출전시킬 펫 이미지 파일을 첨부해주세요!');
+                return;
+            }
+
+            const formData = new FormData(mUploadForm);
+            if (mCurrentTempFilename) {
+                formData.append('temp_filename', mCurrentTempFilename);
+            }
+            fetch('/api/post/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('🎉 펫 콘테스트 출전 신청이 성공적으로 완료되었습니다!');
+                    location.href = '/m/';
+                } else {
+                    alert('출전 신청 실패: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error('업로드 실패:', err);
+                alert('이미지 파일 업로드 중 오류가 발생했습니다.');
+            });
         });
     }
 

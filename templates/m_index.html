@@ -26,7 +26,7 @@
     {% for p in posts %}
         <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
-                <img src="{{ p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                <img src="{% if p.file_path and p.list_file_name %}{{ p.file_path }}{{ p.list_file_name }}{% else %}{{ p.image_path or p.media_url }}{% endif %}" alt="{{ p.title }}" loading="lazy">
                 {% if p.rank_candidate %}
                     <div class="m-card-badge">🏆 {{ p.rank_candidate }}위 후보</div>
                 {% endif %}

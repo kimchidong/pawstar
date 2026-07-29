@@ -16,7 +16,9 @@
             p.PET_TYPE,
             p.TITLE,
             p.CONTENT,
-            p.MEDIA_URL,
+            p.FILE_PATH,
+            p.LIST_FILE_NAME,
+            p.POPUP_FILE_NAME,
             p.MEDIA_TYPE,
             p.SCORE,
             p.VIEW_COUNT,
@@ -44,7 +46,9 @@
             p.PET_TYPE,
             p.TITLE,
             p.CONTENT,
-            p.MEDIA_URL,
+            p.FILE_PATH,
+            p.LIST_FILE_NAME,
+            p.POPUP_FILE_NAME,
             p.MEDIA_TYPE,
             p.SCORE AS TOTAL_ACCUMULATED_SCORE,
             SUM(ds.VIEW_COUNT * 1 + ds.LIKE_COUNT * 5 + ds.COMMENT_COUNT * 10 + ds.SHARE_COUNT * 20) AS TRENDING_SCORE,
@@ -59,7 +63,7 @@
             AND ds.STAT_DATE >= CURRENT_DATE() - INTERVAL 30 DAY
         WHERE p.CONTEST_ID = #{contestId}
         GROUP BY p.POST_ID, p.USER_ID, u.NICKNAME, u.PROFILE_IMG, p.CONTEST_ID, c.TITLE, 
-                 p.PET_NAME, p.PET_TYPE, p.TITLE, p.CONTENT, p.MEDIA_URL, p.MEDIA_TYPE, p.SCORE
+                 p.PET_NAME, p.PET_TYPE, p.TITLE, p.CONTENT, p.IMAGE_PATH, p.MEDIA_TYPE, p.SCORE
         ORDER BY TRENDING_SCORE DESC, p.CREATED_AT DESC
     </select>
 
@@ -76,7 +80,9 @@
             p.PET_NAME,
             p.PET_TYPE,
             p.TITLE AS POST_TITLE,
-            p.MEDIA_URL,
+            p.FILE_PATH,
+            p.LIST_FILE_NAME,
+            p.POPUP_FILE_NAME,
             p.SCORE,
             u.USER_ID,
             u.NICKNAME,

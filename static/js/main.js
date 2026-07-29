@@ -342,9 +342,11 @@ function openDetailModal(post) {
     // 게시물 상세 팝업 오픈시 조회수 1회 자동 증가 (+1점)
     triggerEvent(post.post_id, 'view');
 
-    // 데이터 채우기
+    // 데이터 채우기 (팝업용 고화질 이미지 바인딩)
     const imgEl = document.getElementById('detailImg');
-    if (imgEl) imgEl.src = post.media_url || '';
+    if (imgEl) {
+        imgEl.src = (post.file_path || '') + (post.popup_file_name || post.list_file_name || post.image_path || post.media_url || '');
+    }
 
     const authorImgEl = document.getElementById('detailAuthorImg');
     if (authorImgEl) authorImgEl.src = post.user_profile || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
