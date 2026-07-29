@@ -173,22 +173,22 @@
                     </div>
 
                     <!-- 한줄 댓글 입력 및 목록 섹션 -->
-                    <div style="margin-top: 1rem; border-top: 1px solid var(--border-light); padding-top: 0.85rem;">
-                        <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;">
+                        <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
                             <span>💬 한줄 댓글 <span id="detailCommentHeaderCount" style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
                             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">작성 시 +10점 획득!</span>
                         </h4>
 
                         <!-- 댓글 입력 폼 -->
-                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            <input type="text" id="detailCommentInput" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" style="flex: 1; padding: 0.5rem 0.85rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light);" onkeypress="if(event.key==='Enter') submitDetailComment()">
-                            <button type="button" onclick="submitDetailComment()" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap;">
+                        <div style="display: flex; gap: 0.4rem; margin-bottom: 0.6rem;">
+                            <input type="text" id="detailCommentInput" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light);" onkeypress="if(event.key==='Enter') submitDetailComment()">
+                            <button type="button" onclick="submitDetailComment()" style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap;">
                                 등록
                             </button>
                         </div>
 
                         <!-- 댓글 리스트 목록 -->
-                        <div id="detailCommentList" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.2rem;">
+                        <div id="detailCommentList" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 0.45rem; padding-right: 0.2rem;">
                             <!-- JS 동적 렌더링 -->
                         </div>
                     </div>
