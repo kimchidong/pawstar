@@ -175,7 +175,7 @@ def api_auth_register():
     if not user_id or not nickname or not password:
         return jsonify({'success': False, 'message': '아이디, 닉네임, 사용자인증번호(비밀번호)는 필수 입력 사항입니다.'}), 400
 
-    if user_id in service.users:
+    if service.is_user_exists(user_id):
         return jsonify({'success': False, 'message': '이미 사용 중인 아이디입니다.'}), 400
 
     # 임시 이미지 디렉터리에 있으면 최종 static/image/profile/YYYY/MM 으로 이동
@@ -374,6 +374,14 @@ def is_mobile_user_agent():
     mobile_keywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone', 'opera mini']
     return any(k in ua for k in mobile_keywords)
 
+def get_current_user_id():
+    """ 로그인 유저 ID 또는 세션 쿠키 기반의 고유 방문자 익명 ID 통합 반환 """
+    if session.get('user_id'):
+        return session['user_id']
+    if not session.get('anon_user_id'):
+        session['anon_user_id'] = f"guest_{uuid.uuid4().hex[:12]}"
+    return session['anon_user_id']
+
 # --- PC 전용 라우트 (1280px 고정) ---
 
 # 1. 홈 (콘테스트 게시물 메인)
@@ -387,9 +395,10 @@ def index():
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
     page = request.args.get('page', 1, type=int)
+    current_user_id = get_current_user_id()
 
     current_contest = service.get_contest(contest_id)
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
 
     return render_template(
         'index.html',
@@ -694,12 +703,8 @@ def post_event():
         if not post_id or not event_type:
             return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 200
 
-        user_id = session.get('user_id')
+        user_id = get_current_user_id()
         
-        # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
-        if not user_id and event_type in ['like', 'unlike', 'comment', 'share']:
-            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 200
-
         res = service.trigger_event(post_id, event_type, user_id=user_id)
         if res:
             if res.get('is_owner'):
@@ -716,7 +721,7 @@ def post_event():
 def get_user_post_actions(post_id):
     """ 특정 게시물에 대해 사용자가 4가지 영향력(조회, 좋아요, 댓글, 공유)을 반영했는지 여부 조회 """
     try:
-        user_id = session.get('user_id') or 'user1'
+        user_id = get_current_user_id()
         actions = service.get_user_post_actions(post_id, user_id)
         return jsonify({'success': True, 'actions': actions})
     except Exception as e:
@@ -815,16 +820,15 @@ def add_comment(post_id):
         if not content:
             return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 400
 
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'success': False, 'message': '로그인 후 댓글을 작성할 수 있습니다.', 'require_login': True}), 401
+        user_id = get_current_user_id()
 
         user_profile = None
-        if user_id in service.users:
-            user_nickname = service.users[user_id].get('nickname', '집사')
-            user_profile = service.users[user_id].get('profile_img')
+        user_data = service.get_user_profile(user_id)
+        if user_data and user_data.get('user_info'):
+            user_nickname = user_data['user_info'].get('nickname', '귀여운 집사')
+            user_profile = user_data['user_info'].get('profile_img')
         else:
-            user_nickname = data.get('nickname') or '회원 집사'
+            user_nickname = data.get('nickname') or '귀여운 집사'
 
         comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile, user_id=user_id)
         if comment is None:
