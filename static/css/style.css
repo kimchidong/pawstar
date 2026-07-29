@@ -777,18 +777,23 @@ body {
 
 .action-btn {
     background: var(--bg-primary);
-    border: 1px solid var(--border-light);
+    border: 1.5px solid var(--border-light);
     color: var(--text-secondary);
-    padding: 0.5rem 0.2rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.78rem;
+    padding: 0.5rem 0.3rem;
+    border-radius: 13px;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
+    justify-content: center;
+    gap: 0.2rem;
     transition: var(--transition);
+}
+
+.action-btn i {
+    font-size: 1.05rem;
 }
 
 .action-btn:hover {
@@ -808,44 +813,52 @@ body {
     background: #eff6ff !important;
     border: 2px solid #3b82f6 !important;
     color: #2563eb !important;
-    font-weight: 900 !important;
+    font-weight: 800 !important;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
-.action-btn.btn-view.active i, #detailBtnView.active i {
+.action-btn.btn-view.active i, #detailBtnView.active i,
+.action-btn.btn-view.active span, #detailBtnView.active span {
     color: #2563eb !important;
+    font-weight: 800 !important;
 }
 
 .action-btn.btn-like.active, #detailBtnLike.active {
     background: #fff1f2 !important;
     border: 2px solid #f43f5e !important;
     color: #e11d48 !important;
-    font-weight: 900 !important;
-    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.22);
 }
-.action-btn.btn-like.active i, #detailBtnLike.active i {
+.action-btn.btn-like.active i, #detailBtnLike.active i,
+.action-btn.btn-like.active span, #detailBtnLike.active span {
     color: #e11d48 !important;
+    font-weight: 800 !important;
 }
 
 .action-btn.btn-comment.active, #detailBtnComment.active {
     background: #f5f3ff !important;
     border: 2px solid #8b5cf6 !important;
     color: #7c3aed !important;
-    font-weight: 900 !important;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
 }
-.action-btn.btn-comment.active i, #detailBtnComment.active i {
+.action-btn.btn-comment.active i, #detailBtnComment.active i,
+.action-btn.btn-comment.active span, #detailBtnComment.active span {
     color: #7c3aed !important;
+    font-weight: 800 !important;
 }
 
 .action-btn.btn-share.active, #detailBtnShare.active {
     background: #ecfdf5 !important;
     border: 2px solid #10b981 !important;
     color: #059669 !important;
-    font-weight: 900 !important;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+    font-weight: 800 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
-.action-btn.btn-share.active i, #detailBtnShare.active i {
+.action-btn.btn-share.active i, #detailBtnShare.active i,
+.action-btn.btn-share.active span, #detailBtnShare.active span {
     color: #059669 !important;
+    font-weight: 800 !important;
 }
 
 .action-btn .score-plus {

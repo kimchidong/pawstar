@@ -199,9 +199,6 @@ class PawStarService:
 
     def get_posts(self, contest_id=3, sort_type='latest', search_query='', pet_type='all', page=1, per_page=12, user_id=None):
         """ 100% MySQL DB Direct SELECT 피드 목록 인출 """
-        if not user_id:
-            user_id = 'user1'
-
         conn = self.get_db_connection()
         if not conn:
             return {'posts': [], 'total_count': 0, 'current_page': page, 'total_pages': 1}
@@ -268,6 +265,7 @@ class PawStarService:
 
                 conn.close()
 
+                total_pages = max(1, (total_count + per_page - 1) // per_page)
                 return {
                     'posts': posts,
                     'total_count': total_count,
@@ -401,9 +399,14 @@ class PawStarService:
             return {'success': False, 'message': str(ex)}
 
     def get_user_post_actions(self, post_id, user_id=None):
-        """ 100% DB Direct SELECT 영향력 4가지 상태 판별 """
+        """ 100% DB Direct SELECT 로그인 회원 전용 영향력 4가지 상태 판별 """
         if not user_id:
-            user_id = 'user1'
+            return {
+                'is_viewed': False,
+                'is_liked': False,
+                'is_commented': False,
+                'is_shared': False
+            }
 
         is_viewed, is_liked, is_commented, is_shared = False, False, False, False
         conn = self.get_db_connection()
@@ -411,16 +414,20 @@ class PawStarService:
             try:
                 with conn.cursor() as cur:
                     cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
-                    if cur.fetchone()['cnt'] > 0: is_viewed = True
+                    r_v = cur.fetchone()
+                    if r_v and (r_v['cnt'] if isinstance(r_v, dict) else r_v[0]) > 0: is_viewed = True
 
                     cur.execute("SELECT COUNT(*) as cnt FROM POST_LIKE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
-                    if cur.fetchone()['cnt'] > 0: is_liked = True
+                    r_l = cur.fetchone()
+                    if r_l and (r_l['cnt'] if isinstance(r_l, dict) else r_l[0]) > 0: is_liked = True
 
                     cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE post_id = %s AND user_id = %s", (post_id, user_id))
-                    if cur.fetchone()['cnt'] > 0: is_commented = True
+                    r_c = cur.fetchone()
+                    if r_c and (r_c['cnt'] if isinstance(r_c, dict) else r_c[0]) > 0: is_commented = True
 
                     cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
-                    if cur.fetchone()['cnt'] > 0: is_shared = True
+                    r_s = cur.fetchone()
+                    if r_s and (r_s['cnt'] if isinstance(r_s, dict) else r_s[0]) > 0: is_shared = True
                 conn.close()
             except Exception as ex:
                 print("DB 영향력 직접 조회 예외:", ex)
@@ -582,6 +589,54 @@ class PawStarService:
         except Exception as e:
             print("get_hall_of_fame DB error:", e)
             return []
+
+    def hash_user_id(self, raw_id):
+        if not raw_id:
+            return ""
+        if len(str(raw_id)) == 64 and all(c in '0123456789abcdefABCDEF' for c in str(raw_id)):
+            return str(raw_id).lower()
+        import hashlib
+        return hashlib.sha256(str(raw_id).encode('utf-8')).hexdigest()
+
+    def google_login_or_register(self, google_id, email=None, default_name=None, picture=None):
+        """ 100% MySQL DB Direct SELECT/INSERT 기반 구글 로그인 및 회원가입 """
+        raw_user_id = f"google_{google_id}"
+        user_id = self.hash_user_id(raw_user_id)
+        profile_img = picture if (picture and picture.strip()) else '/static/image/profile/default_profile.png'
+
+        conn = self.get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT * FROM USERS WHERE USER_ID = %s", (user_id,))
+                    u = cur.fetchone()
+                    if not u:
+                        import random
+                        prefix_list = ['귀여운집사', '행복집사', '초보집사', '댕냥집사', '심쿵집사', '빛나는집사', '러블리집사']
+                        random_nickname = default_name or f"{random.choice(prefix_list)}_{random.randint(1000, 9999)}"
+                        bio = 'PawStar에서 반려동물과 행복한 일상을 나누고 있습니다 🐾'
+                        cur.execute("""
+                            INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, BIO)
+                            VALUES (%s, %s, %s, %s)
+                        """, (user_id, random_nickname, profile_img, bio))
+                        conn.commit()
+                        u = {'USER_ID': user_id, 'NICKNAME': random_nickname, 'PROFILE_IMG': profile_img, 'BIO': bio}
+                    else:
+                        if picture and picture.strip():
+                            cur.execute("UPDATE USERS SET PROFILE_IMG = %s WHERE USER_ID = %s", (profile_img, user_id))
+                            conn.commit()
+                            u['PROFILE_IMG'] = profile_img
+                conn.close()
+                return {
+                    'user_id': u['USER_ID'],
+                    'nickname': u['NICKNAME'],
+                    'profile_img': u['PROFILE_IMG'],
+                    'bio': u.get('BIO', '')
+                }
+            except Exception as e:
+                print("google_login_or_register DB error:", e)
+
+        return {'user_id': user_id, 'nickname': default_name or '구글 회원', 'profile_img': profile_img, 'bio': ''}
 
 # 100% Pure MySQL DB Direct 서비스 싱글톤 객체 생성
 service = PawStarService()

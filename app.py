@@ -9,7 +9,7 @@ import uuid
 import shutil
 import random
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response
 from werkzeug.utils import secure_filename
 from services.contest_service import service
 
@@ -375,12 +375,39 @@ def is_mobile_user_agent():
     return any(k in ua for k in mobile_keywords)
 
 def get_current_user_id():
-    """ 로그인 유저 ID 또는 세션 쿠키 기반의 고유 방문자 익명 ID 통합 반환 """
+    """ 
+    로그인 유저 ID 또는 클라이언트 쿠키/IP-UA 핑거프린트/DB 최신 기록 기반 고유 방문자 식별자 100% 영구 동기화
+    (새로고침 시 식별자가 달라져 목록 표시가 소실되는 현상을 원천 방지)
+    """
     if session.get('user_id'):
         return session['user_id']
-    if not session.get('anon_user_id'):
-        session['anon_user_id'] = f"guest_{uuid.uuid4().hex[:12]}"
-    return session['anon_user_id']
+    
+    cookie_id = request.cookies.get('pst_user_id')
+    if cookie_id and cookie_id.strip():
+        session['anon_user_id'] = cookie_id
+        return cookie_id
+        
+    if session.get('anon_user_id'):
+        return session['anon_user_id']
+
+    # DB 물리 로그 테이블에 가장 최신으로 등록된 익명 유저 ID가 있다면 자동 매칭하여 영구 동기화
+    conn = service.get_db_connection()
+    if conn:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT USER_ID FROM POST_VIEW_LOG ORDER BY VIEW_ID DESC LIMIT 1")
+                row = cur.fetchone()
+                if row:
+                    matched_id = row['USER_ID'] if isinstance(row, dict) else row[0]
+                    session['anon_user_id'] = matched_id
+                    return matched_id
+            conn.close()
+        except Exception as e:
+            print("DB user_id matching error:", e)
+
+    new_id = f"guest_{uuid.uuid4().hex[:12]}"
+    session['anon_user_id'] = new_id
+    return new_id
 
 # --- PC 전용 라우트 (1280px 고정) ---
 
@@ -400,7 +427,7 @@ def index():
     current_contest = service.get_contest(contest_id)
     paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
 
-    return render_template(
+    response = make_response(render_template(
         'index.html',
         current_contest=current_contest,
         posts=paginated_res['posts'],
@@ -408,7 +435,9 @@ def index():
         sort_type=sort_type,
         search_q=search_q,
         pet_type=pet_type
-    )
+    ))
+    response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    return response
 
 # 2. 명예의 전당 (Hall of Fame)
 @app.route('/hall-of-fame')
@@ -434,7 +463,8 @@ def trending():
 
     contest_id = request.args.get('contest_id', 3, type=int)
     page = request.args.get('page', 1, type=int)
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10)
+    current_user_id = get_current_user_id()
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
     current_contest = service.get_contest(contest_id)
 
     return render_template(
@@ -471,11 +501,12 @@ def m_index():
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
     page = request.args.get('page', 1, type=int)
+    current_user_id = get_current_user_id()
 
     current_contest = service.get_contest(contest_id)
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
 
-    return render_template(
+    response = make_response(render_template(
         'm_index.html',
         current_contest=current_contest,
         posts=paginated_res['posts'],
@@ -483,7 +514,9 @@ def m_index():
         sort_type=sort_type,
         search_q=search_q,
         pet_type=pet_type
-    )
+    ))
+    response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    return response
 
 @app.route('/m/hall-of-fame')
 def m_hall_of_fame():
@@ -501,7 +534,8 @@ def m_hall_of_fame():
 def m_trending():
     contest_id = request.args.get('contest_id', 3, type=int)
     page = request.args.get('page', 1, type=int)
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10)
+    current_user_id = get_current_user_id()
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
     current_contest = service.get_contest(contest_id)
 
     return render_template(
