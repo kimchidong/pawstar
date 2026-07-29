@@ -31,11 +31,11 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                 <div class="m-form-group">
                     <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐶 아이 이름</label>
-                    <input type="text" name="pet_name" class="m-form-control" placeholder="아이 이름" required style="width: 100%; padding: 0.75rem;">
+                    <input type="text" name="pet_name" class="m-form-control" required style="width: 100%; padding: 0.75rem;">
                 </div>
                 <div class="m-form-group">
                     <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐾 동물 종류</label>
-                    <select name="pet_type" class="m-form-control" style="width: 100%; padding: 0.75rem; font-weight: 700;">
+                    <select name="pet_type" class="m-form-control" required style="width: 100%; padding: 0.75rem; font-weight: 700;">
                         <option value="🐕 강아지">🐕 강아지</option>
                         <option value="🐈 고양이">🐈 고양이</option>
                         <option value="🐹 햄스터">🐹 햄스터</option>
@@ -47,17 +47,17 @@
 
             <div class="m-form-group" style="margin-bottom: 1rem;">
                 <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">✨ 자랑 제목</label>
-                <input type="text" name="title" class="m-form-control" placeholder="심쿵한 제목을 입력하세요!" required style="width: 100%; padding: 0.75rem;">
+                <input type="text" name="title" class="m-form-control" required style="width: 100%; padding: 0.75rem;">
             </div>
 
             <div class="m-form-group" style="margin-bottom: 1rem;">
-                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🖼️ 출전 사진 파일 첨부</label>
-                <input type="file" id="mUploadMediaFile" name="media_file" accept="image/*" class="m-form-control" style="width: 100%; padding: 0.75rem; background: var(--bg-primary);">
+                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🖼️ 출전 사진 파일 첨부 <span style="color: #e11d48;">*필수</span></label>
+                <input type="file" id="mUploadMediaFile" name="media_file" accept="image/*" class="m-form-control" required style="width: 100%; padding: 0.75rem; background: var(--bg-primary);">
             </div>
 
             <div class="m-form-group" style="margin-bottom: 1.25rem;">
                 <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">📝 소개글</label>
-                <textarea name="content" class="m-form-control" rows="3" placeholder="아이 소개 및 자랑할 이야기를 적어주세요!" style="width: 100%; padding: 0.75rem; font-family: inherit;"></textarea>
+                <textarea name="content" class="m-form-control" rows="3" required style="width: 100%; padding: 0.75rem; font-family: inherit;"></textarea>
             </div>
 
             <!-- 모바일 실시간 원본 크기 미리보기 섹션 (Full Width) -->
@@ -218,9 +218,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mUploadForm) {
         mUploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            const petName = inputPetName ? inputPetName.value.trim() : '';
+            const petType = selectPetType ? selectPetType.value.trim() : '';
+            const title = inputTitle ? inputTitle.value.trim() : '';
+            const content = textareaContent ? textareaContent.value.trim() : '';
             const fileInput = document.getElementById('mUploadMediaFile') || document.querySelector('input[type="file"]');
+
+            if (!petName) {
+                alert('🐶 아이 이름을 입력해주세요!');
+                if (inputPetName) inputPetName.focus();
+                return;
+            }
+
+            if (!petType) {
+                alert('🐾 동물 종류를 선택해주세요!');
+                if (selectPetType) selectPetType.focus();
+                return;
+            }
+
+            if (!title) {
+                alert('✨ 자랑 제목을 입력해주세요!');
+                if (inputTitle) inputTitle.focus();
+                return;
+            }
+
+            if (!content) {
+                alert('📝 소개글 및 자랑 내용을 입력해주세요!');
+                if (textareaContent) textareaContent.focus();
+                return;
+            }
+
             if (!mCurrentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
-                alert('출전시킬 펫 이미지 파일을 첨부해주세요!');
+                alert('🖼️ 출전시킬 펫 이미지 파일을 반드시 첨부해주세요!');
+                if (fileInput) fileInput.focus();
                 return;
             }
 

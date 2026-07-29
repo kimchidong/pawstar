@@ -888,19 +888,20 @@ def create_post():
             temp_filename = data.get('temp_filename') or data.get('temp_url')
             file = None
 
+        if not pet_name:
+            return jsonify({'success': False, 'message': '반려동물 이름을 입력해주세요.'}), 400
+        if not pet_type:
+            return jsonify({'success': False, 'message': '반려동물 종류를 선택해주세요.'}), 400
         if not title:
-            return jsonify({'success': False, 'message': '제목을 입력해주세요.'}), 400
-
-        next_post_id = service.get_next_post_id()
+            return jsonify({'success': False, 'message': '자랑 제목을 입력해주세요.'}), 400
+        if not content:
+            return jsonify({'success': False, 'message': '자랑 내용 및 소개글을 입력해주세요.'}), 400
 
         src_target = temp_filename or file
-        if src_target:
-            file_path, list_file_name, popup_file_name = process_paw_images_dual(src_target, contest_id, next_post_id)
-        else:
-            now = datetime.datetime.now()
-            file_path = f"/static/image/paw/{now.strftime('%Y/%m')}/"
-            list_file_name = f"{contest_id}-{next_post_id}_list.webp"
-            popup_file_name = f"{contest_id}-{next_post_id}_popup.webp"
+        if not src_target:
+            return jsonify({'success': False, 'message': '출전시킬 반려동물 사진 이미지 파일을 반드시 첨부해주세요.'}), 400
+
+        file_path, list_file_name, popup_file_name = process_paw_images_dual(src_target, contest_id, next_post_id)
 
         new_post = service.create_post(
             contest_id, user_id, pet_name, pet_type, title, content, 

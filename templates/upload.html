@@ -46,14 +46,14 @@
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐶 이름
                             </label>
-                            <input type="text" name="pet_name" class="form-control" placeholder="예: 뽀삐, 냥이" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                            <input type="text" name="pet_name" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                         </div>
 
                         <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐾 동물 종류
                             </label>
-                            <select name="pet_type" class="form-control" style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
+                            <select name="pet_type" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
                                 <option value="🐕 강아지">🐕 강아지</option>
                                 <option value="🐈 고양이">🐈 고양이</option>
                                 <option value="🐹 햄스터">🐹 햄스터</option>
@@ -68,17 +68,17 @@
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             ✨ 자랑 제목
                         </label>
-                        <input type="text" name="title" class="form-control" placeholder="아이의 매력을 한눈에 보여줄 심쿵 제목을 입력하세요!" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                        <input type="text" name="title" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                     </div>
 
                     <!-- 4. 파일 업로드 -->
                     <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                            🖼️ 출전 사진 파일 첨부
+                            🖼️ 출전 사진 파일 첨부 <span style="color: #e11d48;">*필수</span>
                         </label>
-                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" class="form-control" style="width: 100%; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600; background: var(--bg-primary);">
+                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" class="form-control" required style="width: 100%; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600; background: var(--bg-primary);">
                         <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; display: block;">
-                            * JPG, PNG, WEBP 등 사랑스러운 펫 이미지를 첨부해주세요.
+                            * JPG, PNG, WEBP 등 사랑스러운 펫 이미지를 필수 첨부해주세요.
                         </span>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                             📝 자랑 내용 및 소개글
                         </label>
-                        <textarea name="content" class="form-control" placeholder="우리 아이의 성격, 장기, 좋아하는 음식이나 출전 포부를 적어주세요!" style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 240px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
+                        <textarea name="content" class="form-control" required style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 240px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
                     </div>
                 </div>
             </div>
@@ -298,9 +298,40 @@ document.addEventListener('DOMContentLoaded', function() {
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            const petName = inputPetName ? inputPetName.value.trim() : '';
+            const petType = selectPetType ? selectPetType.value.trim() : '';
+            const title = inputTitle ? inputTitle.value.trim() : '';
+            const content = textareaContent ? textareaContent.value.trim() : '';
             const fileInput = document.getElementById('uploadMediaFile');
+
+            if (!petName) {
+                alert('🐶 반려동물 이름을 입력해주세요!');
+                if (inputPetName) inputPetName.focus();
+                return;
+            }
+
+            if (!petType) {
+                alert('🐾 반려동물 종류를 선택해주세요!');
+                if (selectPetType) selectPetType.focus();
+                return;
+            }
+
+            if (!title) {
+                alert('✨ 자랑 제목을 입력해주세요!');
+                if (inputTitle) inputTitle.focus();
+                return;
+            }
+
+            if (!content) {
+                alert('📝 자랑 내용 및 소개글을 입력해주세요!');
+                if (textareaContent) textareaContent.focus();
+                return;
+            }
+
             if (!currentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
-                alert('출전시킬 펫 이미지 파일을 첨부해주세요!');
+                alert('🖼️ 출전시킬 반려동물 사진 이미지 파일을 반드시 첨부해주세요!');
+                if (fileInput) fileInput.focus();
                 return;
             }
 
