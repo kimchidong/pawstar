@@ -160,15 +160,20 @@ function submitMobileDetailComment() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) {
-            inputEl.value = '';
-            loadMobileComments(window.currentMobileDetailPostId);
-            if (data.event_res) {
-                const scoreEl = document.getElementById('mDetailScoreNum');
-                if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-            }
-        } else {
+        if (!data.success) {
             alert(data.message || '댓글 작성 실패');
+            if (data.require_login) {
+                const mAuthModal = document.getElementById('mAuthModal');
+                if (mAuthModal) mAuthModal.classList.add('active');
+            }
+            return;
+        }
+        
+        inputEl.value = '';
+        loadMobileComments(window.currentMobileDetailPostId);
+        if (data.event_res) {
+            const scoreEl = document.getElementById('mDetailScoreNum');
+            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
         }
     })
     .catch(err => {

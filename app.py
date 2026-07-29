@@ -693,8 +693,16 @@ def post_event():
     if not post_id or not event_type:
         return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 400
 
-    res = service.trigger_event(post_id, event_type)
+    user_id = session.get('user_id')
+    
+    # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
+    if not user_id and event_type in ['like', 'comment', 'share']:
+        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 401
+
+    res = service.trigger_event(post_id, event_type, user_id=user_id)
     if res:
+        if res.get('is_owner'):
+            return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 403
         return jsonify({'success': True, 'data': res})
     return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
 
@@ -714,12 +722,15 @@ def add_comment(post_id):
             return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 400
 
         user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': '로그인 후 댓글을 작성할 수 있습니다.', 'require_login': True}), 401
+
         user_profile = None
-        if user_id and user_id in service.users:
+        if user_id in service.users:
             user_nickname = service.users[user_id].get('nickname', '집사')
             user_profile = service.users[user_id].get('profile_img')
         else:
-            user_nickname = data.get('nickname') or '익명 집사'
+            user_nickname = data.get('nickname') or '회원 집사'
 
         comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile, user_id=user_id)
         if comment is None:

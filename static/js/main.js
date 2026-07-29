@@ -171,57 +171,68 @@ async function triggerEvent(postId, eventType) {
         });
         const res = await response.json();
 
-        if (res.success) {
-            const data = res.data;
-            
-            // UI Score 수치 갱신 & 카운터 갱신
-            const card = document.getElementById(`post-card-${postId}`);
-            if (card) {
-                const scoreDisplay = card.querySelector('.score-num');
-                if (scoreDisplay) {
-                    scoreDisplay.textContent = data.new_score.toLocaleString();
-                    
-                    // 애니메이션 효과
-                    scoreDisplay.style.color = '#f43f5e';
-                    scoreDisplay.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        scoreDisplay.style.color = '';
-                        scoreDisplay.style.transform = 'scale(1)';
-                    }, 400);
-                }
+        if (!res.success) {
+            if (res.require_login) {
+                showToast(res.message || '로그인이 필요한 서비스입니다.', 'warning');
+                const googleModal = document.getElementById('googleAuthModal');
+                if (googleModal) googleModal.classList.add('show');
+            } else if (res.is_owner) {
+                showToast(res.message || '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.', 'warning');
+            } else {
+                showToast(res.message || '요청 처리 실패', 'warning');
+            }
+            return;
+        }
 
-                // 각 이벤트별 수치 갱신
-                const viewNum = card.querySelector('.view-count');
-                const likeNum = card.querySelector('.like-count');
-                const commentNum = card.querySelector('.comment-count');
-                const shareNum = card.querySelector('.share-count');
-
-                if (viewNum) viewNum.textContent = data.view_count;
-                if (likeNum) likeNum.textContent = data.like_count;
-                if (commentNum) commentNum.textContent = data.comment_count;
-                if (shareNum) shareNum.textContent = data.share_count;
+        const data = res.data;
+        
+        // UI Score 수치 갱신 & 카운터 갱신
+        const card = document.getElementById(`post-card-${postId}`);
+        if (card) {
+            const scoreDisplay = card.querySelector('.score-num');
+            if (scoreDisplay) {
+                scoreDisplay.textContent = data.new_score.toLocaleString();
+                
+                // 애니메이션 효과
+                scoreDisplay.style.color = '#f43f5e';
+                scoreDisplay.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    scoreDisplay.style.color = '';
+                    scoreDisplay.style.transform = 'scale(1)';
+                }, 400);
             }
 
-            // 모달 내부 수치 동기화 갱신
-            const detailScore = document.getElementById('detailScoreNum');
-            if (detailScore) detailScore.textContent = data.new_score.toLocaleString();
-            const dView = document.getElementById('detailViewCount');
-            if (dView) dView.textContent = data.view_count;
-            const dLike = document.getElementById('detailLikeCount');
-            if (dLike) dLike.textContent = data.like_count;
-            const dComment = document.getElementById('detailCommentCount');
-            if (dComment) dComment.textContent = data.comment_count;
-            const dShare = document.getElementById('detailShareCount');
-            if (dShare) dShare.textContent = data.share_count;
+            // 각 이벤트별 수치 갱신
+            const viewNum = card.querySelector('.view-count');
+            const likeNum = card.querySelector('.like-count');
+            const commentNum = card.querySelector('.comment-count');
+            const shareNum = card.querySelector('.share-count');
 
-            const messages = {
-                'view': '조회수 +1 (Score +1)',
-                'like': '❤️ 좋아요! (Score +5)',
-                'comment': '💬 댓글 작성 (Score +10)',
-                'share': '🚀 공유 유입 (Score +20)'
-            };
-            showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
+            if (viewNum) viewNum.textContent = data.view_count;
+            if (likeNum) likeNum.textContent = data.like_count;
+            if (commentNum) commentNum.textContent = data.comment_count;
+            if (shareNum) shareNum.textContent = data.share_count;
         }
+
+        // 모달 내부 수치 동기화 갱신
+        const detailScore = document.getElementById('detailScoreNum');
+        if (detailScore) detailScore.textContent = data.new_score.toLocaleString();
+        const dView = document.getElementById('detailViewCount');
+        if (dView) dView.textContent = data.view_count;
+        const dLike = document.getElementById('detailLikeCount');
+        if (dLike) dLike.textContent = data.like_count;
+        const dComment = document.getElementById('detailCommentCount');
+        if (dComment) dComment.textContent = data.comment_count;
+        const dShare = document.getElementById('detailShareCount');
+        if (dShare) dShare.textContent = data.share_count;
+
+        const messages = {
+            'view': '조회수 +1 (Score +1)',
+            'like': '❤️ 좋아요! (Score +5)',
+            'comment': '💬 댓글 작성 (Score +10)',
+            'share': '🚀 공유 유입 (Score +20)'
+        };
+        showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
     } catch (err) {
         console.error(err);
     }
@@ -443,27 +454,32 @@ function submitDetailComment() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) {
-            inputEl.value = '';
-            showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
-            loadComments(window.currentDetailPostId);
-            
-            if (data.event_res) {
-                const scoreEl = document.getElementById('detailScoreNum');
-                const commentEl = document.getElementById('detailCommentCount');
-                if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-                if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
-                
-                const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
-                if (card) {
-                    const cardScore = card.querySelector('.score-num');
-                    const cardComment = card.querySelector('.comment-count');
-                    if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-                    if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
-                }
+        if (!data.success) {
+            showToast(data.message || '댓글 작성 실패', 'warning');
+            if (data.require_login) {
+                const googleModal = document.getElementById('googleAuthModal');
+                if (googleModal) googleModal.classList.add('show');
             }
-        } else {
-            showToast(data.message || '댓글 작성 실패', 'error');
+            return;
+        }
+        
+        inputEl.value = '';
+        showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
+        loadComments(window.currentDetailPostId);
+        
+        if (data.event_res) {
+            const scoreEl = document.getElementById('detailScoreNum');
+            const commentEl = document.getElementById('detailCommentCount');
+            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+            if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
+            
+            const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
+            if (card) {
+                const cardScore = card.querySelector('.score-num');
+                const cardComment = card.querySelector('.comment-count');
+                if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+                if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
+            }
         }
     })
     .catch(err => {
@@ -471,3 +487,8 @@ function submitDetailComment() {
         showToast('댓글 등록 중 오류가 발생했습니다.', 'error');
     });
 }
+
+// 전역 스코프 바인딩
+window.openDetailModal = openDetailModal;
+window.closeDetailModal = closeDetailModal;
+window.submitDetailComment = submitDetailComment;

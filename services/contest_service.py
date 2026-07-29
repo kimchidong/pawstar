@@ -539,19 +539,30 @@ class PawStarService:
         # 급상승 공식: 조회*1 + 좋아요*5 + 댓글*10 + 공유*20
         return (sum_view * 1) + (sum_like * 5) + (sum_comment * 10) + (sum_share * 20)
 
-    def trigger_event(self, post_id, event_type):
+    def trigger_event(self, post_id, event_type, user_id=None):
         """
-        이벤트 발생시 실시간 score 증가
-        - 조회: +1
-        - 좋아요: +5
-        - 댓글: +10
-        - 공유유입: +20
+        이벤트 발생시 실시간 score 증가 (본인 게시물 점수 반영 차단)
         """
         post_id = int(post_id)
         if post_id not in self.posts:
             return None
 
         post = self.posts[post_id]
+
+        # 본인 게시물 이벤트 수치/점수 반영 차단
+        if user_id and post.get('user_id') == user_id:
+            return {
+                'success': False,
+                'is_owner': True,
+                'message': '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.',
+                'post_id': post_id,
+                'new_score': post['score'],
+                'view_count': post['view_count'],
+                'like_count': post['like_count'],
+                'comment_count': post['comment_count'],
+                'share_count': post['share_count']
+            }
+
         today_str = str(datetime.now().date())
 
         v_delta, l_delta, c_delta, s_delta = 0, 0, 0, 0
