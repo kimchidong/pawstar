@@ -235,10 +235,39 @@ async function triggerEvent(postId, eventType) {
             const commentNum = card.querySelector('.comment-count');
             const shareNum = card.querySelector('.share-count');
 
-            if (viewNum) viewNum.textContent = data.view_count;
-            if (likeNum) likeNum.textContent = data.like_count;
-            if (commentNum) commentNum.textContent = data.comment_count;
-            if (shareNum) shareNum.textContent = data.share_count;
+            if (viewNum) {
+                viewNum.textContent = data.view_count;
+                const bView = card.querySelector('.btn-view');
+                if (bView) bView.classList.add('active');
+            }
+            if (likeNum) {
+                likeNum.textContent = data.like_count;
+                const bLike = card.querySelector('.btn-like');
+                if (bLike) {
+                    const icon = bLike.querySelector('i');
+                    if (eventType === 'like') {
+                        bLike.classList.add('active');
+                        if (icon) icon.className = 'fa-solid fa-heart';
+                    } else if (eventType === 'unlike') {
+                        bLike.classList.remove('active');
+                        if (icon) icon.className = 'fa-regular fa-heart';
+                    }
+                }
+            }
+            if (commentNum) {
+                commentNum.textContent = data.comment_count;
+                const bComment = card.querySelector('.btn-comment');
+                if (bComment && eventType === 'comment') {
+                    bComment.classList.add('active');
+                    const icon = bComment.querySelector('i');
+                    if (icon) icon.className = 'fa-solid fa-comment';
+                }
+            }
+            if (shareNum) {
+                shareNum.textContent = data.share_count;
+                const bShare = card.querySelector('.btn-share');
+                if (bShare && eventType === 'share') bShare.classList.add('active');
+            }
         }
 
         // 모달 내부 수치 동기화 갱신

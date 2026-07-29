@@ -491,6 +491,9 @@ class PawStarService:
             trending_score = self._calculate_30day_trending_score(p['post_id'])
             item['trending_score'] = trending_score
 
+            # 4가지 영향력 반영 상태 (조회, 좋아요, 댓글, 공유)
+            item['actions'] = self.get_user_post_actions(p['post_id'], 'user1')
+
             # 수상 내역 여부
             item['badges'] = user_info.get('badges', [])
             result.append(item)
