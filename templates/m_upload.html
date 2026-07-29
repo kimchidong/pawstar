@@ -5,8 +5,11 @@
 <div style="padding: 1.25rem 1rem 2rem 1rem;">
     <!-- 모바일 타이틀 카드 -->
     <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-md); padding: 1.5rem 1.25rem; color: #ffffff; margin-bottom: 1.25rem; box-shadow: var(--shadow-soft);">
-        <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 12px; font-weight: 800; font-size: 0.75rem; margin-bottom: 0.5rem;">
-            <i class="fa-solid fa-trophy" style="color: #fde047;"></i> CONTEST ENTRY
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.35rem 0.85rem; border-radius: 16px; font-weight: 800; font-size: 0.78rem; margin-bottom: 0.5rem;">
+            <span><i class="fa-solid fa-trophy" style="color: #fde047; margin-right: 0.25rem;"></i> {{ current_contest.title }}</span>
+            <span style="font-size: 0.7rem; background: linear-gradient(135deg, #ff2a5f 0%, #e11d48 100%); color: #ffffff; padding: 0.15rem 0.55rem; border-radius: 12px; font-weight: 900; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35); display: inline-flex; align-items: center; gap: 0.2rem;">
+                🔥 {{ current_contest.status }}
+            </span>
         </div>
         <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 0.35rem;">🐾 우리 아이 출전 신청</h2>
         <p style="font-size: 0.85rem; opacity: 0.92; line-height: 1.4;">
@@ -17,16 +20,7 @@
     <!-- 출전 폼 카드 -->
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft);">
         <form method="POST" action="/m/upload" enctype="multipart/form-data">
-            <div class="m-form-group" style="margin-bottom: 1rem;">
-                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🏆 참가 회차</label>
-                <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
-                <div style="width: 100%; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 800; font-size: 0.88rem; background: #f1f5f9; color: #4f46e5; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
-                    <span>제{{ current_contest.contest_id }}회: {{ current_contest.title }}</span>
-                    <span style="font-size: 0.75rem; background: linear-gradient(135deg, #ff2a5f 0%, #e11d48 100%); color: #ffffff; padding: 0.2rem 0.65rem; border-radius: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35); display: inline-flex; align-items: center; gap: 0.25rem;">
-                        🔥 {{ current_contest.status }}
-                    </span>
-                </div>
-            </div>
+            <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                 <div class="m-form-group">
@@ -36,6 +30,7 @@
                 <div class="m-form-group">
                     <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐾 동물 종류</label>
                     <select name="pet_type" class="m-form-control" required style="width: 100%; padding: 0.75rem; font-weight: 700;">
+                        <option value="" selected>선택</option>
                         <option value="🐕 강아지">🐕 강아지</option>
                         <option value="🐈 고양이">🐈 고양이</option>
                         <option value="🐹 햄스터">🐹 햄스터</option>
@@ -161,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateMobilePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
-        const petType = selectPetType ? selectPetType.value : '🐕 강아지';
+        const petType = (selectPetType && selectPetType.value) ? selectPetType.value : '🐾 미선택';
         const title = inputTitle ? inputTitle.value.trim() : '';
         const content = textareaContent ? textareaContent.value.trim() : '';
 
