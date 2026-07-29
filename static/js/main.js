@@ -370,6 +370,15 @@ function loadComments(postId) {
         .then(data => {
             if (data.success) {
                 renderDetailComments(data.comments);
+                const count = data.comments ? data.comments.length : 0;
+                const commentCountEl = document.getElementById('detailCommentCount');
+                if (commentCountEl) commentCountEl.textContent = count;
+                
+                const card = document.getElementById(`post-card-${postId}`);
+                if (card) {
+                    const cardComment = card.querySelector('.comment-count');
+                    if (cardComment) cardComment.textContent = count;
+                }
             }
         })
         .catch(err => console.error('댓글 로드 실패:', err));

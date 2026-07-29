@@ -960,12 +960,15 @@ class PawStarService:
         return new_post
 
     def get_comments_by_post(self, post_id):
-        """ 특정 게시물의 댓글 목록 반환 """
+        """ 특정 게시물의 댓글 목록 반환 및 실제 개수로 comment_count 동기화 """
         try:
             p_id = int(post_id)
         except (ValueError, TypeError):
             p_id = 1
-        return [c for c in self.comments if c.get('post_id') == p_id]
+        comments = [c for c in self.comments if c.get('post_id') == p_id]
+        if p_id in self.posts:
+            self.posts[p_id]['comment_count'] = len(comments)
+        return comments
 
     def add_comment(self, post_id, user_nickname, content, user_profile=None):
         """ 한줄 댓글 추가 및 10점 점수/댓글수 카운트 반영 """
@@ -987,6 +990,15 @@ class PawStarService:
         self.comments.append(comment)
         # 댓글 이벤트 기록 (+10점 반영)
         event_res = self.trigger_event(p_id, 'comment')
+        
+        # 실제 등록된 댓글 개수로 정확히 카운트 동기화
+        post_comments = [c for c in self.comments if c.get('post_id') == p_id]
+        actual_count = len(post_comments)
+        if p_id in self.posts:
+            self.posts[p_id]['comment_count'] = actual_count
+        if event_res:
+            event_res['comment_count'] = actual_count
+            
         return comment, event_res
 
 # 싱글톤 서비스 객체 생성
