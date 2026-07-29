@@ -344,10 +344,26 @@ function openDetailModal(post) {
     const btnComment = document.getElementById('detailBtnComment');
     const btnShare = document.getElementById('detailBtnShare');
 
-    if (btnView) btnView.onclick = () => triggerEvent(post.post_id, 'view');
+    if (btnView) {
+        btnView.onclick = () => {
+            showToast('현재 게시물의 누적 조회수입니다. 👁️', 'info');
+        };
+    }
     if (btnLike) btnLike.onclick = () => triggerEvent(post.post_id, 'like');
-    if (btnComment) btnComment.onclick = () => triggerEvent(post.post_id, 'comment');
-    if (btnShare) btnShare.onclick = () => triggerEvent(post.post_id, 'share');
+    if (btnComment) {
+        btnComment.onclick = () => {
+            const inputEl = document.getElementById('detailCommentInput');
+            if (inputEl) inputEl.focus();
+        };
+    }
+    if (btnShare) {
+        btnShare.onclick = () => {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+            }
+            showToast('게시물 링크가 클립보드에 복사되었습니다! 🔗', 'success');
+        };
+    }
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
