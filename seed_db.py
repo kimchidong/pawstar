@@ -31,11 +31,13 @@ def seed_database():
                       VALUES (%s, %s, %s, %s, %s)"""
         cur.executemany(sql_user, users_data)
 
-        # 2. Contests
+        # 2. Contests (1회 ~ 5회 역대 콘테스트)
         contests_data = [
-            (1, '제1회 Paw Star 콘테스트', 'Paw Star 대망의 개막 1회 콘테스트 🎉', '2026-05-01 00:00:00', '2026-05-31 23:59:59', 'CLOSED', ''),
-            (2, '제2회 Paw Star 콘테스트', '매일이 매력 폭발! 최고의 펫 스타를 가리는 콘테스트 🌟', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'CLOSED', ''),
-            (3, '제3회 Paw Star 콘테스트', '세상에서 가장 사랑스러운 우리 아이의 심쿵 모먼트! 🌟 대한민국 대표 펫 스타에 도전하세요!', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'IN_PROGRESS', '')
+            (1, '제1회 Paw Star 개막 콘테스트', 'Paw Star 대망의 개막 1회 콘테스트 🎉', '2026-03-01 00:00:00', '2026-03-31 23:59:59', 'CLOSED', ''),
+            (2, '제2회 Paw Star 댕냥이 콘테스트', '매일이 매력 폭발! 최고의 펫 스타를 가리는 콘테스트 🌟', '2026-04-01 00:00:00', '2026-04-30 23:59:59', 'CLOSED', ''),
+            (3, '제3회 Paw Star 썸머 펫 콘테스트', '무더위를 날려버릴 사랑스러운 반려동물 모여라 🌊', '2026-05-01 00:00:00', '2026-05-31 23:59:59', 'CLOSED', ''),
+            (4, '제4회 Paw Star 심쿵 자랑 콘테스트', '역대급 귀여움! 심장 폭격 반려동물 스타 선발전 💘', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'CLOSED', ''),
+            (5, '제5회 Paw Star 챔피언십 콘테스트', '세상에서 가장 사랑스러운 우리 아이의 심쿵 모먼트! 🌟 대한민국 대표 펫 스타에 도전하세요!', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'IN_PROGRESS', '')
         ]
         sql_contest = """INSERT INTO CONTEST (CONTEST_ID, TITLE, DESCRIPTION, START_DATE, END_DATE, STATUS, BANNER_IMG)
                          VALUES (%s, %s, %s, %s, %s, %s, %s)"""
@@ -81,7 +83,7 @@ def seed_database():
         ]
 
         user_ids = ['user1', 'user2', 'user3', 'user4']
-        all_posts = list(sample_posts)
+        all_posts = []
 
         for idx in range(105, 228):
             p_type, p_names, p_titles, p_imgs = pet_templates[idx % len(pet_templates)]
@@ -89,6 +91,7 @@ def seed_database():
             p_title_prefix = p_titles[idx % len(p_titles)]
             u_id = user_ids[idx % len(user_ids)]
             img_url = p_imgs[idx % len(p_imgs)]
+            contest_id_val = (idx % 5) + 1
             
             day_offset = (idx % 25) + 1
             hour = (idx % 12) + 9
@@ -102,20 +105,33 @@ def seed_database():
             calc_score = (views * 1) + (likes * 5) + (comments * 10) + (shares * 20)
 
             all_posts.append((
-                idx, hash_id(u_id), 3, p_name, p_type,
+                idx, hash_id(u_id), contest_id_val, p_name, p_type,
                 f"{p_name}의 {p_title_prefix}! ({idx}호)",
                 f"안녕하세요! 귀여운 {p_name}의 일상 자랑입니다. 많이 많이 응원해주세요 🐾",
-                img_url, 'IMAGE', calc_score, views, likes, comments, shares, c_date
+                '/static/image/paw/2026/07/', f'3-{idx}_list.webp', f'3-{idx}_popup.webp',
+                'IMAGE', calc_score, views, likes, comments, shares, c_date
             ))
+
+        # initial posts 101~104 format adjust
+        fixed_sample_posts = []
+        for sp in sample_posts:
+            pid = sp[0]
+            fixed_sample_posts.append((
+                sp[0], sp[1], sp[2], sp[3], sp[4], sp[5], sp[6],
+                '/static/image/paw/2026/07/', f'3-{pid}_list.webp', f'3-{pid}_popup.webp',
+                sp[8], sp[9], sp[10], sp[11], sp[12], sp[13], sp[14]
+            ))
+
+        full_posts = fixed_sample_posts + all_posts
 
         sql_post = """INSERT INTO POST (POST_ID, USER_ID, CONTEST_ID, PET_NAME, PET_TYPE, TITLE, CONTENT, FILE_PATH, LIST_FILE_NAME, POPUP_FILE_NAME, MEDIA_TYPE, SCORE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT, CREATED_AT)
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cur.executemany(sql_post, all_posts)
+        cur.executemany(sql_post, full_posts)
 
         # 4. Daily Stats
         today = datetime.now().date()
         daily_stats = []
-        for post in all_posts:
+        for post in full_posts:
             post_id = post[0]
             for i in range(30):
                 stat_date = str(today - timedelta(days=i))
@@ -129,16 +145,47 @@ def seed_database():
                       VALUES (%s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_stat, daily_stats)
 
-        # 5. Contest Winners (For Contest #2 & #1)
+        # 5. Contest Winners (역대 1회~5회 선정된 수상자 풍부한 데이터 총 30개)
         winners_data = [
+            # 제5회 콘테스트 (6개)
+            (5, 113, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
+            (5, 114, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
+            (5, 115, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
+            (5, 116, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
+            (5, 117, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
+            (5, 118, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+
+            # 제4회 콘테스트 (6개)
+            (4, 107, hash_id('user3'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
+            (4, 108, hash_id('user4'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
+            (4, 109, hash_id('user1'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
+            (4, 110, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
+            (4, 111, hash_id('user3'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
+            (4, 112, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+
+            # 제3회 콘테스트 (6개)
+            (3, 105, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
+            (3, 106, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
+            (3, 119, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
+            (3, 120, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
+            (3, 121, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
+            (3, 122, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+
+            # 제2회 콘테스트 (6개)
             (2, 102, hash_id('user2'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
             (2, 101, hash_id('user1'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
             (2, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (2, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 특별상 & 루키 배지'),
+            (2, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
+            (2, 123, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
+            (2, 124, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지'),
+
+            # 제1회 콘테스트 (6개)
             (1, 101, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피 & 백화점 상품권 50만원'),
             (1, 102, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피 & 반려동물 용품 30만원'),
             (1, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피 & 고급 사료 세트'),
-            (1, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 특별상 & 루키 배지')
+            (1, 125, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상 & 루키 배지'),
+            (1, 126, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상 & 루키 배지'),
+            (1, 127, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상 & 루키 배지')
         ]
         sql_winner = """INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
                         VALUES (%s, %s, %s, %s, %s)"""

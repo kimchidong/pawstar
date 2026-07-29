@@ -445,12 +445,14 @@ def hall_of_fame():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_hall_of_fame', **request.args))
 
-    contest_id = request.args.get('contest_id', 2, type=int)
+    contest_id = request.args.get('contest_id', 4, type=int)
+    contests = service.get_contests()
     current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
 
     return render_template(
         'hall_of_fame.html',
+        contests=contests,
         current_contest=current_contest,
         winners=winners
     )
@@ -520,12 +522,14 @@ def m_index():
 
 @app.route('/m/hall-of-fame')
 def m_hall_of_fame():
-    contest_id = request.args.get('contest_id', 2, type=int)
+    contest_id = request.args.get('contest_id', 4, type=int)
+    contests = service.get_contests()
     current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
 
     return render_template(
         'm_hall_of_fame.html',
+        contests=contests,
         current_contest=current_contest,
         winners=winners
     )

@@ -11,7 +11,7 @@
 
         <!-- 회차 선택 -->
         <div style="margin-top: 1.5rem;">
-            <select id="contestSelect" class="select-custom" style="padding: 0.8rem 1.5rem; font-size: 1.05rem;">
+            <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.8rem 1.5rem; font-size: 1.05rem;">
                 {% for c in contests %}
                     <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
                         {{ c.title }} ({{ c.status }})
@@ -22,30 +22,26 @@
     </div>
 
     <!-- 1~3위 시상대 (Podium) -->
+    {% set ns = namespace(super_star=None, rising_star=None, bright_star=None, rookie_stars=[]) %}
+    {% for w in winners %}
+        {% if w.award_type == 'SUPER_STAR' %}{% set ns.super_star = w %}{% endif %}
+        {% if w.award_type == 'RISING_STAR' %}{% set ns.rising_star = w %}{% endif %}
+        {% if w.award_type == 'BRIGHT_STAR' %}{% set ns.bright_star = w %}{% endif %}
+        {% if w.award_type == 'ROOKIE_STAR' %}{% set _ = ns.rookie_stars.append(w) %}{% endif %}
+    {% endfor %}
+
     <div class="winners-podium">
-        {% set super_star = None %}
-        {% set rising_star = None %}
-        {% set bright_star = None %}
-        {% set rookie_star = None %}
-
-        {% for w in winners %}
-            {% if w.award_type == 'SUPER_STAR' %}{% set super_star = w %}{% endif %}
-            {% if w.award_type == 'RISING_STAR' %}{% set rising_star = w %}{% endif %}
-            {% if w.award_type == 'BRIGHT_STAR' %}{% set bright_star = w %}{% endif %}
-            {% if w.award_type == 'ROOKIE_STAR' %}{% set rookie_star = w %}{% endif %}
-        {% endfor %}
-
         <!-- 2위 라이징 스타 -->
         <div class="podium-card rising-star">
             <div class="crown-badge">🥈</div>
             <div class="winner-title-badge">라이징스타 (Rising Star)</div>
-            {% if rising_star %}
-                <img src="{{ rising_star.image_path or item.media_url }}" class="winner-img" alt="Rising Star">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ rising_star.pet_name }} ({{ rising_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ rising_star.user_nickname }}</p>
+            {% if ns.rising_star %}
+                <img src="{{ ns.rising_star.image_path or (ns.rising_star.file_path + ns.rising_star.list_file_name) }}" class="winner-img" alt="Rising Star">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ ns.rising_star.pet_name }} ({{ ns.rising_star.pet_type }})</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ ns.rising_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.6rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-                    <span style="font-weight: 800; color: var(--accent-silver);">Score: {{ "{:,}".format(rising_star.score) }}</span>
-                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem; font-weight: 600;">{{ rising_star.prize_name }}</div>
+                    <span style="font-weight: 800; color: var(--accent-silver);">Score: {{ "{:,}".format(ns.rising_star.score) }}</span>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem; font-weight: 600;">{{ ns.rising_star.prize_name }}</div>
                 </div>
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
@@ -56,13 +52,13 @@
         <div class="podium-card super-star">
             <div class="crown-badge">🥇</div>
             <div class="winner-title-badge">슈퍼스타 (Super Star)</div>
-            {% if super_star %}
-                <img src="{{ super_star.image_path or item.media_url }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
-                <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">{{ super_star.pet_name }} ({{ super_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.3rem;">집사: {{ super_star.user_nickname }}</p>
+            {% if ns.super_star %}
+                <img src="{{ ns.super_star.image_path or (ns.super_star.file_path + ns.super_star.list_file_name) }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
+                <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">{{ ns.super_star.pet_name }} ({{ ns.super_star.pet_type }})</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.3rem;">집사: {{ ns.super_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.75rem; background: #fffbeb; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
-                    <span style="font-weight: 900; font-size: 1.15rem; color: var(--accent-gold);">Score: {{ "{:,}".format(super_star.score) }}</span>
-                    <div style="font-size: 0.85rem; color: var(--accent-gold); margin-top: 0.2rem; font-weight: 700;">{{ super_star.prize_name }}</div>
+                    <span style="font-weight: 900; font-size: 1.15rem; color: var(--accent-gold);">Score: {{ "{:,}".format(ns.super_star.score) }}</span>
+                    <div style="font-size: 0.85rem; color: var(--accent-gold); margin-top: 0.2rem; font-weight: 700;">{{ ns.super_star.prize_name }}</div>
                 </div>
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
@@ -73,13 +69,13 @@
         <div class="podium-card bright-star">
             <div class="crown-badge">🥉</div>
             <div class="winner-title-badge">브라이트스타 (Bright Star)</div>
-            {% if bright_star %}
-                <img src="{{ bright_star.image_path or item.media_url }}" class="winner-img" alt="Bright Star">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ bright_star.pet_name }} ({{ bright_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ bright_star.user_nickname }}</p>
+            {% if ns.bright_star %}
+                <img src="{{ ns.bright_star.image_path or (ns.bright_star.file_path + ns.bright_star.list_file_name) }}" class="winner-img" alt="Bright Star">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ ns.bright_star.pet_name }} ({{ ns.bright_star.pet_type }})</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ ns.bright_star.user_nickname }}</p>
                 <div style="margin-top: 1rem; padding: 0.6rem; background: #fff7ed; border-radius: var(--radius-sm); border: 1px solid #ffedd5;">
-                    <span style="font-weight: 800; color: var(--accent-bronze);">Score: {{ "{:,}".format(bright_star.score) }}</span>
-                    <div style="font-size: 0.8rem; color: var(--accent-bronze); margin-top: 0.2rem; font-weight: 600;">{{ bright_star.prize_name }}</div>
+                    <span style="font-weight: 800; color: var(--accent-bronze);">Score: {{ "{:,}".format(ns.bright_star.score) }}</span>
+                    <div style="font-size: 0.8rem; color: var(--accent-bronze); margin-top: 0.2rem; font-weight: 600;">{{ ns.bright_star.prize_name }}</div>
                 </div>
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
@@ -87,29 +83,45 @@
         </div>
     </div>
 
-    <!-- 루키 스타 (급상승 1위) 배지 섹션 -->
-    <div class="rookie-card">
-        <div style="font-size: 3.5rem; color: var(--accent-purple);">⭐</div>
-        <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">급상승 1위 특별상 : 루키스타 (Rookie Star)</h3>
-                <span class="badge-tag">⭐ ROOKIE BADGE</span>
+    <!-- 루키 스타 (총 3마리 급상승 특별상) 배지 섹션 -->
+    <div class="rookie-card" style="flex-direction: column; align-items: stretch;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div style="font-size: 2.2rem; color: var(--accent-purple);">⭐</div>
+            <div>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    급상승 특별상 : 루키스타 (Rookie Star <span style="color: var(--accent-purple); font-weight: 900;">TOP 3</span>)
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.88rem; font-weight: 500; margin-top: 0.15rem;">
+                    최근 폭발적인 급상승 반응으로 스타성을 입증한 3마리의 자랑스러운 루키들입니다!
+                </p>
             </div>
-            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem; font-weight: 500;">
-                1~3위 순위에는 아쉽게 들지 못했지만, 최근 30일 폭발적인 급상승 반응으로 스타성을 입증한 자랑스러운 루키입니다!
-            </p>
-            {% if rookie_star %}
-                <div style="display: flex; align-items: center; gap: 1rem; background: #ffffff; padding: 0.9rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); box-shadow: var(--shadow-soft);">
-                    <img src="{{ rookie_star.image_path or item.media_url }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" alt="rookie">
-                    <div>
-                        <div style="font-weight: 800; color: var(--text-primary);">{{ rookie_star.pet_name }} (집사: {{ rookie_star.user_nickname }})</div>
-                        <div style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 700;">{{ rookie_star.post_title }} (Score: {{ "{:,}".format(rookie_star.score) }})</div>
-                    </div>
-                </div>
-            {% else %}
-                <p style="color: var(--text-muted);">해당 회차 루키스타 데이터가 준비 중입니다.</p>
-            {% endif %}
         </div>
+
+        {% if ns.rookie_stars %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.75rem;">
+                {% for r_star in ns.rookie_stars %}
+                    <div style="display: flex; align-items: center; gap: 1rem; background: #ffffff; padding: 1rem; border-radius: var(--radius-md); border: 1.5px solid #f3e8ff; box-shadow: var(--shadow-soft);">
+                        <img src="{{ r_star.image_path or (r_star.file_path + r_star.list_file_name) }}" style="width: 64px; height: 64px; border-radius: 14px; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="rookie">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                                <span class="badge-tag" style="background: #f3e8ff; color: #7c3aed; font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 12px; font-weight: 800;">⭐ 루키 {{ loop.index }}위</span>
+                            </div>
+                            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ r_star.pet_name }} ({{ r_star.pet_type }})
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                집사: <strong>{{ r_star.user_nickname }}</strong> | {{ r_star.post_title }}
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--accent-purple); font-weight: 700; margin-top: 0.25rem;">
+                                Score: {{ "{:,}".format(r_star.score) }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); padding: 1rem 0;">해당 회차 루키스타 데이터가 준비 중입니다.</p>
+        {% endif %}
     </div>
 </div>
 

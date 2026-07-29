@@ -469,6 +469,201 @@ class PawStarService:
     def is_user_liked(self, post_id, user_id):
         """ 100% MySQL DB POST_LIKE_LOG 물리 테이블 조회를 통한 좋아요 반영 여부 반환 """
         try:
+                total_row = cur.fetchone()
+                total_count = total_row['total'] if isinstance(total_row, dict) else total_row[0]
+
+                offset = (page - 1) * per_page
+                sql += " LIMIT %s OFFSET %s"
+                params.extend([per_page, offset])
+
+                cur.execute(sql, params)
+                rows = cur.fetchall()
+
+                posts = []
+                for r in rows:
+                    pid = r['post_id']
+                    r['actions'] = self.get_user_post_actions(pid, user_id)
+                    posts.append(r)
+
+                conn.close()
+
+                total_pages = max(1, (total_count + per_page - 1) // per_page)
+                return {
+                    'posts': posts,
+                    'total_count': total_count,
+                    'current_page': page,
+                    'page': page,
+                    'per_page': per_page,
+                    'total_pages': total_pages,
+                    'has_next': page < total_pages,
+                    'has_prev': page > 1
+                }
+        except Exception as e:
+            print("get_posts 100% DB error:", e)
+            return {'posts': [], 'total_count': 0, 'current_page': page, 'total_pages': 1}
+
+    def trigger_event(self, post_id, event_type, user_id=None):
+        """ 100% MySQL DB Direct SQL INSERT / DELETE & 수치 재계산 """
+        conn = self.get_db_connection()
+        if not conn:
+            return {'success': False, 'message': 'DB 연결 실패'}
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT USER_ID, SCORE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT FROM POST WHERE POST_ID = %s", (post_id,))
+                p_row = cur.fetchone()
+                if not p_row:
+                    conn.close()
+                    return {'success': False, 'message': '게시글이 존재하지 않습니다.'}
+
+                if user_id and p_row['USER_ID'] == user_id:
+                    conn.close()
+                    return {
+                        'success': False,
+                        'is_owner': True,
+                        'message': '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.',
+                        'post_id': post_id,
+                        'new_score': p_row['SCORE'],
+                        'view_count': p_row['VIEW_COUNT'],
+                        'like_count': p_row['LIKE_COUNT'],
+                        'comment_count': p_row['COMMENT_COUNT'],
+                        'share_count': p_row['SHARE_COUNT']
+                    }
+
+                today_str = str(datetime.now().date())
+                v_delta, l_delta, c_delta, s_delta = 0, 0, 0, 0
+
+                if event_type == 'view':
+                    if user_id:
+                        cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                        v_cnt = cur.fetchone()['cnt']
+                        if v_cnt > 0:
+                            conn.close()
+                            return {
+                                'success': False,
+                                'already_viewed': True,
+                                'message': '이미 조회가 완료된 게시물입니다.',
+                                'post_id': post_id,
+                                'new_score': p_row['SCORE'],
+                                'view_count': p_row['VIEW_COUNT'],
+                                'like_count': p_row['LIKE_COUNT'],
+                                'comment_count': p_row['COMMENT_COUNT'],
+                                'share_count': p_row['SHARE_COUNT']
+                            }
+                        cur.execute("INSERT IGNORE INTO POST_VIEW_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                    v_delta = 1
+
+                elif event_type == 'like':
+                    if user_id:
+                        cur.execute("INSERT IGNORE INTO POST_LIKE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                    l_delta = 1
+
+                elif event_type == 'unlike':
+                    if user_id:
+                        cur.execute("DELETE FROM POST_LIKE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                    l_delta = -1
+
+                elif event_type == 'comment':
+                    c_delta = 1
+
+                elif event_type == 'share':
+                    if user_id:
+                        cur.execute("INSERT IGNORE INTO POST_SHARE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                    s_delta = 1
+
+                cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s", (post_id,))
+                db_v = cur.fetchone()['cnt']
+
+                cur.execute("SELECT COUNT(*) as cnt FROM POST_LIKE_LOG WHERE POST_ID = %s", (post_id,))
+                db_l = cur.fetchone()['cnt']
+
+                cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE POST_ID = %s", (post_id,))
+                db_c = cur.fetchone()['cnt']
+
+                cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s", (post_id,))
+                db_s = cur.fetchone()['cnt']
+
+                final_v = max(p_row['VIEW_COUNT'], db_v)
+                final_l = max(0, db_l)
+                final_c = max(p_row['COMMENT_COUNT'], db_c)
+                final_s = max(p_row['SHARE_COUNT'], db_s)
+                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) + (final_s * 20)
+
+                cur.execute("""
+                    UPDATE POST 
+                    SET SCORE = %s, VIEW_COUNT = %s, LIKE_COUNT = %s, COMMENT_COUNT = %s, SHARE_COUNT = %s 
+                    WHERE POST_ID = %s
+                """, (final_score, final_v, final_l, final_c, final_s, post_id))
+
+                cur.execute("""
+                    INSERT INTO POST_DAILY_STAT (POST_ID, STAT_DATE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE 
+                        VIEW_COUNT = VIEW_COUNT + VALUES(VIEW_COUNT),
+                        LIKE_COUNT = LIKE_COUNT + VALUES(LIKE_COUNT),
+                        COMMENT_COUNT = COMMENT_COUNT + VALUES(COMMENT_COUNT),
+                        SHARE_COUNT = SHARE_COUNT + VALUES(SHARE_COUNT)
+                """, (post_id, today_str, max(0, v_delta), max(0, l_delta), max(0, c_delta), max(0, s_delta)))
+
+                conn.commit()
+                conn.close()
+
+                return {
+                    'post_id': post_id,
+                    'new_score': final_score,
+                    'view_count': final_v,
+                    'like_count': final_l,
+                    'comment_count': final_c,
+                    'share_count': final_s
+                }
+        except Exception as ex:
+            print("trigger_event 100% DB error:", ex)
+            return {'success': False, 'message': str(ex)}
+
+    def get_user_post_actions(self, post_id, user_id=None):
+        """ 100% DB Direct SELECT 로그인 회원 전용 영향력 4가지 상태 판별 """
+        if not user_id:
+            return {
+                'is_viewed': False,
+                'is_liked': False,
+                'is_commented': False,
+                'is_shared': False
+            }
+
+        is_viewed, is_liked, is_commented, is_shared = False, False, False, False
+        conn = self.get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                    r_v = cur.fetchone()
+                    if r_v and (r_v['cnt'] if isinstance(r_v, dict) else r_v[0]) > 0: is_viewed = True
+
+                    cur.execute("SELECT COUNT(*) as cnt FROM POST_LIKE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                    r_l = cur.fetchone()
+                    if r_l and (r_l['cnt'] if isinstance(r_l, dict) else r_l[0]) > 0: is_liked = True
+
+                    cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE post_id = %s AND user_id = %s", (post_id, user_id))
+                    r_c = cur.fetchone()
+                    if r_c and (r_c['cnt'] if isinstance(r_c, dict) else r_c[0]) > 0: is_commented = True
+
+                    cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                    r_s = cur.fetchone()
+                    if r_s and (r_s['cnt'] if isinstance(r_s, dict) else r_s[0]) > 0: is_shared = True
+                conn.close()
+            except Exception as ex:
+                print("DB 영향력 직접 조회 예외:", ex)
+
+        return {
+            'is_viewed': is_viewed,
+            'is_liked': is_liked,
+            'is_commented': is_commented,
+            'is_shared': is_shared
+        }
+
+    def is_user_liked(self, post_id, user_id):
+        """ 100% MySQL DB POST_LIKE_LOG 물리 테이블 조회를 통한 좋아요 반영 여부 반환 """
+        try:
             if not user_id:
                 return False
             conn = self.get_db_connection()
@@ -601,6 +796,7 @@ class PawStarService:
                         COALESCE(p.FILE_PATH, '/static/image/paw/2026/07/') as file_path,
                         COALESCE(p.LIST_FILE_NAME, '3-101_list.webp') as list_file_name,
                         COALESCE(p.POPUP_FILE_NAME, '3-101_popup.webp') as popup_file_name,
+                        CONCAT(COALESCE(p.FILE_PATH, '/static/image/paw/2026/07/'), COALESCE(p.LIST_FILE_NAME, '3-101_list.webp')) as image_path,
                         COALESCE(p.SCORE, 0) as score,
                         COALESCE(u.NICKNAME, '우승집사') as user_nickname,
                         COALESCE(u.PROFILE_IMG, '/static/image/profile/default_profile.png') as user_profile
@@ -608,7 +804,12 @@ class PawStarService:
                     LEFT JOIN POST p ON w.POST_ID = p.POST_ID
                     LEFT JOIN USERS u ON w.USER_ID = u.USER_ID
                     WHERE w.CONTEST_ID = %s
-                    ORDER BY p.SCORE DESC
+                    ORDER BY CASE 
+                        WHEN w.AWARD_TYPE = 'SUPER_STAR' THEN 1
+                        WHEN w.AWARD_TYPE = 'RISING_STAR' THEN 2
+                        WHEN w.AWARD_TYPE = 'BRIGHT_STAR' THEN 3
+                        ELSE 4
+                    END, p.SCORE DESC
                 """, (int(contest_id),))
                 rows = cur.fetchall()
                 conn.close()
