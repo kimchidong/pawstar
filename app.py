@@ -888,6 +888,8 @@ def create_post():
             temp_filename = data.get('temp_filename') or data.get('temp_url')
             file = None
 
+        next_post_id = service.get_next_post_id()
+
         if not pet_name:
             return jsonify({'success': False, 'message': '반려동물 이름을 입력해주세요.'}), 400
         if not pet_type:

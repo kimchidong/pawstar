@@ -182,7 +182,8 @@ async function triggerEvent(postId, eventType) {
                 const googleModal = document.getElementById('googleAuthModal');
                 if (googleModal) googleModal.classList.add('show');
             } else if (res.is_owner) {
-                showToast(res.message || '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.', 'warning');
+                // 본인 게시물일 경우 알림창을 띄우지 않고 조용히 기능만 제어
+                return false;
             } else if (res.already_viewed) {
                 // 이미 조회한 글인 경우 조용히 무시
                 return false;
