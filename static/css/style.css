@@ -943,17 +943,38 @@ body {
     right: 1.2rem;
     left: auto;
     display: inline-block;
-    padding: 0.35rem 1.1rem;
+    padding: 0.38rem 1.15rem;
     border-radius: 20px;
-    font-weight: 800;
+    font-weight: 900;
     font-size: 0.85rem;
+    letter-spacing: -0.3px;
     z-index: 3;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    text-shadow: none;
 }
 
-.super-star .winner-title-badge { background: var(--gradient-gold); color: #ffffff; }
-.rising-star .winner-title-badge { background: var(--gradient-silver); color: var(--text-primary); }
-.bright-star .winner-title-badge { background: var(--gradient-bronze); color: #ffffff; }
+/* 🥇 슈퍼스타 - 화사한 명확한 리얼 골드 */
+.super-star .winner-title-badge { 
+    background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #eab308 100%); 
+    color: #713f12; 
+    border: 1.5px solid #d97706;
+    box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+}
+
+/* 🥈 라이징스타 - 시원하고 화사한 명확한 브라이트 실버 */
+.rising-star .winner-title-badge { 
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #cbd5e1 100%); 
+    color: #0f172a; 
+    border: 1.5px solid #94a3b8;
+    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.3);
+}
+
+/* 🥉 브라이트스타 - 포근하고 선명한 명확한 코퍼 브론즈 */
+.bright-star .winner-title-badge { 
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fdba74 100%); 
+    color: #7c2d12; 
+    border: 1.5px solid #f97316;
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+}
 
 .winner-img {
     width: 130px;
