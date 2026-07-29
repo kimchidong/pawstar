@@ -86,6 +86,23 @@
                 </div>
             </div>
             <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;"></p>
+
+            <!-- 모바일 한줄 댓글 입력 및 목록 -->
+            <div style="border-top: 1px solid var(--border-light); padding-top: 0.75rem; margin-top: 0.75rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.82rem; font-weight: 800; color: var(--text-primary);">💬 한줄 댓글 <span id="mDetailCommentHeaderCount" style="color: var(--accent-purple);">(0)</span></span>
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">+10점</span>
+                </div>
+                <div style="display: flex; gap: 0.4rem; margin-bottom: 0.6rem;">
+                    <input type="text" id="mDetailCommentInput" class="m-form-control" placeholder="한줄 댓글 작성..." style="flex: 1; padding: 0.4rem 0.65rem; font-size: 0.8rem; border-radius: 16px;" onkeypress="if(event.key==='Enter') submitMobileDetailComment()">
+                    <button type="button" onclick="submitMobileDetailComment()" style="padding: 0.4rem 0.8rem; border-radius: 16px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                        등록
+                    </button>
+                </div>
+                <div id="mDetailCommentList" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <!-- 모바일 댓글 동적 렌더링 -->
+                </div>
+            </div>
         </div>
     </div>
 

@@ -3,6 +3,16 @@
  * "반려동물도 스타가 될 수 있다."
  */
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initEventHandlers();
 });
@@ -310,6 +320,10 @@ function openDetailModal(post) {
     const shareCountEl = document.getElementById('detailShareCount');
     if (shareCountEl) shareCountEl.textContent = post.share_count || 0;
 
+    // 현재 열린 게시물 ID 저장 및 댓글 로드
+    window.currentDetailPostId = post.post_id;
+    loadComments(post.post_id);
+
     // 랭킹 배지 채우기
     const badgeEl = document.getElementById('detailRankBadge');
     if (badgeEl) {
@@ -341,4 +355,90 @@ function openDetailModal(post) {
 function closeDetailModal() {
     const modal = document.getElementById('postDetailModal');
     if (modal) modal.classList.remove('show');
+}
+
+/**
+ * 댓글 목록 로드 및 렌더링
+ */
+function loadComments(postId) {
+    fetch(`/api/comments/${postId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderDetailComments(data.comments);
+            }
+        })
+        .catch(err => console.error('댓글 로드 실패:', err));
+}
+
+function renderDetailComments(comments) {
+    const listEl = document.getElementById('detailCommentList');
+    const headerCountEl = document.getElementById('detailCommentHeaderCount');
+    if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
+    
+    if (!listEl) return;
+    if (!comments || comments.length === 0) {
+        listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.75rem 0;">첫 한줄 댓글의 주인공이 되어보세요! 💬</div>';
+        return;
+    }
+    
+    listEl.innerHTML = comments.map(c => `
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 800; color: var(--text-primary);">
+                    <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
+                    <span>${escapeHtml(c.user_nickname || '집사')}</span>
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at || ''}</span>
+            </div>
+            <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.4rem;">
+                ${escapeHtml(c.content)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function submitDetailComment() {
+    const inputEl = document.getElementById('detailCommentInput');
+    if (!inputEl || !window.currentDetailPostId) return;
+    const content = inputEl.value.trim();
+    if (!content) {
+        showToast('댓글 내용을 입력해주세요.', 'warning');
+        return;
+    }
+    
+    fetch(`/api/comments/${window.currentDetailPostId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            inputEl.value = '';
+            showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
+            loadComments(window.currentDetailPostId);
+            
+            if (data.event_res) {
+                const scoreEl = document.getElementById('detailScoreNum');
+                const commentEl = document.getElementById('detailCommentCount');
+                if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+                if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
+                
+                const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
+                if (card) {
+                    const cardScore = card.querySelector('.score-num');
+                    const cardComment = card.querySelector('.comment-count');
+                    if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+                    if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
+                }
+            }
+        } else {
+            showToast(data.message || '댓글 작성 실패', 'error');
+        }
+    })
+    .catch(err => {
+        console.error('댓글 작성 오류:', err);
+        showToast('댓글 등록 중 오류가 발생했습니다.', 'error');
+    });
 }

@@ -14,6 +14,12 @@ class PawStarService:
         self.daily_stats = [] # list of dicts
         self.winners = [] # list of dicts
         self.users = {}
+        self.comments = [
+            {'comment_id': 1, 'post_id': 1, 'user_nickname': '뽀삐집사_4955', 'user_profile': '/static/image/profile/default_profile.png', 'content': '세상에 너무 귀여워요! 심쿵 💖', 'created_at': '2026-07-29 10:15'},
+            {'comment_id': 2, 'post_id': 1, 'user_nickname': '냥집사', 'user_profile': '/static/image/profile/default_profile.png', 'content': '1위 우승 예감이네요!! 🐾', 'created_at': '2026-07-29 11:30'},
+            {'comment_id': 3, 'post_id': 2, 'user_nickname': '멍멍이파', 'user_profile': '/static/image/profile/default_profile.png', 'content': '눈빛이 너무 사랑스러워요 🌟', 'created_at': '2026-07-29 14:20'},
+            {'comment_id': 4, 'post_id': 3, 'user_nickname': '귀요미덕후', 'user_profile': '/static/image/profile/default_profile.png', 'content': '무조건 10점 득점 응원합니다!', 'created_at': '2026-07-29 15:45'},
+        ]
         
         # 데이터베이스(DB_PST)에서 데이터 불러오기 시도
         if not self.load_data_from_db():
@@ -952,6 +958,36 @@ class PawStarService:
         }
         self.posts[post_id] = new_post
         return new_post
+
+    def get_comments_by_post(self, post_id):
+        """ 특정 게시물의 댓글 목록 반환 """
+        try:
+            p_id = int(post_id)
+        except (ValueError, TypeError):
+            p_id = 1
+        return [c for c in self.comments if c.get('post_id') == p_id]
+
+    def add_comment(self, post_id, user_nickname, content, user_profile=None):
+        """ 한줄 댓글 추가 및 10점 점수/댓글수 카운트 반영 """
+        try:
+            p_id = int(post_id)
+        except (ValueError, TypeError):
+            p_id = 1
+
+        new_comment_id = len(self.comments) + 1
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+        comment = {
+            'comment_id': new_comment_id,
+            'post_id': p_id,
+            'user_nickname': user_nickname or '익명 집사',
+            'user_profile': user_profile or '/static/image/profile/default_profile.png',
+            'content': content,
+            'created_at': now_str
+        }
+        self.comments.append(comment)
+        # 댓글 이벤트 기록 (+10점 반영)
+        event_res = self.trigger_event(p_id, 'comment')
+        return comment, event_res
 
 # 싱글톤 서비스 객체 생성
 service = PawStarService()

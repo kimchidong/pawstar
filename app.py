@@ -698,6 +698,39 @@ def post_event():
         return jsonify({'success': True, 'data': res})
     return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
 
+@app.route('/api/comments/<int:post_id>', methods=['GET'])
+def get_comments(post_id):
+    """ 게시물 한줄 댓글 목록 조회 """
+    comments = service.get_comments_by_post(post_id)
+    return jsonify({'success': True, 'comments': comments})
+
+@app.route('/api/comments/<int:post_id>', methods=['POST'])
+def add_comment(post_id):
+    """ 한줄 댓글 등록 """
+    try:
+        data = request.get_json() or {}
+        content = data.get('content', '').strip()
+        if not content:
+            return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 400
+
+        user_id = session.get('user_id')
+        user_profile = None
+        if user_id and user_id in service.users:
+            user_nickname = service.users[user_id].get('nickname', '집사')
+            user_profile = service.users[user_id].get('profile_img')
+        else:
+            user_nickname = data.get('nickname') or '익명 집사'
+
+        comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile)
+        return jsonify({
+            'success': True,
+            'comment': comment,
+            'event_res': event_res
+        })
+    except Exception as e:
+        print("댓글 등록 오류:", e)
+        return jsonify({'success': False, 'message': f'댓글 등록 중 오류: {str(e)}'}), 500
+
 @app.route('/api/post/create', methods=['POST'])
 def create_post():
     """ 신규 자랑 게시물 등록 API """

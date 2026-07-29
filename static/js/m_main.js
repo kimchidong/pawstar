@@ -3,6 +3,16 @@
  * 모든 모바일 관련 작업 파일은 'm'으로 시작하는 규칙 준수
  */
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 1. 모바일 자랑하기 (/m/upload 전용 페이지 전환 적용)
     const mBtnUploadNav = document.getElementById('mBtnUploadNav');
@@ -81,6 +91,9 @@ function openMobileDetailModal(postData) {
     document.getElementById('mDetailTitle').textContent = postData.title || '';
     document.getElementById('mDetailContent').textContent = postData.content || '';
 
+    window.currentMobileDetailPostId = postData.post_id;
+    loadMobileComments(postData.post_id);
+
     detailModal.classList.add('active');
 }
 
@@ -89,4 +102,74 @@ function closeMobileDetailModal() {
     if (detailModal) {
         detailModal.classList.remove('active');
     }
+}
+
+function loadMobileComments(postId) {
+    fetch(`/api/comments/${postId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderMobileDetailComments(data.comments);
+            }
+        })
+        .catch(err => console.error('모바일 댓글 로드 실패:', err));
+}
+
+function renderMobileDetailComments(comments) {
+    const listEl = document.getElementById('mDetailCommentList');
+    const headerCountEl = document.getElementById('mDetailCommentHeaderCount');
+    if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
+    
+    if (!listEl) return;
+    if (!comments || comments.length === 0) {
+        listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 0.5rem 0;">첫 한줄 댓글의 주인공이 되어보세요! 💬</div>';
+        return;
+    }
+    
+    listEl.innerHTML = comments.map(c => `
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 10px; padding: 0.4rem 0.6rem; font-size: 0.78rem; display: flex; flex-direction: column; gap: 0.15rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.3rem; font-weight: 800; color: var(--text-primary);">
+                    <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">
+                    <span>${escapeHtml(c.user_nickname || '집사')}</span>
+                </div>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">${c.created_at || ''}</span>
+            </div>
+            <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.2rem;">
+                ${escapeHtml(c.content)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function submitMobileDetailComment() {
+    const inputEl = document.getElementById('mDetailCommentInput');
+    if (!inputEl || !window.currentMobileDetailPostId) return;
+    const content = inputEl.value.trim();
+    if (!content) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+    
+    fetch(`/api/comments/${window.currentMobileDetailPostId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            inputEl.value = '';
+            loadMobileComments(window.currentMobileDetailPostId);
+            if (data.event_res) {
+                const scoreEl = document.getElementById('mDetailScoreNum');
+                if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+            }
+        } else {
+            alert(data.message || '댓글 작성 실패');
+        }
+    })
+    .catch(err => {
+        console.error('모바일 댓글 작성 오류:', err);
+    });
 }
