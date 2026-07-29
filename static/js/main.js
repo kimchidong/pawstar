@@ -338,6 +338,25 @@ function openDetailModal(post) {
     window.currentDetailPostId = post.post_id;
     loadComments(post.post_id);
 
+    // 본인 게시물인 경우 댓글 입력 폼 비활성화
+    const inputEl = document.getElementById('detailCommentInput');
+    const submitBtn = inputEl ? inputEl.nextElementSibling : null;
+    const isOwner = (window.CURRENT_USER_ID && post.user_id && String(window.CURRENT_USER_ID) === String(post.user_id)) ||
+                    (window.CURRENT_USER_NICKNAME && post.user_nickname && window.CURRENT_USER_NICKNAME === post.user_nickname);
+
+    if (inputEl) {
+        if (isOwner) {
+            inputEl.value = '';
+            inputEl.disabled = true;
+            inputEl.placeholder = '🔒 본인이 작성한 게시물에는 한줄 댓글을 작성할 수 없습니다.';
+            if (submitBtn) submitBtn.disabled = true;
+        } else {
+            inputEl.disabled = false;
+            inputEl.placeholder = '사랑스러운 응원의 한줄 댓글을 남겨보세요!';
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+
     // 랭킹 배지 채우기
     const badgeEl = document.getElementById('detailRankBadge');
     if (badgeEl) {

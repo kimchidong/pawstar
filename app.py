@@ -697,12 +697,12 @@ def post_event():
     
     # 카운팅 및 점수 반영은 반드시 로그인 회원만 가능
     if not user_id and event_type in ['like', 'unlike', 'comment', 'share']:
-        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 401
+        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다.', 'require_login': True}), 200
 
     res = service.trigger_event(post_id, event_type, user_id=user_id)
     if res:
         if res.get('is_owner'):
-            return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 403
+            return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 200
         return jsonify({'success': True, 'data': res})
     return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
 
@@ -737,7 +737,7 @@ def add_comment(post_id):
             return jsonify({
                 'success': False,
                 'message': event_res or '이미 이 게시물에 한줄 댓글을 작성하셨습니다.'
-            }), 400
+            }), 200
 
         return jsonify({
             'success': True,
