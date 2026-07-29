@@ -1349,6 +1349,25 @@ body {
     background: #ffffff;
 }
 
+.detail-info-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detail-info-container::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.detail-info-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.detail-info-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-purple);
+}
+
 #detailCommentList {
     scrollbar-width: none;
     -ms-overflow-style: none;
