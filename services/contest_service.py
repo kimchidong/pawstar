@@ -117,12 +117,29 @@ class PawStarService:
         if not contest:
             return contest
         try:
-            end_date = datetime.strptime(str(contest.get('end_date') or contest.get('start_date')), '%Y-%m-%d')
-            today = datetime.now()
-            d_day = (end_date - today).days
-            contest['d_day'] = max(0, d_day)
-        except Exception:
+            from datetime import date, datetime
+            raw_end = contest.get('end_date') or contest.get('start_date')
+            if isinstance(raw_end, datetime):
+                end_date = raw_end.date()
+            elif isinstance(raw_end, date):
+                end_date = raw_end
+            else:
+                end_date = datetime.strptime(str(raw_end)[:10], '%Y-%m-%d').date()
+
+            today = datetime.now().date()
+            diff_days = (end_date - today).days
+            contest['d_day'] = max(0, diff_days)
+
+            if diff_days > 0:
+                contest['d_day_str'] = f"D-{diff_days}"
+            elif diff_days == 0:
+                contest['d_day_str'] = "D-DAY"
+            else:
+                contest['d_day_str'] = f"D+{abs(diff_days)}"
+        except Exception as e:
+            print("_attach_d_day error:", e)
             contest['d_day'] = 5
+            contest['d_day_str'] = "D-5"
         return contest
 
     def get_next_post_id(self):
