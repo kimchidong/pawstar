@@ -51,8 +51,12 @@
                     <div style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 0.2rem;">
                         작품: {{ w.post_title }} | 집사: <strong>{{ w.user_nickname }}</strong>
                     </div>
-                    <div style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 700;">
-                        📊 {{ w.score_breakdown }} ({{ "{:,}".format(w.score) }} P)
+                    <div style="font-size: 0.73rem; color: var(--text-secondary); font-weight: 700; display: flex; align-items: center; gap: 0.65rem; margin-top: 0.25rem; flex-wrap: wrap;">
+                        <span>👀 {{ "{:,}".format(w.view_count) }}</span>
+                        <span>❤️ {{ "{:,}".format(w.like_count) }}</span>
+                        <span>💬 {{ "{:,}".format(w.comment_count) }}</span>
+                        <span>🔄 {{ "{:,}".format(w.share_count) }}</span>
+                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">({{ "{:,}".format(w.score) }} P)</span>
                     </div>
                 </div>
             </div>

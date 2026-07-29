@@ -820,7 +820,7 @@ class PawStarService:
                 for r in rows:
                     if r.get('prize_name') and '&' in r['prize_name']:
                         r['prize_name'] = r['prize_name'].split('&')[0].strip()
-                    r['score_breakdown'] = f"👀 {r.get('view_count', 0):,} · ❤️ {r.get('like_count', 0):,} · 💬 {r.get('comment_count', 0):,} · 🔄 {r.get('share_count', 0):,}"
+                    r['score_breakdown'] = f"👀 {r.get('view_count', 0):,}   ❤️ {r.get('like_count', 0):,}   💬 {r.get('comment_count', 0):,}   🔄 {r.get('share_count', 0):,}"
                 return rows
         except Exception as e:
             print("get_hall_of_fame DB error:", e)
