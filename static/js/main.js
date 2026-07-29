@@ -171,12 +171,19 @@ async function triggerEvent(postId, eventType) {
         });
         const contentType = response.headers.get('content-type') || '';
         if (!contentType.includes('application/json')) {
-            showToast('서버 응답 오류가 발생하였습니다.', 'error');
+            if (eventType !== 'view') {
+                showToast('서버 응답 오류가 발생하였습니다.', 'error');
+            }
             return false;
         }
         const res = await response.json();
 
         if (!res.success) {
+            // 조회(view) 이벤트시에는 어떠한 메세지도 일절 띄우지 않음
+            if (eventType === 'view') {
+                return false;
+            }
+
             if (res.require_login) {
                 showToast(res.message || '로그인이 필요한 서비스입니다.', 'warning');
                 const googleModal = document.getElementById('googleAuthModal');
@@ -246,14 +253,17 @@ async function triggerEvent(postId, eventType) {
         const dShare = document.getElementById('detailShareCount');
         if (dShare) dShare.textContent = data.share_count;
 
-        const messages = {
-            'view': '조회수 +1 (Score +1)',
-            'like': '❤️ 좋아요! (Score +5)',
-            'unlike': '🤍 좋아요 취소 (Score -5)',
-            'comment': '💬 댓글 작성 (Score +10)',
-            'share': '🚀 공유 유입 (Score +20)'
-        };
-        showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
+        if (eventType !== 'view') {
+            const messages = {
+                'like': '❤️ 좋아요! (Score +5)',
+                'unlike': '🤍 좋아요 취소 (Score -5)',
+                'comment': '💬 댓글 작성 (Score +10)',
+                'share': '🚀 공유 유입 (Score +20)'
+            };
+            if (messages[eventType]) {
+                showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
+            }
+        }
         return true;
     } catch (err) {
         console.error(err);
