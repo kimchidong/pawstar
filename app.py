@@ -445,8 +445,16 @@ def hall_of_fame():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_hall_of_fame', **request.args))
 
-    contest_id = request.args.get('contest_id', 4, type=int)
-    contests = service.get_contests()
+    contests = service.get_closed_contests()
+    contest_id_arg = request.args.get('contest_id', type=int)
+    
+    if contest_id_arg and any(c['contest_id'] == contest_id_arg for c in contests):
+        contest_id = contest_id_arg
+    elif contests:
+        contest_id = contests[0]['contest_id']
+    else:
+        contest_id = 4
+
     current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
 
@@ -522,8 +530,16 @@ def m_index():
 
 @app.route('/m/hall-of-fame')
 def m_hall_of_fame():
-    contest_id = request.args.get('contest_id', 4, type=int)
-    contests = service.get_contests()
+    contests = service.get_closed_contests()
+    contest_id_arg = request.args.get('contest_id', type=int)
+    
+    if contest_id_arg and any(c['contest_id'] == contest_id_arg for c in contests):
+        contest_id = contest_id_arg
+    elif contests:
+        contest_id = contests[0]['contest_id']
+    else:
+        contest_id = 4
+
     current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
 

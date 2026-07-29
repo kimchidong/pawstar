@@ -96,6 +96,24 @@ class PawStarService:
             print("get_contests error:", e)
             return []
 
+    def get_closed_contests(self):
+        """ 100% DB SELECT 마감된(지난) 명예의 전당 콘테스트 목록 (진행중인 현재회차 제외) """
+        conn = self.get_db_connection()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT CONTEST_ID as contest_id, TITLE as title, START_DATE as start_date, END_DATE as end_date, STATUS as status, DESCRIPTION as description FROM CONTEST WHERE STATUS = 'CLOSED' ORDER BY CONTEST_ID DESC")
+                rows = cur.fetchall()
+                contests = []
+                for r in rows:
+                    contests.append(self._attach_d_day(r))
+                conn.close()
+                return contests
+        except Exception as e:
+            print("get_closed_contests error:", e)
+            return []
+
     def get_contest(self, contest_id):
         """ 100% DB SELECT 특정 콘테스트 """
         conn = self.get_db_connection()

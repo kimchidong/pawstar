@@ -15,7 +15,7 @@
 <div class="m-filter-scroll" style="padding: 0 1rem 1rem 1rem;">
     {% for c in contests %}
         <a href="/m/hall-of-fame?contest_id={{ c.contest_id }}" class="m-chip {{ 'active' if c.contest_id == current_contest.contest_id }}">
-            {{ c.title }} ({{ c.status }})
+            {{ c.title }}
         </a>
     {% endfor %}
 </div>

@@ -14,7 +14,7 @@
             <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.8rem 1.5rem; font-size: 1.05rem;">
                 {% for c in contests %}
                     <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
-                        {{ c.title }} ({{ c.status }})
+                        {{ c.title }}
                     </option>
                 {% endfor %}
             </select>
