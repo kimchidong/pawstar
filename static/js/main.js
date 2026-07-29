@@ -181,7 +181,7 @@ async function triggerEvent(postId, eventType) {
             } else {
                 showToast(res.message || '요청 처리 실패', 'warning');
             }
-            return;
+            return false;
         }
 
         const data = res.data;
@@ -234,8 +234,10 @@ async function triggerEvent(postId, eventType) {
             'share': '🚀 공유 유입 (Score +20)'
         };
         showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
+        return true;
     } catch (err) {
         console.error(err);
+        return false;
     }
 }
 
@@ -362,44 +364,31 @@ function openDetailModal(post) {
         heartIcon.style.color = '#f43f5e';
     }
 
-    const toggleLikeHandler = () => {
+    const toggleLikeHandler = async () => {
         if (!isLiked) {
-            triggerEvent(post.post_id, 'like');
-            isLiked = true;
-            if (heartIcon) {
-                heartIcon.className = 'fa-solid fa-heart';
-                heartIcon.style.color = '#ef4444';
+            const success = await triggerEvent(post.post_id, 'like');
+            if (success) {
+                isLiked = true;
+                if (heartIcon) {
+                    heartIcon.className = 'fa-solid fa-heart';
+                    heartIcon.style.color = '#ef4444';
+                }
             }
         } else {
-            triggerEvent(post.post_id, 'unlike');
-            isLiked = false;
-            if (heartIcon) {
-                heartIcon.className = 'fa-regular fa-heart';
-                heartIcon.style.color = '#f43f5e';
+            const success = await triggerEvent(post.post_id, 'unlike');
+            if (success) {
+                isLiked = false;
+                if (heartIcon) {
+                    heartIcon.className = 'fa-regular fa-heart';
+                    heartIcon.style.color = '#f43f5e';
+                }
             }
         }
     };
 
+    // 오직 우측 상단 하트 버튼에만 좋아요 토글 이벤트 연결
     if (heartBtn) heartBtn.onclick = toggleLikeHandler;
-    if (btnLike) btnLike.onclick = toggleLikeHandler;
 
-    const btnView = document.getElementById('detailBtnView');
-    const btnComment = document.getElementById('detailBtnComment');
-    const btnShare = document.getElementById('detailBtnShare');
-    if (btnComment) {
-        btnComment.onclick = () => {
-            const inputEl = document.getElementById('detailCommentInput');
-            if (inputEl) inputEl.focus();
-        };
-    }
-    if (btnShare) {
-        btnShare.onclick = () => {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(window.location.href);
-            }
-            showToast('게시물 링크가 클립보드에 복사되었습니다! 🔗', 'success');
-        };
-    }
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
