@@ -704,6 +704,8 @@ def post_event():
         if res:
             if res.get('is_owner'):
                 return jsonify({'success': False, 'message': res.get('message'), 'is_owner': True, 'data': res}), 200
+            if res.get('already_viewed'):
+                return jsonify({'success': False, 'message': res.get('message'), 'already_viewed': True, 'data': res}), 200
             return jsonify({'success': True, 'data': res})
         return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 200
     except Exception as e:

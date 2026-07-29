@@ -183,6 +183,9 @@ async function triggerEvent(postId, eventType) {
                 if (googleModal) googleModal.classList.add('show');
             } else if (res.is_owner) {
                 showToast(res.message || '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.', 'warning');
+            } else if (res.already_viewed) {
+                // 이미 조회한 글인 경우 조용히 무시
+                return false;
             } else {
                 showToast(res.message || '요청 처리 실패', 'warning');
             }

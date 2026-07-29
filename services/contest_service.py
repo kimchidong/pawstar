@@ -220,6 +220,8 @@ class PawStarService:
         }
         # 유저별 좋아요 누른 게시물 ID 집합 (user_id -> set of post_ids)
         self.user_likes = {}
+        # 유저별 이미 조회를 완료한 게시물 ID 집합 (user_id -> set of post_ids)
+        self.user_views = {}
 
         # Posts for Contest #3 (진행중)
         sample_posts = [
@@ -569,6 +571,28 @@ class PawStarService:
 
         v_delta, l_delta, c_delta, s_delta = 0, 0, 0, 0
         if event_type == 'view':
+            # 유저별 중복 조회 방지 검사
+            if user_id:
+                if not hasattr(self, 'user_views') or self.user_views is None:
+                    self.user_views = {}
+                if user_id not in self.user_views:
+                    self.user_views[user_id] = set()
+                
+                # 이미 본 게시물인 경우 조회수/점수 증가 차단
+                if post_id in self.user_views[user_id]:
+                    return {
+                        'success': False,
+                        'already_viewed': True,
+                        'message': '이미 조회가 완료된 게시물입니다.',
+                        'post_id': post_id,
+                        'new_score': post['score'],
+                        'view_count': post['view_count'],
+                        'like_count': post['like_count'],
+                        'comment_count': post['comment_count'],
+                        'share_count': post['share_count']
+                    }
+                self.user_views[user_id].add(post_id)
+
             v_delta = 1
             post['view_count'] += 1
         elif event_type == 'like':
