@@ -120,7 +120,7 @@
                     <img src="{{ p.user_profile }}" class="author-img" alt="profile">
                     <div class="author-detail">
                         <div class="nickname">{{ p.user_nickname }}</div>
-                        <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
+                        <div class="pet-tag">{% if p.pet_name and p.pet_name != '강아지' and p.pet_name != '우리 강아지' and p.pet_name != '아이 이름' %}{{ p.pet_type }} {{ p.pet_name }}{% else %}{{ p.pet_type }}{% endif %}</div>
                     </div>
 
                     <!-- 총점 (작성자 우측에 자연스럽게 배치) -->

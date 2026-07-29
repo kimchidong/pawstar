@@ -283,7 +283,8 @@ function openDetailModal(post) {
     if (nicknameEl) nicknameEl.textContent = post.user_nickname || '집사';
 
     const petTagEl = document.getElementById('detailPetTag');
-    if (petTagEl) petTagEl.textContent = `${post.pet_type || ''} ${post.pet_name || ''}`;
+    const nameStr = (post.pet_name && post.pet_name !== '강아지' && post.pet_name !== '우리 강아지' && post.pet_name !== '아이 이름') ? ` ${post.pet_name}` : '';
+    if (petTagEl) petTagEl.textContent = `${post.pet_type || '🐕 강아지'}${nameStr}`;
 
     const scoreNumEl = document.getElementById('detailScoreNum');
     if (scoreNumEl) scoreNumEl.textContent = Number(post.score || 0).toLocaleString();

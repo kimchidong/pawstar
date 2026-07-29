@@ -310,7 +310,6 @@ body {
 }
 
 .btn-hero-cta:hover {
-    transform: translateY(-3px) scale(1.03);
     box-shadow: 0 12px 30px rgba(245, 158, 11, 0.55);
     text-decoration: none;
 }
@@ -334,7 +333,6 @@ body {
 .btn-hero-sec:hover {
     background: rgba(255, 255, 255, 0.35);
     color: #ffffff;
-    transform: translateY(-2px);
 }
 
 /* Glassmorphism Live Contest Info Block (우측 콘테스트 카드) */
@@ -603,9 +601,8 @@ body {
 }
 
 .post-card:hover {
-    transform: translateY(-8px);
     border-color: rgba(124, 58, 237, 0.5);
-    box-shadow: 0 20px 35px -5px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 12px 25px -5px rgba(124, 58, 237, 0.15);
 }
 
 .card-media {
@@ -624,7 +621,7 @@ body {
 }
 
 .post-card:hover .card-media img {
-    transform: scale(1.06);
+    /* 오버 확대 효과 제거 */
 }
 
 /* Rank Ribbon 3D Metallic Emblem Badges */
@@ -647,7 +644,7 @@ body {
 }
 
 .rank-ribbon:hover {
-    transform: scale(1.08) translateY(-2px);
+    /* 오버 효과 제거 */
 }
 
 .rank-ribbon i {
@@ -1111,7 +1108,6 @@ body {
     background: var(--gradient-brand);
     color: #ffffff;
     border-color: transparent;
-    transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 }
 
@@ -1153,7 +1149,6 @@ body {
 
 .footer-links a:hover {
     color: var(--accent-purple);
-    transform: translateX(4px);
 }
 
 .award-badges-mini {
@@ -1246,7 +1241,6 @@ body {
 .page-link:hover {
     border-color: var(--accent-purple);
     color: var(--accent-purple);
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
 }
 
@@ -1295,7 +1289,6 @@ body {
 
 .detail-close:hover {
     background: #ffffff;
-    transform: scale(1.1);
 }
 
 .detail-modal-body {
@@ -1389,7 +1382,6 @@ body {
 }
 
 .btn-edit-profile:hover {
-    transform: translateY(-2px) scale(1.02);
     box-shadow: 0 8px 22px rgba(124, 58, 237, 0.5);
     color: #ffffff;
 }
@@ -1400,7 +1392,7 @@ body {
 }
 
 .btn-edit-profile:hover i {
-    transform: rotate(-10deg) scale(1.1);
+    /* 오버 회전 효과 제거 */
 }
 
 /* Save Profile Button Styling */
@@ -1425,7 +1417,6 @@ body {
 }
 
 .btn-save-profile:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(124, 58, 237, 0.5);
     color: #ffffff;
 }

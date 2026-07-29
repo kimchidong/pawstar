@@ -40,11 +40,11 @@
                         </div>
                     </div>
 
-                    <!-- 2. 아이 이름 & 동물 종류 -->
+                    <!-- 2. 이름 & 동물 종류 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                                🐶 반려동물 이름
+                                🐶 이름
                             </label>
                             <input type="text" name="pet_name" class="form-control" placeholder="예: 뽀삐, 냥이" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                         </div>
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const title = inputTitle ? inputTitle.value.trim() : '';
         const content = textareaContent ? textareaContent.value.trim() : '';
 
-        const petTagText = `${petType} ${petName || '아이 이름'}`;
+        const petTagText = petName ? `${petType} ${petName}` : petType;
         const titleText = title || '자랑 제목이 여기에 표시됩니다';
         const descText = content || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
 

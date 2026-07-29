@@ -75,7 +75,8 @@ function openMobileDetailModal(postData) {
     document.getElementById('mDetailImg').src = postData.media_url || '';
     document.getElementById('mDetailAuthorImg').src = postData.user_profile || '';
     document.getElementById('mDetailAuthorNickname').textContent = postData.user_nickname || '집사';
-    document.getElementById('mDetailPetTag').textContent = `${postData.pet_type || ''} ${postData.pet_name || ''}`;
+    const mNameStr = (postData.pet_name && postData.pet_name !== '강아지' && postData.pet_name !== '우리 강아지' && postData.pet_name !== '아이 이름') ? ` ${postData.pet_name}` : '';
+    document.getElementById('mDetailPetTag').textContent = `${postData.pet_type || '🐕 강아지'}${mNameStr}`;
     document.getElementById('mDetailScoreNum').textContent = (postData.score || 0).toLocaleString();
     document.getElementById('mDetailTitle').textContent = postData.title || '';
     document.getElementById('mDetailContent').textContent = postData.content || '';
