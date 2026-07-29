@@ -637,12 +637,13 @@ body {
     font-weight: 900;
     font-size: 0.88rem;
     letter-spacing: -0.3px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     backdrop-filter: blur(8px);
     z-index: 10;
     transition: var(--transition);
+    white-space: nowrap;
 }
 
 .rank-ribbon:hover {
@@ -1329,6 +1330,14 @@ body {
     position: absolute;
     top: 15px;
     left: 15px;
+    z-index: 10;
+}
+
+.detail-rank-badge .rank-ribbon {
+    position: relative;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
 }
 
 .detail-info-container {
