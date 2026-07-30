@@ -39,15 +39,7 @@
                 {% endif %}
             </div>
 
-            <!-- 보유 배지 목록 -->
-            <div>
-                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">보유 수상 뱃지 & 칭호</span>
-                {% for b in user.badges %}
-                    <span class="badge-tag" style="background: #fffbeb; border: 1px solid #fde68a; color: var(--accent-gold); font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 12px; font-size: 0.85rem; margin-right: 0.4rem;">{{ b }}</span>
-                {% else %}
-                    <span style="font-size: 0.85rem; color: var(--text-muted);">아직 획득한 배지가 없습니다. 콘테스트에 도전해보세요!</span>
-                {% endfor %}
-            </div>
+
         </div>
     </div>
 

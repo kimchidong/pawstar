@@ -720,11 +720,10 @@ def api_profile_update():
     if not user_id:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
     data = request.json or {}
-    user_id = data.get('user_id', 'user1')
     nickname = data.get('nickname')
     bio = data.get('bio')
-    # 프로필 이미지는 수정/등록 대상이 아니므로 기존 이미지 유지
-    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, bio=bio, profile_img=None)
+    profile_img = data.get('profile_img')
+    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, bio=bio, profile_img=profile_img)
     return jsonify({'success': True, 'message': '프로필 정보가 수정되었습니다.', 'data': updated_user})
 
 

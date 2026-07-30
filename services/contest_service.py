@@ -776,6 +776,50 @@ class PawStarService:
             'my_awards': my_awards
         }
 
+    def update_user_profile(self, user_id, nickname=None, bio=None, profile_img=None):
+        """ 사용자 프로필(닉네임, 한줄소개, 프로필이미지) DB 업데이트 """
+        conn = self.get_db_connection()
+        if conn:
+            try:
+                with conn.cursor() as cur:
+                    update_fields = []
+                    params = []
+
+                    if nickname is not None and str(nickname).strip():
+                        update_fields.append("NICKNAME = %s")
+                        params.append(str(nickname).strip())
+                    if bio is not None:
+                        update_fields.append("BIO = %s")
+                        params.append(str(bio).strip())
+                    if profile_img is not None and str(profile_img).strip():
+                        update_fields.append("PROFILE_IMG = %s")
+                        params.append(str(profile_img).strip())
+
+                    if update_fields:
+                        params.append(user_id)
+                        sql = f"UPDATE USERS SET {', '.join(update_fields)} WHERE USER_ID = %s"
+                        cur.execute(sql, tuple(params))
+                        
+                        if nickname is not None and str(nickname).strip():
+                            cur.execute("UPDATE post_comment SET user_nickname = %s WHERE user_id = %s", (str(nickname).strip(), user_id))
+
+                        conn.commit()
+
+                    cur.execute("SELECT USER_ID, NICKNAME, PROFILE_IMG, BIO FROM USERS WHERE USER_ID = %s", (user_id,))
+                    u = cur.fetchone()
+                conn.close()
+                if u:
+                    return {
+                        'user_id': u['USER_ID'],
+                        'nickname': u['NICKNAME'],
+                        'profile_img': u['PROFILE_IMG'],
+                        'bio': u.get('BIO', '')
+                    }
+            except Exception as e:
+                print("update_user_profile DB error:", e)
+
+        return {'user_id': user_id, 'nickname': nickname or '', 'bio': bio or '', 'profile_img': profile_img or ''}
+
     def delete_user(self, user_id):
         """ 100% DB DELETE 회원 탈퇴 처리 """
         conn = self.get_db_connection()
@@ -870,8 +914,8 @@ class PawStarService:
                     u = cur.fetchone()
                     if not u:
                         import random
-                        prefix_list = ['귀여운집사', '행복집사', '초보집사', '댕냥집사', '심쿵집사', '빛나는집사', '러블리집사']
-                        random_nickname = default_name or f"{random.choice(prefix_list)}_{random.randint(1000, 9999)}"
+                        prefix_list = ['귀여운집사', '행복집사', '초보집사', '댕냥집사', '심쿵집사', '빛나는집사', '러블리집사', '펫스타', '보송보송집사', '말랑말랑집사']
+                        random_nickname = f"{random.choice(prefix_list)}_{random.randint(1000, 9999)}"
                         bio = 'PawStar에서 반려동물과 행복한 일상을 나누고 있습니다 🐾'
                         cur.execute("""
                             INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, BIO, LAST_LOGIN_AT, LOGIN_COUNT)
@@ -905,7 +949,10 @@ class PawStarService:
             except Exception as e:
                 print("google_login_or_register DB error:", e)
 
-        return {'user_id': user_id, 'nickname': default_name or '구글 회원', 'profile_img': profile_img, 'bio': ''}
+        import random
+        prefix_list = ['귀여운집사', '행복집사', '초보집사', '댕냥집사', '심쿵집사', '빛나는집사', '러블리집사', '펫스타', '보송보송집사', '말랑말랑집사']
+        fallback_nick = f"{random.choice(prefix_list)}_{random.randint(1000, 9999)}"
+        return {'user_id': user_id, 'nickname': fallback_nick, 'profile_img': profile_img, 'bio': ''}
 
     def get_comments_by_post(self, post_id):
         """ 게시물 댓글 목록 조회 """
