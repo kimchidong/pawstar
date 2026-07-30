@@ -199,10 +199,10 @@ def run_monthly_award_batch():
                     ON DUPLICATE KEY UPDATE AWARD_TYPE = VALUES(AWARD_TYPE)
                 """, (contest_id, post_id, user_id, award_type, award_label))
                 cur.execute("""
-                    INSERT INTO USER_BADGE (USER_ID, BADGE_ID)
-                    VALUES (%s, %s)
+                    INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID)
+                    VALUES (%s, %s, %s)
                     ON DUPLICATE KEY UPDATE GRANTED_AT = CURRENT_TIMESTAMP
-                """, (user_id, badge_id))
+                """, (user_id, contest_id, badge_id))
                 awarded_count += 1
                 print(f"  [{award_label}] 순위: {rank_val}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 점수: {score}점 | 하트: {like_cnt}개 | BADGE_ID: {badge_id}")
 
@@ -222,10 +222,10 @@ def run_monthly_award_batch():
                     ON DUPLICATE KEY UPDATE AWARD_TYPE = VALUES(AWARD_TYPE)
                 """, (contest_id, post_id, user_id, award_type, award_label))
                 cur.execute("""
-                    INSERT INTO USER_BADGE (USER_ID, BADGE_ID)
-                    VALUES (%s, %s)
+                    INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID)
+                    VALUES (%s, %s, %s)
                     ON DUPLICATE KEY UPDATE GRANTED_AT = CURRENT_TIMESTAMP
-                """, (user_id, badge_id))
+                """, (user_id, contest_id, badge_id))
                 awarded_count += 1
                 print(f"  [{award_label}] 순위: {rank_val}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 하트: {like_cnt}개 | 점수: {score}점 | BADGE_ID: {badge_id}")
 

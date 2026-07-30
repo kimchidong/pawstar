@@ -63,12 +63,12 @@ def seed_database():
         cur.executemany(sql_badge, badges)
 
         user_badges = [
-            (hash_id('user1'), 1),
-            (hash_id('user2'), 2),
-            (hash_id('user3'), 3),
-            (hash_id('user4'), 4)
+            (hash_id('user1'), 1, 1),
+            (hash_id('user2'), 1, 2),
+            (hash_id('user3'), 1, 3),
+            (hash_id('user4'), 1, 4)
         ]
-        sql_ubadge = """INSERT INTO USER_BADGE (USER_ID, BADGE_ID) VALUES (%s, %s)"""
+        sql_ubadge = """INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID) VALUES (%s, %s, %s)"""
         cur.executemany(sql_ubadge, user_badges)
 
         conn.commit()

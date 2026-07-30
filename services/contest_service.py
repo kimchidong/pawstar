@@ -67,6 +67,14 @@ class PawStarService:
                         KEY idx_post_id (post_id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                 """)
+                cur.execute("SHOW TABLES LIKE 'USER_BADGE'")
+                if cur.fetchone():
+                    cur.execute("SHOW COLUMNS FROM USER_BADGE LIKE 'CONTEST_ID'")
+                    if not cur.fetchone():
+                        try:
+                            cur.execute("ALTER TABLE USER_BADGE ADD COLUMN CONTEST_ID INT NOT NULL AFTER USER_ID")
+                        except Exception as alter_e:
+                            print("USER_BADGE alter error:", alter_e)
                 conn.commit()
             conn.close()
         except Exception as e:
