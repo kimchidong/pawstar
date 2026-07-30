@@ -10,8 +10,8 @@
         </p>
 
         <!-- 회차 선택 -->
-        <div style="margin-top: 1.5rem;">
-            <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.8rem 1.5rem; font-size: 1.05rem;">
+        <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
+            <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.75rem 2.2rem 0.75rem 1.25rem; font-size: 1.05rem; min-width: 320px; width: 100%; max-width: 440px; font-weight: 700; cursor: pointer; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                 {% for c in contests %}
                     <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
                         {{ c.title }}
@@ -104,10 +104,10 @@
             <div style="font-size: 2.2rem; color: var(--accent-purple);">⭐</div>
             <div>
                 <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-                    급상승 특별상 : 루키스타 (Rookie Star <span style="color: var(--accent-purple); font-weight: 900;">TOP 3</span>)
+                    하트 인기상 : 루키스타 (Rookie Star <span style="color: var(--accent-purple); font-weight: 900;">TOP 3</span>)
                 </h3>
                 <p style="color: var(--text-secondary); font-size: 0.88rem; font-weight: 500; margin-top: 0.15rem;">
-                    최근 폭발적인 급상승 반응으로 스타성을 입증한 3마리의 자랑스러운 루키들입니다!
+                    집사님들의 뜨거운 사랑과 하트를 듬뿍 받아 선정된 3마리의 자랑스러운 루키 스타들입니다! ❤️
                 </p>
             </div>
         </div>
