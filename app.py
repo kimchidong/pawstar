@@ -466,25 +466,6 @@ def hall_of_fame():
     )
 
 # 3. 최근 급상승 메뉴
-@app.route('/trending')
-def trending():
-    if is_mobile_user_agent() and not request.args.get('desktop'):
-        return redirect(url_for('m_trending', **request.args))
-
-    contest_id = request.args.get('contest_id', 1, type=int)
-    page = request.args.get('page', 1, type=int)
-    current_user_id = get_current_user_id()
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
-    current_contest = service.get_contest(contest_id)
-
-    return render_template(
-        'trending.html',
-        current_contest=current_contest,
-        posts=paginated_res['posts'],
-        pagination=paginated_res
-    )
-
-# 4. 프로필 (plamodelshop 회원관리 방식과 동일)
 @app.route('/profile')
 def profile():
     if is_mobile_user_agent() and not request.args.get('desktop'):
@@ -548,21 +529,6 @@ def m_hall_of_fame():
         contests=contests,
         current_contest=current_contest,
         winners=winners
-    )
-
-@app.route('/m/trending')
-def m_trending():
-    contest_id = request.args.get('contest_id', 1, type=int)
-    page = request.args.get('page', 1, type=int)
-    current_user_id = get_current_user_id()
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
-    current_contest = service.get_contest(contest_id)
-
-    return render_template(
-        'm_trending.html',
-        current_contest=current_contest,
-        posts=paginated_res['posts'],
-        pagination=paginated_res
     )
 
 @app.route('/m/profile')

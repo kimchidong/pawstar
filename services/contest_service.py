@@ -426,7 +426,6 @@ class PawStarService:
                 """, (final_score, final_v, final_l, final_c, final_s, post_id))
 
                 cur.execute("""
-                    INSERT INTO POST_DAILY_STAT (POST_ID, STAT_DATE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
                     VALUES (%s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY UPDATE 
                         VIEW_COUNT = VIEW_COUNT + VALUES(VIEW_COUNT),
@@ -621,7 +620,6 @@ class PawStarService:
                 """, (final_score, final_v, final_l, final_c, final_s, post_id))
 
                 cur.execute("""
-                    INSERT INTO POST_DAILY_STAT (POST_ID, STAT_DATE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
                     VALUES (%s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY UPDATE 
                         VIEW_COUNT = VIEW_COUNT + VALUES(VIEW_COUNT),

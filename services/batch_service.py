@@ -1,8 +1,7 @@
 """
 Paw Star Batch Processing System
-1. 점수 감점 배치 (일정 기간이 지난 활동 점수 차감 또는 일별 감점 스케줄러)
-2. 최근 30일 급상승 점수 재계산 배치
-3. 회차 종료 및 1~3위 (SUPER_STAR, RISING_STAR, BRIGHT_STAR) + 급상승 1위 (ROOKIE_STAR) 수상자 선정 배치
+1. 점수 감점 배치
+2. 회차 종료 및 수상자 선정 배치 (스타 1~3위 및 루키스타 1~3위)
 """
 
 from datetime import datetime, timedelta

@@ -33,39 +33,6 @@
         ORDER BY p.SCORE DESC, p.CREATED_AT DESC
     </select>
 
-    <!-- 2. 최근 30일 급상승 게시물 목록 SQL (일별 통계 30일 합산 점수 기준) -->
-    <select id="selectPostsByTrending" resultType="PostVo">
-        SELECT 
-            p.POST_ID,
-            p.USER_ID,
-            u.NICKNAME,
-            u.PROFILE_IMG,
-            p.CONTEST_ID,
-            c.TITLE AS CONTEST_TITLE,
-            p.PET_NAME,
-            p.PET_TYPE,
-            p.TITLE,
-            p.CONTENT,
-            p.FILE_PATH,
-            p.LIST_FILE_NAME,
-            p.POPUP_FILE_NAME,
-            p.MEDIA_TYPE,
-            p.SCORE AS TOTAL_ACCUMULATED_SCORE,
-            SUM(ds.VIEW_COUNT * 1 + ds.LIKE_COUNT * 5 + ds.COMMENT_COUNT * 10 + ds.SHARE_COUNT * 20) AS TRENDING_SCORE,
-            SUM(ds.VIEW_COUNT) AS RECENT_VIEW_COUNT,
-            SUM(ds.LIKE_COUNT) AS RECENT_LIKE_COUNT,
-            SUM(ds.COMMENT_COUNT) AS RECENT_COMMENT_COUNT,
-            SUM(ds.SHARE_COUNT) AS RECENT_SHARE_COUNT
-        FROM POST p
-        JOIN USERS u ON p.USER_ID = u.USER_ID
-        JOIN CONTEST c ON p.CONTEST_ID = c.CONTEST_ID
-        LEFT JOIN POST_DAILY_STAT ds ON p.POST_ID = ds.POST_ID 
-            AND ds.STAT_DATE >= CURRENT_DATE() - INTERVAL 30 DAY
-        WHERE p.CONTEST_ID = #{contestId}
-        GROUP BY p.POST_ID, p.USER_ID, u.NICKNAME, u.PROFILE_IMG, p.CONTEST_ID, c.TITLE, 
-                 p.PET_NAME, p.PET_TYPE, p.TITLE, p.CONTENT, p.IMAGE_PATH, p.MEDIA_TYPE, p.SCORE
-        ORDER BY TRENDING_SCORE DESC, p.CREATED_AT DESC
-    </select>
 
     <!-- 3. 명예의 전당 회차별 수상작 조회 SQL (1위 슈퍼스타, 2위 라이징스타, 3위 브라이트스타, 급상승 1위 루키스타) -->
     <select id="selectHallOfFameByContest" resultType="ContestWinnerVo">
@@ -102,7 +69,7 @@
             END ASC
     </select>
 
-    <!-- 4. 실시간 게시물 점수 및 일별 통계 갱신 UPSERT SQL -->
+    <!-- 4. 실시간 게시물 점수 갱신 SQL -->
     <update id="incrementPostScore">
         UPDATE POST
         SET 
@@ -112,17 +79,9 @@
             COMMENT_COUNT = COMMENT_COUNT + #{commentDelta},
             SHARE_COUNT = SHARE_COUNT + #{shareDelta}
         WHERE POST_ID = #{postId};
-
-        INSERT INTO POST_DAILY_STAT (POST_ID, STAT_DATE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
-        VALUES (#{postId}, CURRENT_DATE(), #{viewDelta}, #{likeDelta}, #{commentDelta}, #{shareDelta})
-        ON DUPLICATE KEY UPDATE
-            VIEW_COUNT = VIEW_COUNT + #{viewDelta},
-            LIKE_COUNT = LIKE_COUNT + #{likeDelta},
-            COMMENT_COUNT = COMMENT_COUNT + #{commentDelta},
-            SHARE_COUNT = SHARE_COUNT + #{shareDelta};
     </update>
 
-    <!-- 5. 콘테스트 회차 종료 및 수상자 선정 쿼리 (인기 1,2,3위 및 30일 급상승 1위 루키스타) -->
+    <!-- 5. 콘테스트 회차 종료 및 수상자 선정 쿼리 -->
     <insert id="insertContestWinners">
         -- 1위 SUPER_STAR, 2위 RISING_STAR, 3위 BRIGHT_STAR
         INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
@@ -145,7 +104,7 @@
         ORDER BY p.SCORE DESC
         LIMIT 3;
 
-        -- 순위(1,2,3위) 외 급상승 1위 ROOKIE_STAR 선정
+        -- 순위(1,2,3위) 외 하트 순 1위 ROOKIE_STAR 선정
         INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
         SELECT 
             p.CONTEST_ID,
@@ -154,14 +113,11 @@
             'ROOKIE_STAR' AS AWARD_TYPE,
             '루키 스타 특별상 & 루키 배지' AS PRIZE_NAME
         FROM POST p
-        LEFT JOIN POST_DAILY_STAT ds ON p.POST_ID = ds.POST_ID 
-            AND ds.STAT_DATE >= CURRENT_DATE() - INTERVAL 30 DAY
         WHERE p.CONTEST_ID = #{contestId}
           AND p.POST_ID NOT IN (
               SELECT POST_ID FROM CONTEST_WINNER WHERE CONTEST_ID = #{contestId}
           )
-        GROUP BY p.POST_ID, p.CONTEST_ID, p.USER_ID
-        ORDER BY SUM(ds.VIEW_COUNT * 1 + ds.LIKE_COUNT * 5 + ds.COMMENT_COUNT * 10 + ds.SHARE_COUNT * 20) DESC
+        ORDER BY p.LIKE_COUNT DESC, p.SCORE DESC
         LIMIT 1;
     </insert>
 

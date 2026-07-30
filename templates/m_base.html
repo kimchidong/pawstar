@@ -46,10 +46,6 @@
             </div>
             <span>자랑하기</span>
         </a>
-        <a href="/m/trending" class="m-nav-item {{ 'active' if request.path == '/m/trending' }}">
-            <i class="fa-solid fa-fire"></i>
-            <span>급상승</span>
-        </a>
         {% if is_logged_in %}
             <a href="/m/profile" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
                 <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none;">

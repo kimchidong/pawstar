@@ -14,7 +14,7 @@ def seed_database():
     try:
         # 외래키 체크 비활성화 후 기존 데이터 정리
         cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
-        tables = ["USER_BADGE", "BADGE", "CONTEST_WINNER", "POST_DAILY_STAT", "POST", "CONTEST", "USERS"]
+        tables = ["USER_BADGE", "BADGE", "CONTEST_WINNER", "POST", "CONTEST", "USERS"]
         for table in tables:
             cur.execute(f"TRUNCATE TABLE {table};")
         cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
@@ -70,22 +70,6 @@ def seed_database():
         ]
         sql_ubadge = """INSERT INTO USER_BADGE (USER_ID, BADGE_ID) VALUES (%s, %s)"""
         cur.executemany(sql_ubadge, user_badges)
-
-        # 4. Sample Posts (제1회 콘테스트 테스트용 게시물)
-        # SCORE 기준 스타 1~3위와 LIKE_COUNT 기준 루키스타 1~3위가 다르게 추출되는 케이스
-        posts_data = [
-            (hash_id('user1'), 1, '뽀삐', 'DOG', '오늘의 리트리버 뽀삐', '수영장에서 시원하게 놀았어요 🏊', '/static/uploads/p1.jpg', 'p1.jpg', 'p1_pop.jpg', 'IMAGE', 1000, 50, 50, 20, 5),
-            (hash_id('user2'), 1, '나비', 'CAT', '식빵 굽는 나비', '햇살 아래에서 낮잠 타임 ☀️', '/static/uploads/p2.jpg', 'p2.jpg', 'p2_pop.jpg', 'IMAGE', 900, 40, 40, 15, 3),
-            (hash_id('user3'), 1, '모찌', 'OTHER', '해바라기씨 먹는 모찌', '볼이 터질 것 같아요 🐹', '/static/uploads/p3.jpg', 'p3.jpg', 'p3_pop.jpg', 'IMAGE', 800, 30, 30, 10, 2),
-            (hash_id('user4'), 1, '앵두', 'OTHER', '노래하는 앵두 🦜', '아침마다 기분 좋게 쩨쩨 🎶', '/static/uploads/p4.jpg', 'p4.jpg', 'p4_pop.jpg', 'IMAGE', 200, 500, 500, 8, 1),
-            (hash_id('user1'), 1, '뽀삐2', 'DOG', '산책 나온 뽀삐', '신나게 꼬리 흔들기 🐕', '/static/uploads/p5.jpg', 'p5.jpg', 'p5_pop.jpg', 'IMAGE', 150, 400, 400, 5, 0),
-            (hash_id('user2'), 1, '나비2', 'CAT', '야옹이 츄르 타임', '츄르 먹고 신난 귀요미 🐱', '/static/uploads/p6.jpg', 'p6.jpg', 'p6_pop.jpg', 'IMAGE', 100, 300, 300, 2, 0),
-            (hash_id('user3'), 1, '모찌2', 'OTHER', '쳇바퀴 달리는 모찌', '폭풍 운동 중인 햄찌 💨', '/static/uploads/p7.jpg', 'p7.jpg', 'p7_pop.jpg', 'IMAGE', 50, 20, 20, 1, 0),
-            (hash_id('user4'), 1, '앵두2', 'OTHER', '앵두의 조는 모습', '꾸벅꾸벅 졸고 있어요 😴', '/static/uploads/p8.jpg', 'p8.jpg', 'p8_pop.jpg', 'IMAGE', 20, 5, 5, 0, 0)
-        ]
-        sql_post = """INSERT INTO POST (USER_ID, CONTEST_ID, PET_NAME, PET_TYPE, TITLE, CONTENT, FILE_PATH, LIST_FILE_NAME, POPUP_FILE_NAME, MEDIA_TYPE, SCORE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT)
-                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        cur.executemany(sql_post, posts_data)
 
         conn.commit()
         print("Successfully seeded all data into DB_PST!")
