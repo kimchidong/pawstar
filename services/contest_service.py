@@ -947,5 +947,65 @@ class PawStarService:
 
         return {'user_id': user_id, 'nickname': default_name or '구글 회원', 'profile_img': profile_img, 'bio': ''}
 
+    def get_comments_by_post(self, post_id):
+        """ 게시물 댓글 목록 조회 """
+        conn = self.get_db_connection()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT comment_id, post_id, user_id, user_nickname, user_profile, content,
+                           DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as created_at
+                    FROM post_comment
+                    WHERE post_id = %s
+                    ORDER BY created_at ASC
+                """, (post_id,))
+                rows = cur.fetchall()
+            conn.close()
+            return rows if rows else []
+        except Exception as e:
+            print("get_comments_by_post DB error:", e)
+            if conn:
+                conn.close()
+            return []
+
+    def add_comment(self, post_id, user_nickname, content, user_profile=None, user_id=None):
+        """ 게시물 한줄 댓글 추가 및 1회 한정 +10점 이벤트 처리 """
+        if not user_id:
+            user_id = 'anonymous'
+        
+        conn = self.get_db_connection()
+        if not conn:
+            return None, "DB연결 오류"
+        
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO post_comment (post_id, user_id, user_nickname, user_profile, content)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (post_id, user_id, user_nickname, user_profile, content))
+                comment_id = cur.lastrowid
+                conn.commit()
+            conn.close()
+            
+            # 이벤트(점수 및 수치 증가) 트리거
+            event_res = self.trigger_event(post_id, 'comment', user_id=user_id)
+            
+            comment_data = {
+                'comment_id': comment_id,
+                'post_id': post_id,
+                'user_id': user_id,
+                'user_nickname': user_nickname,
+                'user_profile': user_profile,
+                'content': content
+            }
+            return comment_data, event_res
+        except Exception as e:
+            print("add_comment DB error:", e)
+            if conn:
+                conn.close()
+            return None, str(e)
+
 # 100% Pure MySQL DB Direct 서비스 싱글톤 객체 생성
 service = PawStarService()

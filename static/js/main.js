@@ -235,38 +235,17 @@ async function triggerEvent(postId, eventType) {
             const commentNum = card.querySelector('.comment-count');
             const shareNum = card.querySelector('.share-count');
 
-            if (viewNum) {
+            if (viewNum && data.view_count !== undefined) {
                 viewNum.textContent = data.view_count;
-                const bView = card.querySelector('.btn-view');
-                if (bView) bView.classList.add('active');
             }
-            if (likeNum) {
+            if (likeNum && data.like_count !== undefined) {
                 likeNum.textContent = data.like_count;
-                const bLike = card.querySelector('.btn-like');
-                if (bLike) {
-                    const icon = bLike.querySelector('i');
-                    if (eventType === 'like') {
-                        bLike.classList.add('active');
-                        if (icon) icon.className = 'fa-solid fa-heart';
-                    } else if (eventType === 'unlike') {
-                        bLike.classList.remove('active');
-                        if (icon) icon.className = 'fa-regular fa-heart';
-                    }
-                }
             }
-            if (commentNum) {
+            if (commentNum && data.comment_count !== undefined) {
                 commentNum.textContent = data.comment_count;
-                const bComment = card.querySelector('.btn-comment');
-                if (bComment && eventType === 'comment') {
-                    bComment.classList.add('active');
-                    const icon = bComment.querySelector('i');
-                    if (icon) icon.className = 'fa-solid fa-comment';
-                }
             }
-            if (shareNum) {
+            if (shareNum && data.share_count !== undefined) {
                 shareNum.textContent = data.share_count;
-                const bShare = card.querySelector('.btn-share');
-                if (bShare && eventType === 'share') bShare.classList.add('active');
             }
         }
 
@@ -470,7 +449,7 @@ function openDetailModal(post) {
 
     if (heartIcon) {
         heartIcon.className = 'fa-regular fa-heart';
-        heartIcon.style.color = '#f43f5e';
+        heartIcon.style.color = '';
     }
 
     fetch(`/api/post/user_actions/${post.post_id}`)
@@ -478,42 +457,8 @@ function openDetailModal(post) {
         .then(data => {
             if (data && data.success && data.actions) {
                 const act = data.actions;
-                const btnView = document.getElementById('detailBtnView');
-                const btnLike = document.getElementById('detailBtnLike');
-                const btnComment = document.getElementById('detailBtnComment');
-                const btnShare = document.getElementById('detailBtnShare');
-
-                // 1. 조회수 버튼 (내가 조회 반영한 경우)
-                if (btnView) {
-                    btnView.classList.add('active'); // 모달을 연 순간 조회가 반영되므로 active 컬러 표시
-                }
-                // 2. 좋아요 버튼 (내가 좋아요 반영한 경우)
-                if (btnLike) {
-                    if (act.is_liked) {
-                        isLiked = true;
-                        btnLike.classList.add('active');
-                        if (heartIcon) {
-                            heartIcon.className = 'fa-solid fa-heart';
-                            heartIcon.style.color = '#e11d48';
-                        }
-                    } else {
-                        isLiked = false;
-                        btnLike.classList.remove('active');
-                        if (heartIcon) {
-                            heartIcon.className = 'fa-regular fa-heart';
-                            heartIcon.style.color = '#f43f5e';
-                        }
-                    }
-                }
-                // 3. 댓글 버튼 (내가 댓글 작성을 반영한 경우)
-                if (btnComment) {
-                    if (act.is_commented) btnComment.classList.add('active');
-                    else btnComment.classList.remove('active');
-                }
-                // 4. 공유 버튼 (내가 공유를 반영한 경우)
-                if (btnShare) {
-                    if (act.is_shared) btnShare.classList.add('active');
-                    else btnShare.classList.remove('active');
+                if (btnLike && act) {
+                    isLiked = act.is_liked;
                 }
             }
         })
@@ -524,225 +469,75 @@ function openDetailModal(post) {
             const success = await triggerEvent(post.post_id, 'like');
             if (success) {
                 isLiked = true;
-                if (heartIcon) {
-                    heartIcon.className = 'fa-solid fa-heart';
-                    heartIcon.style.color = '#e11d48';
-                }
-                if (btnLike) btnLike.classList.add('active');
             }
         } else {
             const success = await triggerEvent(post.post_id, 'unlike');
             if (success) {
                 isLiked = false;
-                if (heartIcon) {
-                    heartIcon.className = 'fa-regular fa-heart';
-                    heartIcon.style.color = '#f43f5e';
-                }
-                if (btnLike) btnLike.classList.remove('active');
             }
         }
     };
 
     if (heartBtn) heartBtn.onclick = toggleLikeHandler;
 
-
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-}
-
-function closeDetailModal() {
-    const modal = document.getElementById('postDetailModal');
-    if (modal) {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-    }
 }
 
 /**
- * 댓글 목록 로드 및 렌더링
+ * 회차 종료 & 수상자 자동 선정 배치 실행
+ * @param {number} contestId 
  */
-function loadComments(postId) {
-    fetch(`/api/comments/${postId}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                renderDetailComments(data.comments);
-                const count = data.comments ? data.comments.length : 0;
-                const commentCountEl = document.getElementById('detailCommentCount');
-                if (commentCountEl) commentCountEl.textContent = count;
-                
-                const card = document.getElementById(`post-card-${postId}`);
-                if (card) {
-                    const cardComment = card.querySelector('.comment-count');
-                    if (cardComment) cardComment.textContent = count;
-                }
-            }
-        })
-        .catch(err => console.error('댓글 로드 실패:', err));
-}
-
-function renderDetailComments(comments) {
-    const listEl = document.getElementById('detailCommentList');
-    const headerCountEl = document.getElementById('detailCommentHeaderCount');
-    if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
-    
-    if (!listEl) return;
-    if (!comments || comments.length === 0) {
-        listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.75rem 0;">첫 한줄 댓글의 주인공이 되어보세요! 💬</div>';
+async function runAwardBatch(contestId) {
+    if (!confirm(`제${contestId}회 콘테스트를 종료하고 1~3위 및 급상승 루키스타 수상자를 선정하시겠습니까?`)) {
         return;
     }
-    
-    listEl.innerHTML = comments.map(c => `
-        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 800; color: var(--text-primary);">
-                    <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
-                    <span>${escapeHtml(c.user_nickname || '집사')}</span>
-                </div>
-                <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at || ''}</span>
-            </div>
-            <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.4rem;">
-                ${escapeHtml(c.content)}
-            </div>
-        </div>
-    `).join('');
-}
 
-function submitDetailComment() {
-    const inputEl = document.getElementById('detailCommentInput');
-    if (!inputEl || !window.currentDetailPostId) return;
-    const content = inputEl.value.trim();
-    if (!content) {
-        showToast('댓글 내용을 입력해주세요.', 'warning');
-        return;
-    }
-    
-    fetch(`/api/comments/${window.currentDetailPostId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: content })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.success) {
-            showToast(data.message || '댓글 작성 실패', 'warning');
-            if (data.require_login) {
-                const googleModal = document.getElementById('googleAuthModal');
-                if (googleModal) googleModal.classList.add('show');
-            }
-            return;
-        }
-        
-        inputEl.value = '';
-        showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
-        const btnComment = document.getElementById('detailBtnComment');
-        if (btnComment) {
-            btnComment.classList.add('active');
-            const icon = btnComment.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-comment';
-        }
-        loadComments(window.currentDetailPostId);
-        
-        if (data.event_res) {
-            const scoreEl = document.getElementById('detailScoreNum');
-            const commentEl = document.getElementById('detailCommentCount');
-            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-            if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
-            
-            const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
-            if (card) {
-                const cardScore = card.querySelector('.score-num');
-                const cardComment = card.querySelector('.comment-count');
-                if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-                if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
-            }
-        }
-    })
-    .catch(err => {
-        console.error('댓글 작성 오류:', err);
-        showToast('댓글 등록 중 오류가 발생했습니다.', 'error');
-    });
-}
-
-async function handleShareClick() {
-    if (!window.currentDetailPostId) return;
-    const btnShare = document.getElementById('detailBtnShare');
-    fetch(`/api/post/user_actions/${post.post_id}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.success && data.actions) {
-                const act = data.actions;
-                const btnView = document.getElementById('detailBtnView');
-                const btnLike = document.getElementById('detailBtnLike');
-                const btnComment = document.getElementById('detailBtnComment');
-                const btnShare = document.getElementById('detailBtnShare');
-
-                // 1. 조회수 버튼 (내가 조회 반영한 경우)
-                if (btnView) {
-                    btnView.classList.add('active'); // 모달을 연 순간 조회가 반영되므로 active 컬러 표시
-                }
-                // 2. 좋아요 버튼 (내가 좋아요 반영한 경우)
-                if (btnLike) {
-                    if (act.is_liked) {
-                        isLiked = true;
-                        btnLike.classList.add('active');
-                        if (heartIcon) {
-                            heartIcon.className = 'fa-solid fa-heart';
-                            heartIcon.style.color = '';
-                        }
-                    } else {
-                        isLiked = false;
-                        btnLike.classList.remove('active');
-                        if (heartIcon) {
-                            heartIcon.className = 'fa-regular fa-heart';
-                            heartIcon.style.color = '';
-                        }
-                    }
-                }
-                // 3. 댓글 버튼 (내가 댓글 작성을 반영한 경우)
-                if (btnComment) {
-                    if (act.is_commented) btnComment.classList.add('active');
-                    else btnComment.classList.remove('active');
-                }
-                // 4. 공유 버튼 (내가 공유를 반영한 경우)
-                if (btnShare) {
-                    if (act.is_shared) btnShare.classList.add('active');
-                    else btnShare.classList.remove('active');
-                }
-            }
-        })
-        .catch(err => console.error(err));
-
-    const toggleLikeHandler = async () => {
-        if (!isLiked) {
-            const success = await triggerEvent(post.post_id, 'like');
-            if (success) {
-                isLiked = true;
-                if (heartIcon) {
-                    heartIcon.className = 'fa-solid fa-heart';
-                    heartIcon.style.color = '#e11d48';
-                }
-                if (btnLike) btnLike.classList.add('active');
-            }
+    try {
+        const response = await fetch('/api/admin/close-contest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contest_id: contestId })
+        });
+        const res = await response.json();
+        if (res.success) {
+            showToast('🏆 콘테스트 회차 종료 및 수상자 선정 배치가 완료되었습니다!');
+            setTimeout(() => {
+                window.location.href = `/hall-of-fame?contest_id=${contestId}`;
+            }, 1200);
         } else {
-            const success = await triggerEvent(post.post_id, 'unlike');
-            if (success) {
-                isLiked = false;
-                if (heartIcon) {
-                    heartIcon.className = 'fa-regular fa-heart';
-                    heartIcon.style.color = '#f43f5e';
-                }
-                if (btnLike) btnLike.classList.remove('active');
-            }
+            alert(res.message);
         }
-    };
-
-    if (heartBtn) heartBtn.onclick = toggleLikeHandler;
-
-
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
+    } catch (err) {
+        console.error(err);
+        alert('배치 실행 중 오류가 발생했습니다.');
+    }
 }
+
+/** 토스트 메시지 팝업 */
+function showToast(message) {
+    const existing = document.querySelector('.toast-notification');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.innerHTML = `<i class="fa-solid fa-sparkles"></i> <span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+    }, 2500);
+}
+
+// 전역 post 데이터 레지스트리
+if (!window.postsDataStore) {
+    window.postsDataStore = {};
+}
+
+
 
 function closeDetailModal() {
     const modal = document.getElementById('postDetailModal');
