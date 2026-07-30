@@ -883,10 +883,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadLinks = document.querySelectorAll('a[href="/upload"], a[href="/m/upload"], .btn-hero-cta');
     uploadLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            if (!window.isUserLoggedIn) {
+            // UI 상의 프로필/로그아웃 요소 존재 여부를 함께 체크하여 실제 로그인 상태 정확히 판별
+            const hasProfileUI = document.querySelector('.profile-dropdown') || document.querySelector('.m-nav-profile') || document.querySelector('a[href="/logout"]') || document.querySelector('a[href="/api/logout"]');
+            const isLoggedIn = window.isUserLoggedIn || !!hasProfileUI;
+
+            if (!isLoggedIn) {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.href = '/auth/google';
+                const targetPath = link.getAttribute('href') || '/upload';
+                window.location.href = '/auth/google?next=' + encodeURIComponent(targetPath);
             }
         });
     });

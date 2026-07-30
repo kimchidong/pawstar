@@ -41,7 +41,7 @@ class PawStarService:
                     CREATE TABLE IF NOT EXISTS POST_LIKE_LOG (
                         LIKE_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
                         POST_ID BIGINT NOT NULL,
-                        USER_ID VARCHAR(50) NOT NULL,
+                        USER_ID VARCHAR(100) NOT NULL,
                         CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
                         UNIQUE KEY uk_like_post_user (POST_ID, USER_ID)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -49,7 +49,7 @@ class PawStarService:
                 cur.execute("""
                         SHARE_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
                         POST_ID BIGINT NOT NULL,
-                        USER_ID VARCHAR(50) NOT NULL,
+                        USER_ID VARCHAR(100) NOT NULL,
                         CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
                         UNIQUE KEY uk_share_post_user (POST_ID, USER_ID)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -59,7 +59,7 @@ class PawStarService:
                     CREATE TABLE IF NOT EXISTS post_comment (
                         comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         post_id BIGINT NOT NULL,
-                        user_id VARCHAR(50) NOT NULL,
+                        user_id VARCHAR(100) NOT NULL,
                         user_nickname VARCHAR(50),
                         user_profile VARCHAR(255),
                         content TEXT NOT NULL,

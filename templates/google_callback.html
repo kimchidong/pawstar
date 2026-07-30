@@ -2,57 +2,34 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Google 계정 인증 중...</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background: #f8fafc;
-        }
-        .loading-box {
-            text-align: center;
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        }
-    </style>
+    <title>인증 처리 중</title>
 </head>
-<body>
-    <div class="loading-box" 
-         id="authResultData"
+<body style="background:#ffffff; margin:0; padding:0;">
+    <div id="authResultData" 
          data-success="{{ 'true' if success else 'false' }}" 
          data-message="{{ message or '' }}" 
-         data-error="{{ error or '' }}">
-        <h3 style="color: #4f46e5; margin-bottom: 0.5rem;">🌐 Google 계정 인증 확인 중</h3>
-        <p style="color: #64748b; font-size: 0.9rem;">잠시만 기다려주세요...</p>
-    </div>
+         data-target="{{ target_url or '' }}"
+         data-error="{{ error or '' }}" style="display:none;"></div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const authDataElem = document.getElementById('authResultData');
         const isSuccess = authDataElem ? (authDataElem.dataset.success === 'true') : false;
-        const serverMessage = authDataElem ? authDataElem.dataset.message : '';
         const serverError = authDataElem ? authDataElem.dataset.error : '';
+        const customTarget = authDataElem ? authDataElem.dataset.target : '';
 
         const isMobile = /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent);
-        const targetProfileUrl = isMobile ? '/m/profile' : '/profile';
+        const targetProfileUrl = customTarget || (isMobile ? '/m/profile' : '/profile');
 
         if (isSuccess) {
             if (window.opener && !window.opener.closed) {
                 try {
                     window.opener.location.href = targetProfileUrl;
                     window.close();
-                } catch (e) {
-                    location.href = targetProfileUrl;
-                }
-            } else {
-                location.href = targetProfileUrl;
+                    return;
+                } catch (e) {}
             }
+            location.replace(targetProfileUrl);
             return;
         }
 
@@ -61,14 +38,11 @@
                 try {
                     window.opener.alert('Google 인증 실패: ' + serverError);
                     window.close();
-                } catch (e) {
-                    alert('Google 인증 실패: ' + serverError);
-                    location.href = '/';
-                }
-            } else {
-                alert('Google 인증 실패: ' + serverError);
-                location.href = '/';
+                    return;
+                } catch (e) {}
             }
+            alert('Google 인증 실패: ' + serverError);
+            location.replace('/');
             return;
         }
 
@@ -98,44 +72,29 @@
             })
             .then(res => res ? res.json() : null)
             .then(data => {
-                if (data && data.success) {
-                    if (window.opener && !window.opener.closed) {
-                        try {
-                            window.opener.location.href = targetProfileUrl;
-                            window.close();
-                        } catch (e) {
-                            location.href = targetProfileUrl;
-                        }
-                    } else {
-                        location.href = targetProfileUrl;
-                    }
-                } else {
-                    if (window.opener && !window.opener.closed) {
-                        window.opener.location.href = '/';
-                        window.close();
-                    } else {
-                        location.href = '/';
-                    }
-                }
-            })
-            .catch(err => {
-                console.error(err);
+                const finalTarget = (data && data.target_url) || targetProfileUrl;
                 if (window.opener && !window.opener.closed) {
-                    window.opener.location.href = '/';
-                    window.close();
-                } else {
-                    location.href = '/';
+                    try {
+                        window.opener.location.href = finalTarget;
+                        window.close();
+                        return;
+                    } catch (e) {}
                 }
+                location.replace(finalTarget);
+            })
+            .catch(() => {
+                if (window.opener && !window.opener.closed) {
+                    try { window.opener.location.href = '/'; window.close(); return; } catch (e) {}
+                }
+                location.replace('/');
             });
         } else {
             if (window.opener && !window.opener.closed) {
-                window.opener.location.href = '/';
-                window.close();
-            } else {
-                location.href = '/';
+                try { window.opener.location.href = '/'; window.close(); return; } catch (e) {}
             }
+            location.replace('/');
         }
-    });
+    })();
     </script>
 </body>
 </html>

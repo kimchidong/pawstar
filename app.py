@@ -65,16 +65,17 @@ def finalize_temp_profile_image(avatar_icon):
 
 @app.before_request
 def check_session_timeout():
-    """ 30분 동안 웹 서비스 이용(요청)이 없거나 세션 만료 시 자동 로그아웃 처리 """
+    """ 웹 서비스 이용(요청) 중 세션 활성화 및 2시간 타임아웃 처리 """
     now_ts = datetime.datetime.now().timestamp()
     last_act = session.get('last_activity')
 
-    if session.get('user_id') and last_act:
-        if now_ts - last_act > 1800:
+    if session.get('user_id'):
+        if last_act and (now_ts - last_act > 7200):
             session.clear()
             session['logged_out_reason'] = 'timeout'
         else:
             session['last_activity'] = now_ts
+
 
 @app.context_processor
 def inject_global_vars():
@@ -263,6 +264,9 @@ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI = get_google_config(
 @app.route('/auth/google')
 def auth_google_redirect():
     """ 팝업 창을 구글 공식 OAuth 2.0 Authorization Code 인증 페이지로 직접 리다이렉트 (response_type=code) """
+    next_url = request.args.get('next') or request.args.get('return_url')
+    if next_url:
+        session['next_url'] = next_url
     client_id, client_secret, redirect_uri = get_google_config()
     google_auth_url = (
         f"https://accounts.google.com/o/oauth2/v2/auth?"
@@ -282,14 +286,15 @@ def auth_google_callback():
     """
     code = request.args.get('code')
     error = request.args.get('error')
+    next_url = session.get('next_url')
 
     # 인가 코드가 없는 경우 (또는 에러/클라이언트 직접 호출)
     if not code:
-        return render_template('google_callback.html', error=error or '인증 코드가 전송되지 않았습니다.')
+        return render_template('google_callback.html', error=error or '인증 코드가 전송되지 않았습니다.', target_url=next_url)
 
     client_id, client_secret, redirect_uri = get_google_config()
     if not client_secret:
-        return render_template('google_callback.html', error='서버 환경 변수 GOOGLE_CLIENT_SECRET이 설정되지 않았습니다. .env 파일을 확인해주세요.')
+        return render_template('google_callback.html', error='서버 환경 변수 GOOGLE_CLIENT_SECRET이 설정되지 않았습니다. .env 파일을 확인해주세요.', target_url=next_url)
 
     # 1. Google OAuth Token Endpoint로 GOOGLE_CLIENT_SECRET을 사용하여 Server-to-Server 검증 요청
     token_url = "https://oauth2.googleapis.com/token"
@@ -308,7 +313,7 @@ def auth_google_callback():
         access_token = token_data.get('access_token')
         if not access_token:
             print(f"[Google OAuth Error] Token Exchange Failed: {token_data}")
-            return render_template('google_callback.html', error=token_data.get('error_description', '구글 토큰 검증 실패'))
+            return render_template('google_callback.html', error=token_data.get('error_description', '구글 토큰 검증 실패'), target_url=next_url)
 
         # 2. 발급받은 access_token으로 Google UserInfo API 호출 및 유저 정보 검증
         userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
@@ -321,23 +326,26 @@ def auth_google_callback():
         picture = user_data.get('picture') or ''
 
         if not email or not google_id:
-            return render_template('google_callback.html', error='구글 프로필 정보 수신 실패')
+            return render_template('google_callback.html', error='구글 프로필 정보 수신 실패', target_url=next_url)
 
         # 3. PawStar 서비스 회원 가입/로그인 처리
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
+        saved_next_url = session.get('next_url')
         session.clear()
         session['user_id'] = user_info['user_id']
         session['access_token'] = access_token
         session['is_logged_in'] = True
         session['last_activity'] = datetime.datetime.now().timestamp()
         session.pop('logged_out', None)
+        if saved_next_url:
+            session['next_url'] = saved_next_url
 
         msg = f"{user_info['nickname']}님, Google 계정({email}) 인증으로 로그인되었습니다!"
-        return render_template('google_callback.html', success=True, message=msg, user=user_info)
+        return render_template('google_callback.html', success=True, message=msg, user=user_info, target_url=saved_next_url)
     except Exception as err:
         print(f"[Google OAuth Exception] {err}")
-        return render_template('google_callback.html', error=str(err))
+        return render_template('google_callback.html', error=str(err), target_url=next_url)
 
 @app.route('/api/auth/google', methods=['POST'])
 def api_auth_google():
@@ -589,14 +597,14 @@ def upload_page():
     if not user_id:
         if request.method == 'POST' or request.is_json:
             return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
-        return redirect('/auth/google')
+        return redirect('/auth/google?next=/upload')
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
     
     if request.method == 'POST':
         contest_id = current_contest['contest_id'] if current_contest else 1
-        user_id = session.get('user_id') or 'user1'
+        user_id = session.get('user_id')
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')
         title = request.form.get('title', '')
@@ -625,7 +633,7 @@ def m_upload_page():
     if not user_id:
         if request.method == 'POST' or request.is_json:
             return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
-        return redirect('/auth/google')
+        return redirect('/auth/google?next=/m/upload')
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)

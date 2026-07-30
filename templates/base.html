@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+    </script>
 </head>
 <body>
 
@@ -330,7 +333,7 @@
                     email: email,
                     name: email.split('@')[0]
                 });
-            window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+            });
         }
     });
     </script>
