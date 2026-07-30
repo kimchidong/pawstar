@@ -99,20 +99,26 @@
                 </div>
                 <div class="card-body">
                     <div class="author-info">
-                        <img src="{{ p.user_profile }}" class="author-img" alt="profile">
-                        <div class="author-detail">
-                            <div class="nickname">{{ p.user_nickname }}</div>
-                            <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
-                        </div>
-                        <div class="card-total-score">
-                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                        <div style="display: flex; align-items: center; gap: 0.65rem;">
+                            <img src="{{ p.user_profile }}" class="author-img" alt="profile">
+                            <div class="author-detail">
+                                <div class="nickname">{{ p.user_nickname }}</div>
+                                <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
+                            </div>
                         </div>
                     </div>
 
                     <h3 class="post-title">{{ p.title }}</h3>
                     <p class="post-desc">{{ p.content }}</p>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: auto;">
-                        등록일: {{ p.created_at }}
+
+                    <!-- 등록 일시 (시분초) 및 총 점수 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">
+                            {{ p.created_at }}
+                        </span>
+                        <div class="card-total-score">
+                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                        </div>
                     </div>
                 </div>
             </div>
