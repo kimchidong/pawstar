@@ -519,16 +519,13 @@ body.m-body {
     font-size: 0.95rem;
 }
 
-/* 내가 영향력을 반영한 경우에도 버튼 강조 스타일 표시 안함 */
-.action-btn.active {
-    background: #ffffff !important;
-    border: 1.5px solid var(--border-light) !important;
-    color: var(--text-secondary) !important;
-    font-weight: 700 !important;
-    box-shadow: none !important;
+/* 좋아요 active 상태 스타일 */
+.action-btn.btn-like.active {
+    background: #fff0f3 !important;
+    border-color: #f43f5e !important;
+    color: #e11d48 !important;
 }
-.action-btn.active i,
-.action-btn.active span {
-    color: var(--text-secondary) !important;
-    font-weight: 700 !important;
+.action-btn.btn-like.active i,
+.action-btn.btn-like.active span {
+    color: #e11d48 !important;
 }

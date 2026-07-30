@@ -162,15 +162,15 @@
                     <!-- 실시간 수치 현황 표시 영역 (단순 정보용) -->
                     <!-- 실시간 수치 현황 표시 영역 (내가 반영한 영향력 아이콘 컬러 커스텀) -->
                     <div class="card-actions detail-actions">
-                        <div class="action-btn btn-view" id="detailBtnView" title="조회수">
+                        <div class="action-btn btn-view" id="detailBtnView" title="조회수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'view');">
                             <i class="fa-regular fa-eye"></i>
                             <span class="view-count" id="detailViewCount">0</span>
                         </div>
-                        <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수">
+                        <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');">
                             <i class="fa-regular fa-heart"></i>
                             <span class="like-count" id="detailLikeCount">0</span>
                         </div>
-                        <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수">
+                        <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();">
                             <i class="fa-regular fa-comment"></i>
                             <span class="comment-count" id="detailCommentCount">0</span>
                         </div>

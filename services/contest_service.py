@@ -389,103 +389,63 @@ class PawStarService:
                     conn.close()
                     return {'success': False, 'message': '게시글이 존재하지 않습니다.'}
 
-                if user_id and p_row['USER_ID'] == user_id:
-                    conn.close()
-                    return {
-                        'success': False,
-                        'is_owner': True,
-                        'message': '본인의 게시물에는 점수 및 카운팅이 반영되지 않습니다.',
-                        'post_id': post_id,
-                        'new_score': p_row['SCORE'],
-                        'view_count': p_row['VIEW_COUNT'],
-                        'like_count': p_row['LIKE_COUNT'],
-                        'comment_count': p_row['COMMENT_COUNT'],
-                        'share_count': p_row['SHARE_COUNT']
-                    }
+
 
                 today_str = str(datetime.now().date())
-                v_delta, l_delta, c_delta, s_delta = 0, 0, 0, 0
+                v_cnt = p_row.get('VIEW_COUNT', 0) or 0
+                l_cnt = p_row.get('LIKE_COUNT', 0) or 0
+                c_cnt = p_row.get('COMMENT_COUNT', 0) or 0
+                s_cnt = p_row.get('SHARE_COUNT', 0) or 0
 
                 if event_type == 'view':
+                    v_cnt += 1
                     if user_id:
-                        cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
-                        v_cnt = cur.fetchone()['cnt']
-                        if v_cnt > 0:
-                            conn.close()
-                            return {
-                                'success': False,
-                                'already_viewed': True,
-                                'message': '이미 조회가 완료된 게시물입니다.',
-                                'post_id': post_id,
-                                'new_score': p_row['SCORE'],
-                                'view_count': p_row['VIEW_COUNT'],
-                                'like_count': p_row['LIKE_COUNT'],
-                                'comment_count': p_row['COMMENT_COUNT'],
-                                'share_count': p_row['SHARE_COUNT']
-                            }
-                        cur.execute("INSERT IGNORE INTO POST_VIEW_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
-                    v_delta = 1
+                        try:
+                            cur.execute("INSERT IGNORE INTO POST_VIEW_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                        except Exception:
+                            pass
 
                 elif event_type == 'like':
+                    l_cnt += 1
                     if user_id:
-                        cur.execute("INSERT IGNORE INTO POST_LIKE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
-                    l_delta = 1
+                        try:
+                            cur.execute("INSERT IGNORE INTO POST_LIKE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                        except Exception:
+                            pass
 
                 elif event_type == 'unlike':
+                    l_cnt = max(0, l_cnt - 1)
                     if user_id:
-                        cur.execute("DELETE FROM POST_LIKE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
-                    l_delta = -1
+                        try:
+                            cur.execute("DELETE FROM POST_LIKE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
+                        except Exception:
+                            pass
 
                 elif event_type == 'comment':
-                    c_delta = 1
+                    c_cnt += 1
 
                 elif event_type == 'share':
-                    if user_id:
-                        pass
-                    s_delta = 1
+                    s_cnt += 1
 
-                cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s", (post_id,))
-                db_v = cur.fetchone()['cnt']
-
-                cur.execute("SELECT COUNT(*) as cnt FROM POST_LIKE_LOG WHERE POST_ID = %s", (post_id,))
-                db_l = cur.fetchone()['cnt']
-
-                cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE POST_ID = %s", (post_id,))
-                db_c = cur.fetchone()['cnt']
-
-                db_s = cur.fetchone()['cnt']
-
-                final_v = max(p_row['VIEW_COUNT'], db_v)
-                final_l = max(0, db_l)
-                final_c = max(p_row['COMMENT_COUNT'], db_c)
-                final_s = max(p_row['SHARE_COUNT'], db_s)
-                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) 
+                final_score = (v_cnt * 1) + (l_cnt * 5) + (c_cnt * 10) + (s_cnt * 2)
 
                 cur.execute("""
                     UPDATE POST 
                     SET SCORE = %s, VIEW_COUNT = %s, LIKE_COUNT = %s, COMMENT_COUNT = %s, SHARE_COUNT = %s 
                     WHERE POST_ID = %s
-                """, (final_score, final_v, final_l, final_c, final_s, post_id))
-
-                cur.execute("""
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE 
-                        VIEW_COUNT = VIEW_COUNT + VALUES(VIEW_COUNT),
-                        LIKE_COUNT = LIKE_COUNT + VALUES(LIKE_COUNT),
-                        COMMENT_COUNT = COMMENT_COUNT + VALUES(COMMENT_COUNT),
-                        SHARE_COUNT = SHARE_COUNT + VALUES(SHARE_COUNT)
-                """, (post_id, today_str, max(0, v_delta), max(0, l_delta), max(0, c_delta), max(0, s_delta)))
+                """, (final_score, v_cnt, l_cnt, c_cnt, s_cnt, post_id))
 
                 conn.commit()
                 conn.close()
 
                 return {
+                    'success': True,
                     'post_id': post_id,
                     'new_score': final_score,
-                    'view_count': final_v,
-                    'like_count': final_l,
-                    'comment_count': final_c,
-                    'share_count': final_s
+                    'view_count': v_cnt,
+                    'like_count': l_cnt,
+                    'comment_count': c_cnt,
+                    'share_count': s_cnt
                 }
         except Exception as ex:
             print("trigger_event 100% DB error:", ex)
@@ -645,7 +605,7 @@ class PawStarService:
                 cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE POST_ID = %s", (post_id,))
                 db_c = cur.fetchone()['cnt']
 
-                db_s = cur.fetchone()['cnt']
+                db_s = p_row.get('SHARE_COUNT', 0)
 
                 final_v = max(p_row['VIEW_COUNT'], db_v)
                 final_l = max(0, db_l)

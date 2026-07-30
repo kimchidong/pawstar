@@ -447,18 +447,25 @@ function openDetailModal(post) {
 
     let isLiked = false;
 
-    if (heartIcon) {
-        heartIcon.className = 'fa-regular fa-heart';
-        heartIcon.style.color = '';
-    }
-
     fetch(`/api/post/user_actions/${post.post_id}`)
         .then(res => res.json())
         .then(data => {
             if (data && data.success && data.actions) {
                 const act = data.actions;
-                if (btnLike && act) {
-                    isLiked = act.is_liked;
+                if (act.is_liked) {
+                    isLiked = true;
+                    if (btnLike) btnLike.classList.add('active');
+                    if (heartIcon) {
+                        heartIcon.className = 'fa-solid fa-heart';
+                        heartIcon.style.color = '#e11d48';
+                    }
+                } else {
+                    isLiked = false;
+                    if (btnLike) btnLike.classList.remove('active');
+                    if (heartIcon) {
+                        heartIcon.className = 'fa-regular fa-heart';
+                        heartIcon.style.color = '';
+                    }
                 }
             }
         })
@@ -467,18 +474,29 @@ function openDetailModal(post) {
     const toggleLikeHandler = async () => {
         if (!isLiked) {
             const success = await triggerEvent(post.post_id, 'like');
-            if (success) {
+            if (success !== false) {
                 isLiked = true;
+                if (btnLike) btnLike.classList.add('active');
+                if (heartIcon) {
+                    heartIcon.className = 'fa-solid fa-heart';
+                    heartIcon.style.color = '#e11d48';
+                }
             }
         } else {
             const success = await triggerEvent(post.post_id, 'unlike');
-            if (success) {
+            if (success !== false) {
                 isLiked = false;
+                if (btnLike) btnLike.classList.remove('active');
+                if (heartIcon) {
+                    heartIcon.className = 'fa-regular fa-heart';
+                    heartIcon.style.color = '';
+                }
             }
         }
     };
 
     if (heartBtn) heartBtn.onclick = toggleLikeHandler;
+    if (btnLike) btnLike.onclick = toggleLikeHandler;
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -660,10 +678,37 @@ async function handleShareClick() {
     if (btnShare) btnShare.classList.add('active');
 }
 
+async function toggleLikeCard(btn, postId) {
+    if (!btn) return;
+    const icon = btn.querySelector('i');
+    const isLiked = icon ? icon.classList.contains('fa-solid') : btn.classList.contains('active');
+    
+    if (isLiked) {
+        const success = await triggerEvent(postId, 'unlike');
+        if (success !== false) {
+            btn.classList.remove('active');
+            if (icon) {
+                icon.className = 'fa-regular fa-heart';
+                icon.style.color = '';
+            }
+        }
+    } else {
+        const success = await triggerEvent(postId, 'like');
+        if (success !== false) {
+            btn.classList.add('active');
+            if (icon) {
+                icon.className = 'fa-solid fa-heart';
+                icon.style.color = '#e11d48';
+            }
+        }
+    }
+}
+
 // 전역 스코프 바인딩
 window.openDetailModal = openDetailModal;
 window.closeDetailModal = closeDetailModal;
 window.triggerEvent = triggerEvent;
+window.toggleLikeCard = toggleLikeCard;
 window.submitDetailComment = submitDetailComment;
 window.handleShareClick = handleShareClick;
 window.runAwardBatch = runAwardBatch;
