@@ -75,6 +75,21 @@ class PawStarService:
                             cur.execute("ALTER TABLE USER_BADGE ADD COLUMN CONTEST_ID INT NOT NULL AFTER USER_ID")
                         except Exception as alter_e:
                             print("USER_BADGE alter error:", alter_e)
+
+                cur.execute("SHOW COLUMNS FROM USERS LIKE 'LAST_LOGIN_AT'")
+                if not cur.fetchone():
+                    try:
+                        cur.execute("ALTER TABLE USERS ADD COLUMN LAST_LOGIN_AT DATETIME DEFAULT CURRENT_TIMESTAMP")
+                    except Exception as err_u1:
+                        print("USERS LAST_LOGIN_AT alter error:", err_u1)
+
+                cur.execute("SHOW COLUMNS FROM USERS LIKE 'LOGIN_COUNT'")
+                if not cur.fetchone():
+                    try:
+                        cur.execute("ALTER TABLE USERS ADD COLUMN LOGIN_COUNT INT DEFAULT 0")
+                    except Exception as err_u2:
+                        print("USERS LOGIN_COUNT alter error:", err_u2)
+
                 conn.commit()
             conn.close()
         except Exception as e:
@@ -899,15 +914,26 @@ class PawStarService:
                         random_nickname = default_name or f"{random.choice(prefix_list)}_{random.randint(1000, 9999)}"
                         bio = 'PawStar에서 반려동물과 행복한 일상을 나누고 있습니다 🐾'
                         cur.execute("""
-                            INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, BIO)
-                            VALUES (%s, %s, %s, %s)
+                            INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, BIO, LAST_LOGIN_AT, LOGIN_COUNT)
+                            VALUES (%s, %s, %s, %s, NOW(), 1)
                         """, (user_id, random_nickname, profile_img, bio))
                         conn.commit()
                         u = {'USER_ID': user_id, 'NICKNAME': random_nickname, 'PROFILE_IMG': profile_img, 'BIO': bio}
                     else:
                         if picture and picture.strip():
-                            cur.execute("UPDATE USERS SET PROFILE_IMG = %s WHERE USER_ID = %s", (profile_img, user_id))
-                            conn.commit()
+                            cur.execute("""
+                                UPDATE USERS 
+                                SET PROFILE_IMG = %s, LAST_LOGIN_AT = NOW(), LOGIN_COUNT = COALESCE(LOGIN_COUNT, 0) + 1 
+                                WHERE USER_ID = %s
+                            """, (profile_img, user_id))
+                        else:
+                            cur.execute("""
+                                UPDATE USERS 
+                                SET LAST_LOGIN_AT = NOW(), LOGIN_COUNT = COALESCE(LOGIN_COUNT, 0) + 1 
+                                WHERE USER_ID = %s
+                            """, (user_id,))
+                        conn.commit()
+                        if picture and picture.strip():
                             u['PROFILE_IMG'] = profile_img
                 conn.close()
                 return {
