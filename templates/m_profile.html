@@ -11,7 +11,6 @@
     </p>
 
     <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
-        <div><i class="fa-regular fa-calendar"></i> 가입/방문일: {{ user.joined_date or '2026-01-15' }}</div>
         {% if user.email %}
             <div style="background: #f1f5f9; color: #334155; padding: 0.25rem 0.7rem; border-radius: 14px; font-weight: 700; font-size: 0.78rem; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 연동 계정: {{ user.email }}

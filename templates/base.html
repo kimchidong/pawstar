@@ -312,7 +312,6 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
                     location.href = '/profile';
                 } else {
                     alert('Google 인증 실패: ' + data.message);

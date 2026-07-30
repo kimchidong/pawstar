@@ -32,7 +32,6 @@
             </p>
 
             <div style="display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
-                <span><i class="fa-regular fa-calendar"></i> 가입/방문일: {{ user.joined_date or '2026-01-15' }}</span>
                 {% if user.email %}
                     <span style="background: #f1f5f9; color: #334155; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 700; font-size: 0.82rem; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 연동 계정: {{ user.email }}

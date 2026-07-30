@@ -45,15 +45,12 @@
         if (isSuccess) {
             if (window.opener && !window.opener.closed) {
                 try {
-                    window.opener.alert(serverMessage || 'Google 계정으로 로그인되었습니다!');
                     window.opener.location.href = targetProfileUrl;
                     window.close();
                 } catch (e) {
-                    alert(serverMessage || 'Google 계정으로 로그인되었습니다!');
                     location.href = targetProfileUrl;
                 }
             } else {
-                alert(serverMessage || 'Google 계정으로 로그인되었습니다!');
                 location.href = targetProfileUrl;
             }
             return;
@@ -104,15 +101,12 @@
                 if (data && data.success) {
                     if (window.opener && !window.opener.closed) {
                         try {
-                            window.opener.alert(data.message);
                             window.opener.location.href = targetProfileUrl;
                             window.close();
                         } catch (e) {
-                            alert(data.message);
                             location.href = targetProfileUrl;
                         }
                     } else {
-                        alert(data.message);
                         location.href = targetProfileUrl;
                     }
                 } else {
