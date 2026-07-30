@@ -149,10 +149,6 @@
                         <i class="fa-{% if p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i>
                         <span class="comment-count">{{ p.comment_count }}</span>
                     </div>
-                    <div class="action-btn btn-share {% if p.actions and p.actions.is_shared %}active{% endif %}" title="공유">
-                        <i class="fa-solid fa-share-nodes"></i>
-                        <span class="share-count">{{ p.share_count }}</span>
-                    </div>
                 </div>
             </div>
         </div>

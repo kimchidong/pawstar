@@ -46,9 +46,7 @@ class PawStarService:
                         UNIQUE KEY uk_like_post_user (POST_ID, USER_ID)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                 """)
-                # 3. POST_SHARE_LOG
                 cur.execute("""
-                    CREATE TABLE IF NOT EXISTS POST_SHARE_LOG (
                         SHARE_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
                         POST_ID BIGINT NOT NULL,
                         USER_ID VARCHAR(50) NOT NULL,
@@ -420,7 +418,7 @@ class PawStarService:
 
                 elif event_type == 'share':
                     if user_id:
-                        cur.execute("INSERT IGNORE INTO POST_SHARE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                        pass
                     s_delta = 1
 
                 cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s", (post_id,))
@@ -432,14 +430,13 @@ class PawStarService:
                 cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE POST_ID = %s", (post_id,))
                 db_c = cur.fetchone()['cnt']
 
-                cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s", (post_id,))
                 db_s = cur.fetchone()['cnt']
 
                 final_v = max(p_row['VIEW_COUNT'], db_v)
                 final_l = max(0, db_l)
                 final_c = max(p_row['COMMENT_COUNT'], db_c)
                 final_s = max(p_row['SHARE_COUNT'], db_s)
-                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) + (final_s * 20)
+                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) 
 
                 cur.execute("""
                     UPDATE POST 
@@ -498,7 +495,6 @@ class PawStarService:
                     r_c = cur.fetchone()
                     if r_c and (r_c['cnt'] if isinstance(r_c, dict) else r_c[0]) > 0: is_commented = True
 
-                    cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
                     r_s = cur.fetchone()
                     if r_s and (r_s['cnt'] if isinstance(r_s, dict) else r_s[0]) > 0: is_shared = True
                 conn.close()
@@ -614,7 +610,7 @@ class PawStarService:
 
                 elif event_type == 'share':
                     if user_id:
-                        cur.execute("INSERT IGNORE INTO POST_SHARE_LOG (POST_ID, USER_ID) VALUES (%s, %s)", (post_id, user_id))
+                        pass
                     s_delta = 1
 
                 cur.execute("SELECT COUNT(*) as cnt FROM POST_VIEW_LOG WHERE POST_ID = %s", (post_id,))
@@ -626,14 +622,13 @@ class PawStarService:
                 cur.execute("SELECT COUNT(*) as cnt FROM post_comment WHERE POST_ID = %s", (post_id,))
                 db_c = cur.fetchone()['cnt']
 
-                cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s", (post_id,))
                 db_s = cur.fetchone()['cnt']
 
                 final_v = max(p_row['VIEW_COUNT'], db_v)
                 final_l = max(0, db_l)
                 final_c = max(p_row['COMMENT_COUNT'], db_c)
                 final_s = max(p_row['SHARE_COUNT'], db_s)
-                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) + (final_s * 20)
+                final_score = (final_v * 1) + (final_l * 5) + (final_c * 10) 
 
                 cur.execute("""
                     UPDATE POST 
@@ -692,7 +687,6 @@ class PawStarService:
                     r_c = cur.fetchone()
                     if r_c and (r_c['cnt'] if isinstance(r_c, dict) else r_c[0]) > 0: is_commented = True
 
-                    cur.execute("SELECT COUNT(*) as cnt FROM POST_SHARE_LOG WHERE POST_ID = %s AND USER_ID = %s", (post_id, user_id))
                     r_s = cur.fetchone()
                     if r_s and (r_s['cnt'] if isinstance(r_s, dict) else r_s[0]) > 0: is_shared = True
                 conn.close()

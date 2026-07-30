@@ -57,8 +57,8 @@ class Post:
         self.comment_count += comment_delta
         self.share_count += share_delta
         
-        # 이벤트 발생 시 score 계산: 조회+1, 좋아요+5, 댓글+10, 공유유입+20
-        delta_score = (view_delta * 1) + (like_delta * 5) + (comment_delta * 10) + (share_delta * 20)
+        # 이벤트 발생 시 score 계산: 조회+1, 좋아요+5, 댓글+10, 
+        delta_score = (view_delta * 1) + (like_delta * 5) + (comment_delta * 10) 
         self.score += delta_score
         return delta_score
 

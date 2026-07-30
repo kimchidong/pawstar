@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS POST (
     VIEW_COUNT INT DEFAULT 0,                  -- 조회 수 (+1)
     LIKE_COUNT INT DEFAULT 0,                  -- 좋아요 수 (+5)
     COMMENT_COUNT INT DEFAULT 0,               -- 댓글 수 (+10)
-    SHARE_COUNT INT DEFAULT 0,                 -- 공유 수 (+20)
+    SHARE_COUNT INT DEFAULT 0,                 -- 공유 수
     RANKING INT DEFAULT NULL,                  -- 대회 전체/당선 순위
     BADGE_ID INT DEFAULT NULL,                 -- 당선 배지 ID
     CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,

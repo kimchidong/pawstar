@@ -286,8 +286,7 @@ async function triggerEvent(postId, eventType) {
             const messages = {
                 'like': '❤️ 좋아요! (Score +5)',
                 'unlike': '🤍 좋아요 취소 (Score -5)',
-                'comment': '💬 댓글 작성 (Score +10)',
-                'share': '🚀 공유 유입 (Score +20)'
+                'comment': '💬 댓글 작성 (Score +10)'
             };
             if (messages[eventType]) {
                 showToast(`✨ ${messages[eventType]} 점수가 반영되었습니다!`);
