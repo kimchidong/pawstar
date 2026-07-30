@@ -39,10 +39,11 @@
 
                 <div style="flex: 1; min-width: 0;">
                     <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if w.award_type == 'SUPER_STAR' else ('#64748b' if w.award_type == 'RISING_STAR' else ('#b45309' if w.award_type == 'BRIGHT_STAR' else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem;">
-                        {% if w.award_type == 'SUPER_STAR' %}슈퍼 스타 (1위)
-                        {% elif w.award_type == 'RISING_STAR' %}라이징 스타 (2위)
-                        {% elif w.award_type == 'BRIGHT_STAR' %}브라이트 스타 (3위)
-                        {% else %}루키 스타 (하트 인기상)
+                        {% if w.award_type == 'SUPER_STAR' %}🥇 슈퍼 스타 (1위)
+                        {% elif w.award_type == 'RISING_STAR' %}🥈 라이징 스타 (2위)
+                        {% elif w.award_type == 'BRIGHT_STAR' %}🥉 브라이트 스타 (3위)
+                        {% elif 'ROOKIE' in w.award_type %}⭐ 루키 스타 (하트 인기상)
+                        {% else %}🏆 {{ w.prize_name }}
                         {% endif %}
                     </div>
                     <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">

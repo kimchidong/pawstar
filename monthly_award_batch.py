@@ -229,6 +229,28 @@ def run_monthly_award_batch():
                 awarded_count += 1
                 print(f"  [{award_label}] 순위: {rank_val}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 하트: {like_cnt}개 | 점수: {score}점 | BADGE_ID: {badge_id}")
 
+            # 3-2. 동물 종류별 1, 2, 3위 (강아지 1위, 고양이 1위, 햄스터 1위 등) 선정
+            categories = ['강아지', '고양이', '햄스터', '앵무새', '토끼']
+            for cat in categories:
+                cur.execute("""
+                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
+                    FROM POST
+                    WHERE CONTEST_ID = %s AND PET_TYPE LIKE %s
+                    ORDER BY SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC
+                    LIMIT 3
+                """, (contest_id, f"%{cat}%"))
+                cat_posts = cur.fetchall()
+                for idx, post in enumerate(cat_posts):
+                    rank_num = idx + 1
+                    award_type = f"CAT_{cat}_{rank_num}"
+                    award_label = f"{cat} {rank_num}위"
+                    cur.execute("""
+                        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE PRIZE_NAME = VALUES(PRIZE_NAME)
+                    """, (contest_id, post['POST_ID'], post['USER_ID'], award_type, award_label))
+                    print(f"  [{award_label}] 게시물 ID: {post['POST_ID']} | 반려동물: {post['PET_NAME']} | 점수: {post['SCORE']}점")
+
             # 4. 1~6위 당선작 외의 모든 남아있는 게시물 순위(RANKING) 순차 부여 (7위, 8위, ...)
             awarded_post_ids = star_post_ids + [p['POST_ID'] for p in rookie_posts]
             if awarded_post_ids:

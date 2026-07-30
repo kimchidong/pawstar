@@ -846,11 +846,96 @@ class PawStarService:
                 print("close_contest DB error:", e)
         return self.get_hall_of_fame(contest_id)
 
-    def get_hall_of_fame(self, contest_id=2):
+    def ensure_contest_winners(self, conn, contest_id):
+        """ 회차별 수상자 데이터(종합 1~3위, 루키 1~3위, 동물종류별 1~3위) 보장 """
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) as cnt FROM CONTEST_WINNER WHERE CONTEST_ID = %s", (contest_id,))
+                row = cur.fetchone()
+                if row and row['cnt'] > 0:
+                    return
+
+                # 1. 종합 1~3위 선정 (SCORE DESC, LIKE_COUNT DESC)
+                cur.execute("""
+                    SELECT POST_ID, USER_ID, PET_NAME, PET_TYPE, TITLE, SCORE, LIKE_COUNT
+                    FROM POST
+                    WHERE CONTEST_ID = %s
+                    ORDER BY SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC
+                    LIMIT 3
+                """, (contest_id,))
+                star_posts = cur.fetchall()
+
+                star_awards = [
+                    ('SUPER_STAR', '🥇 스타 1위 (슈퍼스타)'),
+                    ('RISING_STAR', '🥈 스타 2위 (라이징스타)'),
+                    ('BRIGHT_STAR', '🥉 스타 3위 (브라이트스타)')
+                ]
+
+                star_post_ids = []
+                for idx, post in enumerate(star_posts):
+                    award_type, prize_name = star_awards[idx]
+                    star_post_ids.append(post['POST_ID'])
+                    cur.execute("""
+                        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE PRIZE_NAME = VALUES(PRIZE_NAME)
+                    """, (contest_id, post['POST_ID'], post['USER_ID'], award_type, prize_name))
+
+                # 2. 루키 스타 3마리 (하트 순)
+                rookie_sql = "SELECT POST_ID, USER_ID, PET_NAME, PET_TYPE, TITLE, SCORE, LIKE_COUNT FROM POST WHERE CONTEST_ID = %s"
+                if star_post_ids:
+                    fmt = ','.join(['%s'] * len(star_post_ids))
+                    rookie_sql += f" AND POST_ID NOT IN ({fmt})"
+                rookie_sql += " ORDER BY LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC LIMIT 3"
+
+                args = [contest_id] + star_post_ids if star_post_ids else [contest_id]
+                cur.execute(rookie_sql, args)
+                rookie_posts = cur.fetchall()
+
+                rookie_awards = [
+                    ('ROOKIE_STAR_1', '⭐ 루키스타 1위'),
+                    ('ROOKIE_STAR_2', '⭐ 루키스타 2위'),
+                    ('ROOKIE_STAR_3', '⭐ 루키스타 3위')
+                ]
+                for idx, post in enumerate(rookie_posts):
+                    award_type, prize_name = rookie_awards[idx]
+                    cur.execute("""
+                        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
+                        VALUES (%s, %s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE PRIZE_NAME = VALUES(PRIZE_NAME)
+                    """, (contest_id, post['POST_ID'], post['USER_ID'], award_type, prize_name))
+
+                # 3. 동물 종류별 1, 2, 3위 (강아지 1위, 고양이 1위, 햄스터 1위, 앵무새 1위, 토끼 1위 등)
+                categories = ['강아지', '고양이', '햄스터', '앵무새', '토끼']
+                for cat in categories:
+                    cur.execute("""
+                        SELECT POST_ID, USER_ID, PET_NAME, PET_TYPE, TITLE, SCORE, LIKE_COUNT
+                        FROM POST
+                        WHERE CONTEST_ID = %s AND PET_TYPE LIKE %s
+                        ORDER BY SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC
+                        LIMIT 3
+                    """, (contest_id, f"%{cat}%"))
+                    cat_posts = cur.fetchall()
+                    for idx, post in enumerate(cat_posts):
+                        rank_num = idx + 1
+                        award_type = f"CAT_{cat}_{rank_num}"
+                        prize_name = f"{cat} {rank_num}위"
+                        cur.execute("""
+                            INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
+                            VALUES (%s, %s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE PRIZE_NAME = VALUES(PRIZE_NAME)
+                        """, (contest_id, post['POST_ID'], post['USER_ID'], award_type, prize_name))
+
+            conn.commit()
+        except Exception as e:
+            print(f"ensure_contest_winners error: {e}")
+
+    def get_hall_of_fame(self, contest_id=1):
         """ 100% MySQL DB Direct JOIN SELECT 명예의 전당 수상자 인출 """
         conn = self.get_db_connection()
         if not conn: return []
         try:
+            self.ensure_contest_winners(conn, int(contest_id))
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT 
@@ -878,7 +963,9 @@ class PawStarService:
                         WHEN w.AWARD_TYPE = 'SUPER_STAR' THEN 1
                         WHEN w.AWARD_TYPE = 'RISING_STAR' THEN 2
                         WHEN w.AWARD_TYPE = 'BRIGHT_STAR' THEN 3
-                        ELSE 4
+                        WHEN w.AWARD_TYPE LIKE 'ROOKIE_STAR%%' THEN 4
+                        WHEN w.AWARD_TYPE LIKE 'CAT_%%' THEN 5
+                        ELSE 6
                     END, p.SCORE DESC
                 """, (int(contest_id),))
                 rows = cur.fetchall()
