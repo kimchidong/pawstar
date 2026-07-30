@@ -31,98 +31,78 @@ def seed_database():
                       VALUES (%s, %s, %s, %s, %s)"""
         cur.executemany(sql_user, users_data)
 
-        # 2. Contests (1회 ~ 5회 역대 콘테스트)
+        # 2. Contests (1월~12월 각 월별 테마 콘테스트명과 멘트)
         contests_data = [
-            (1, '제1회 Paw Star 개막 콘테스트', 'Paw Star 대망의 개막 1회 콘테스트 🎉', '2026-03-01 00:00:00', '2026-03-31 23:59:59', 'CLOSED', ''),
-            (2, '제2회 Paw Star 댕냥이 콘테스트', '매일이 매력 폭발! 최고의 펫 스타를 가리는 콘테스트 🌟', '2026-04-01 00:00:00', '2026-04-30 23:59:59', 'CLOSED', ''),
-            (3, '제3회 Paw Star 썸머 펫 콘테스트', '무더위를 날려버릴 사랑스러운 반려동물 모여라 🌊', '2026-05-01 00:00:00', '2026-05-31 23:59:59', 'CLOSED', ''),
-            (4, '제4회 Paw Star 심쿵 자랑 콘테스트', '역대급 귀여움! 심장 폭격 반려동물 스타 선발전 💘', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'CLOSED', ''),
-            (5, '제5회 Paw Star 챔피언십 콘테스트', '세상에서 가장 사랑스러운 우리 아이의 심쿵 모먼트! 🌟 대한민국 대표 펫 스타에 도전하세요!', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'IN_PROGRESS', '')
+            (1, '제1회 새해 맞이 펫스타 콘테스트', '새해 복 많이 받아라냥! 2026년 첫 번째 펫 슈퍼스타에 도전하세요 🌅🐾', '2026-01-01 00:00:00', '2026-01-31 23:59:59', 'CLOSED', ''),
+            (2, '제2회 발렌타인 심쿵 콘테스트', '달콤함 폭발! 사르르 녹아내리는 우리 아이의 사랑스러운 심쿵 모먼트 🍫❤️', '2026-02-01 00:00:00', '2026-02-28 23:59:59', 'CLOSED', ''),
+            (3, '제3회 봄맞이 설렘 펫 콘테스트', '살랑살랑 봄바람 타고 찾아온 미소 천사 펫 스타 🌸🐝', '2026-03-01 00:00:00', '2026-03-31 23:59:59', 'CLOSED', ''),
+            (4, '제4회 벚꽃 피크닉 펫 챔피언십', '벚꽃 길 따라 화사하게 터지는 댕냥이들의 심쿵 피크닉 자랑 🌸🐕', '2026-04-01 00:00:00', '2026-04-30 23:59:59', 'CLOSED', ''),
+            (5, '제5회 가정의 달 펫 패밀리 콘테스트', '우리 집 보물 1호! 세상에서 가장 따뜻한 반려동물 가족의 순간 🏡💖', '2026-05-01 00:00:00', '2026-05-31 23:59:59', 'CLOSED', ''),
+            (6, '제6회 청량 힐링 펫 콘테스트', '초여름의 싱그러움 가득! 보는 것만으로 힐링되는 펫 스타 🌿🌊', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'CLOSED', ''),
+            (7, '제7회 썸머 파라다이스 펫 콘테스트', '세상에서 가장 사랑스러운 우리 아이의 심쿵 모먼트! 무더위를 싹 씻어줄 시원하고 러블리한 펫 스타 🌊🍦', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'IN_PROGRESS', ''),
+            (8, '제8회 한여름 밤의 바캉스 펫 챔피언십', '뜨거운 여름 열기보다 더 핫한 인플루언서 펫 축제 🏖️⭐', '2026-08-01 00:00:00', '2026-08-31 23:59:59', 'SCHEDULED', ''),
+            (9, '제9회 가을 풍요 펫 콘테스트', '마음까지 넉넉해지는 풍성한 가을 둥글둥글 귀요미들 🍂🌾', '2026-09-01 00:00:00', '2026-09-30 23:59:59', 'SCHEDULED', ''),
+            (10, '제10회 할로윈 펌킨 펫 스타전', '귀여운 유령 등장! 심장 멎는 큐트 할로윈 코스튬 파티 🎃👻', '2026-10-01 00:00:00', '2026-10-31 23:59:59', 'SCHEDULED', ''),
+            (11, '제11회 단풍 낭만 펫 콘테스트', '바스락 단풍잎과 함께 찾아온 감성 만점 댕냥이 라이프 🍁☕', '2026-11-01 00:00:00', '2026-11-30 23:59:59', 'SCHEDULED', ''),
+            (12, '제12회 홀리데이 크리스마스 펫 챔피언십', '메리 크리스마스! 산타 옷 입은 세상에서 가장 사랑스러운 선물 🎄🎁', '2026-12-01 00:00:00', '2026-12-31 23:59:59', 'SCHEDULED', '')
         ]
         sql_contest = """INSERT INTO CONTEST (CONTEST_ID, TITLE, DESCRIPTION, START_DATE, END_DATE, STATUS, BANNER_IMG)
                          VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_contest, contests_data)
 
-        # 3. Initial Posts (101~104)
-        sample_posts = [
-            (101, hash_id('user1'), 3, '뽀삐', '🐕 강아지', '웃는 모습이 너무 예쁜 우리 뽀삐 자랑해요!',
-             '오늘 잔디밭 산책 다녀왔는데 기분이 너무 좋은지 햇살 아래서 천사처럼 웃네요 💕 다들 뽀삐 웃음 보고 힐링하세요!',
-             'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80', 'IMAGE', 1580, 320, 112, 40, 15, '2026-07-10 14:20:00'),
-            (102, hash_id('user2'), 3, '나비', '🐈 고양이', '박스만 보면 일단 들어가고 보는 나비의 하루',
-             '택배 박스 뜯자마자 식빵 굽기 완성! 이 굴뚝같은 귀여움 어쩌죠? 🐾',
-             'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80', 'IMAGE', 1420, 410, 90, 32, 12, '2026-07-12 10:15:00'),
-            (103, hash_id('user3'), 3, '모찌', '🐹 햄스터', '볼따구에 해바라기씨 10개 저장 성공!',
-             '볼이 터질 것 같은 볼빵빵 모찌입니다. 귀여운 먹방 구경오세요~',
-             'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80', 'IMAGE', 1890, 590, 130, 45, 10, '2026-07-15 18:30:00'),
-            (104, hash_id('user4'), 3, '앵두', '🦜 앵무새', '주인 껌딱지 앵두의 헤드뱅잉 장기자랑',
-             '신나는 음악 틀어주면 박자에 맞춰서 날개를 흔드는 흥부자 앵두랍니다 🎶',
-             'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80', 'IMAGE', 1210, 260, 80, 25, 15, '2026-07-18 09:00:00')
-        ]
-
-        # 105 ~ 227 posts
+        # 3. Sample Posts Generation using D:\dev\pawstar\sample_image (sample_01.jpg ~ sample_20.jpg)
+        sample_images = [f"sample_{i:02d}.jpg" for i in range(1, 21)]
+        
         pet_templates = [
             ('🐕 강아지', ['뽀삐', '초코', '해피', '몽이', '두부', '코코', '마루', '보리', '망고', '콩이'], 
-             ['스마일 천사', '산책 대장', '개구쟁이 일상', '세상에서 제일 귀여운 점프', '간식 보고 눈 똥그래진 순간'],
-             ['https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=800&q=80',
-              'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
-              'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80']),
+             ['스마일 천사', '산책 대장', '개구쟁이 일상', '세상에서 제일 귀여운 점프', '간식 보고 눈 똥그래진 순간', '햇살 모닝 인사', '잔디밭 신나는 미소', '낮잠 부비부비']),
             ('🐈 고양이', ['나비', '야옹이', '치즈', '까망이', '루시', '미유', '네로', '쿠키', '라떼', '모카'],
-             ['식빵 굽기의 정석', '박스 사수 작전', '캣타워 정상 정복', '애교 폭발 순간', '골골송 라이브'],
-             ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
-              'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=800&q=80',
-              'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=800&q=80']),
-            ('🐹 햄스터', ['모찌', '볼빵이', '해바라기', '햄찌', '치즈볼', '모찌모찌'],
-             ['볼에 해바라기씨 20개 저장', '쳇바퀴 마라톤 선수', '쿨쿨 자는 모습', '야식 먹방 귀요미'],
-             ['https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&w=800&q=80']),
-            ('🦜 앵무새', ['앵두', '파랑이', '피코', '체리', '날개'],
-             ['노래 부르는 흥부자', '주인 어깨 위 껌딱지', '반짝이는 눈망울 자랑', '화려한 깃털 자랑'],
-             ['https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80']),
-            ('🐾 기타', ['토토', '바니', '거북이', '도마뱀'],
-             ['당근 맛나게 뇸뇸', '느림의 미학 힐링', '귀여운 일상 컷'],
-             ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=800&q=80'])
+             ['식빵 굽기의 정석', '박스 사수 작전', '캣타워 정상 정복', '애교 폭발 순간', '골골송 라이브', '햇살 캣닢 타임', '분홍 발바닥 젤리 자랑']),
+            ('🐹 햄스터', ['모찌', '볼빵이', '해바라기', '햄찌', '치즈볼', '모찌모찌', '모찌군'],
+             ['볼에 해바라기씨 20개 저장', '쳇바퀴 마라톤 선수', '쿨쿨 자는 모습', '야식 먹방 귀요미', '손바닥 위 오물오물']),
+            ('🦜 앵무새', ['앵두', '파랑이', '피코', '체리', '날개', '피치'],
+             ['노래 부르는 흥부자', '주인 어깨 위 껌딱지', '반짝이는 눈망울 자랑', '화려한 깃털 자랑', '헤드뱅잉 흥부자']),
+            ('🐾 기타', ['토토', '바니', '거북이', '도마뱀', '포동이'],
+             ['당근 맛나게 뇸뇸', '느림의 미학 힐링', '귀여운 일상 컷', '힐링 귀요미 순간'])
         ]
 
         user_ids = ['user1', 'user2', 'user3', 'user4']
-        all_posts = []
+        full_posts = []
 
-        for idx in range(105, 228):
-            p_type, p_names, p_titles, p_imgs = pet_templates[idx % len(pet_templates)]
-            p_name = p_names[idx % len(p_names)]
-            p_title_prefix = p_titles[idx % len(p_titles)]
-            u_id = user_ids[idx % len(user_ids)]
-            img_url = p_imgs[idx % len(p_imgs)]
-            contest_id_val = (idx % 5) + 1
-            
-            day_offset = (idx % 25) + 1
-            hour = (idx % 12) + 9
-            minute = (idx * 7) % 60
-            c_date = f"2026-07-{day_offset:02d} {hour:02d}:{minute:02d}:00"
-            
-            views = 100 + (idx * 17) % 800
-            likes = 20 + (idx * 11) % 200
-            comments = 5 + (idx * 3) % 50
-            shares = 1 + (idx * 2) % 20
-            calc_score = (views * 1) + (likes * 5) + (comments * 10) + (shares * 20)
+        post_id_counter = 101
 
-            all_posts.append((
-                idx, hash_id(u_id), contest_id_val, p_name, p_type,
-                f"{p_name}의 {p_title_prefix}! ({idx}호)",
-                f"안녕하세요! 귀여운 {p_name}의 일상 자랑입니다. 많이 많이 응원해주세요 🐾",
-                '/static/image/paw/2026/07/', f'3-{idx}_list.webp', f'3-{idx}_popup.webp',
-                'IMAGE', calc_score, views, likes, comments, shares, c_date
-            ))
+        # 1회~7회 콘테스트 포스트 생성 (각 회차당 20개씩)
+        for contest_id_val in range(1, 8):
+            for i in range(20):
+                pid = post_id_counter
+                post_id_counter += 1
 
-        # initial posts 101~104 format adjust
-        fixed_sample_posts = []
-        for sp in sample_posts:
-            pid = sp[0]
-            fixed_sample_posts.append((
-                sp[0], sp[1], sp[2], sp[3], sp[4], sp[5], sp[6],
-                '/static/image/paw/2026/07/', f'3-{pid}_list.webp', f'3-{pid}_popup.webp',
-                sp[8], sp[9], sp[10], sp[11], sp[12], sp[13], sp[14]
-            ))
+                p_type, p_names, p_titles = pet_templates[(pid + i) % len(pet_templates)]
+                p_name = p_names[(pid + i) % len(p_names)]
+                p_title_prefix = p_titles[(pid + i) % len(p_titles)]
+                u_id = user_ids[(pid + i) % len(user_ids)]
+                
+                img_name = sample_images[(pid - 101) % len(sample_images)]
 
-        full_posts = fixed_sample_posts + all_posts
+                month_str = f"{contest_id_val:02d}"
+                day_offset = (i % 25) + 1
+                hour = (i % 12) + 9
+                minute = (pid * 7) % 60
+                c_date = f"2026-{month_str}-{day_offset:02d} {hour:02d}:{minute:02d}:00"
+
+                views = 150 + (pid * 19) % 1200
+                likes = 30 + (pid * 13) % 450
+                comments = 8 + (pid * 5) % 90
+                shares = 2 + (pid * 3) % 35
+                calc_score = (views * 1) + (likes * 5) + (comments * 10) + (shares * 20)
+
+                full_posts.append((
+                    pid, hash_id(u_id), contest_id_val, p_name, p_type,
+                    f"[{contest_id_val}회] {p_name}의 {p_title_prefix}!",
+                    f"안녕하세요! {contest_id_val}회 Paw Star 콘테스트 참가작 {p_name}의 일상 자랑입니다 💕 예쁘게 봐주시고 응원 투표 부탁드려요 🐾",
+                    '/static/sample_image/', img_name, img_name,
+                    'IMAGE', calc_score, views, likes, comments, shares, c_date
+                ))
 
         sql_post = """INSERT INTO POST (POST_ID, USER_ID, CONTEST_ID, PET_NAME, PET_TYPE, TITLE, CONTENT, FILE_PATH, LIST_FILE_NAME, POPUP_FILE_NAME, MEDIA_TYPE, SCORE, VIEW_COUNT, LIKE_COUNT, COMMENT_COUNT, SHARE_COUNT, CREATED_AT)
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
@@ -133,7 +113,7 @@ def seed_database():
         daily_stats = []
         for post in full_posts:
             post_id = post[0]
-            for i in range(30):
+            for i in range(15):
                 stat_date = str(today - timedelta(days=i))
                 v = random.randint(5, 30)
                 l = random.randint(1, 10)
@@ -145,48 +125,19 @@ def seed_database():
                       VALUES (%s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_stat, daily_stats)
 
-        # 5. Contest Winners (역대 1회~5회 선정된 수상자 풍부한 데이터 총 30개)
-        winners_data = [
-            # 제5회 콘테스트 (6개)
-            (5, 113, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
-            (5, 114, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
-            (5, 115, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
-            (5, 116, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
-            (5, 117, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
-            (5, 118, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
-
-            # 제4회 콘테스트 (6개)
-            (4, 107, hash_id('user3'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
-            (4, 108, hash_id('user4'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
-            (4, 109, hash_id('user1'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
-            (4, 110, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
-            (4, 111, hash_id('user3'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
-            (4, 112, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
-
-            # 제3회 콘테스트 (6개)
-            (3, 105, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
-            (3, 106, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
-            (3, 119, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
-            (3, 120, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
-            (3, 121, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
-            (3, 122, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
-
-            # 제2회 콘테스트 (6개)
-            (2, 102, hash_id('user2'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
-            (2, 101, hash_id('user1'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
-            (2, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
-            (2, 104, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
-            (2, 123, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
-            (2, 124, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상'),
-
-            # 제1회 콘테스트 (6개)
-            (1, 101, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
-            (1, 102, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
-            (1, 103, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
-            (1, 125, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
-            (1, 126, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
-            (1, 127, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상')
-        ]
+        # 5. Contest Winners (종료된 1회~6회 수상자 데이터)
+        winners_data = []
+        # 1회: post 101~120, 2회: 121~140, 3회: 141~160, 4회: 161~180, 5회: 181~200, 6회: 201~220
+        for c_id in range(1, 7):
+            base_p = 101 + (c_id - 1) * 20
+            winners_data.extend([
+                (c_id, base_p + 0, hash_id('user1'), 'SUPER_STAR', '🥇 Paw Star 골드 트로피'),
+                (c_id, base_p + 1, hash_id('user2'), 'RISING_STAR', '🥈 Paw Star 실버 트로피'),
+                (c_id, base_p + 2, hash_id('user3'), 'BRIGHT_STAR', '🥉 Paw Star 브론즈 트로피'),
+                (c_id, base_p + 3, hash_id('user4'), 'ROOKIE_STAR', '⭐ 루키 스타 1위 특별상'),
+                (c_id, base_p + 4, hash_id('user1'), 'ROOKIE_STAR', '⭐ 루키 스타 2위 특별상'),
+                (c_id, base_p + 5, hash_id('user2'), 'ROOKIE_STAR', '⭐ 루키 스타 3위 특별상')
+            ])
         sql_winner = """INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
                         VALUES (%s, %s, %s, %s, %s)"""
         cur.executemany(sql_winner, winners_data)

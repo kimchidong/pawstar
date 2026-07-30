@@ -417,7 +417,7 @@ def index():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_index', **request.args))
 
-    contest_id = request.args.get('contest_id', 3, type=int)
+    contest_id = request.args.get('contest_id', 7, type=int)
     sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
@@ -471,7 +471,7 @@ def trending():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_trending', **request.args))
 
-    contest_id = request.args.get('contest_id', 3, type=int)
+    contest_id = request.args.get('contest_id', 7, type=int)
     page = request.args.get('page', 1, type=int)
     current_user_id = get_current_user_id()
     paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
@@ -506,7 +506,7 @@ def profile():
 @app.route('/m/')
 @app.route('/m')
 def m_index():
-    contest_id = request.args.get('contest_id', 3, type=int)
+    contest_id = request.args.get('contest_id', 7, type=int)
     sort_type = request.args.get('sort', 'latest')
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
@@ -552,7 +552,7 @@ def m_hall_of_fame():
 
 @app.route('/m/trending')
 def m_trending():
-    contest_id = request.args.get('contest_id', 3, type=int)
+    contest_id = request.args.get('contest_id', 7, type=int)
     page = request.args.get('page', 1, type=int)
     current_user_id = get_current_user_id()
     paginated_res = service.get_posts(contest_id=contest_id, sort_type='trending', page=page, per_page=10, user_id=current_user_id)
@@ -620,10 +620,10 @@ def save_uploaded_media(file):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
     contests = service.get_contests()
-    current_contest = next((c for c in contests if c.get('status') == '진행중'), contests[0] if contests else None)
+    current_contest = next((c for c in contests if c.get('status') in ['진행중', 'IN_PROGRESS']), contests[0] if contests else None)
     
     if request.method == 'POST':
-        contest_id = current_contest['contest_id'] if current_contest else 3
+        contest_id = current_contest['contest_id'] if current_contest else 7
         user_id = session.get('user_id') or 'user1'
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')
@@ -650,10 +650,10 @@ def upload_page():
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
     contests = service.get_contests()
-    current_contest = next((c for c in contests if c.get('status') == '진행중'), contests[0] if contests else None)
+    current_contest = next((c for c in contests if c.get('status') in ['진행중', 'IN_PROGRESS']), contests[0] if contests else None)
 
     if request.method == 'POST':
-        contest_id = current_contest['contest_id'] if current_contest else 3
+        contest_id = current_contest['contest_id'] if current_contest else 7
         user_id = session.get('user_id') or 'user1'
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')

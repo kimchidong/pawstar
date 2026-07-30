@@ -166,14 +166,14 @@ class PawStarService:
             contest['d_day'] = 5
             contest['d_day_str'] = "D-5"
 
-        # status 맵핑 (영문 코드를 직관적인 한글 상태 뱃지로 변환)
+        # status 맵핑 (영문 코드를 한글 상태 뱃지로 변환)
         st = contest.get('status', 'IN_PROGRESS')
-        if st in ['IN_PROGRESS', '진행중']:
-            contest['status'] = '🔥 진행중'
-        elif st in ['SCHEDULED', '예정']:
-            contest['status'] = '📅 예정'
-        elif st in ['CLOSED', '종료']:
-            contest['status'] = '🏁 종료'
+        if st in ['IN_PROGRESS', '진행중', '🔥 진행중']:
+            contest['status'] = '진행중'
+        elif st in ['SCHEDULED', '예정', '📅 예정']:
+            contest['status'] = '예정'
+        elif st in ['CLOSED', '종료', '🏁 종료']:
+            contest['status'] = '종료'
 
         return contest
 
