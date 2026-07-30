@@ -91,8 +91,11 @@
         <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
             <i class="fa-solid fa-clock"></i> 최신등록순
         </a>
+        <a href="?contest_id={{ current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'score' }}">
+            <i class="fa-solid fa-star"></i> 종합순위순
+        </a>
         <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
-            <i class="fa-solid fa-fire"></i> 인기순
+            <i class="fa-solid fa-heart"></i> 하트인기순
         </a>
     </div>
 </div>

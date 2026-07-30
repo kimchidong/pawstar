@@ -292,8 +292,10 @@ class PawStarService:
                     q_param = f"%{search_query}%"
                     params.extend([q_param, q_param, q_param])
 
-                if sort_type in ['popular', 'trending']:
-                    sql += " ORDER BY p.SCORE DESC, p.POST_ID DESC"
+                if sort_type == 'popular':
+                    sql += " ORDER BY p.LIKE_COUNT DESC, p.SCORE DESC, p.POST_ID DESC"
+                elif sort_type == 'score':
+                    sql += " ORDER BY p.SCORE DESC, p.LIKE_COUNT DESC, p.POST_ID DESC"
                 else:
                     sql += " ORDER BY p.POST_ID DESC"
 
