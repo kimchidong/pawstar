@@ -24,8 +24,8 @@ class Contest:
         return {
             'contest_id': self.contest_id,
             'title': self.title,
-            'start_date': str(self.start_date),
-            'end_date': str(self.end_date),
+            'start_date': str(self.start_date)[:10] if self.start_date else '',
+            'end_date': str(self.end_date)[:10] if self.end_date else '',
             'status': self.status,
             'description': self.description,
             'banner_img': self.banner_img

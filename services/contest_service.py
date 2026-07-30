@@ -136,7 +136,14 @@ class PawStarService:
             return contest
         try:
             from datetime import date, datetime
+            raw_start = contest.get('start_date')
             raw_end = contest.get('end_date') or contest.get('start_date')
+
+            if raw_start:
+                contest['start_date'] = str(raw_start)[:10]
+            if raw_end:
+                contest['end_date'] = str(raw_end)[:10]
+
             if isinstance(raw_end, datetime):
                 end_date = raw_end.date()
             elif isinstance(raw_end, date):

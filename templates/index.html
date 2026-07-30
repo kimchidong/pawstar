@@ -34,11 +34,11 @@
             <div class="contest-time-grid">
                 <div class="time-box">
                     <span class="time-label"><i class="fa-regular fa-calendar-check"></i> 시작일</span>
-                    <span class="time-val">{{ current_contest.start_date }}</span>
+                    <span class="time-val">{{ (current_contest.start_date|string)[:10] }}</span>
                 </div>
                 <div class="time-box">
                     <span class="time-label"><i class="fa-regular fa-calendar-xmark"></i> 종료일</span>
-                    <span class="time-val">{{ current_contest.end_date }}</span>
+                    <span class="time-val">{{ (current_contest.end_date|string)[:10] }}</span>
                 </div>
             </div>
 
