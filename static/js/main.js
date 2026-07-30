@@ -688,14 +688,14 @@ async function handleShareClick() {
                         btnLike.classList.add('active');
                         if (heartIcon) {
                             heartIcon.className = 'fa-solid fa-heart';
-                            heartIcon.style.color = '#e11d48';
+                            heartIcon.style.color = '';
                         }
                     } else {
                         isLiked = false;
                         btnLike.classList.remove('active');
                         if (heartIcon) {
                             heartIcon.className = 'fa-regular fa-heart';
-                            heartIcon.style.color = '#f43f5e';
+                            heartIcon.style.color = '';
                         }
                     }
                 }
