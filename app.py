@@ -796,10 +796,9 @@ def get_post_liked_status(post_id):
 
 def process_paw_images_dual(src_file_or_path, contest_id, post_id):
     """
-    1. 임시 경로(static/image/temp/paw/)를 거쳐
-    2. 영구 폴더 /static/image/paw/YYYY/MM/ 생성
-    3. 목록용 파일(3-101_list.webp) 및 팝업용 파일(3-101_popup.webp) 2개 생성
-    4. 임시 파일 삭제 후 (file_path, list_file_name, popup_file_name) 반환
+    1. 임시 폴더 : static/image/temp/paw
+    2. 저장 폴더 : static/image/paw/yyyy/mm
+    3. 파일명 : contest_id-post_id.webp
     """
     now = datetime.datetime.now()
     yyyy = now.strftime('%Y')
@@ -809,11 +808,11 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
     perm_dir = os.path.join(PERM_PAW_BASE_DIR, yyyy, mm)
     os.makedirs(perm_dir, exist_ok=True)
 
-    list_file_name = f"{contest_id}-{post_id}_list.webp"
-    popup_file_name = f"{contest_id}-{post_id}_popup.webp"
+    file_name = f"{contest_id}-{post_id}.webp"
+    list_file_name = file_name
+    popup_file_name = file_name
 
-    perm_list_path = os.path.join(perm_dir, list_file_name)
-    perm_popup_path = os.path.join(perm_dir, popup_file_name)
+    perm_file_path = os.path.join(perm_dir, file_name)
 
     temp_filepath = None
     src_img_path = None
@@ -839,17 +838,12 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
                 else:
                     img_base = img.convert('RGB')
                 
-                # 팝업용 고화질 WebP (1000px)
-                img_popup = img_base.copy()
-                img_popup.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
-                img_popup.save(perm_popup_path, 'WEBP', quality=90)
-
-                # 목록용 썸네일 WebP (500px)
-                img_list = img_base.copy()
-                img_list.thumbnail((500, 500), Image.Resampling.LANCZOS)
-                img_list.save(perm_list_path, 'WEBP', quality=85)
+                # contest_id-post_id.webp 저장
+                img_conv = img_base.copy()
+                img_conv.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
+                img_conv.save(perm_file_path, 'WEBP', quality=90)
     except Exception as e:
-        print("Dual WebP 생성 중 오류:", e)
+        print("WebP 이미지 생성 중 오류:", e)
     finally:
         if temp_filepath and os.path.exists(temp_filepath):
             try:
