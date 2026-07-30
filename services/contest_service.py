@@ -131,6 +131,26 @@ class PawStarService:
             print("get_contest error:", e)
             return None
 
+    def get_current_contest(self):
+        """ 100% DB 현재 진행 중인(IN_PROGRESS) 콘테스트 회차 반환 """
+        conn = self.get_db_connection()
+        if not conn:
+            return None
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT CONTEST_ID as contest_id, TITLE as title, START_DATE as start_date, END_DATE as end_date, STATUS as status, DESCRIPTION as description FROM CONTEST WHERE STATUS = 'IN_PROGRESS' ORDER BY CONTEST_ID ASC LIMIT 1")
+                r = cur.fetchone()
+                if not r:
+                    cur.execute("SELECT CONTEST_ID as contest_id, TITLE as title, START_DATE as start_date, END_DATE as end_date, STATUS as status, DESCRIPTION as description FROM CONTEST ORDER BY CONTEST_ID ASC LIMIT 1")
+                    r = cur.fetchone()
+                conn.close()
+                if r:
+                    return self._attach_d_day(r)
+                return None
+        except Exception as e:
+            print("get_current_contest error:", e)
+            return None
+
     def _attach_d_day(self, contest):
         if not contest:
             return contest

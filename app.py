@@ -586,7 +586,7 @@ def save_uploaded_media(file):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
     contests = service.get_contests()
-    current_contest = next((c for c in contests if c.get('status') in ['진행중', 'IN_PROGRESS']), contests[0] if contests else None)
+    current_contest = service.get_current_contest() or (contests[0] if contests else None)
     
     if request.method == 'POST':
         contest_id = current_contest['contest_id'] if current_contest else 1
@@ -616,7 +616,7 @@ def upload_page():
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
     contests = service.get_contests()
-    current_contest = next((c for c in contests if c.get('status') in ['진행중', 'IN_PROGRESS']), contests[0] if contests else None)
+    current_contest = service.get_current_contest() or (contests[0] if contests else None)
 
     if request.method == 'POST':
         contest_id = current_contest['contest_id'] if current_contest else 1
