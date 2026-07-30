@@ -56,9 +56,11 @@
     <div class="filter-left-group">
         <select id="contestSelect" class="select-custom" title="콘테스트 회차 선택">
             {% for c in contests %}
-                <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
-                    {{ c.title }} ({{ c.status }})
-                </option>
+                {% if '예정' not in c.status and c.status != 'SCHEDULED' %}
+                    <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
+                        {{ c.title }} ({{ c.status }})
+                    </option>
+                {% endif %}
             {% endfor %}
         </select>
 
