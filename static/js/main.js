@@ -389,7 +389,7 @@ function openDetailModal(post) {
     if (contentEl) contentEl.textContent = post.content || '';
 
     const createdAtEl = document.getElementById('detailCreatedAt');
-    if (createdAtEl) createdAtEl.textContent = `등록일: ${post.created_at || '2026-07-28'}`;
+    if (createdAtEl) createdAtEl.textContent = post.created_at || '2026-07-28 00:00:00';
 
     const viewCountEl = document.getElementById('detailViewCount');
     if (viewCountEl) viewCountEl.textContent = post.view_count || 0;

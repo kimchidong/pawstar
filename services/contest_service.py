@@ -315,7 +315,7 @@ class PawStarService:
                         p.LIKE_COUNT as like_count,
                         p.COMMENT_COUNT as comment_count,
                         p.SHARE_COUNT as share_count,
-                        DATE_FORMAT(p.CREATED_AT, '%%Y-%%m-%%d %%H:%%i') as created_at,
+                        DATE_FORMAT(p.CREATED_AT, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at,
                         COALESCE(u.NICKNAME, '집사') as user_nickname,
                         COALESCE(u.PROFILE_IMG, '/static/image/profile/default_profile.png') as user_profile
                     FROM POST p
@@ -963,7 +963,7 @@ class PawStarService:
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT comment_id, post_id, user_id, user_nickname, user_profile, content,
-                           DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as created_at
+                           DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at
                     FROM post_comment
                     WHERE post_id = %s
                     ORDER BY created_at ASC
