@@ -19,3 +19,6 @@ git push -f origin main
 
 --
 
+# 수상 당선 배치
+0 0 1 * * /usr/bin/python3 /d/dev/workspace1/pawstar/monthly_award_batch.py >> /d/dev/workspace1/pawstar/batch.log 2>&1
+
