@@ -41,7 +41,7 @@
                             {{ current_user.nickname }}
                         </a>
                     {% else %}
-                        <a href="javascript:void(0);" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
+                        <a href="/auth/google" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
                             <i class="fa-solid fa-right-to-bracket"></i> 로그인
                         </a>
                     {% endif %}
@@ -331,7 +331,7 @@
                     email: email,
                     name: email.split('@')[0]
                 });
-            });
+            window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
         }
     });
     </script>

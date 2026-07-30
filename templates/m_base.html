@@ -52,7 +52,7 @@
                 <span>{{ current_user.nickname }}</span>
             </a>
         {% else %}
-            <a href="javascript:void(0);" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
+            <a href="/auth/google" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 <span>로그인</span>
             </a>
@@ -324,7 +324,7 @@
                         location.href = '/m/profile';
                     }
                 });
-            });
+        window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
         }
     });
     </script>

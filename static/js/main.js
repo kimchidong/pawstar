@@ -186,8 +186,7 @@ async function triggerEvent(postId, eventType) {
 
             if (res.require_login) {
                 showToast(res.message || '로그인이 필요한 서비스입니다.', 'warning');
-                const googleModal = document.getElementById('googleAuthModal');
-                if (googleModal) googleModal.classList.add('show');
+                window.location.href = '/auth/google';
             } else if (res.is_owner) {
                 // 본인 게시물일 경우 알림창을 띄우지 않고 조용히 기능만 제어
                 return false;
@@ -664,6 +663,200 @@ function submitDetailComment() {
 async function handleShareClick() {
     if (!window.currentDetailPostId) return;
     const btnShare = document.getElementById('detailBtnShare');
+    fetch(`/api/post/user_actions/${post.post_id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success && data.actions) {
+                const act = data.actions;
+                const btnView = document.getElementById('detailBtnView');
+                const btnLike = document.getElementById('detailBtnLike');
+                const btnComment = document.getElementById('detailBtnComment');
+                const btnShare = document.getElementById('detailBtnShare');
+
+                // 1. 조회수 버튼 (내가 조회 반영한 경우)
+                if (btnView) {
+                    btnView.classList.add('active'); // 모달을 연 순간 조회가 반영되므로 active 컬러 표시
+                }
+                // 2. 좋아요 버튼 (내가 좋아요 반영한 경우)
+                if (btnLike) {
+                    if (act.is_liked) {
+                        isLiked = true;
+                        btnLike.classList.add('active');
+                        if (heartIcon) {
+                            heartIcon.className = 'fa-solid fa-heart';
+                            heartIcon.style.color = '#e11d48';
+                        }
+                    } else {
+                        isLiked = false;
+                        btnLike.classList.remove('active');
+                        if (heartIcon) {
+                            heartIcon.className = 'fa-regular fa-heart';
+                            heartIcon.style.color = '#f43f5e';
+                        }
+                    }
+                }
+                // 3. 댓글 버튼 (내가 댓글 작성을 반영한 경우)
+                if (btnComment) {
+                    if (act.is_commented) btnComment.classList.add('active');
+                    else btnComment.classList.remove('active');
+                }
+                // 4. 공유 버튼 (내가 공유를 반영한 경우)
+                if (btnShare) {
+                    if (act.is_shared) btnShare.classList.add('active');
+                    else btnShare.classList.remove('active');
+                }
+            }
+        })
+        .catch(err => console.error(err));
+
+    const toggleLikeHandler = async () => {
+        if (!isLiked) {
+            const success = await triggerEvent(post.post_id, 'like');
+            if (success) {
+                isLiked = true;
+                if (heartIcon) {
+                    heartIcon.className = 'fa-solid fa-heart';
+                    heartIcon.style.color = '#e11d48';
+                }
+                if (btnLike) btnLike.classList.add('active');
+            }
+        } else {
+            const success = await triggerEvent(post.post_id, 'unlike');
+            if (success) {
+                isLiked = false;
+                if (heartIcon) {
+                    heartIcon.className = 'fa-regular fa-heart';
+                    heartIcon.style.color = '#f43f5e';
+                }
+                if (btnLike) btnLike.classList.remove('active');
+            }
+        }
+    };
+
+    if (heartBtn) heartBtn.onclick = toggleLikeHandler;
+
+
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('postDetailModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * 댓글 목록 로드 및 렌더링
+ */
+function loadComments(postId) {
+    fetch(`/api/comments/${postId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderDetailComments(data.comments);
+                const count = data.comments ? data.comments.length : 0;
+                const commentCountEl = document.getElementById('detailCommentCount');
+                if (commentCountEl) commentCountEl.textContent = count;
+                
+                const card = document.getElementById(`post-card-${postId}`);
+                if (card) {
+                    const cardComment = card.querySelector('.comment-count');
+                    if (cardComment) cardComment.textContent = count;
+                }
+            }
+        })
+        .catch(err => console.error('댓글 로드 실패:', err));
+}
+
+function renderDetailComments(comments) {
+    const listEl = document.getElementById('detailCommentList');
+    const headerCountEl = document.getElementById('detailCommentHeaderCount');
+    if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
+    
+    if (!listEl) return;
+    if (!comments || comments.length === 0) {
+        listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.75rem 0;">첫 한줄 댓글의 주인공이 되어보세요! 💬</div>';
+        return;
+    }
+    
+    listEl.innerHTML = comments.map(c => `
+        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 800; color: var(--text-primary);">
+                    <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
+                    <span>${escapeHtml(c.user_nickname || '집사')}</span>
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at || ''}</span>
+            </div>
+            <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.4rem;">
+                ${escapeHtml(c.content)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function submitDetailComment() {
+    const inputEl = document.getElementById('detailCommentInput');
+    if (!inputEl || !window.currentDetailPostId) return;
+    const content = inputEl.value.trim();
+    if (!content) {
+        showToast('댓글 내용을 입력해주세요.', 'warning');
+        return;
+    }
+    
+    fetch(`/api/comments/${window.currentDetailPostId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            showToast(data.message || '댓글 작성 실패', 'warning');
+            if (data.require_login) {
+                const googleModal = document.getElementById('googleAuthModal');
+                if (googleModal) googleModal.classList.add('show');
+            }
+            return;
+        }
+        
+        inputEl.value = '';
+        showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
+        const btnComment = document.getElementById('detailBtnComment');
+        if (btnComment) {
+            btnComment.classList.add('active');
+            const icon = btnComment.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-comment';
+        }
+        loadComments(window.currentDetailPostId);
+        
+        if (data.event_res) {
+            const scoreEl = document.getElementById('detailScoreNum');
+            const commentEl = document.getElementById('detailCommentCount');
+            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+            if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
+            
+            const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
+            if (card) {
+                const cardScore = card.querySelector('.score-num');
+                const cardComment = card.querySelector('.comment-count');
+                if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
+                if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
+            }
+        }
+    })
+    .catch(err => {
+        console.error('댓글 작성 오류:', err);
+        showToast('댓글 등록 중 오류가 발생했습니다.', 'error');
+    });
+}
+
+async function handleShareClick() {
+    if (!window.currentDetailPostId) return;
+    const btnShare = document.getElementById('detailBtnShare');
     const success = await triggerEvent(window.currentDetailPostId, 'share');
     if (btnShare) btnShare.classList.add('active');
 }
@@ -675,3 +868,31 @@ window.triggerEvent = triggerEvent;
 window.submitDetailComment = submitDetailComment;
 window.handleShareClick = handleShareClick;
 window.runAwardBatch = runAwardBatch;
+
+// 출전 신청 및 로그인 필요 기능 가드
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. URL login_required 쿼리 감지 시 로그인 유도 토스트 및 모달 표시
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login_required') === 'true') {
+        showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        const googleModal = document.getElementById('googleAuthModal') || document.getElementById('mGoogleAuthModal');
+        if (googleModal) googleModal.classList.add('show');
+    }
+
+    // 2. 모든 출전 신청 링크/버튼 클릭 시 비로그인이면 즉시 로그인 모달 팝업 표출
+    const uploadLinks = document.querySelectorAll('a[href="/upload"], a[href="/m/upload"], .btn-hero-cta');
+    uploadLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!window.isUserLoggedIn) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = '/auth/google';
+            }
+        });
+    });
+});
+
+function openGoogleLoginModal() {
+    window.location.href = '/auth/google';
+}
+window.openGoogleLoginModal = openGoogleLoginModal;

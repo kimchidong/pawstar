@@ -585,6 +585,12 @@ def save_uploaded_media(file):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
+    user_id = session.get('user_id')
+    if not user_id:
+        if request.method == 'POST' or request.is_json:
+            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
+        return redirect('/auth/google')
+
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
     
@@ -615,6 +621,12 @@ def upload_page():
 
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
+    user_id = session.get('user_id')
+    if not user_id:
+        if request.method == 'POST' or request.is_json:
+            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
+        return redirect('/auth/google')
+
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
 
@@ -696,6 +708,9 @@ def upload_profile():
 # 4-2. 프로필 수정 API
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
     data = request.json or {}
     user_id = data.get('user_id', 'user1')
     nickname = data.get('nickname')
@@ -714,11 +729,15 @@ def admin():
 
 @app.route('/api/post/event', methods=['POST'])
 def post_event():
-    """ 실시간 점수 증가 API (조회 +1, 좋아요 +5, 댓글 +10, 공유 +20) """
+    """ 실시간 점수 증가 API (조회 +1, 좋아요 +5, 댓글 +10) """
     try:
         data = request.get_json() or {}
         post_id = data.get('post_id')
-        event_type = data.get('event_type') # view, like, comment, share
+        event_type = data.get('event_type') # view, like, comment
+        user_id = session.get('user_id')
+
+        if event_type != 'view' and not user_id:
+            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
 
         if not post_id or not event_type:
             return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 200
