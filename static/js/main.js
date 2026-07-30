@@ -217,7 +217,8 @@ async function triggerEvent(postId, eventType) {
         if (card) {
             const scoreDisplay = card.querySelector('.score-num');
             if (scoreDisplay) {
-                scoreDisplay.textContent = data.new_score.toLocaleString();
+                const cardScoreVal = Number((data && data.new_score !== undefined) ? data.new_score : ((data && data.score) || 0));
+                scoreDisplay.textContent = cardScoreVal.toLocaleString();
                 
                 // 애니메이션 효과
                 scoreDisplay.style.color = '#f43f5e';
@@ -271,11 +272,14 @@ async function triggerEvent(postId, eventType) {
 
         // 모달 내부 수치 동기화 갱신
         const detailScore = document.getElementById('detailScoreNum');
-        if (detailScore) detailScore.textContent = data.new_score.toLocaleString();
+        if (detailScore) {
+            const modalScoreVal = Number((data && data.new_score !== undefined) ? data.new_score : ((data && data.score) || 0));
+            detailScore.textContent = modalScoreVal.toLocaleString();
+        }
         const dView = document.getElementById('detailViewCount');
-        if (dView) dView.textContent = data.view_count;
+        if (dView && data && data.view_count !== undefined) dView.textContent = data.view_count;
         const dLike = document.getElementById('detailLikeCount');
-        if (dLike) dLike.textContent = data.like_count;
+        if (dLike && data && data.like_count !== undefined) dLike.textContent = data.like_count;
         const dComment = document.getElementById('detailCommentCount');
         if (dComment) dComment.textContent = data.comment_count;
         const dShare = document.getElementById('detailShareCount');
