@@ -846,6 +846,17 @@ body {
     color: #e11d48 !important;
 }
 
+/* 댓글 작성 완료 active 상태 스타일 */
+.action-btn.btn-comment.active, #detailBtnComment.active {
+    background: #f3e8ff !important;
+    border-color: #a855f7 !important;
+    color: #7c3aed !important;
+}
+.action-btn.btn-comment.active i, #detailBtnComment.active i,
+.action-btn.btn-comment.active span, #detailBtnComment.active span {
+    color: #7c3aed !important;
+}
+
 .action-btn .score-plus {
     font-size: 0.68rem;
     color: var(--text-muted);

@@ -642,6 +642,7 @@ class PawStarService:
                 all_rows = cur.fetchall()
 
                 liked_user_ids = set()
+                commented_user_ids = set()
                 if current_user_id:
                     cur.execute("""
                         SELECT ENT_USER_ID FROM pst_contest_like
@@ -649,6 +650,13 @@ class PawStarService:
                     """, (contest_id, current_user_id))
                     liked_rows = cur.fetchall()
                     liked_user_ids = {r['ENT_USER_ID'] for r in liked_rows}
+
+                    cur.execute("""
+                        SELECT DISTINCT ENT_USER_ID FROM pst_contest_cmt
+                        WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    commented_rows = cur.fetchall()
+                    commented_user_ids = {r['ENT_USER_ID'] for r in commented_rows}
 
                 total_count = len(all_rows)
                 total_pages = max(1, (total_count + per_page - 1) // per_page)
@@ -669,7 +677,10 @@ class PawStarService:
                     row['ENT_DT'] = dt_str
                     row['created_at'] = dt_str
                     row['rank_candidate'] = top_scores.get(row['ENT_USER_ID'], None)
-                    row['actions'] = {'is_liked': row['ENT_USER_ID'] in liked_user_ids}
+                    row['actions'] = {
+                        'is_liked': row['ENT_USER_ID'] in liked_user_ids,
+                        'is_commented': row['ENT_USER_ID'] in commented_user_ids
+                    }
                     posts.append(row)
 
                 conn.close()
@@ -776,12 +787,19 @@ class PawStarService:
                 comments = cur.fetchall()
 
                 is_liked = False
+                is_commented = False
                 if current_user_id:
                     cur.execute("""
                         SELECT 1 FROM pst_contest_like
                         WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
                     """, (contest_id, ent_user_id, current_user_id))
                     is_liked = bool(cur.fetchone())
+
+                    cur.execute("""
+                        SELECT 1 FROM pst_contest_cmt
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND CMT_USER_ID = %s
+                    """, (contest_id, ent_user_id, current_user_id))
+                    is_commented = bool(cur.fetchone())
 
                 dt_p = post.get('ENT_DT')
                 if hasattr(dt_p, 'strftime'):
@@ -803,7 +821,7 @@ class PawStarService:
                     cmt_list.append(c)
 
                 post['comments'] = cmt_list
-                post['actions'] = {'is_liked': is_liked}
+                post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented}
                 conn.close()
                 return post
         except Exception as e:

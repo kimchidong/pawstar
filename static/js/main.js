@@ -683,6 +683,13 @@ function submitDetailComment() {
 
             const card = document.getElementById(`post-card-${postId}`) || document.querySelector(`[onclick*="${postId}"]`);
             if (card) {
+                const btnCardComment = card.querySelector('.btn-comment');
+                if (btnCardComment) {
+                    btnCardComment.classList.add('active');
+                    const icon = btnCardComment.querySelector('i');
+                    if (icon) icon.className = 'fa-solid fa-comment';
+                }
+
                 const cardComment = card.querySelector('.comment-count');
                 if (cardComment) {
                     const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;

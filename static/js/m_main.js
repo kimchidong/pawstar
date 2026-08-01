@@ -197,6 +197,13 @@ function submitMobileDetailComment() {
 
             const cards = document.querySelectorAll(`[onclick*="${mPostId}"]`);
             cards.forEach(card => {
+                const btnCardComment = card.querySelector('.btn-comment');
+                if (btnCardComment) {
+                    btnCardComment.classList.add('active');
+                    const icon = btnCardComment.querySelector('i');
+                    if (icon) icon.className = 'fa-solid fa-comment';
+                }
+
                 const cardComment = card.querySelector('.comment-count');
                 if (cardComment) {
                     const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;
