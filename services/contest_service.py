@@ -884,6 +884,10 @@ class PawStarService:
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
+        
+        if not self.is_user_exists(cmt_user_id):
+            self.register_user(cmt_user_id, cmt_user_id)
+
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -901,6 +905,9 @@ class PawStarService:
                 return {'success': True}
         except Exception as e:
             print("add_comment error:", e)
+            err_str = str(e)
+            if "1062" in err_str or "Duplicate entry" in err_str:
+                return {'success': False, 'message': '한 게시물에 한 회원은 단 한번만 댓글 등록 가능합니다.'}
             return {'success': False, 'message': str(e)}
 
     def get_hall_of_fame(self, contest_id=None):

@@ -864,14 +864,27 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
 
     return file_path, list_file_name, popup_file_name
 
-@app.route('/api/comments/<int:post_id>', methods=['GET'])
+@app.route('/api/comments/<path:post_id>', methods=['GET'])
 def get_comments(post_id):
     """ 게시물 한줄 댓글 목록 조회 """
-    comments = service.get_comments_by_post(post_id)
-    return jsonify({'success': True, 'comments': comments})
+    try:
+        contest_id = 1
+        ent_user_id = str(post_id)
+        if '_' in str(post_id):
+            parts = str(post_id).split('_', 1)
+            if parts[0].isdigit():
+                contest_id = int(parts[0])
+                ent_user_id = parts[1]
 
-@app.route('/api/comments/<int:post_id>', methods=['POST'])
-def add_comment(post_id):
+        post_detail = service.get_post_detail(contest_id, ent_user_id)
+        comments = post_detail.get('comments', []) if post_detail else []
+        return jsonify({'success': True, 'comments': comments})
+    except Exception as e:
+        print("댓글 조회 오류:", e)
+        return jsonify({'success': True, 'comments': []})
+
+@app.route('/api/comments/<path:post_id>', methods=['POST'])
+def add_comment_api(post_id):
     """ 한줄 댓글 등록 """
     try:
         data = request.get_json() or {}
@@ -879,27 +892,29 @@ def add_comment(post_id):
         if not content:
             return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 400
 
-        user_id = get_current_user_id()
+        user_id = session.get('user_id') or 'guest'
 
-        user_profile = None
-        user_data = service.get_user_profile(user_id)
-        if user_data and user_data.get('user_info'):
-            user_nickname = user_data['user_info'].get('nickname', '귀여운 집사')
-            user_profile = user_data['user_info'].get('profile_img')
-        else:
-            user_nickname = data.get('nickname') or '귀여운 집사'
+        contest_id = 1
+        ent_user_id = str(post_id)
+        if '_' in str(post_id):
+            parts = str(post_id).split('_', 1)
+            if parts[0].isdigit():
+                contest_id = int(parts[0])
+                ent_user_id = parts[1]
 
-        comment, event_res = service.add_comment(post_id, user_nickname, content, user_profile, user_id=user_id)
-        if comment is None:
-            return jsonify({
-                'success': False,
-                'message': event_res or '이미 이 게시물에 한줄 댓글을 작성하셨습니다.'
-            }), 200
+        res = service.add_comment(contest_id, ent_user_id, user_id, content)
+        if not res.get('success'):
+            return jsonify({'success': False, 'message': res.get('message', '댓글 등록 중 오류가 발생했습니다.')}), 400
+
+        post_detail = service.get_post_detail(contest_id, ent_user_id)
+        comments = post_detail.get('comments', []) if post_detail else []
+        latest_comment = comments[-1] if comments else {'CONTS': content}
 
         return jsonify({
             'success': True,
-            'comment': comment,
-            'event_res': event_res
+            'comment': latest_comment,
+            'comments': comments,
+            'message': '댓글이 성공적으로 작성되었습니다!'
         })
     except Exception as e:
         print("댓글 등록 오류:", e)
