@@ -110,7 +110,6 @@
                         <div class="post-card" style="box-shadow: 0 12px 30px rgba(0,0,0,0.12); cursor: pointer;" onclick="switchPreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
                             <div class="card-media">
                                 <img id="previewCardImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
-                                <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
                             </div>
                             <div class="card-body">
                                 <div class="author-info">
@@ -138,9 +137,6 @@
                             <div class="detail-modal-body" style="height: 480px;">
                                 <div class="detail-media-container" style="height: 100%;">
                                     <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
-                                    <div class="detail-rank-badge">
-                                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
-                                    </div>
                                 </div>
                                 <div class="detail-info-container" style="padding: 2rem;">
                                     <div>
@@ -216,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
-        const petType = (selectPetType && selectPetType.value) ? selectPetType.value : '🐾 미선택';
+        const petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
         const title = inputTitle ? inputTitle.value.trim() : '';
         const content = textareaContent ? textareaContent.value.trim() : '';
 

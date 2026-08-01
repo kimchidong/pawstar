@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateMobilePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
-        const petType = (selectPetType && selectPetType.value) ? selectPetType.value : '🐾 미선택';
+        const petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
         const title = inputTitle ? inputTitle.value.trim() : '';
         const content = textareaContent ? textareaContent.value.trim() : '';
 
