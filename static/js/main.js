@@ -211,10 +211,40 @@ async function triggerEvent(postId, eventType) {
         window.postsDataStore[postId].view_count = data.view_count;
         window.postsDataStore[postId].comment_count = data.comment_count;
         window.postsDataStore[postId].share_count = data.share_count;
+        if (data.is_liked !== undefined) {
+            window.postsDataStore[postId].is_liked = data.is_liked;
+            window.postsDataStore[postId].actions = window.postsDataStore[postId].actions || {};
+            window.postsDataStore[postId].actions.is_liked = data.is_liked;
+        }
 
-        // UI Score 수치 갱신 & 카운터 갱신
-        const card = document.getElementById(`post-card-${postId}`);
+        // UI Score 수치 갱신 & 카운터 갱신 (다중 식별자 호환)
+        const cleanId = String(postId);
+        const rawEntId = cleanId.replace(/^\d+_/, '');
+        const card = document.getElementById(`post-card-${cleanId}`) || 
+                     document.getElementById(`post-card-${rawEntId}`) ||
+                     document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                     document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                     document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+
         if (card) {
+            const btnLike = card.querySelector('.btn-like');
+            if (btnLike && data.is_liked !== undefined) {
+                const icon = btnLike.querySelector('i');
+                if (data.is_liked) {
+                    btnLike.classList.add('active');
+                    if (icon) {
+                        icon.className = 'fa-solid fa-heart';
+                        icon.style.color = '#e11d48';
+                    }
+                } else {
+                    btnLike.classList.remove('active');
+                    if (icon) {
+                        icon.className = 'fa-regular fa-heart';
+                        icon.style.color = '';
+                    }
+                }
+            }
+
             const scoreDisplay = card.querySelector('.score-num');
             if (scoreDisplay) {
                 const cardScoreVal = Number((data && data.new_score !== undefined) ? data.new_score : ((data && data.score) || 0));

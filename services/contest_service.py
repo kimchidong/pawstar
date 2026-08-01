@@ -856,6 +856,10 @@ class PawStarService:
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
+        
+        if not self.is_user_exists(like_user_id):
+            self.register_user(like_user_id, like_user_id)
+
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -897,6 +901,24 @@ class PawStarService:
         except Exception as e:
             print("toggle_like error:", e)
             return {'success': False, 'message': str(e)}
+
+    def trigger_event(self, post_id, event_type, user_id=None, **kwargs):
+        contest_id = 1
+        ent_user_id = str(post_id)
+        if '_' in str(post_id):
+            parts = str(post_id).split('_', 1)
+            if parts[0].isdigit():
+                contest_id = int(parts[0])
+                ent_user_id = parts[1]
+
+        if event_type == 'view':
+            self.increase_view_count(contest_id, ent_user_id, view_user_id=user_id)
+            return {'success': True, 'action': 'view'}
+        elif event_type in ('like', 'unlike', 'toggle_like'):
+            if not user_id:
+                return {'success': False, 'message': '로그인이 필요합니다.'}
+            return self.toggle_like(contest_id, ent_user_id, user_id)
+        return {'success': True}
 
     def add_comment(self, contest_id, ent_user_id, cmt_user_id, comment_text):
         conn = self.get_db_connection()
