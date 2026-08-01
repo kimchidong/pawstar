@@ -82,12 +82,22 @@ function openMobileDetailModal(postData) {
     const detailModal = document.getElementById('mDetailModal');
     if (!detailModal) return;
 
-    const mPopupSrc = (postData.file_path || '') + (postData.popup_file_name || postData.list_file_name || postData.image_path || postData.media_url || '');
+    const mPopupSrc = postData.IMAGE_PATH || postData.image_path || postData.media_url || 
+        ((postData.file_path && postData.list_file_name) ? (postData.file_path.endsWith('/') ? postData.file_path : postData.file_path + '/') + postData.list_file_name : '');
     document.getElementById('mDetailImg').src = mPopupSrc;
-    document.getElementById('mDetailAuthorImg').src = postData.user_profile || '';
-    document.getElementById('mDetailAuthorNickname').textContent = postData.user_nickname || '집사';
-    const mNameStr = (postData.pet_name && postData.pet_name !== '강아지' && postData.pet_name !== '우리 강아지' && postData.pet_name !== '아이 이름') ? ` ${postData.pet_name}` : '';
-    document.getElementById('mDetailPetTag').textContent = `${postData.pet_type || '🐕 강아지'}${mNameStr}`;
+    document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
+    document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
+    
+    const mPetTagEl = document.getElementById('mDetailPetTag');
+    if (mPetTagEl) {
+        const mKindNm = postData.KIND_NM || postData.pet_type || '🐕 강아지';
+        const mPetNm = postData.PET_NM || postData.pet_name || '';
+        if (mPetNm) {
+            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${mPetNm}</span>`;
+        } else {
+            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
+        }
+    }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || 0).toLocaleString();
     document.getElementById('mDetailTitle').textContent = postData.title || '';
     document.getElementById('mDetailContent').textContent = postData.content || '';

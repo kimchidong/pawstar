@@ -365,19 +365,28 @@ function openDetailModal(post) {
 
     // 데이터 채우기 (팝업용 고화질 이미지 바인딩)
     const imgEl = document.getElementById('detailImg');
+    const imgSrc = post.IMAGE_PATH || post.image_path || post.media_url || 
+        ((post.file_path && post.list_file_name) ? (post.file_path.endsWith('/') ? post.file_path : post.file_path + '/') + post.list_file_name : '');
     if (imgEl) {
-        imgEl.src = (post.file_path || '') + (post.popup_file_name || post.list_file_name || post.image_path || post.media_url || '');
+        imgEl.src = imgSrc;
     }
 
     const authorImgEl = document.getElementById('detailAuthorImg');
-    if (authorImgEl) authorImgEl.src = post.user_profile || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+    if (authorImgEl) authorImgEl.src = post.PROFILE_URL || post.user_profile || '/static/image/profile/default_profile.png';
 
     const nicknameEl = document.getElementById('detailAuthorNickname');
-    if (nicknameEl) nicknameEl.textContent = post.user_nickname || '집사';
+    if (nicknameEl) nicknameEl.textContent = post.NK_NM || post.user_nickname || '집사';
 
     const petTagEl = document.getElementById('detailPetTag');
-    const nameStr = (post.pet_name && post.pet_name !== '강아지' && post.pet_name !== '우리 강아지' && post.pet_name !== '아이 이름') ? ` ${post.pet_name}` : '';
-    if (petTagEl) petTagEl.textContent = `${post.pet_type || '🐕 강아지'}${nameStr}`;
+    if (petTagEl) {
+        const kindNm = post.KIND_NM || post.pet_type || '🐕 강아지';
+        const petNm = post.PET_NM || post.pet_name || '';
+        if (petNm) {
+            petTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${kindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petNm}</span>`;
+        } else {
+            petTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${kindNm}</span>`;
+        }
+    }
 
     const scoreNumEl = document.getElementById('detailScoreNum');
     if (scoreNumEl) scoreNumEl.textContent = Number(post.score || 0).toLocaleString();
