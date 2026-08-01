@@ -853,19 +853,7 @@ class PawStarService:
         if not conn:
             return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
 
-        # 본인 자신의 출전 게시물인 경우 조회수 카운트 제외
-        clean_ent = str(ent_user_id).split('_post_')[0]
         clean_vw = str(view_user_id or '').split('_post_')[0]
-        if view_user_id and clean_ent == clean_vw:
-            try:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
-                    r = cur.fetchone()
-                    conn.close()
-                    return {'view_count': r['VW_CNT'] if r else 0, 'new_score': r['SCORE'] if r else 0, 'is_owner': True, 'already_viewed': True}
-            except Exception:
-                if conn: conn.close()
-                return {'view_count': 0, 'new_score': 0, 'already_viewed': True}
 
         try:
             with conn.cursor() as cur:
