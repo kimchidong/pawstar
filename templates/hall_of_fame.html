@@ -9,25 +9,36 @@
             역대 콘테스트를 빛낸 최고의 전설적인 반려동물 스타들을 소개합니다!
         </p>
 
-        <!-- 회차 선택 -->
+        <!-- 회차 선택 (회차 정보 추가) -->
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
             <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.75rem 2.5rem 0.75rem 1.25rem; font-size: 1.05rem; width: fit-content; width: -moz-fit-content; min-width: max-content; font-weight: 700; cursor: pointer;">
                 {% for c in contests %}
-                    <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
-                        {{ c.title }}
+                    {% set c_id = c.CONTEST_ROUND or c.contest_id %}
+                    {% set c_title = c.THEME_NM or c.title %}
+                    {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
+                    <option value="{{ c_id }}" {{ 'selected' if c_id == cur_id }}>
+                        제{{ c_id }}회 - {{ c_title }}
                     </option>
                 {% endfor %}
             </select>
         </div>
     </div>
 
-    <!-- 1~3위 시상대 (Podium) -->
-    {% set ns = namespace(super_star=None, rising_star=None, bright_star=None, rookie_stars=[]) %}
+    <!-- 1~3위 시상대 (Podium - G002P001 부문 매핑) -->
+    {% set ns = namespace(super_stars=[], rising_stars=[], bright_stars=[]) %}
     {% for w in winners %}
-        {% if w.award_type == 'SUPER_STAR' %}{% set ns.super_star = w %}{% endif %}
-        {% if w.award_type == 'RISING_STAR' %}{% set ns.rising_star = w %}{% endif %}
-        {% if w.award_type == 'BRIGHT_STAR' %}{% set ns.bright_star = w %}{% endif %}
-        {% if w.award_type == 'ROOKIE_STAR' %}{% set _ = ns.rookie_stars.append(w) %}{% endif %}
+        {% set part = w.AWARD_PART or w.award_part %}
+        {% set rk = w.RANKING or w.ranking %}
+        {% set cd = w.AWARD_CD or w.award_cd %}
+        {% if part == 'G002P001' %}
+            {% if rk == 1 or cd == 'P001A101' %}
+                {% set _ = ns.super_stars.append(w) %}
+            {% elif rk == 2 or cd == 'P001A102' %}
+                {% set _ = ns.rising_stars.append(w) %}
+            {% elif rk == 3 or cd == 'P001A103' %}
+                {% set _ = ns.bright_stars.append(w) %}
+            {% endif %}
+        {% endif %}
     {% endfor %}
 
     <div class="winners-podium">
@@ -35,18 +46,22 @@
         <div class="podium-card rising-star">
             <div class="crown-badge">🥈</div>
             <div class="winner-title-badge">라이징스타 (Rising Star)</div>
-            {% if ns.rising_star %}
-                <img src="{{ ns.rising_star.image_path or (ns.rising_star.file_path + ns.rising_star.list_file_name) }}" class="winner-img" alt="Rising Star">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ ns.rising_star.pet_name }} ({{ ns.rising_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ ns.rising_star.user_nickname }}</p>
-                <div style="margin-top: 1rem; padding: 0.75rem 0.5rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-                    <span style="font-weight: 800; color: var(--accent-silver); font-size: 0.95rem;">Score: {{ "{:,}".format(ns.rising_star.score) }} P</span>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.35rem; font-weight: 600;">
-                        <span>👀 {{ "{:,}".format(ns.rising_star.view_count) }}</span>
-                        <span>❤️ {{ "{:,}".format(ns.rising_star.like_count) }}</span>
-                        <span>💬 {{ "{:,}".format(ns.rising_star.comment_count) }}</span>
+            {% if ns.rising_stars %}
+                {% for star in ns.rising_stars %}
+                    <div style="{{ 'margin-top: 1rem; border-top: 1px dashed var(--border-light); padding-top: 1rem;' if not loop.first }}">
+                        <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Rising Star">
+                        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ star.PET_NM or star.pet_name }} ({{ star.KIND_NM or star.pet_type }})</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ star.NK_NM or star.user_nickname }}</p>
+                        <div style="margin-top: 1rem; padding: 0.75rem 0.5rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+                            <span style="font-weight: 800; color: var(--accent-silver); font-size: 0.95rem;">Score: {{ "{:,}".format(star.SCORE or star.score) }} P</span>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.35rem; font-weight: 600;">
+                                <span>👀 {{ "{:,}".format(star.VW_CNT or star.view_count or 0) }}</span>
+                                <span>❤️ {{ "{:,}".format(star.LIKE_CNT or star.like_count or 0) }}</span>
+                                <span>💬 {{ "{:,}".format(star.CMT_CNT or star.comment_count or 0) }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
             {% endif %}
@@ -56,18 +71,22 @@
         <div class="podium-card super-star">
             <div class="crown-badge">🥇</div>
             <div class="winner-title-badge">슈퍼스타 (Super Star)</div>
-            {% if ns.super_star %}
-                <img src="{{ ns.super_star.image_path or (ns.super_star.file_path + ns.super_star.list_file_name) }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
-                <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">{{ ns.super_star.pet_name }} ({{ ns.super_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.3rem;">집사: {{ ns.super_star.user_nickname }}</p>
-                <div style="margin-top: 1rem; padding: 0.85rem 0.5rem; background: #fffbeb; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
-                    <span style="font-weight: 900; font-size: 1.15rem; color: var(--accent-gold);">Score: {{ "{:,}".format(ns.super_star.score) }} P</span>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.85rem; color: #b45309; margin-top: 0.35rem; font-weight: 700;">
-                        <span>👀 {{ "{:,}".format(ns.super_star.view_count) }}</span>
-                        <span>❤️ {{ "{:,}".format(ns.super_star.like_count) }}</span>
-                        <span>💬 {{ "{:,}".format(ns.super_star.comment_count) }}</span>
+            {% if ns.super_stars %}
+                {% for star in ns.super_stars %}
+                    <div style="{{ 'margin-top: 1rem; border-top: 1px dashed #fde68a; padding-top: 1rem;' if not loop.first }}">
+                        <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="width: 160px; height: 160px;" alt="Super Star">
+                        <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">{{ star.PET_NM or star.pet_name }} ({{ star.KIND_NM or star.pet_type }})</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.3rem;">집사: {{ star.NK_NM or star.user_nickname }}</p>
+                        <div style="margin-top: 1rem; padding: 0.85rem 0.5rem; background: #fffbeb; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
+                            <span style="font-weight: 900; font-size: 1.15rem; color: var(--accent-gold);">Score: {{ "{:,}".format(star.SCORE or star.score) }} P</span>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.85rem; color: #b45309; margin-top: 0.35rem; font-weight: 700;">
+                                <span>👀 {{ "{:,}".format(star.VW_CNT or star.view_count or 0) }}</span>
+                                <span>❤️ {{ "{:,}".format(star.LIKE_CNT or star.like_count or 0) }}</span>
+                                <span>💬 {{ "{:,}".format(star.CMT_CNT or star.comment_count or 0) }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
             {% endif %}
@@ -77,71 +96,29 @@
         <div class="podium-card bright-star">
             <div class="crown-badge">🥉</div>
             <div class="winner-title-badge">브라이트스타 (Bright Star)</div>
-            {% if ns.bright_star %}
-                <img src="{{ ns.bright_star.image_path or (ns.bright_star.file_path + ns.bright_star.list_file_name) }}" class="winner-img" alt="Bright Star">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ ns.bright_star.pet_name }} ({{ ns.bright_star.pet_type }})</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ ns.bright_star.user_nickname }}</p>
-                <div style="margin-top: 1rem; padding: 0.75rem 0.5rem; background: #fff7ed; border-radius: var(--radius-sm); border: 1px solid #ffedd5;">
-                    <span style="font-weight: 800; color: var(--accent-bronze); font-size: 0.95rem;">Score: {{ "{:,}".format(ns.bright_star.score) }} P</span>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.8rem; color: #c2410c; margin-top: 0.35rem; font-weight: 600;">
-                        <span>👀 {{ "{:,}".format(ns.bright_star.view_count) }}</span>
-                        <span>❤️ {{ "{:,}".format(ns.bright_star.like_count) }}</span>
-                        <span>💬 {{ "{:,}".format(ns.bright_star.comment_count) }}</span>
+            {% if ns.bright_stars %}
+                {% for star in ns.bright_stars %}
+                    <div style="{{ 'margin-top: 1rem; border-top: 1px dashed #ffedd5; padding-top: 1rem;' if not loop.first }}">
+                        <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Bright Star">
+                        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary);">{{ star.PET_NM or star.pet_name }} ({{ star.KIND_NM or star.pet_type }})</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem;">집사: {{ star.NK_NM or star.user_nickname }}</p>
+                        <div style="margin-top: 1rem; padding: 0.75rem 0.5rem; background: #fff7ed; border-radius: var(--radius-sm); border: 1px solid #ffedd5;">
+                            <span style="font-weight: 800; color: var(--accent-bronze); font-size: 0.95rem;">Score: {{ "{:,}".format(star.SCORE or star.score) }} P</span>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; font-size: 0.8rem; color: #c2410c; margin-top: 0.35rem; font-weight: 600;">
+                                <span>👀 {{ "{:,}".format(star.VW_CNT or star.view_count or 0) }}</span>
+                                <span>❤️ {{ "{:,}".format(star.LIKE_CNT or star.like_count or 0) }}</span>
+                                <span>💬 {{ "{:,}".format(star.CMT_CNT or star.comment_count or 0) }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             {% else %}
                 <p style="color: var(--text-muted); padding: 2rem;">선정된 수상자가 없습니다.</p>
             {% endif %}
         </div>
     </div>
 
-    <!-- 루키 스타 (총 3마리 급상승 특별상) 배지 섹션 -->
-    <div class="rookie-card" style="flex-direction: column; align-items: stretch;">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <div style="font-size: 2.2rem; color: var(--accent-purple);">⭐</div>
-            <div>
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-                    하트 인기상 : 루키스타 (Rookie Star <span style="color: var(--accent-purple); font-weight: 900;">TOP 3</span>)
-                </h3>
-                <p style="color: var(--text-secondary); font-size: 0.88rem; font-weight: 500; margin-top: 0.15rem;">
-                    집사님들의 뜨거운 사랑과 하트를 듬뿍 받아 선정된 3마리의 자랑스러운 루키 스타들입니다! ❤️
-                </p>
-            </div>
-        </div>
-
-        {% if ns.rookie_stars %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.75rem;">
-                {% for r_star in ns.rookie_stars %}
-                    <div style="display: flex; align-items: center; gap: 1rem; background: #ffffff; padding: 1rem; border-radius: var(--radius-md); border: 1.5px solid #f3e8ff; box-shadow: var(--shadow-soft);">
-                        <img src="{{ r_star.image_path or (r_star.file_path + r_star.list_file_name) }}" style="width: 64px; height: 64px; border-radius: 14px; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="rookie">
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
-                                <span class="badge-tag" style="background: #f3e8ff; color: #7c3aed; font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: 12px; font-weight: 800;">⭐ 루키 {{ loop.index }}위</span>
-                            </div>
-                            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                {{ r_star.pet_name }} ({{ r_star.pet_type }})
-                            </div>
-                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                집사: <strong>{{ r_star.user_nickname }}</strong> | {{ r_star.post_title }}
-                            </div>
-                            <div style="font-size: 0.78rem; color: var(--accent-purple); font-weight: 700; margin-top: 0.25rem;">
-                                Score: {{ "{:,}".format(r_star.score) }} P
-                            </div>
-                            <div style="display: flex; gap: 0.6rem; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem; font-weight: 600;">
-                                <span>👀 {{ "{:,}".format(r_star.view_count) }}</span>
-                                <span>❤️ {{ "{:,}".format(r_star.like_count) }}</span>
-                                <span>💬 {{ "{:,}".format(r_star.comment_count) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p style="color: var(--text-muted); padding: 1rem 0;">해당 회차 루키스타 데이터가 준비 중입니다.</p>
-        {% endif %}
-    </div>
-
-    <!-- 🐾 동물 종류별 1·2·3위 챔피언 섹션 (Category Awards) -->
+    <!-- 🐾 동물 종목별 TOP 3 챔피언 섹션 (G002P002 품종별 부문) -->
     <div style="margin-top: 3rem;">
         <div style="text-align: center; margin-bottom: 1.5rem;">
             <h3 style="font-size: 1.6rem; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
@@ -152,50 +129,45 @@
             </p>
         </div>
 
-        {% set category_names = ['강아지', '고양이', '햄스터', '앵무새', '토끼'] %}
-        <div style="display: flex; flex-direction: column; gap: 1.75rem;">
-            {% for cat in category_names %}
-                {% set ns_cat = namespace(winners=[]) %}
-                {% for w in winners %}
-                    {% if cat in w.prize_name or cat in w.pet_type %}
-                        {% set _ = ns_cat.winners.append(w) %}
-                    {% endif %}
-                {% endfor %}
+        {% set ns_all_kind = namespace(kind_winners=[]) %}
+        {% for w in winners %}
+            {% set part = w.AWARD_PART or w.award_part %}
+            {% if part == 'G002P002' %}
+                {% set _ = ns_all_kind.kind_winners.append(w) %}
+            {% endif %}
+        {% endfor %}
 
-                {% if ns_cat.winners %}
-                <div style="background: #ffffff; border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; box-shadow: var(--shadow-soft);">
-                    <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid var(--border-light); padding-bottom: 0.6rem;">
-                        {% if '강아지' in cat %}🐕{% elif '고양이' in cat %}🐈{% elif '햄스터' in cat %}🐹{% elif '앵무새' in cat %}🦜{% elif '토끼' in cat %}🐰{% else %}🐾{% endif %}
-                        {{ cat }} 부문 1위 · 2위 · 3위
-                    </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
-                        {% for cw in ns_cat.winners[:3] %}
-                            <div style="display: flex; align-items: center; gap: 0.85rem; background: var(--bg-primary); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
-                                <img src="{{ cw.image_path or (cw.file_path + cw.list_file_name) }}" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="{{ cw.pet_name }}">
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="margin-bottom: 0.2rem;">
-                                        <span style="background: {% if loop.index == 1 or '1위' in cw.prize_name %}#fffbeb; color: #d97706; border: 1px solid #fde68a;{% elif loop.index == 2 or '2위' in cw.prize_name %}#f8fafc; color: #475569; border: 1px solid #cbd5e1;{% else %}#fff7ed; color: #c2410c; border: 1px solid #ffedd5;{% endif %} font-size: 0.72rem; padding: 0.15rem 0.55rem; border-radius: 12px; font-weight: 800;">
-                                            🏆 {{ cw.prize_name if '위' in cw.prize_name else (cat ~ ' ' ~ loop.index ~ '위') }}
-                                        </span>
-                                    </div>
-                                    <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                        {{ cw.pet_name }} ({{ cw.pet_type }})
-                                    </div>
-                                    <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                        집사: <strong>{{ cw.user_nickname }}</strong>
-                                    </div>
-                                    <div style="font-size: 0.76rem; color: var(--accent-gold); font-weight: 800; margin-top: 0.2rem;">
-                                        Score: {{ "{:,}".format(cw.score) }} P
-                                    </div>
+        {% if ns_all_kind.kind_winners %}
+            <div style="background: #ffffff; border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                    {% for kw in ns_all_kind.kind_winners %}
+                        {% set rk = kw.RANKING or kw.ranking %}
+                        <div style="display: flex; align-items: center; gap: 0.85rem; background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                            <img src="{{ kw.IMAGE_PATH or kw.image_path }}" style="width: 72px; height: 72px; border-radius: 14px; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="{{ kw.PET_NM or kw.pet_name }}">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="margin-bottom: 0.25rem;">
+                                    <span style="background: {% if rk == 1 %}#fffbeb; color: #d97706; border: 1px solid #fde68a;{% elif rk == 2 %}#f8fafc; color: #475569; border: 1px solid #cbd5e1;{% else %}#fff7ed; color: #c2410c; border: 1px solid #ffedd5;{% endif %} font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 800;">
+                                        🏆 {{ kw.KIND_NM or kw.pet_type }} {{ rk }}위
+                                    </span>
+                                </div>
+                                <div style="font-weight: 800; font-size: 1rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ kw.PET_NM or kw.pet_name }}
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    집사: <strong>{{ kw.NK_NM or kw.user_nickname }}</strong>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 800; margin-top: 0.25rem;">
+                                    Score: {{ "{:,}".format(kw.SCORE or kw.score) }} P
                                 </div>
                             </div>
-                        {% endfor %}
-                    </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted); background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                등록된 종목별 챔피언 데이터가 준비 중입니다.
+            </div>
+        {% endif %}
     </div>
-</div>
-
 {% endblock %}

@@ -11,11 +11,14 @@
     </div>
 </div>
 
-<!-- 모바일 회차 선택 가로 스크롤 칩 -->
+<!-- 모바일 회차 선택 가로 스크롤 칩 (회차 정보 추가) -->
 <div class="m-filter-scroll" style="padding: 0 1rem 1rem 1rem;">
     {% for c in contests %}
-        <a href="/m/hall-of-fame?contest_id={{ c.contest_id }}" class="m-chip {{ 'active' if c.contest_id == current_contest.contest_id }}">
-            {{ c.title }}
+        {% set c_id = c.CONTEST_ROUND or c.contest_id %}
+        {% set c_title = c.THEME_NM or c.title %}
+        {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
+        <a href="/m/hall-of-fame?contest_id={{ c_id }}" class="m-chip {{ 'active' if c_id == cur_id }}">
+            제{{ c_id }}회 - {{ c_title }}
         </a>
     {% endfor %}
 </div>
@@ -24,39 +27,40 @@
     <!-- 모바일 수상자 리스트 -->
     <div style="display: flex; flex-direction: column; gap: 0.85rem;">
         {% for w in winners %}
-            <div style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if w.award_type == 'SUPER_STAR' else ('#e2e8f0' if w.award_type == 'RISING_STAR' else ('#ffedd5' if w.award_type == 'BRIGHT_STAR' else 'var(--border-light)')) }}; border-radius: var(--radius-md); padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; box-shadow: var(--shadow-soft); position: relative;">
+            {% set part = w.AWARD_PART or w.award_part %}
+            {% set rk = w.RANKING or w.ranking %}
+            <div style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if (part == 'G002P001' and rk == 1) else ('#e2e8f0' if (part == 'G002P001' and rk == 2) else ('#ffedd5' if (part == 'G002P001' and rk == 3) else 'var(--border-light)')) }}; border-radius: var(--radius-md); padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; box-shadow: var(--shadow-soft); position: relative;">
                 <!-- 이미지 및 좌측 상단 메달 뱃지 -->
                 <div style="position: relative; flex-shrink: 0;">
-                    <img src="{{ w.image_path or (w.file_path + w.list_file_name) }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); display: block;" alt="{{ w.pet_name }}">
+                    <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
                     <div style="position: absolute; top: -8px; left: -8px; font-size: 1.5rem; line-height: 1; z-index: 2; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
-                        {% if w.award_type == 'SUPER_STAR' %}🥇
-                        {% elif w.award_type == 'RISING_STAR' %}🥈
-                        {% elif w.award_type == 'BRIGHT_STAR' %}🥉
-                        {% else %}⭐
+                        {% if part == 'G002P001' and rk == 1 %}🥇
+                        {% elif part == 'G002P001' and rk == 2 %}🥈
+                        {% elif part == 'G002P001' and rk == 3 %}🥉
+                        {% else %}🏆
                         {% endif %}
                     </div>
                 </div>
 
                 <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if w.award_type == 'SUPER_STAR' else ('#64748b' if w.award_type == 'RISING_STAR' else ('#b45309' if w.award_type == 'BRIGHT_STAR' else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem;">
-                        {% if w.award_type == 'SUPER_STAR' %}🥇 슈퍼 스타 (1위)
-                        {% elif w.award_type == 'RISING_STAR' %}🥈 라이징 스타 (2위)
-                        {% elif w.award_type == 'BRIGHT_STAR' %}🥉 브라이트 스타 (3위)
-                        {% elif 'ROOKIE' in w.award_type %}⭐ 루키 스타 (하트 인기상)
-                        {% else %}🏆 {{ w.prize_name }}
+                    <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if (part == 'G002P001' and rk == 1) else ('#64748b' if (part == 'G002P001' and rk == 2) else ('#b45309' if (part == 'G002P001' and rk == 3) else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem;">
+                        {% if part == 'G002P001' and rk == 1 %}🥇 슈퍼 스타 (전체 1위)
+                        {% elif part == 'G002P001' and rk == 2 %}🥈 라이징 스타 (전체 2위)
+                        {% elif part == 'G002P001' and rk == 3 %}🥉 브라이트 스타 (전체 3위)
+                        {% else %}🏆 {{ w.KIND_NM or w.pet_type }} {{ rk }}위
                         {% endif %}
                     </div>
                     <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        {{ w.pet_name }} ({{ w.pet_type }})
+                        {{ w.PET_NM or w.pet_name }} ({{ w.KIND_NM or w.pet_type }})
                     </div>
                     <div style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 0.2rem;">
-                        작품: {{ w.post_title }} | 집사: <strong>{{ w.user_nickname }}</strong>
+                        집사: <strong>{{ w.NK_NM or w.user_nickname }}</strong>
                     </div>
                     <div style="font-size: 0.73rem; color: var(--text-secondary); font-weight: 700; display: flex; align-items: center; gap: 0.65rem; margin-top: 0.25rem; flex-wrap: wrap;">
-                        <span>👀 {{ "{:,}".format(w.view_count) }}</span>
-                        <span>❤️ {{ "{:,}".format(w.like_count) }}</span>
-                        <span>💬 {{ "{:,}".format(w.comment_count) }}</span>
-                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">({{ "{:,}".format(w.score) }} P)</span>
+                        <span>👀 {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span>
+                        <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span>
+                        <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span>
+                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">({{ "{:,}".format(w.SCORE or w.score or 0) }} P)</span>
                     </div>
                 </div>
             </div>

@@ -108,21 +108,33 @@ def run_monthly_award_batch():
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (real_vw, real_like, real_cmt, calc_score, round_id, p['ROUND_NO']))
 
-            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장
+            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT)
             cur.execute("""
-                SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
+                SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
                 FROM pst_contest_round
                 WHERE CONTEST_ROUND = %s
-                ORDER BY SCORE DESC, ENT_DT ASC
+                ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, ENT_DT ASC
             """, (round_id,))
             total_sorted = cur.fetchall()
 
-            for rank_idx, item in enumerate(total_sorted, start=1):
+            current_rank = 1
+            prev_key = None
+            total_sorted_with_rank = []
+
+            for item in total_sorted:
+                key = (item['SCORE'], item['CMT_CNT'], item['LIKE_CNT'], item['VW_CNT'])
+                if prev_key is not None and key != prev_key:
+                    current_rank += 1
+                
+                item['rank'] = current_rank
+                prev_key = key
+                total_sorted_with_rank.append(item)
+
                 cur.execute("""
                     UPDATE pst_contest_round
                     SET TOTAL_RANKING = %s, PRC_DT = NOW()
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (rank_idx, round_id, item['ROUND_NO']))
+                """, (current_rank, round_id, item['ROUND_NO']))
 
             # 4. 품종별 순위(KIND_RANKING) 산출 & 저장
             cur.execute("""
@@ -130,64 +142,79 @@ def run_monthly_award_batch():
             """, (round_id,))
             kind_rows = cur.fetchall()
 
+            kind_sorted_with_rank_dict = {}
+
             for k_row in kind_rows:
                 k_cd = k_row['KIND_CD']
                 cur.execute("""
-                    SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
+                    SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
                     FROM pst_contest_round
                     WHERE CONTEST_ROUND = %s AND KIND_CD = %s
-                    ORDER BY SCORE DESC, ENT_DT ASC
+                    ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, ENT_DT ASC
                 """, (round_id, k_cd))
                 k_sorted = cur.fetchall()
-                for k_rank, k_item in enumerate(k_sorted, start=1):
+
+                k_rank = 1
+                k_prev_key = None
+                k_list = []
+
+                for k_item in k_sorted:
+                    k_key = (k_item['SCORE'], k_item['CMT_CNT'], k_item['LIKE_CNT'], k_item['VW_CNT'])
+                    if k_prev_key is not None and k_key != k_prev_key:
+                        k_rank += 1
+                    
+                    k_item['rank'] = k_rank
+                    k_prev_key = k_key
+                    k_list.append(k_item)
+
                     cur.execute("""
                         UPDATE pst_contest_round
                         SET KIND_RANKING = %s
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                     """, (k_rank, round_id, k_item['ROUND_NO']))
 
-            # 5. 당선자 레코드 (pst_contest_award) INSERT (VW_CNT, LIKE_CNT, CMT_CNT 저장 포함)
-            award_codes_overall = ['P001A101', 'P001A102', 'P001A103']
-            for rank_idx, item in enumerate(total_sorted[:3], start=1):
-                award_cd = award_codes_overall[rank_idx - 1]
+                kind_sorted_with_rank_dict[k_cd] = k_list
+
+            # 5. 당선자 레코드 (pst_contest_award) INSERT (KIND_CD 저장 포함 및 rank <= 3 인 모든 동률 포함)
+            award_codes_overall = {1: 'P001A101', 2: 'P001A102', 3: 'P001A103'}
+            top_overall = [item for item in total_sorted_with_rank if item['rank'] <= 3]
+
+            for item in top_overall:
+                r_val = item['rank']
+                award_cd = award_codes_overall.get(r_val, 'P001A103')
                 cur.execute("""
                     INSERT INTO pst_contest_award
-                    (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
-                    VALUES (%s, %s, 'G002P001', %s, %s, %s, %s, %s, %s, %s)
+                    (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                    VALUES (%s, %s, 'G002P001', %s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY UPDATE 
+                        KIND_CD=VALUES(KIND_CD),
                         VW_CNT=VALUES(VW_CNT),
                         LIKE_CNT=VALUES(LIKE_CNT),
                         CMT_CNT=VALUES(CMT_CNT),
                         SCORE=VALUES(SCORE), 
                         RANKING=VALUES(RANKING), 
                         ENT_USER_ID=VALUES(ENT_USER_ID)
-                """, (round_id, item['ROUND_NO'], award_cd, item['ENT_USER_ID'], item['VW_CNT'], item['LIKE_CNT'], item['CMT_CNT'], item['SCORE'], rank_idx))
+                """, (round_id, item['ROUND_NO'], award_cd, item['ENT_USER_ID'], item['KIND_CD'], item['VW_CNT'], item['LIKE_CNT'], item['CMT_CNT'], item['SCORE'], r_val))
 
-            award_codes_kind = ['P002A901', 'P002A902', 'P002A903']
-            for k_row in kind_rows:
-                k_cd = k_row['KIND_CD']
-                cur.execute("""
-                    SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
-                    FROM pst_contest_round
-                    WHERE CONTEST_ROUND = %s AND KIND_CD = %s
-                    ORDER BY SCORE DESC, ENT_DT ASC
-                    LIMIT 3
-                """, (round_id, k_cd))
-                k_top = cur.fetchall()
-                for rank_idx, item in enumerate(k_top, start=1):
-                    award_cd = award_codes_kind[rank_idx - 1]
+            award_codes_kind = {1: 'P002A901', 2: 'P002A902', 3: 'P002A903'}
+            for k_cd, k_list in kind_sorted_with_rank_dict.items():
+                k_top = [item for item in k_list if item['rank'] <= 3]
+                for item in k_top:
+                    r_val = item['rank']
+                    award_cd = award_codes_kind.get(r_val, 'P002A903')
                     cur.execute("""
                         INSERT INTO pst_contest_award
-                        (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
-                        VALUES (%s, %s, 'G002P002', %s, %s, %s, %s, %s, %s, %s)
+                        (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                        VALUES (%s, %s, 'G002P002', %s, %s, %s, %s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE 
+                            KIND_CD=VALUES(KIND_CD),
                             VW_CNT=VALUES(VW_CNT),
                             LIKE_CNT=VALUES(LIKE_CNT),
                             CMT_CNT=VALUES(CMT_CNT),
                             SCORE=VALUES(SCORE), 
                             RANKING=VALUES(RANKING), 
                             ENT_USER_ID=VALUES(ENT_USER_ID)
-                    """, (round_id, item['ROUND_NO'], award_cd, item['ENT_USER_ID'], item['VW_CNT'], item['LIKE_CNT'], item['CMT_CNT'], item['SCORE'], rank_idx))
+                    """, (round_id, item['ROUND_NO'], award_cd, item['ENT_USER_ID'], item['KIND_CD'], item['VW_CNT'], item['LIKE_CNT'], item['CMT_CNT'], item['SCORE'], r_val))
 
             # 6. 현재 회차 종료 (G001C002) 처리
             cur.execute("""

@@ -613,10 +613,8 @@ class PawStarService:
                 query += " AND (r.TITLE LIKE %s OR r.CONTS LIKE %s OR r.PET_NM LIKE %s OR u.NK_NM LIKE %s)"
                 params.extend([f"%{search_q}%", f"%{search_q}%", f"%{search_q}%", f"%{search_q}%"])
 
-            if sort_type == 'popular':
-                query += " ORDER BY r.LIKE_CNT DESC, r.SCORE DESC, r.ENT_DT DESC"
-            elif sort_type == 'score':
-                query += " ORDER BY r.SCORE DESC, r.ENT_DT DESC"
+            if sort_type == 'popular' or sort_type == 'score':
+                query += " ORDER BY r.SCORE DESC, r.CMT_CNT DESC, r.LIKE_CNT DESC, r.VW_CNT DESC, r.ENT_DT DESC"
             else:
                 query += " ORDER BY r.ENT_DT DESC"
 
@@ -1087,6 +1085,7 @@ class PawStarService:
                         ca.ROUND_NO,
                         ca.AWARD_PART,
                         ca.AWARD_CD,
+                        COALESCE(ca.KIND_CD, r.KIND_CD) AS KIND_CD,
                         COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
                         a.BADGE_IMG_PATH_FILE,
                         ca.SCORE,
@@ -1098,7 +1097,7 @@ class PawStarService:
                         COALESCE(k.KIND_NM, '반려동물') AS KIND_NM,
                         k.KIND_CLASS,
                         r.TITLE,
-                        COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
                         u.USER_ID,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
@@ -1115,7 +1114,7 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         COALESCE(k.KIND_NM, '반려동물') AS pet_type,
                         r.TITLE AS title,
-                        COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS image_path,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS image_path,
                         u.USER_ID AS user_id,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
@@ -1125,7 +1124,7 @@ class PawStarService:
                     LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
                     LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
-                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                    LEFT JOIN pst_pet_kind k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                 """, (contest_id,))
@@ -1143,6 +1142,7 @@ class PawStarService:
                                 ca.ROUND_NO,
                                 ca.AWARD_PART,
                                 ca.AWARD_CD,
+                                COALESCE(ca.KIND_CD, r.KIND_CD) AS KIND_CD,
                                 COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
                                 a.BADGE_IMG_PATH_FILE,
                                 ca.SCORE,
@@ -1154,7 +1154,7 @@ class PawStarService:
                                 COALESCE(k.KIND_NM, '반려동물') AS KIND_NM,
                                 k.KIND_CLASS,
                                 r.TITLE,
-                                COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
+                                COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
                                 u.USER_ID,
                                 COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                                 COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
@@ -1171,7 +1171,7 @@ class PawStarService:
                                 r.PET_NM AS pet_name,
                                 COALESCE(k.KIND_NM, '반려동물') AS pet_type,
                                 r.TITLE AS title,
-                                COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS image_path,
+                                COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS image_path,
                                 u.USER_ID AS user_id,
                                 COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                                 COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
@@ -1181,7 +1181,7 @@ class PawStarService:
                             LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                             LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
                             LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
-                            LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                            LEFT JOIN pst_pet_kind k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
                             WHERE ca.CONTEST_ROUND = %s
                             ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                         """, (latest_id,))
