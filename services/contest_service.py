@@ -1,5 +1,5 @@
 """
-Paw Star Contest & Ranking Service (Complete Methods Integration)
+Paw Star Contest Service (create_post method added)
 """
 
 from datetime import datetime, timedelta
@@ -42,8 +42,20 @@ class PawStarService:
             contest['d_day_str'] = f"D-{diff_days}"
         return contest
 
+    def get_next_post_id(self):
+        conn = self.get_db_connection()
+        if not conn:
+            return 1
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) + 1 AS next_id FROM pst_contest_round")
+                r = cur.fetchone()
+                conn.close()
+                return r['next_id'] if r else 1
+        except Exception:
+            return 1
+
     def get_pet_kinds(self):
-        """ PST_PET_KIND 테이블 동물 종류 목록 반환 """
         conn = self.get_db_connection()
         if not conn:
             return []
@@ -672,6 +684,21 @@ class PawStarService:
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
+        
+        # 유저가 DB에 없으면 자동 가입
+        if not self.is_user_exists(user_id):
+            self.register_user(user_id, user_id)
+
+        # kind_cd가 'K001' 형태가 아닐 때 역추적 매핑
+        if kind_cd and not kind_cd.startswith('K'):
+            kinds = self.get_pet_kinds()
+            for k in kinds:
+                if k['KIND_NM'] in kind_cd or kind_cd in k['KIND_NM']:
+                    kind_cd = k['KIND_CD']
+                    break
+            else:
+                kind_cd = 'K008'
+
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -688,6 +715,32 @@ class PawStarService:
         except Exception as e:
             print("create_contest_entry error:", e)
             return {'success': False, 'message': str(e)}
+
+    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path="", list_file_name="", popup_file_name="", **kwargs):
+        """ create_post 별칭 트랜잭션 메서드 """
+        pht_path = file_path or "/static/image/post"
+        pht_file1 = list_file_name
+
+        if media_url and not pht_file1:
+            if "/" in media_url:
+                parts = media_url.rsplit('/', 1)
+                pht_path = parts[0]
+                pht_file1 = parts[1]
+            else:
+                pht_file1 = media_url
+
+        if not pht_file1:
+            pht_file1 = "default_pet.jpg"
+
+        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, pht_path, pht_file1, popup_file_name)
+        return {
+            'success': True,
+            'CONTEST_ROUND': contest_id,
+            'ENT_USER_ID': user_id,
+            'post_id': f"{contest_id}_{user_id}",
+            'PET_NM': pet_name,
+            'TITLE': title
+        }
 
     def get_hall_of_fame(self, contest_id=None):
         conn = self.get_db_connection()

@@ -22,9 +22,8 @@
         </div>
     </div>
 
-    <!-- 출전 등록 메인 폼 카드 -->
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
-        <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data">
+        <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
 
             <!-- 상단: 2열 입력 폼 영역 -->
@@ -269,6 +268,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function showCustomToast(message, iconClass = 'fa-circle-exclamation') {
+        let toast = document.getElementById('pawCustomToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'pawCustomToast';
+            toast.className = 'paw-custom-toast-container';
+            toast.innerHTML = `<i class="fa-solid ${iconClass} paw-custom-toast-icon"></i><span id="pawCustomToastMsg"></span>`;
+            document.body.appendChild(toast);
+        }
+        const msgEl = document.getElementById('pawCustomToastMsg');
+        if (msgEl) msgEl.textContent = message;
+
+        toast.classList.add('show');
+        clearTimeout(window.pawToastTimer);
+        window.pawToastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3200);
+    }
+
+    function highlightInvalidField(element) {
+        if (!element) return;
+        element.classList.remove('input-invalid-shake');
+        void element.offsetWidth;
+        element.classList.add('input-invalid-shake');
+        element.focus();
+        element.addEventListener('input', () => { element.classList.remove('input-invalid-shake'); }, { once: true });
+        element.addEventListener('change', () => { element.classList.remove('input-invalid-shake'); }, { once: true });
+    }
+
     const uploadForm = document.getElementById('postUploadForm');
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
@@ -281,32 +309,32 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('uploadMediaFile');
 
             if (!petName) {
-                alert('🐶 반려동물 이름을 입력해주세요!');
-                if (inputPetName) inputPetName.focus();
+                showCustomToast('🐶 반려동물 이름을 입력해주세요!', 'fa-paw');
+                highlightInvalidField(inputPetName);
                 return;
             }
 
             if (!petType) {
-                alert('🐾 반려동물 종류를 선택해주세요!');
-                if (selectPetType) selectPetType.focus();
+                showCustomToast('🐾 반려동물 종류를 선택해주세요!', 'fa-list');
+                highlightInvalidField(selectPetType);
                 return;
             }
 
             if (!title) {
-                alert('✨ 자랑 제목을 입력해주세요!');
-                if (inputTitle) inputTitle.focus();
+                showCustomToast('✨ 자랑 제목을 입력해주세요!', 'fa-pen-nib');
+                highlightInvalidField(inputTitle);
                 return;
             }
 
             if (!content) {
-                alert('📝 자랑 내용 및 소개글을 입력해주세요!');
-                if (textareaContent) textareaContent.focus();
+                showCustomToast('📝 자랑 내용 및 소개글을 입력해주세요!', 'fa-align-left');
+                highlightInvalidField(textareaContent);
                 return;
             }
 
             if (!currentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
-                alert('🖼️ 출전시킬 반려동물 사진 이미지 파일을 반드시 첨부해주세요!');
-                if (fileInput) fileInput.focus();
+                showCustomToast('🖼️ 출전시킬 반려동물 사진 이미지를 반드시 첨부해주세요!', 'fa-image');
+                highlightInvalidField(fileInput);
                 return;
             }
 
