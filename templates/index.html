@@ -64,14 +64,12 @@
             {% endfor %}
         </select>
 
-        <!-- 동물 종류 콤보 박스 -->
+        <!-- 동물 종류 콤보 박스 (PST_PET_KIND 테이블 데이터 기반 동적 렌더링) -->
         <select id="petTypeSelect" class="select-custom" title="동물 종류 선택">
             <option value="all" {{ 'selected' if pet_type == 'all' }}>🐾 전체 동물</option>
-            <option value="🐕 강아지" {{ 'selected' if pet_type == '🐕 강아지' }}>🐕 강아지</option>
-            <option value="🐈 고양이" {{ 'selected' if pet_type == '🐈 고양이' }}>🐈 고양이</option>
-            <option value="🐹 햄스터" {{ 'selected' if pet_type == '🐹 햄스터' }}>🐹 햄스터</option>
-            <option value="🦜 앵무새" {{ 'selected' if pet_type == '🦜 앵무새' }}>🦜 앵무새</option>
-            <option value="기타" {{ 'selected' if pet_type == '기타' }}>🐾 기타</option>
+            {% for k in pet_kinds %}
+                <option value="{{ k.KIND_NM }}" {{ 'selected' if pet_type == k.KIND_NM or pet_type == k.KIND_CD }}>{{ k.KIND_NM }}</option>
+            {% endfor %}
         </select>
 
         <!-- 검색창 (동물종류 콤보 바로 옆에 나란히 배치) -->

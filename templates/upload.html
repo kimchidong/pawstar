@@ -47,11 +47,9 @@
                             </label>
                             <select name="pet_type" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
                                 <option value="" selected>선택</option>
-                                <option value="🐕 강아지">🐕 강아지</option>
-                                <option value="🐈 고양이">🐈 고양이</option>
-                                <option value="🐹 햄스터">🐹 햄스터</option>
-                                <option value="🦜 앵무새">🦜 앵무새</option>
-                                <option value="기타">🐾 기타</option>
+                                {% for k in pet_kinds %}
+                                    <option value="{{ k.KIND_CD }}">{{ k.KIND_NM }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>

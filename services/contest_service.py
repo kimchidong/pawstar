@@ -1,5 +1,5 @@
 """
-Paw Star Contest Service (Google Login/Register Support Added)
+Paw Star Contest & Ranking Service (Complete Methods Integration)
 """
 
 from datetime import datetime, timedelta
@@ -41,6 +41,21 @@ class PawStarService:
         else:
             contest['d_day_str'] = f"D-{diff_days}"
         return contest
+
+    def get_pet_kinds(self):
+        """ PST_PET_KIND 테이블 동물 종류 목록 반환 """
+        conn = self.get_db_connection()
+        if not conn:
+            return []
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT KIND_CD, KIND_NM, KIND_CLASS FROM pst_pet_kind ORDER BY KIND_CD ASC")
+                rows = cur.fetchall()
+                conn.close()
+                return rows
+        except Exception as e:
+            print("get_pet_kinds error:", e)
+            return []
 
     def get_contests(self):
         conn = self.get_db_connection()
@@ -203,7 +218,6 @@ class PawStarService:
             return False, str(e)
 
     def google_login_or_register(self, google_id, email, name, picture="", **kwargs):
-        """ 구글 소셜 로그인 / 회원가입 연동 메서드 """
         user_id = f"google_{google_id}" if google_id else (email or "google_user")
         nickname = name or (email.split('@')[0] if email else "구글집사")
         profile_img = picture or '/static/image/profile/default_profile.png'

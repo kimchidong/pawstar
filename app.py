@@ -94,6 +94,7 @@ def inject_global_vars():
 
     return {
         'contests': service.get_contests(),
+        'pet_kinds': service.get_pet_kinds(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
         'is_logged_in': is_logged_in
