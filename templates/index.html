@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<!-- Contest Hero Banner -->
-<div class="contest-hero">
+<!-- Contest Hero Banner (PST_THEME 테이블의 BANNER_IMG_FILE_PATH 중앙 정렬 바인딩) -->
+<div class="contest-hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.65) 0%, rgba(79, 70, 229, 0.55) 50%, rgba(225, 29, 72, 0.45) 100%), url('{{ current_contest.BANNER_IMG_FILE_PATH or current_contest.banner_img }}') center center / cover no-repeat;">
     <div class="hero-overlay"></div>
     <div class="hero-container">
         <!-- 좌측: 타이틀 & 대형 슬로건 -->
