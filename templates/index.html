@@ -101,7 +101,7 @@
 <!-- Post Cards Grid -->
 <div class="posts-grid">
     {% for p in posts %}
-        <div class="post-card" id="post-card-{{ p.ENT_USER_ID or p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
+        <div class="post-card" id="post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
             <div class="card-media">
                 <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 

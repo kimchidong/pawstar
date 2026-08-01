@@ -741,7 +741,14 @@ function submitDetailComment() {
                 scoreNumEl.textContent = (currentScore + 10).toLocaleString();
             }
 
-            const card = document.getElementById(`post-card-${postId}`);
+            const cleanId = String(postId);
+            const rawEntId = cleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`post-card-${cleanId}`) || 
+                         document.getElementById(`post-card-${rawEntId}`) ||
+                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+                         
             if (card) {
                 const btnCardComment = card.querySelector('.btn-comment');
                 if (btnCardComment) {

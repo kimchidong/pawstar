@@ -258,7 +258,14 @@ function submitMobileDetailComment() {
                 mScoreEl.textContent = (currentScore + 10).toLocaleString();
             }
 
-            const card = document.getElementById(`m-post-card-${mPostId}`);
+            const mCleanId = String(mPostId);
+            const mRawEntId = mCleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`m-post-card-${mCleanId}`) || 
+                         document.getElementById(`m-post-card-${mRawEntId}`) ||
+                         document.querySelector(`[data-post-id="${mCleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
+
             if (card) {
                 const btnCardComment = card.querySelector('.btn-comment');
                 if (btnCardComment) {
