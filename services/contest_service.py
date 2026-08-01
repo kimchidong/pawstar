@@ -2,8 +2,7 @@
 Paw Star Contest Service (get_posts & get_post_detail query rewrite)
 """
 
-import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 import pymysql
 from config import db_config
 

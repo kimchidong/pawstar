@@ -385,38 +385,11 @@ def is_mobile_user_agent():
 
 def get_current_user_id():
     """ 
-    로그인 유저 ID 또는 클라이언트 쿠키/IP-UA 핑거프린트/DB 최신 기록 기반 고유 방문자 식별자 100% 영구 동기화
-    (새로고침 시 식별자가 달라져 목록 표시가 소실되는 현상을 원천 방지)
+    로그인한 회원 유저 ID 반환 (로그아웃/비로그인 시 None 반환)
     """
     if session.get('user_id'):
         return session['user_id']
-    
-    cookie_id = request.cookies.get('pst_user_id')
-    if cookie_id and cookie_id.strip():
-        session['anon_user_id'] = cookie_id
-        return cookie_id
-        
-    if session.get('anon_user_id'):
-        return session['anon_user_id']
-
-    # DB 물리 로그 테이블에 가장 최신으로 등록된 익명 유저 ID가 있다면 자동 매칭하여 영구 동기화
-    conn = service.get_db_connection()
-    if conn:
-        try:
-            with conn.cursor() as cur:
-                cur.execute("SELECT USER_ID FROM POST_VIEW_LOG ORDER BY VIEW_ID DESC LIMIT 1")
-                row = cur.fetchone()
-                if row:
-                    matched_id = row['USER_ID'] if isinstance(row, dict) else row[0]
-                    session['anon_user_id'] = matched_id
-                    return matched_id
-            conn.close()
-        except Exception as e:
-            print("DB user_id matching error:", e)
-
-    new_id = f"guest_{uuid.uuid4().hex[:12]}"
-    session['anon_user_id'] = new_id
-    return new_id
+    return None
 
 # --- PC 전용 라우트 (1280px 고정) ---
 
@@ -445,7 +418,10 @@ def index():
         search_q=search_q,
         pet_type=pet_type
     ))
-    response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    if current_user_id:
+        response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    else:
+        response.delete_cookie('pst_user_id')
     return response
 
 # 2. 명예의 전당 (Hall of Fame)
@@ -515,7 +491,10 @@ def m_index():
         search_q=search_q,
         pet_type=pet_type
     ))
-    response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    if current_user_id:
+        response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
+    else:
+        response.delete_cookie('pst_user_id')
     return response
 
 @app.route('/m/hall-of-fame')
@@ -762,7 +741,7 @@ def post_event():
         event_type = data.get('event_type') # view, like, comment
         user_id = session.get('user_id')
 
-        if event_type != 'view' and not user_id:
+        if not user_id:
             return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
 
         if not post_id or not event_type:

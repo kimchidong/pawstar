@@ -305,6 +305,24 @@ async function triggerEvent(postId, eventType) {
         if (dView && data && data.view_count !== undefined) dView.textContent = data.view_count;
         const dLike = document.getElementById('detailLikeCount');
         if (dLike && data && data.like_count !== undefined) dLike.textContent = data.like_count;
+        if (data && data.is_liked !== undefined) {
+            const detailBtnLike = document.getElementById('detailBtnLike');
+            const detailHeartIcon = document.getElementById('detailHeartIcon');
+            if (detailBtnLike) {
+                const icon = detailBtnLike.querySelector('i');
+                if (data.is_liked) {
+                    detailBtnLike.classList.add('active');
+                    if (icon) icon.className = 'fa-solid fa-heart';
+                } else {
+                    detailBtnLike.classList.remove('active');
+                    if (icon) icon.className = 'fa-regular fa-heart';
+                }
+            }
+            if (detailHeartIcon) {
+                detailHeartIcon.className = data.is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                detailHeartIcon.style.color = data.is_liked ? '#e11d48' : '';
+            }
+        }
         const dComment = document.getElementById('detailCommentCount');
         if (dComment) dComment.textContent = data.comment_count;
         const dShare = document.getElementById('detailShareCount');
@@ -384,6 +402,14 @@ if (!window.postsDataStore) {
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
 function openDetailModal(post) {
+    if (!window.isUserLoggedIn) {
+        showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        setTimeout(() => {
+            window.location.href = '/auth/google';
+        }, 400);
+        return;
+    }
+
     const modal = document.getElementById('postDetailModal');
     if (!modal || !post) return;
 
@@ -532,42 +558,37 @@ function openDetailModal(post) {
 
     let isLiked = !!((post.actions && post.actions.is_liked) || post.is_liked);
 
-    // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화
-    if (heartIcon) {
-        heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-        heartIcon.style.color = isLiked ? '#e11d48' : '';
-    }
-    if (btnLike) {
-        if (isLiked) btnLike.classList.add('active');
-        else btnLike.classList.remove('active');
-    }
+    const updatePopupLikeUI = (likedState) => {
+        if (btnLike) {
+            const icon = btnLike.querySelector('i');
+            if (likedState) {
+                btnLike.classList.add('active');
+                if (icon) icon.className = 'fa-solid fa-heart';
+            } else {
+                btnLike.classList.remove('active');
+                if (icon) icon.className = 'fa-regular fa-heart';
+            }
+        }
+        if (heartIcon) {
+            heartIcon.className = likedState ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            heartIcon.style.color = likedState ? '#e11d48' : '';
+        }
+    };
+
+    // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화 및 색상 채우기
+    updatePopupLikeUI(isLiked);
 
     fetch(`/api/post/user_actions/${post.post_id}`)
         .then(res => res.json())
         .then(data => {
             if (data && data.success && data.actions) {
-                const act = data.actions;
-                isLiked = !!act.is_liked;
-                if (btnLike) {
-                    if (isLiked) btnLike.classList.add('active');
-                    else btnLike.classList.remove('active');
-                }
-                if (heartIcon) {
-                    heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-                    heartIcon.style.color = isLiked ? '#e11d48' : '';
-                }
+                isLiked = !!data.actions.is_liked;
+                updatePopupLikeUI(isLiked);
             }
         })
         .catch(err => {
             console.error(err);
-            if (heartIcon) {
-                heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-                heartIcon.style.color = isLiked ? '#e11d48' : '';
-            }
-            if (btnLike) {
-                if (isLiked) btnLike.classList.add('active');
-                else btnLike.classList.remove('active');
-            }
+            updatePopupLikeUI(isLiked);
         });
 
     const toggleLikeHandler = async () => {
@@ -575,21 +596,13 @@ function openDetailModal(post) {
             const success = await triggerEvent(post.post_id, 'like');
             if (success !== false) {
                 isLiked = true;
-                if (btnLike) btnLike.classList.add('active');
-                if (heartIcon) {
-                    heartIcon.className = 'fa-solid fa-heart';
-                    heartIcon.style.color = '#e11d48';
-                }
+                updatePopupLikeUI(true);
             }
         } else {
             const success = await triggerEvent(post.post_id, 'unlike');
             if (success !== false) {
                 isLiked = false;
-                if (btnLike) btnLike.classList.remove('active');
-                if (heartIcon) {
-                    heartIcon.className = 'fa-regular fa-heart';
-                    heartIcon.style.color = '';
-                }
+                updatePopupLikeUI(false);
             }
         }
     };

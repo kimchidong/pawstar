@@ -79,6 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 3. 모바일 전용 게시물 상세보기 모달 open
 function openMobileDetailModal(postData) {
+    if (!window.isUserLoggedIn) {
+        if (typeof showToast === 'function') {
+            showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        } else {
+            alert('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾');
+        }
+        setTimeout(() => {
+            window.location.href = '/auth/google';
+        }, 400);
+        return;
+    }
+
     const detailModal = document.getElementById('mDetailModal');
     if (!detailModal) return;
 
@@ -123,8 +135,14 @@ function openMobileDetailModal(postData) {
     const mBtnLikePopup = document.getElementById('mDetailBtnLike');
     const mHeartIcon = document.getElementById('mDetailHeartIcon');
     if (mBtnLikePopup) {
-        if (mIsLiked) mBtnLikePopup.classList.add('active');
-        else mBtnLikePopup.classList.remove('active');
+        const icon = mBtnLikePopup.querySelector('i');
+        if (mIsLiked) {
+            mBtnLikePopup.classList.add('active');
+            if (icon) icon.className = 'fa-solid fa-heart';
+        } else {
+            mBtnLikePopup.classList.remove('active');
+            if (icon) icon.className = 'fa-regular fa-heart';
+        }
     }
     if (mHeartIcon) {
         mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
