@@ -40,8 +40,8 @@
                 <li class="nav-item">
                     {% if is_logged_in %}
                         <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
-                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
-                            {{ current_user.nickname }}
+                            <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
+                            {{ current_user.NK_NM or current_user.nickname }}
                         </a>
                     {% else %}
                         <a href="/auth/google" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">

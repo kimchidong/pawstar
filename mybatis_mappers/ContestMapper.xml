@@ -6,119 +6,72 @@
     <!-- 1. 인기순 게시물 목록 (현재 회차 기준 score DESC) -->
     <select id="selectPostsByPopularity" resultType="PostVo">
         SELECT 
-            p.POST_ID,
-            p.USER_ID,
-            u.NICKNAME,
-            u.PROFILE_IMG,
-            p.CONTEST_ID,
-            c.TITLE AS CONTEST_TITLE,
-            p.PET_NAME,
-            p.PET_TYPE,
-            p.TITLE,
-            p.CONTENT,
-            p.FILE_PATH,
-            p.LIST_FILE_NAME,
-            p.POPUP_FILE_NAME,
-            p.MEDIA_TYPE,
-            p.SCORE,
-            p.VIEW_COUNT,
-            p.LIKE_COUNT,
-            p.COMMENT_COUNT,
-            p.SHARE_COUNT,
-            p.CREATED_AT
-        FROM POST p
-        JOIN USERS u ON p.USER_ID = u.USER_ID
-        JOIN CONTEST c ON p.CONTEST_ID = c.CONTEST_ID
-        WHERE p.CONTEST_ID = #{contestId}
-        ORDER BY p.SCORE DESC, p.CREATED_AT DESC
+            r.CONTEST_ROUND,
+            r.ENT_USER_ID AS USER_ID,
+            u.NK_NM AS NICKNAME,
+            u.PROFILE_URL AS PROFILE_IMG,
+            t.THEME_NM AS CONTEST_TITLE,
+            r.PET_NM AS PET_NAME,
+            k.KIND_NM AS PET_TYPE,
+            r.TITLE,
+            r.CONTS AS CONTENT,
+            r.PHT_PATH AS FILE_PATH,
+            r.PHT_FILE1 AS LIST_FILE_NAME,
+            r.PHT_FILE2 AS POPUP_FILE_NAME,
+            r.SCORE,
+            r.VW_CNT AS VIEW_COUNT,
+            r.LIKE_CNT AS LIKE_COUNT,
+            r.CMT_CNT AS COMMENT_COUNT,
+            r.ENT_DT AS CREATED_AT
+        FROM pst_contest_round r
+        JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
+        JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
+        JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+        JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+        WHERE r.CONTEST_ROUND = #{contestId}
+        ORDER BY r.SCORE DESC, r.ENT_DT DESC
     </select>
 
 
-    <!-- 3. 명예의 전당 회차별 수상작 조회 SQL (1위 슈퍼스타, 2위 라이징스타, 3위 브라이트스타, 급상승 1위 루키스타) -->
+    <!-- 3. 명예의 전당 회차별 수상작 조회 SQL -->
     <select id="selectHallOfFameByContest" resultType="ContestWinnerVo">
         SELECT 
-            w.WINNER_ID,
-            w.CONTEST_ID,
-            c.TITLE AS CONTEST_TITLE,
-            w.AWARD_TYPE,
-            w.PRIZE_NAME,
-            w.AWARDED_AT,
-            p.POST_ID,
-            p.PET_NAME,
-            p.PET_TYPE,
-            p.TITLE AS POST_TITLE,
-            p.FILE_PATH,
-            p.LIST_FILE_NAME,
-            p.POPUP_FILE_NAME,
-            p.SCORE,
+            ca.CONTEST_ROUND,
+            t.THEME_NM AS CONTEST_TITLE,
+            ca.AWARD_PART,
+            ca.AWARD_CD,
+            a.AWARD_NM AS PRIZE_NAME,
+            a.BADGE_IMG_PATH_FILE,
+            ca.SCORE,
+            ca.RANKING,
+            r.PET_NM AS PET_NAME,
+            k.KIND_NM AS PET_TYPE,
+            r.TITLE AS POST_TITLE,
+            r.PHT_PATH AS FILE_PATH,
+            r.PHT_FILE1 AS LIST_FILE_NAME,
             u.USER_ID,
-            u.NICKNAME,
-            u.PROFILE_IMG
-        FROM CONTEST_WINNER w
-        JOIN CONTEST c ON w.CONTEST_ID = c.CONTEST_ID
-        JOIN POST p ON w.POST_ID = p.POST_ID
-        JOIN USERS u ON w.USER_ID = u.USER_ID
-        WHERE w.CONTEST_ID = #{contestId}
-        ORDER BY 
-            CASE w.AWARD_TYPE
-                WHEN 'SUPER_STAR' THEN 1
-                WHEN 'RISING_STAR' THEN 2
-                WHEN 'BRIGHT_STAR' THEN 3
-                WHEN 'ROOKIE_STAR' THEN 4
-                ELSE 5
-            END ASC
+            u.NK_NM AS NICKNAME,
+            u.PROFILE_URL AS PROFILE_IMG
+        FROM pst_contest_award ca
+        JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+        JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+        JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+        JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ENT_USER_ID = r.ENT_USER_ID
+        JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
+        LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+        WHERE ca.CONTEST_ROUND = #{contestId}
+        ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
     </select>
 
     <!-- 4. 실시간 게시물 점수 갱신 SQL -->
     <update id="incrementPostScore">
-        UPDATE POST
+        UPDATE pst_contest_round
         SET 
             SCORE = SCORE + #{scoreDelta},
-            VIEW_COUNT = VIEW_COUNT + #{viewDelta},
-            LIKE_COUNT = LIKE_COUNT + #{likeDelta},
-            COMMENT_COUNT = COMMENT_COUNT + #{commentDelta},
-            SHARE_COUNT = SHARE_COUNT + #{shareDelta}
-        WHERE POST_ID = #{postId};
+            VW_CNT = VW_CNT + #{viewDelta},
+            LIKE_CNT = LIKE_CNT + #{likeDelta},
+            CMT_CNT = CMT_CNT + #{commentDelta}
+        WHERE CONTEST_ROUND = #{contestId} AND ENT_USER_ID = #{userId};
     </update>
-
-    <!-- 5. 콘테스트 회차 종료 및 수상자 선정 쿼리 -->
-    <insert id="insertContestWinners">
-        -- 1위 SUPER_STAR, 2위 RISING_STAR, 3위 BRIGHT_STAR
-        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
-        SELECT 
-            p.CONTEST_ID,
-            p.POST_ID,
-            p.USER_ID,
-            CASE ROW_NUMBER() OVER (ORDER BY p.SCORE DESC)
-                WHEN 1 THEN 'SUPER_STAR'
-                WHEN 2 THEN 'RISING_STAR'
-                WHEN 3 THEN 'BRIGHT_STAR'
-            END AS AWARD_TYPE,
-            CASE ROW_NUMBER() OVER (ORDER BY p.SCORE DESC)
-                WHEN 1 THEN 'Paw Star 골드 트로피 & 백화점 상품권 50만원'
-                WHEN 2 THEN 'Paw Star 실버 트로피 & 반려동물 용품 30만원'
-                WHEN 3 THEN 'Paw Star 브론즈 트로피 & 고급 사료 세트'
-            END AS PRIZE_NAME
-        FROM POST p
-        WHERE p.CONTEST_ID = #{contestId}
-        ORDER BY p.SCORE DESC
-        LIMIT 3;
-
-        -- 순위(1,2,3위) 외 하트 순 1위 ROOKIE_STAR 선정
-        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
-        SELECT 
-            p.CONTEST_ID,
-            p.POST_ID,
-            p.USER_ID,
-            'ROOKIE_STAR' AS AWARD_TYPE,
-            '루키 스타 특별상 & 루키 배지' AS PRIZE_NAME
-        FROM POST p
-        WHERE p.CONTEST_ID = #{contestId}
-          AND p.POST_ID NOT IN (
-              SELECT POST_ID FROM CONTEST_WINNER WHERE CONTEST_ID = #{contestId}
-          )
-        ORDER BY p.LIKE_COUNT DESC, p.SCORE DESC
-        LIMIT 1;
-    </insert>
 
 </mapper>

@@ -10,10 +10,10 @@
         <div class="hero-main-info">
             <div class="contest-badge-live">
                 <span class="live-dot"></span>
-                <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.status }}</span>
+                <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
             </div>
-            <h2 class="hero-title">{{ current_contest.title }}</h2>
-            <p class="hero-desc">{{ current_contest.description }}</p>
+            <h2 class="hero-title">{{ current_contest.THEME_NM or current_contest.title }}</h2>
+            <p class="hero-desc">{{ current_contest.CONTS or current_contest.description }}</p>
             
             <div class="hero-actions">
                 <a href="/upload" class="btn-hero-cta">
@@ -34,11 +34,11 @@
             <div class="contest-time-grid">
                 <div class="time-box">
                     <span class="time-label"><i class="fa-regular fa-calendar-check"></i> 시작일</span>
-                    <span class="time-val">{{ (current_contest.start_date|string)[:10] }}</span>
+                    <span class="time-val">{{ ((current_contest.ST_DT or current_contest.start_date)|string)[:10] }}</span>
                 </div>
                 <div class="time-box">
                     <span class="time-label"><i class="fa-regular fa-calendar-xmark"></i> 종료일</span>
-                    <span class="time-val">{{ (current_contest.end_date|string)[:10] }}</span>
+                    <span class="time-val">{{ ((current_contest.ED_DT or current_contest.end_date)|string)[:10] }}</span>
                 </div>
             </div>
 
@@ -56,9 +56,9 @@
     <div class="filter-left-group">
         <select id="contestSelect" class="select-custom" title="콘테스트 회차 선택">
             {% for c in contests %}
-                {% if '예정' not in c.status and c.status != 'SCHEDULED' %}
-                    <option value="{{ c.contest_id }}" {{ 'selected' if c.contest_id == current_contest.contest_id }}>
-                        {{ c.title }} ({{ c.status }})
+                {% if '예정' not in (c.CONTEST_STAT_NM or c.status) and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                    <option value="{{ c.CONTEST_ROUND or c.contest_id }}" {{ 'selected' if (c.CONTEST_ROUND or c.contest_id) == (current_contest.CONTEST_ROUND or current_contest.contest_id) }}>
+                        {{ c.THEME_NM or c.title }} ({{ c.CONTEST_STAT_NM or c.status }})
                     </option>
                 {% endif %}
             {% endfor %}
@@ -77,7 +77,7 @@
         <!-- 검색창 (동물종류 콤보 바로 옆에 나란히 배치) -->
         <div class="search-box">
             <form method="GET" action="/">
-                <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
+                <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
                 <input type="hidden" name="sort" value="{{ sort_type }}">
                 <input type="hidden" name="pet_type" value="{{ pet_type }}">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -88,13 +88,13 @@
 
     <!-- 3. 정렬 탭 (우측: 최신등록순, 인기순, 최근 급상승) -->
     <div class="tab-sort-group">
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
             <i class="fa-solid fa-clock"></i> 최신등록순
         </a>
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'score' }}">
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'score' }}">
             <i class="fa-solid fa-star"></i> 종합순위순
         </a>
-        <a href="?contest_id={{ current_contest.contest_id }}&sort=popular&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=popular&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
             <i class="fa-solid fa-heart"></i> 하트인기순
         </a>
     </div>
@@ -103,9 +103,9 @@
 <!-- Post Cards Grid -->
 <div class="posts-grid">
     {% for p in posts %}
-        <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
+        <div class="post-card" id="post-card-{{ p.ENT_USER_ID or p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
             <div class="card-media">
-                <img src="{% if p.file_path and p.list_file_name %}{{ p.file_path }}{{ p.list_file_name }}{% else %}{{ p.image_path or p.media_url }}{% endif %}" alt="{{ p.title }}" loading="lazy">
+                <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 
                 <!-- 랭킹 배지 (실시간 점수 SCORE 기준 1~3위 게시물에 배지 표시) -->
                 {% if p.rank_candidate == 1 %}
@@ -120,40 +120,40 @@
             <div class="card-body">
                 <div class="author-info">
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
-                        <img src="{{ p.user_profile }}" class="author-img" alt="profile">
+                        <img src="{{ p.PROFILE_URL or p.user_profile }}" class="author-img" alt="profile">
                         <div class="author-detail">
-                            <div class="nickname">{{ p.user_nickname }}</div>
-                            <div class="pet-tag">{% if p.pet_name and p.pet_name != '강아지' and p.pet_name != '우리 강아지' and p.pet_name != '아이 이름' %}{{ p.pet_type }} {{ p.pet_name }}{% else %}{{ p.pet_type }}{% endif %}</div>
+                            <div class="nickname">{{ p.NK_NM or p.user_nickname }}</div>
+                            <div class="pet-tag">{% if p.PET_NM and p.PET_NM != '강아지' and p.PET_NM != '우리 강아지' and p.PET_NM != '아이 이름' %}{{ p.KIND_NM or p.pet_type }} {{ p.PET_NM or p.pet_name }}{% else %}{{ p.KIND_NM or p.pet_type }}{% endif %}</div>
                         </div>
                     </div>
                 </div>
 
-                <h3 class="post-title">{{ p.title }}</h3>
-                <p class="post-desc">{{ p.content }}</p>
+                <h3 class="post-title">{{ p.TITLE or p.title }}</h3>
+                <p class="post-desc">{{ p.CONTS or p.content }}</p>
 
                 <!-- 등록 일시 (시분초) 및 총 점수 -->
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
                     <span style="font-size: 0.78rem; color: var(--text-muted);">
-                        {{ p.created_at }}
+                        {{ p.ENT_DT or p.created_at }}
                     </span>
                     <div class="card-total-score">
-                        <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                        <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.SCORE or p.score or 0) }}</span> 점
                     </div>
                 </div>
 
                 <!-- 수치 표시 현황 (조회, 좋아요, 댓글) -->
                 <div class="card-actions">
-                    <div class="action-btn btn-view" title="조회수" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'view');">
+                    <div class="action-btn btn-view" title="조회수" onclick="event.stopPropagation(); triggerEvent('{{ p.ENT_USER_ID or p.post_id }}', 'view');">
                         <i class="fa-regular fa-eye"></i>
-                        <span class="view-count">{{ p.view_count or 0 }}</span>
+                        <span class="view-count">{{ p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-like {% if p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요" onclick="event.stopPropagation(); toggleLikeCard(this, {{ p.post_id }});">
+                    <div class="action-btn btn-like {% if p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요" onclick="event.stopPropagation(); toggleLikeCard(this, '{{ p.ENT_USER_ID or p.post_id }}');">
                         <i class="fa-{% if p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i>
-                        <span class="like-count">{{ p.like_count or 0 }}</span>
+                        <span class="like-count">{{ p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0) }}</span>
                     </div>
                     <div class="action-btn btn-comment" title="댓글" onclick="event.stopPropagation(); openDetailModal({{ p | tojson | forceescape }});">
                         <i class="fa-regular fa-comment"></i>
-                        <span class="comment-count">{{ p.comment_count or 0 }}</span>
+                        <span class="comment-count">{{ p.CMT_CNT if p.CMT_CNT is not none else (p.comment_count or 0) }}</span>
                     </div>
                 </div>
             </div>
@@ -175,10 +175,10 @@
     <div class="pagination">
         <!-- 첫 페이지로 이동 -->
         {% if pagination.page > 1 %}
-            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page=1" class="page-link first" title="첫 페이지로 이동">
+            <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page=1" class="page-link first" title="첫 페이지로 이동">
                 <i class="fa-solid fa-angles-left"></i>
             </a>
-            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page - 1 }}" class="page-link prev">
+            <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page - 1 }}" class="page-link prev">
                 <i class="fa-solid fa-chevron-left"></i> 이전
             </a>
         {% endif %}
@@ -188,7 +188,7 @@
             {% if p_num == pagination.page %}
                 <span class="page-link active">{{ p_num }}</span>
             {% elif p_num <= 5 or p_num >= pagination.total_pages - 1 or (p_num >= pagination.page - 2 and p_num <= pagination.page + 2) %}
-                <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ p_num }}" class="page-link">{{ p_num }}</a>
+                <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ p_num }}" class="page-link">{{ p_num }}</a>
             {% elif p_num == 6 and pagination.page > 7 %}
                 <span class="page-ellipsis">...</span>
             {% endif %}
@@ -196,17 +196,15 @@
 
         <!-- 다음 및 마지막 페이지로 이동 -->
         {% if pagination.page < pagination.total_pages %}
-            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page + 1 }}" class="page-link next">
+            <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.page + 1 }}" class="page-link next">
                 다음 <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a href="?contest_id={{ current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.total_pages }}" class="page-link last" title="마지막 페이지로 이동">
+            <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort={{ sort_type }}&q={{ search_q }}&pet_type={{ pet_type }}&page={{ pagination.total_pages }}" class="page-link last" title="마지막 페이지로 이동">
                 <i class="fa-solid fa-angles-right"></i>
             </a>
         {% endif %}
     </div>
 </div>
 {% endif %}
-
-
 
 {% endblock %}

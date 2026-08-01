@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Paw Star 매월 1일 대회 당선 로직 배치 스크립트
+Paw Star 매월 1일 대회 당선 및 회차 생성 배치 스크립트
 
 [Crontab 설정 방법]
 매월 1일 0시 0분 0초 실행:
 0 0 1 * * /usr/bin/python3 /path/to/pawstar/monthly_award_batch.py >> /path/to/pawstar/batch.log 2>&1
 
-[처리 내용]
-1. 진행 중이었던 지난달 회차(CONTEST) 선정 및 상태 종료(CLOSED) 처리
-2. 해당 회차의 게시물(POST) 중 하트(LIKE_COUNT/SCORE) 기준 순위 산출:
-   - 스타 1위, 2위, 3위 (RANKING 1, 2, 3)
-   - 루키스타 3마리 (상위 1~3위 제외 후 하트 순 1, 2, 3위 -> RANKING 4, 5, 6)
-3. 당선 결과를 POST 테이블의 RANKING (전체순위) 및 BADGE_ID 컬럼에 UPDATE 저장
-4. (연동) CONTEST_WINNER 및 USER_BADGE 테이블에도 수상 기록 보장
+[업무 처리 내용]
+1. 현재 진행 중(G001C001) 회차 조회
+2. 해당 회차 참가자 전원의 점수(SCORE) 계산
+3. 전체 순위(TOTAL_RANKING) 및 품종별 순위(KIND_RANKING) 산출 및 pst_contest_round 저장 (PRC_DT 동결)
+4. 수상자 레코드(pst_contest_award) INSERT
+   - 전체 1~3위 (G002P001: P001A101, P001A102, P001A103)
+   - 품종별 1~3위 (G002P002: P002A901, P002A902, P002A903)
+5. 진행 중 회차 상태 종료(G001C002) 처리
+6. 다음 월 테마(pst_theme)를 기반으로 새 회차(G001C001) 자동 생성
 """
 
 import sys
@@ -32,272 +34,165 @@ def get_db_connection():
     try:
         return pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
     except Exception as e:
-        print(f"[{datetime.datetime.now()}] ❌ DB 연결 실패: {e}")
+        print(f"[{datetime.datetime.now()}] DB 연결 실패: {e}")
         return None
-
-def ensure_schema(conn):
-    """ POST 테이블에 RANKING 및 BADGE_ID 컬럼 자가 점검 및 마이그레이션 """
-    with conn.cursor() as cur:
-        # 기존 `RANK` 컬럼이 남아있다면 `RANKING`으로 컬럼명 변경
-        cur.execute("SHOW COLUMNS FROM POST LIKE 'RANK'")
-        if cur.fetchone():
-            print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블의 RANK 컬럼을 RANKING으로 변경 중...")
-            cur.execute("ALTER TABLE POST CHANGE COLUMN `RANK` RANKING INT DEFAULT NULL")
-
-        # POST 테이블에 SCORE, RANKING, BADGE_ID 컬럼 존재 여부 체크 및 추가
-        cur.execute("SHOW COLUMNS FROM POST LIKE 'SCORE'")
-        if not cur.fetchone():
-            print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블에 SCORE 컬럼 추가 중...")
-            cur.execute("ALTER TABLE POST ADD COLUMN SCORE INT DEFAULT 0")
-
-        cur.execute("SHOW COLUMNS FROM POST LIKE 'RANKING'")
-        if not cur.fetchone():
-            print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블에 RANKING 컬럼 추가 중...")
-            cur.execute("ALTER TABLE POST ADD COLUMN RANKING INT DEFAULT NULL")
-
-        cur.execute("SHOW COLUMNS FROM POST LIKE 'BADGE_ID'")
-        if not cur.fetchone():
-            print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블에 BADGE_ID 컬럼 추가 중...")
-            cur.execute("ALTER TABLE POST ADD COLUMN BADGE_ID INT DEFAULT NULL")
-
-        # 필수 BADGE 기본데이터 보장
-        badges = [
-            (1, '🥇 1위 슈퍼스타', 'trophy-gold', '콘테스트 1위 슈퍼스타'),
-            (2, '🥈 2위 라이징스타', 'trophy-silver', '콘테스트 2위 라이징스타'),
-            (3, '🥉 3위 브라이트스타', 'trophy-bronze', '콘테스트 3위 브라이트스타'),
-            (4, '⭐ 루키스타 1위', 'star-rookie-1', '급상승 루키스타 1위'),
-            (5, '⭐ 루키스타 2위', 'star-rookie-2', '급상승 루키스타 2위'),
-            (6, '⭐ 루키스타 3위', 'star-rookie-3', '급상승 루키스타 3위'),
-        ]
-        for badge_id, name, icon, desc in badges:
-            cur.execute("""
-                INSERT INTO BADGE (BADGE_ID, BADGE_NAME, BADGE_ICON, DESCRIPTION)
-                VALUES (%s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE BADGE_NAME=%s, BADGE_ICON=%s, DESCRIPTION=%s
-            """, (badge_id, name, icon, desc, name, icon, desc))
-    conn.commit()
 
 def run_monthly_award_batch():
     now = datetime.datetime.now()
-    print(f"==================================================")
-    print(f"[{now}] 🏆 월간 파라다이스 콘테스트 당선 배치 처리 시작")
-    print(f"==================================================")
+    print("==================================================")
+    print(f"[{now}] PAW STAR 월간 당선 & 회차 생성 배치 실행")
+    print("==================================================")
 
     conn = get_db_connection()
     if not conn:
         sys.exit(1)
 
     try:
-        ensure_schema(conn)
-
         with conn.cursor() as cur:
-            # 1. 진행 중이었던 지난달 회차 찾기
-            # 우선순위: STATUS = 'IN_PROGRESS' 인 가장 최근 회차, 없을 시 END_DATE가 현재 이전인 가장 최근 회차
+            cur.execute("SET NAMES utf8mb4;")
+
+            # 1. 진행 중인 회차 조회 (G001C001)
             cur.execute("""
-                SELECT CONTEST_ID, TITLE, START_DATE, END_DATE, STATUS 
-                FROM CONTEST
-                WHERE STATUS = 'IN_PROGRESS'
-                ORDER BY CONTEST_ID ASC
+                SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
+                FROM pst_contest
+                WHERE CONTEST_STAT = 'G001C001'
+                ORDER BY CONTEST_ROUND DESC
                 LIMIT 1
             """)
-            target_contest = cur.fetchone()
+            current_contest = cur.fetchone()
 
-            if not target_contest:
-                # IN_PROGRESS가 없는 경우 최신 종료 대상 회차 조회
+            if not current_contest:
+                print(f"[{now}] 진행 중인 회차가 없어 회차 #1 자동 생성을 진행합니다.")
                 cur.execute("""
-                    SELECT CONTEST_ID, TITLE, START_DATE, END_DATE, STATUS 
-                    FROM CONTEST
-                    ORDER BY CONTEST_ID DESC
-                    LIMIT 1
+                    INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
+                    VALUES (1, 'T001', NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH), 'G001C001')
                 """)
-                target_contest = cur.fetchone()
-
-            if not target_contest:
-                print(f"[{now}] ⚠️ 진행 대상 콘테스트 회차가 존재하지 않습니다.")
-                return
-
-            contest_id = target_contest['CONTEST_ID']
-            contest_title = target_contest['TITLE']
-            print(f"[{now}] 🎯 대상 회차 선정: [ID: {contest_id}] {contest_title}")
-
-            # 해당 회차 상태를 'CLOSED' (종료) 로 업데이트
-            cur.execute("UPDATE CONTEST SET STATUS = 'CLOSED' WHERE CONTEST_ID = %s", (contest_id,))
-            print(f"[{now}] 🔒 회차 STATUS를 'CLOSED'로 변경 완료.")
-
-            # 다음 달 예정(SCHEDULED) 회차가 있다면 'IN_PROGRESS'로 변경
-            cur.execute("""
-                UPDATE CONTEST 
-                SET STATUS = 'IN_PROGRESS' 
-                WHERE STATUS = 'SCHEDULED' 
-                ORDER BY CONTEST_ID ASC 
-                LIMIT 1
-            """)
-
-            # 2. 스타 1~3위 선정 (SCORE 기준: SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC)
-            cur.execute("""
-                SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                FROM POST
-                WHERE CONTEST_ID = %s
-                ORDER BY SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC
-                LIMIT 3
-            """, (contest_id,))
-            star_posts = cur.fetchall()
-
-            star_post_ids = [p['POST_ID'] for p in star_posts]
-
-            # 3. 루키스타 3마리 선정 (1~3위 스타 제외, 오로지 하트 기준: LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC)
-            if star_post_ids:
-                format_strings = ','.join(['%s'] * len(star_post_ids))
-                rookie_sql = f"""
-                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                    FROM POST
-                    WHERE CONTEST_ID = %s
-                      AND POST_ID NOT IN ({format_strings})
-                    ORDER BY LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC
-                    LIMIT 3
-                """
-                cur.execute(rookie_sql, [contest_id] + star_post_ids)
-            else:
-                cur.execute("""
-                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                    FROM POST
-                    WHERE CONTEST_ID = %s
-                    ORDER BY LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC
-                    LIMIT 3
-                """, (contest_id,))
-            rookie_posts = cur.fetchall()
-
-            if not star_posts and not rookie_posts:
-                print(f"[{now}] ⚠️ 대상 회차({contest_id})에 등록된 게시물이 없습니다.")
                 conn.commit()
-                return
-
-            print(f"[{now}] 📊 스타 3위(점수 기준) 및 루키스타 3마리(하트 기준) 선정 시작.")
-
-            star_awards = [
-                (1, 1, 'SUPER_STAR', '🥇 스타 1위 (슈퍼스타)'),
-                (2, 2, 'RISING_STAR', '🥈 스타 2위 (라이징스타)'),
-                (3, 3, 'BRIGHT_STAR', '🥉 스타 3위 (브라이트스타)'),
-            ]
-
-            rookie_awards = [
-                (4, 4, 'ROOKIE_STAR_1', '⭐ 루키스타 1위'),
-                (5, 5, 'ROOKIE_STAR_2', '⭐ 루키스타 2위'),
-                (6, 6, 'ROOKIE_STAR_3', '⭐ 루키스타 3위'),
-            ]
-
-            awarded_count = 0
-
-            # 스타 1~3위 업데이트
-            for idx, post in enumerate(star_posts):
-                rank_val, badge_id, award_type, award_label = star_awards[idx]
-                post_id = post['POST_ID']
-                user_id = post['USER_ID']
-                pet_name = post['PET_NAME']
-                score = post['SCORE']
-                like_cnt = post['LIKE_COUNT']
-
-                cur.execute("UPDATE POST SET RANKING = %s, BADGE_ID = %s WHERE POST_ID = %s", (rank_val, badge_id, post_id))
                 cur.execute("""
-                    INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
-                    VALUES (%s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE AWARD_TYPE = VALUES(AWARD_TYPE)
-                """, (contest_id, post_id, user_id, award_type, award_label))
-                cur.execute("""
-                    INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID)
-                    VALUES (%s, %s, %s)
-                    ON DUPLICATE KEY UPDATE GRANTED_AT = CURRENT_TIMESTAMP
-                """, (user_id, contest_id, badge_id))
-                awarded_count += 1
-                print(f"  [{award_label}] 순위: {rank_val}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 점수: {score}점 | 하트: {like_cnt}개 | BADGE_ID: {badge_id}")
+                    SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
+                    FROM pst_contest WHERE CONTEST_ROUND = 1
+                """)
+                current_contest = cur.fetchone()
 
-            # 루키스타 1~3위 (하트 순) 업데이트
-            for idx, post in enumerate(rookie_posts):
-                rank_val, badge_id, award_type, award_label = rookie_awards[idx]
-                post_id = post['POST_ID']
-                user_id = post['USER_ID']
-                pet_name = post['PET_NAME']
-                score = post['SCORE']
-                like_cnt = post['LIKE_COUNT']
+            round_id = current_contest['CONTEST_ROUND']
+            print(f"[{now}] 대상 콘테스트 회차: 제{round_id}회")
 
-                cur.execute("UPDATE POST SET RANKING = %s, BADGE_ID = %s WHERE POST_ID = %s", (rank_val, badge_id, post_id))
-                cur.execute("""
-                    INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
-                    VALUES (%s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE AWARD_TYPE = VALUES(AWARD_TYPE)
-                """, (contest_id, post_id, user_id, award_type, award_label))
-                cur.execute("""
-                    INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID)
-                    VALUES (%s, %s, %s)
-                    ON DUPLICATE KEY UPDATE GRANTED_AT = CURRENT_TIMESTAMP
-                """, (user_id, contest_id, badge_id))
-                awarded_count += 1
-                print(f"  [{award_label}] 순위: {rank_val}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 하트: {like_cnt}개 | 점수: {score}점 | BADGE_ID: {badge_id}")
+            # 2. 해당 회차 모든 참가물의 실시간 점수(SCORE) 재집계 및 순위 산출
+            cur.execute("""
+                SELECT CONTEST_ROUND, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT,
+                       (LIKE_CNT * 5 + CMT_CNT * 10 + VW_CNT * 1) AS CALC_SCORE
+                FROM pst_contest_round
+                WHERE CONTEST_ROUND = %s
+            """, (round_id,))
+            participants = cur.fetchall()
 
-            # 3-2. 동물 종류별 1, 2, 3위 (강아지 1위, 고양이 1위, 햄스터 1위 등) 선정
-            categories = ['강아지', '고양이', '햄스터', '앵무새', '토끼']
-            for cat in categories:
+            print(f"[{now}] 총 참가 작품 수: {len(participants)}개")
+
+            for p in participants:
+                calc_score = p['CALC_SCORE']
                 cur.execute("""
-                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                    FROM POST
-                    WHERE CONTEST_ID = %s AND PET_TYPE LIKE %s
-                    ORDER BY SCORE DESC, LIKE_COUNT DESC, CREATED_AT ASC
-                    LIMIT 3
-                """, (contest_id, f"%{cat}%"))
-                cat_posts = cur.fetchall()
-                for idx, post in enumerate(cat_posts):
-                    rank_num = idx + 1
-                    award_type = f"CAT_{cat}_{rank_num}"
-                    award_label = f"{cat} {rank_num}위"
+                    UPDATE pst_contest_round
+                    SET SCORE = %s
+                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                """, (calc_score, round_id, p['ENT_USER_ID']))
+
+            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장
+            cur.execute("""
+                SELECT CONTEST_ROUND, ENT_USER_ID, SCORE
+                FROM pst_contest_round
+                WHERE CONTEST_ROUND = %s
+                ORDER BY SCORE DESC, ENT_DT ASC
+            """, (round_id,))
+            total_sorted = cur.fetchall()
+
+            for rank_idx, item in enumerate(total_sorted, start=1):
+                cur.execute("""
+                    UPDATE pst_contest_round
+                    SET TOTAL_RANKING = %s, PRC_DT = NOW()
+                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                """, (rank_idx, round_id, item['ENT_USER_ID']))
+
+            # 4. 품종별 순위(KIND_RANKING) 산출 & 저장
+            cur.execute("""
+                SELECT DISTINCT KIND_CD FROM pst_contest_round WHERE CONTEST_ROUND = %s AND KIND_CD IS NOT NULL
+            """, (round_id,))
+            kind_rows = cur.fetchall()
+
+            for k_row in kind_rows:
+                k_cd = k_row['KIND_CD']
+                cur.execute("""
+                    SELECT CONTEST_ROUND, ENT_USER_ID, SCORE
+                    FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND KIND_CD = %s
+                    ORDER BY SCORE DESC, ENT_DT ASC
+                """, (round_id, k_cd))
+                k_sorted = cur.fetchall()
+                for k_rank, k_item in enumerate(k_sorted, start=1):
                     cur.execute("""
-                        INSERT INTO CONTEST_WINNER (CONTEST_ID, POST_ID, USER_ID, AWARD_TYPE, PRIZE_NAME)
-                        VALUES (%s, %s, %s, %s, %s)
-                        ON DUPLICATE KEY UPDATE PRIZE_NAME = VALUES(PRIZE_NAME)
-                    """, (contest_id, post['POST_ID'], post['USER_ID'], award_type, award_label))
-                    print(f"  [{award_label}] 게시물 ID: {post['POST_ID']} | 반려동물: {post['PET_NAME']} | 점수: {post['SCORE']}점")
+                        UPDATE pst_contest_round
+                        SET KIND_RANKING = %s
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                    """, (k_rank, round_id, k_item['ENT_USER_ID']))
 
-            # 4. 1~6위 당선작 외의 모든 남아있는 게시물 순위(RANKING) 순차 부여 (7위, 8위, ...)
-            awarded_post_ids = star_post_ids + [p['POST_ID'] for p in rookie_posts]
-            if awarded_post_ids:
-                format_strings = ','.join(['%s'] * len(awarded_post_ids))
-                other_sql = f"""
-                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                    FROM POST
-                    WHERE CONTEST_ID = %s
-                      AND POST_ID NOT IN ({format_strings})
-                    ORDER BY LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC
-                """
-                cur.execute(other_sql, [contest_id] + awarded_post_ids)
-            else:
+            # 5. 당선자 레코드 (pst_contest_award) INSERT
+            award_codes_overall = ['P001A101', 'P001A102', 'P001A103']
+            for rank_idx, item in enumerate(total_sorted[:3], start=1):
+                award_cd = award_codes_overall[rank_idx - 1]
                 cur.execute("""
-                    SELECT POST_ID, USER_ID, PET_NAME, TITLE, LIKE_COUNT, SCORE
-                    FROM POST
-                    WHERE CONTEST_ID = %s
-                    ORDER BY LIKE_COUNT DESC, SCORE DESC, CREATED_AT ASC
-                """, (contest_id,))
+                    INSERT INTO pst_contest_award
+                    (CONTEST_ROUND, AWARD_PART, AWARD_CD, ENT_USER_ID, SCORE, RANKING)
+                    VALUES (%s, 'G002P001', %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE SCORE=VALUES(SCORE), RANKING=VALUES(RANKING)
+                """, (round_id, award_cd, item['ENT_USER_ID'], item['SCORE'], rank_idx))
 
-            other_posts = cur.fetchall()
+            award_codes_kind = ['P002A901', 'P002A902', 'P002A903']
+            for k_row in kind_rows:
+                k_cd = k_row['KIND_CD']
+                cur.execute("""
+                    SELECT CONTEST_ROUND, ENT_USER_ID, SCORE
+                    FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND KIND_CD = %s
+                    ORDER BY SCORE DESC, ENT_DT ASC
+                    LIMIT 3
+                """, (round_id, k_cd))
+                k_top = cur.fetchall()
+                for rank_idx, item in enumerate(k_top, start=1):
+                    award_cd = award_codes_kind[rank_idx - 1]
+                    cur.execute("""
+                        INSERT INTO pst_contest_award
+                        (CONTEST_ROUND, AWARD_PART, AWARD_CD, ENT_USER_ID, SCORE, RANKING)
+                        VALUES (%s, 'G002P002', %s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE SCORE=VALUES(SCORE), RANKING=VALUES(RANKING)
+                    """, (round_id, award_cd, item['ENT_USER_ID'], item['SCORE'], rank_idx))
 
-            current_rank = len(awarded_post_ids) + 1
-            for post in other_posts:
-                post_id = post['POST_ID']
-                pet_name = post['PET_NAME']
-                score = post['SCORE']
-                like_cnt = post['LIKE_COUNT']
+            # 6. 현재 회차 종료 (G001C002) 처리
+            cur.execute("""
+                UPDATE pst_contest
+                SET CONTEST_STAT = 'G001C002'
+                WHERE CONTEST_ROUND = %s
+            """, (round_id,))
 
-                cur.execute("UPDATE POST SET RANKING = %s, BADGE_ID = NULL WHERE POST_ID = %s", (current_rank, post_id))
-                print(f"  [참가 게시물] 순위: {current_rank}위 | 게시물 ID: {post_id} | 반려동물: {pet_name} | 하트: {like_cnt}개 | 점수: {score}점 | BADGE_ID: None")
-                current_rank += 1
+            # 7. 다음 회차 (CONTEST_ROUND + 1) 생성 (G001C001)
+            next_round = round_id + 1
+            next_month = (now.month % 12) + 1
+            next_theme_cd = f'T{next_month:03d}'
+
+            cur.execute("""
+                INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
+                VALUES (%s, %s, NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH), 'G001C001')
+                ON DUPLICATE KEY UPDATE CONTEST_STAT = 'G001C001'
+            """, (next_round, next_theme_cd))
 
             conn.commit()
-            print(f"[{datetime.datetime.now()}] ✅ 회차 내 전체 총 {awarded_count + len(other_posts)}개 게시물 순위(RANKING) 반영 및 당선 정보 UPDATE 완료!")
+            print(f"[{now}] 제{round_id}회 마감 및 당선자 선정 완료! 제{next_round}회(테마: {next_theme_cd}) 진행중으로 새로 오픈되었습니다.")
+            conn.close()
 
-    except Exception as err:
-        conn.rollback()
-        print(f"[{datetime.datetime.now()}] ❌ 배치 실행 중 오류 발생: {err}")
-        raise err
-    finally:
-        conn.close()
+    except Exception as e:
+        print(f"[{now}] 배치 실패: {e}")
+        if conn:
+            conn.rollback()
+            conn.close()
+        sys.exit(1)
 
 if __name__ == '__main__':
     run_monthly_award_batch()
