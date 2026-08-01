@@ -1,5 +1,5 @@
 """
-Paw Star Contest & Ranking Service (Backend Complete Methods Support)
+Paw Star Contest & Ranking Service (Pagination Dictionary Fix)
 """
 
 from datetime import datetime, timedelta
@@ -143,7 +143,6 @@ class PawStarService:
         return contests[0]
 
     def get_contest(self, contest_id=None):
-        """ app.py 호환 단수형 get_contest 메서드 """
         return self.get_current_contest(contest_id)
 
     def is_user_exists(self, user_id):
@@ -186,7 +185,6 @@ class PawStarService:
                 cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
                 if not user:
-                    # 신규 소셜 유저인 경우 자동 생성
                     user = self.register_user(user_id, user_id)
                 else:
                     cur.execute("UPDATE pst_user SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() WHERE USER_ID = %s", (user_id,))
@@ -227,13 +225,11 @@ class PawStarService:
                 if not user_info:
                     user_info = {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}
 
-                # 마이 포스트 목록
                 cur.execute("""
                     SELECT 
                         r.CONTEST_ROUND, r.ENT_USER_ID, r.PET_NM, r.TITLE, r.CONTS,
                         CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
                         r.VW_CNT, r.LIKE_CNT, r.CMT_CNT, r.SCORE, r.ENT_DT,
-                        -- 호환
                         r.CONTEST_ROUND AS contest_id, r.ENT_USER_ID AS user_id, r.PET_NM AS pet_name, r.TITLE AS title, r.SCORE AS score
                     FROM pst_contest_round r
                     WHERE r.ENT_USER_ID = %s
@@ -241,12 +237,10 @@ class PawStarService:
                 """, (user_id,))
                 my_posts = cur.fetchall()
 
-                # 통계 계산
                 my_post_count = len(my_posts)
                 total_score = sum(p.get('SCORE', 0) for p in my_posts)
                 total_likes = sum(p.get('LIKE_CNT', 0) for p in my_posts)
 
-                # 수상 내역
                 cur.execute("""
                     SELECT 
                         ca.CONTEST_ROUND, ca.AWARD_CD, a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
@@ -280,10 +274,14 @@ class PawStarService:
             print("get_user_profile error:", e)
             return {'user_info': {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}, 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0}, 'my_posts': [], 'my_awards': []}
 
-    def get_posts(self, contest_id=None, pet_type='all', sort_type='latest', search_q='', current_user_id=None, page=1, per_page=12):
+    def get_posts(self, contest_id=None, pet_type='all', sort_type='latest', search_q='', search_query='', current_user_id=None, user_id=None, page=1, per_page=12, **kwargs):
+        search_q = search_query or search_q
+        current_user_id = user_id or current_user_id
+
         conn = self.get_db_connection()
         if not conn:
-            return {'posts': [], 'pagination': {'total_count': 0, 'page': 1, 'total_pages': 1}}
+            empty_pag = {'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page}
+            return {'posts': [], 'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page, 'pagination': empty_pag}
 
         try:
             if not contest_id:
@@ -382,18 +380,26 @@ class PawStarService:
                     posts.append(row)
 
                 conn.close()
+
+                pag_dict = {
+                    'total_count': total_count,
+                    'page': page,
+                    'total_pages': total_pages,
+                    'per_page': per_page
+                }
+
                 return {
                     'posts': posts,
-                    'pagination': {
-                        'total_count': total_count,
-                        'page': page,
-                        'total_pages': total_pages,
-                        'per_page': per_page
-                    }
+                    'total_count': total_count,
+                    'page': page,
+                    'total_pages': total_pages,
+                    'per_page': per_page,
+                    'pagination': pag_dict
                 }
         except Exception as e:
             print("get_posts error:", e)
-            return {'posts': [], 'pagination': {'total_count': 0, 'page': 1, 'total_pages': 1}}
+            empty_pag = {'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page}
+            return {'posts': [], 'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page, 'pagination': empty_pag}
 
     def get_post_detail(self, contest_id, ent_user_id, current_user_id=None):
         conn = self.get_db_connection()
