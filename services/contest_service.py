@@ -325,18 +325,64 @@ class PawStarService:
 
                 cur.execute("""
                     SELECT 
-                        r.CONTEST_ROUND, r.ENT_USER_ID, r.PET_NM, r.TITLE, r.CONTS,
+                        r.CONTEST_ROUND,
+                        r.ENT_USER_ID,
+                        r.ENT_USER_ID AS USER_ID,
+                        u.NK_NM,
+                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
+                        k.KIND_NM,
+                        k.KIND_CLASS,
+                        r.PET_NM,
+                        r.TITLE,
+                        r.CONTS,
+                        r.PHT_PATH,
+                        r.PHT_FILE1,
+                        r.PHT_FILE2,
                         CASE 
-                            WHEN r.PHT_PATH LIKE '/%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN 
+                                IF(RIGHT(r.PHT_PATH, 1) = '/', CONCAT(r.PHT_PATH, r.PHT_FILE1), CONCAT(r.PHT_PATH, '/', r.PHT_FILE1))
+                            ELSE CONCAT('/static/image/paw/2026/08/', r.PHT_FILE1)
                         END AS IMAGE_PATH,
-                        r.VW_CNT, r.LIKE_CNT, r.CMT_CNT, r.SCORE, r.ENT_DT,
-                        r.CONTEST_ROUND AS contest_id, r.ENT_USER_ID AS user_id, r.PET_NM AS pet_name, r.TITLE AS title, r.SCORE AS score
+                        r.VW_CNT,
+                        r.LIKE_CNT,
+                        r.CMT_CNT,
+                        r.SCORE,
+                        r.ENT_DT,
+                        -- 호환 키
+                        r.CONTEST_ROUND AS contest_id,
+                        r.ENT_USER_ID AS user_id,
+                        CONCAT(r.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id,
+                        u.NK_NM AS user_nickname,
+                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
+                        k.KIND_NM AS pet_type,
+                        r.PET_NM AS pet_name,
+                        r.TITLE AS title,
+                        r.CONTS AS content,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN 
+                                IF(RIGHT(r.PHT_PATH, 1) = '/', CONCAT(r.PHT_PATH, r.PHT_FILE1), CONCAT(r.PHT_PATH, '/', r.PHT_FILE1))
+                            ELSE CONCAT('/static/image/paw/2026/08/', r.PHT_FILE1)
+                        END AS image_path,
+                        r.VW_CNT AS view_count,
+                        r.LIKE_CNT AS like_count,
+                        r.CMT_CNT AS comment_count,
+                        r.SCORE AS score
                     FROM pst_contest_round r
+                    JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
+                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE r.ENT_USER_ID = %s OR r.ENT_USER_ID LIKE %s
                     ORDER BY r.ENT_DT DESC
                 """, (user_id, f"{user_id}_post_%"))
                 my_posts = cur.fetchall()
+
+                for p in my_posts:
+                    dt_val = p.get('ENT_DT')
+                    if hasattr(dt_val, 'strftime'):
+                        dt_str = dt_val.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        dt_str = str(dt_val or '')
+                    p['ENT_DT'] = dt_str
+                    p['created_at'] = dt_str
 
                 my_post_count = len(my_posts)
                 total_score = sum(p.get('SCORE', 0) for p in my_posts)

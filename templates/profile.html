@@ -95,29 +95,34 @@
         {% for p in my_posts %}
             <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
-                    <img src="{{ p.image_path or p.media_url }}" alt="{{ p.title }}" loading="lazy">
+                    <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 </div>
                 <div class="card-body">
                     <div class="author-info">
                         <div style="display: flex; align-items: center; gap: 0.65rem;">
-                            <img src="{{ p.user_profile }}" class="author-img" alt="profile">
+                            <img src="{{ p.PROFILE_URL or p.user_profile or user_info.profile_img }}" class="author-img" alt="profile">
                             <div class="author-detail">
-                                <div class="nickname">{{ p.user_nickname }}</div>
-                                <div class="pet-tag">{{ p.pet_type }} {{ p.pet_name }}</div>
+                                <div class="nickname">{{ p.NK_NM or p.user_nickname or user_info.nickname }}</div>
+                                <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
+                                    <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                                    {% if p.PET_NM or p.pet_name %}
+                                        <span style="color: #6d28d9; font-weight: 700;">{{ p.PET_NM or p.pet_name }}</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <h3 class="post-title">{{ p.title }}</h3>
-                    <p class="post-desc">{{ p.content }}</p>
+                    <h3 class="post-title">{{ p.TITLE or p.title }}</h3>
+                    <p class="post-desc">{{ p.CONTS or p.content }}</p>
 
                     <!-- 등록 일시 (시분초) 및 총 점수 -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
                         <span style="font-size: 0.78rem; color: var(--text-muted);">
-                            {{ p.created_at }}
+                            {{ p.ENT_DT or p.created_at }}
                         </span>
                         <div class="card-total-score">
-                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.score) }}</span> 점
+                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.SCORE or p.score or 0) }}</span> 점
                         </div>
                     </div>
                 </div>
