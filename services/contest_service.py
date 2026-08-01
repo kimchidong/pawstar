@@ -880,10 +880,11 @@ class PawStarService:
                     exists = cur.fetchone()
 
                     if not exists:
-                        # 최초 1회 조회시에만 기록 추가 및 VW_CNT / SCORE 카운트 증가
+                        # 최초 1회 조회시 pst_contest_vw 기록 추가 및 VW_CNT / SCORE 카운트 증가
                         cur.execute("""
-                            INSERT IGNORE INTO pst_contest_vw (CONTEST_ROUND, ENT_USER_ID, VW_USER_ID)
-                            VALUES (%s, %s, %s)
+                            INSERT INTO pst_contest_vw (CONTEST_ROUND, ENT_USER_ID, VW_USER_ID, VW_DT)
+                            VALUES (%s, %s, %s, NOW())
+                            ON DUPLICATE KEY UPDATE VW_DT = NOW()
                         """, (contest_id, ent_user_id, view_user_id))
                         cur.execute("""
                             UPDATE pst_contest_round
@@ -892,6 +893,14 @@ class PawStarService:
                         """, (contest_id, ent_user_id))
                         conn.commit()
                     else:
+                        # 이미 조회가 되었더라도 조회 일시(VW_DT)는 최신 시각(NOW())으로 실시간 갱신!
+                        cur.execute("""
+                            UPDATE pst_contest_vw
+                            SET VW_DT = NOW()
+                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                            AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
+                        """, (contest_id, ent_user_id, view_user_id, clean_vw))
+                        conn.commit()
                         already_viewed = True
                 else:
                     already_viewed = True
