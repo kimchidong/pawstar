@@ -13,7 +13,7 @@
                 <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
             </div>
             <h2 class="hero-title">{{ current_contest.THEME_NM or current_contest.title }}</h2>
-            <p class="hero-desc">{{ current_contest.CONTS or current_contest.description }}</p>
+            <p class="hero-desc">{{ current_contest.THEME_MENT or current_contest.description }}</p>
             
             <div class="hero-actions">
                 <a href="/upload" class="btn-hero-cta">

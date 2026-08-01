@@ -1,5 +1,5 @@
 """
-Paw Star Contest & Ranking Service (Pagination Dictionary Fix)
+Paw Star Contest Service (THEME_MENT Explicit Binding Fix)
 """
 
 from datetime import datetime, timedelta
@@ -53,14 +53,16 @@ class PawStarService:
                         c.CONTEST_ROUND,
                         c.THEME_CD,
                         t.THEME_NM,
+                        t.THEME_MENT,
                         c.ST_DT,
                         c.ED_DT,
                         c.CONTEST_STAT,
                         cd.CD_NM AS CONTEST_STAT_NM,
-                        CONCAT('제', c.CONTEST_ROUND, '회 ', t.THEME_NM, ' 펫 콘테스트') AS CONTS,
+                        t.THEME_MENT AS CONTS,
                         t.BANNER_IMG_FILE_PATH,
                         c.CONTEST_ROUND AS contest_id,
                         t.THEME_NM AS title,
+                        t.THEME_MENT AS description,
                         c.ST_DT AS start_date,
                         c.ED_DT AS end_date,
                         cd.CD_NM AS status,
@@ -89,13 +91,16 @@ class PawStarService:
                         c.CONTEST_ROUND,
                         c.THEME_CD,
                         t.THEME_NM,
+                        t.THEME_MENT,
                         c.ST_DT,
                         c.ED_DT,
                         c.CONTEST_STAT,
                         cd.CD_NM AS CONTEST_STAT_NM,
+                        t.THEME_MENT AS CONTS,
                         t.BANNER_IMG_FILE_PATH,
                         c.CONTEST_ROUND AS contest_id,
                         t.THEME_NM AS title,
+                        t.THEME_MENT AS description,
                         c.ST_DT AS start_date,
                         c.ED_DT AS end_date,
                         cd.CD_NM AS status
@@ -118,16 +123,18 @@ class PawStarService:
         if not contests:
             return {
                 'CONTEST_ROUND': 1,
-                'THEME_NM': '새해 맞이',
-                'ST_DT': '2026-01-01',
-                'ED_DT': '2026-01-31',
+                'THEME_NM': '한여름 밤의 바캉스',
+                'THEME_MENT': '파도 소리와 함께 즐기는 핫한 바캉스! 여름 최고의 슈퍼스타 등장 🌴',
+                'ST_DT': '2026-08-01',
+                'ED_DT': '2026-08-31',
                 'CONTEST_STAT': 'G001C001',
                 'CONTEST_STAT_NM': '진행중',
-                'CONTS': '새해 최고의 펫 스타를 뽑아주세요!',
-                'BANNER_IMG_FILE_PATH': '/static/image/banner/T001.png',
-                'd_day_str': 'D-15',
+                'CONTS': '파도 소리와 함께 즐기는 핫한 바캉스! 여름 최고의 슈퍼스타 등장 🌴',
+                'BANNER_IMG_FILE_PATH': '/static/image/banner/T008.png',
+                'd_day_str': 'D-30',
                 'contest_id': 1,
-                'title': '새해 맞이',
+                'title': '한여름 밤의 바캉스',
+                'description': '파도 소리와 함께 즐기는 핫한 바캉스! 여름 최고의 슈퍼스타 등장 🌴',
                 'status': '진행중'
             }
 
