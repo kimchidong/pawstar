@@ -1,5 +1,5 @@
 """
-Paw Star Contest & Ranking Service (DB Column Variable Names Standardized)
+Paw Star Contest & Ranking Service (Backend Complete Methods Support)
 """
 
 from datetime import datetime, timedelta
@@ -43,7 +43,6 @@ class PawStarService:
         return contest
 
     def get_contests(self):
-        """ DB 컬럼 대문자 변수명 표준화 콘테스트 목록 """
         conn = self.get_db_connection()
         if not conn:
             return []
@@ -72,9 +71,7 @@ class PawStarService:
                     ORDER BY c.CONTEST_ROUND DESC
                 """)
                 rows = cur.fetchall()
-                contests = []
-                for r in rows:
-                    contests.append(self._attach_d_day(r))
+                contests = [self._attach_d_day(r) for r in rows]
                 conn.close()
                 return contests
         except Exception as e:
@@ -82,7 +79,6 @@ class PawStarService:
             return []
 
     def get_closed_contests(self):
-        """ 마감된 콘테스트 목록 """
         conn = self.get_db_connection()
         if not conn:
             return []
@@ -141,46 +137,148 @@ class PawStarService:
                     return c
 
         for c in contests:
-            if c['CONTEST_STAT_NM'] == '진행중' or c.get('status') == '진행중':
+            if c.get('CONTEST_STAT_NM') == '진행중' or c.get('status') == '진행중':
                 return c
 
         return contests[0]
 
-    def get_user_profile(self, user_id):
+    def get_contest(self, contest_id=None):
+        """ app.py 호환 단수형 get_contest 메서드 """
+        return self.get_current_contest(contest_id)
+
+    def is_user_exists(self, user_id):
         conn = self.get_db_connection()
         if not conn:
-            return {'user_info': {'USER_ID': user_id, 'NK_NM': '프로필', 'PROFILE_URL': '/static/image/profile/default_profile.png'}}
+            return False
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM pst_user WHERE USER_ID = %s", (user_id,))
+                res = bool(cur.fetchone())
+                conn.close()
+                return res
+        except Exception:
+            return False
+
+    def register_user(self, user_id, nickname, password="", profile_img="", bio=""):
+        conn = self.get_db_connection()
+        if not conn:
+            return None
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT 
-                        USER_ID,
-                        NK_NM,
-                        PROFILE_URL,
-                        LGN_CNT,
-                        LGN_DT,
-                        JOIN_DT,
-                        USER_ID AS user_id,
-                        NK_NM AS nickname,
-                        PROFILE_URL AS profile_img
-                    FROM pst_user
-                    WHERE USER_ID = %s
+                    INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                    VALUES (%s, %s, %s, 1, NOW(), NOW())
+                    ON DUPLICATE KEY UPDATE NK_NM=VALUES(NK_NM), PROFILE_URL=VALUES(PROFILE_URL), LGN_CNT=LGN_CNT+1, LGN_DT=NOW()
+                """, (user_id, nickname, profile_img or '/static/image/profile/default_profile.png'))
+                conn.commit()
+                conn.close()
+                return {'USER_ID': user_id, 'NK_NM': nickname, 'PROFILE_URL': profile_img, 'user_id': user_id, 'nickname': nickname, 'profile_img': profile_img}
+        except Exception as e:
+            print("register_user error:", e)
+            return None
+
+    def authenticate_user(self, user_id, password=""):
+        conn = self.get_db_connection()
+        if not conn:
+            return False, "DB 연결 실패"
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                user = cur.fetchone()
+                if not user:
+                    # 신규 소셜 유저인 경우 자동 생성
+                    user = self.register_user(user_id, user_id)
+                else:
+                    cur.execute("UPDATE pst_user SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() WHERE USER_ID = %s", (user_id,))
+                    conn.commit()
+                conn.close()
+                return True, {'USER_ID': user['USER_ID'], 'NK_NM': user.get('NK_NM', user_id), 'user_id': user['USER_ID'], 'nickname': user.get('NK_NM', user_id)}
+        except Exception as e:
+            print("authenticate_user error:", e)
+            return False, str(e)
+
+    def delete_user(self, user_id):
+        conn = self.get_db_connection()
+        if not conn:
+            return False
+        try:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s", (user_id,))
+                conn.commit()
+                conn.close()
+                return True
+        except Exception as e:
+            print("delete_user error:", e)
+            return False
+
+    def get_user_profile(self, user_id):
+        conn = self.get_db_connection()
+        if not conn:
+            return {'user_info': {'USER_ID': user_id, 'NK_NM': '프로필', 'PROFILE_URL': '/static/image/profile/default_profile.png'}, 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0}, 'my_posts': [], 'my_awards': []}
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT
+                    FROM pst_user WHERE USER_ID = %s
                 """, (user_id,))
                 user_info = cur.fetchone()
-                conn.close()
+
                 if not user_info:
-                    user_info = {
-                        'USER_ID': user_id,
-                        'NK_NM': user_id,
-                        'PROFILE_URL': '/static/image/profile/default_profile.png',
-                        'user_id': user_id,
-                        'nickname': user_id,
-                        'profile_img': '/static/image/profile/default_profile.png'
-                    }
-                return {'user_info': user_info}
+                    user_info = {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}
+
+                # 마이 포스트 목록
+                cur.execute("""
+                    SELECT 
+                        r.CONTEST_ROUND, r.ENT_USER_ID, r.PET_NM, r.TITLE, r.CONTS,
+                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
+                        r.VW_CNT, r.LIKE_CNT, r.CMT_CNT, r.SCORE, r.ENT_DT,
+                        -- 호환
+                        r.CONTEST_ROUND AS contest_id, r.ENT_USER_ID AS user_id, r.PET_NM AS pet_name, r.TITLE AS title, r.SCORE AS score
+                    FROM pst_contest_round r
+                    WHERE r.ENT_USER_ID = %s
+                    ORDER BY r.ENT_DT DESC
+                """, (user_id,))
+                my_posts = cur.fetchall()
+
+                # 통계 계산
+                my_post_count = len(my_posts)
+                total_score = sum(p.get('SCORE', 0) for p in my_posts)
+                total_likes = sum(p.get('LIKE_CNT', 0) for p in my_posts)
+
+                # 수상 내역
+                cur.execute("""
+                    SELECT 
+                        ca.CONTEST_ROUND, ca.AWARD_CD, a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
+                        ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img
+                    FROM pst_contest_award ca
+                    JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                    WHERE ca.ENT_USER_ID = %s
+                """, (user_id,))
+                my_awards = cur.fetchall()
+
+                conn.close()
+                return {
+                    'user_info': {
+                        'USER_ID': user_info['USER_ID'],
+                        'NK_NM': user_info.get('NK_NM', user_id),
+                        'PROFILE_URL': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
+                        'user_id': user_info['USER_ID'],
+                        'nickname': user_info.get('NK_NM', user_id),
+                        'profile_img': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png')
+                    },
+                    'stats': {
+                        'my_post_count': my_post_count,
+                        'total_score': total_score,
+                        'total_likes': total_likes,
+                        'award_count': len(my_awards)
+                    },
+                    'my_posts': my_posts,
+                    'my_awards': my_awards
+                }
         except Exception as e:
             print("get_user_profile error:", e)
-            return {'user_info': {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}}
+            return {'user_info': {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}, 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0}, 'my_posts': [], 'my_awards': []}
 
     def get_posts(self, contest_id=None, pet_type='all', sort_type='latest', search_q='', current_user_id=None, page=1, per_page=12):
         conn = self.get_db_connection()
@@ -215,7 +313,7 @@ class PawStarService:
                     DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS ENT_DT,
                     r.TOTAL_RANKING,
                     r.KIND_RANKING,
-                    -- 호환용 앨리어스
+                    -- 호환용
                     r.CONTEST_ROUND AS contest_id,
                     r.ENT_USER_ID AS user_id,
                     CONCAT(r.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id,
