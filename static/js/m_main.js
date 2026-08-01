@@ -295,13 +295,17 @@ function submitMobileDetailComment() {
             if (icon) icon.className = 'fa-solid fa-comment';
         }
         
-        // 메인 피드 카드 및 모바일 모달 수치 실시간 갱신 (+1 댓글, +10 점수)
+        // 서버 DB에서 최종 재계산된 3요소 및 SCORE 데이터 활용
+        const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
+        const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
+        const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+        const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
+
         const mPostId = window.currentMobileDetailPostId;
         if (mPostId) {
             const mScoreEl = document.getElementById('mDetailScoreNum');
-            if (mScoreEl) {
-                const currentScore = parseInt(mScoreEl.textContent.replace(/,/g, ''), 10) || 0;
-                mScoreEl.textContent = (currentScore + 10).toLocaleString();
+            if (mScoreEl && finalScore) {
+                mScoreEl.textContent = finalScore.toLocaleString();
             }
 
             const mCleanId = String(mPostId);
@@ -321,23 +325,17 @@ function submitMobileDetailComment() {
                 }
 
                 const cardComment = card.querySelector('.comment-count');
-                if (cardComment) {
-                    const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;
-                    cardComment.textContent = currentCardCnt + 1;
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = finalComment;
                 }
                 const cardScore = card.querySelector('.m-card-score, .score-num');
-                if (cardScore) {
-                    const currentScore = parseInt(cardScore.textContent.replace(/,/g, '').replace('⭐', '').trim(), 10) || 0;
-                    cardScore.textContent = `⭐ ${(currentScore + 10).toLocaleString()}`;
+                if (cardScore && finalScore) {
+                    cardScore.textContent = `⭐ ${finalScore.toLocaleString()}`;
                 }
             }
         }
 
         loadMobileComments(window.currentMobileDetailPostId);
-        if (data.event_res) {
-            const scoreEl = document.getElementById('mDetailScoreNum');
-            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-        }
     })
     .catch(err => {
         console.error('모바일 댓글 작성 오류:', err);

@@ -911,10 +911,30 @@ def add_comment_api(post_id):
         comments = post_detail.get('comments', []) if post_detail else []
         latest_comment = comments[-1] if comments else {'CONTS': content}
 
+        vw_cnt = res.get('view_count', post_detail.get('VW_CNT', 0) if post_detail else 0)
+        like_cnt = res.get('like_count', post_detail.get('LIKE_CNT', 0) if post_detail else 0)
+        cmt_cnt = res.get('comment_count', post_detail.get('CMT_CNT', 0) if post_detail else 0)
+        final_score = res.get('score', post_detail.get('SCORE', 0) if post_detail else 0)
+
+        event_res = {
+            'view_count': vw_cnt,
+            'like_count': like_cnt,
+            'comment_count': cmt_cnt,
+            'score': final_score,
+            'new_score': final_score
+        }
+
         return jsonify({
             'success': True,
             'comment': latest_comment,
             'comments': comments,
+            'view_count': vw_cnt,
+            'like_count': like_cnt,
+            'comment_count': cmt_cnt,
+            'score': final_score,
+            'new_score': final_score,
+            'stats': event_res,
+            'event_res': event_res,
             'message': '댓글이 성공적으로 작성되었습니다!'
         })
     except Exception as e:

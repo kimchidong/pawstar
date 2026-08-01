@@ -594,7 +594,9 @@ class PawStarService:
                     (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
-                    r.SCORE AS score,
+                    ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
+                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
+                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
                 JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -740,7 +742,9 @@ class PawStarService:
                         (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
                         (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
-                        r.SCORE AS score,
+                        ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
+                         (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
+                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS score,
                         r.ENT_DT AS created_at
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -825,10 +829,54 @@ class PawStarService:
             print("get_post_detail error:", e)
             return None
 
+    def sync_and_get_post_stats(self, cur, contest_id, round_no):
+        """
+        3가지 평가 요소(조회/좋아요/댓글) 이벤트 발생 시 공통 적용:
+        1. 하위 테이블(pst_contest_vw, pst_contest_like, pst_contest_cmt)에서 실제 3요소 개수 DB 재조회
+        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10)
+        3. DB pst_contest_round 테이블에 3요소 카운트 및 SCORE 반영 UPDATE
+        4. DB에서 최종 3요소 및 SCORE를 다시 SELECT하여 반환
+        """
+        # 1. DB에서 3요소 개수 재조회
+        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        vw_cnt = cur.fetchone()['cnt']
+
+        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        like_cnt = cur.fetchone()['cnt']
+
+        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        cmt_cnt = cur.fetchone()['cnt']
+
+        # 2. 총 점수 계산
+        calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10)
+
+        # 3. DB pst_contest_round 최신화 UPDATE
+        cur.execute("""
+            UPDATE pst_contest_round
+            SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SCORE = %s
+            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+        """, (vw_cnt, like_cnt, cmt_cnt, calc_score, contest_id, round_no))
+
+        # 4. DB에서 최종 3요소 및 SCORE 다시 SELECT하여 반환
+        cur.execute("""
+            SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE 
+            FROM pst_contest_round 
+            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+        """, (contest_id, round_no))
+        row = cur.fetchone() or {'VW_CNT': vw_cnt, 'LIKE_CNT': like_cnt, 'CMT_CNT': cmt_cnt, 'SCORE': calc_score}
+        
+        return {
+            'view_count': row['VW_CNT'],
+            'like_count': row['LIKE_CNT'],
+            'comment_count': row['CMT_CNT'],
+            'score': row['SCORE'],
+            'new_score': row['SCORE']
+        }
+
     def increase_view_count(self, contest_id, target_id, view_user_id=None):
         conn = self.get_db_connection()
         if not conn:
-            return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
+            return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
 
         try:
             with conn.cursor() as cur:
@@ -840,7 +888,7 @@ class PawStarService:
                 r_info = cur.fetchone()
                 if not r_info:
                     conn.close()
-                    return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
+                    return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
                 round_no = r_info['ROUND_NO']
 
                 already_viewed = False
@@ -852,35 +900,38 @@ class PawStarService:
                     exists = cur.fetchone()
 
                     if not exists:
+                        # 1. DB에 조회 이력 먼저 저장
                         cur.execute("""
                             INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
                             VALUES (%s, %s, %s, NOW())
                             ON DUPLICATE KEY UPDATE VW_DT = NOW()
                         """, (contest_id, round_no, view_user_id))
-                        cur.execute("""
-                            UPDATE pst_contest_round
-                            SET VW_CNT = VW_CNT + 1, SCORE = SCORE + 1
-                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                        """, (contest_id, round_no))
-                        conn.commit()
                     else:
                         cur.execute("""
                             UPDATE pst_contest_vw
                             SET VW_DT = NOW()
                             WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                         """, (contest_id, round_no, view_user_id))
-                        conn.commit()
                         already_viewed = True
                 else:
                     already_viewed = True
 
-                cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-                r = cur.fetchone()
+                # 2, 3, 4. DB에서 3요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
+                stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
+                conn.commit()
                 conn.close()
-                return {'view_count': r['VW_CNT'] if r else 0, 'new_score': r['SCORE'] if r else 0, 'already_viewed': already_viewed}
+
+                return {
+                    'view_count': stats['view_count'],
+                    'like_count': stats['like_count'],
+                    'comment_count': stats['comment_count'],
+                    'new_score': stats['score'],
+                    'score': stats['score'],
+                    'already_viewed': already_viewed
+                }
         except Exception as e:
             print("increase_view_count error:", e)
-            return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
+            return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
 
     def toggle_like(self, contest_id, target_id, like_user_id):
         conn = self.get_db_connection()
@@ -909,58 +960,33 @@ class PawStarService:
                 """, (contest_id, round_no, like_user_id))
                 exists = cur.fetchone()
 
+                # 1. DB에 먼저 저장 (추가 또는 삭제)
                 if exists:
                     cur.execute("""
                         DELETE FROM pst_contest_like
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
                     """, (contest_id, round_no, like_user_id))
-                    cur.execute("""
-                        UPDATE pst_contest_round
-                        SET LIKE_CNT = GREATEST(0, LIKE_CNT - 1)
-                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                    """, (contest_id, round_no))
                     is_liked = False
                 else:
                     cur.execute("""
                         INSERT INTO pst_contest_like (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID)
                         VALUES (%s, %s, %s)
                     """, (contest_id, round_no, like_user_id))
-                    cur.execute("""
-                        UPDATE pst_contest_round
-                        SET LIKE_CNT = LIKE_CNT + 1
-                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                    """, (contest_id, round_no))
                     is_liked = True
 
-                # 카운트 및 SCORE 실시간 동기화 보정
-                cur.execute("""
-                    UPDATE pst_contest_round
-                    SET VW_CNT = (SELECT COUNT(*) FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s),
-                        LIKE_CNT = (SELECT COUNT(*) FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s),
-                        CMT_CNT = (SELECT COUNT(*) FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s)
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s;
-                """, (contest_id, round_no, contest_id, round_no, contest_id, round_no, contest_id, round_no))
-
-                cur.execute("""
-                    UPDATE pst_contest_round
-                    SET SCORE = (VW_CNT * 1) + (LIKE_CNT * 5) + (CMT_CNT * 10)
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s;
-                """, (contest_id, round_no))
-
+                # 2, 3, 4. DB에서 3요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
+                stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
                 conn.commit()
-
-                cur.execute("SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-                r = cur.fetchone() or {}
                 conn.close()
 
                 return {
                     'success': True,
                     'is_liked': is_liked,
-                    'like_count': r.get('LIKE_CNT', 0),
-                    'view_count': r.get('VW_CNT', 0),
-                    'comment_count': r.get('CMT_CNT', 0),
-                    'new_score': r.get('SCORE', 0),
-                    'score': r.get('SCORE', 0)
+                    'like_count': stats['like_count'],
+                    'view_count': stats['view_count'],
+                    'comment_count': stats['comment_count'],
+                    'new_score': stats['score'],
+                    'score': stats['score']
                 }
         except Exception as e:
             print("toggle_like error:", e)
@@ -977,7 +1003,16 @@ class PawStarService:
 
         if event_type == 'view':
             res_vw = self.increase_view_count(contest_id, target_id, view_user_id=user_id)
-            return {'success': True, 'action': 'view', 'view_count': res_vw.get('view_count', 0), 'new_score': res_vw.get('new_score', 0), 'is_viewed': True}
+            return {
+                'success': True,
+                'action': 'view',
+                'view_count': res_vw.get('view_count', 0),
+                'like_count': res_vw.get('like_count', 0),
+                'comment_count': res_vw.get('comment_count', 0),
+                'new_score': res_vw.get('new_score', 0),
+                'score': res_vw.get('score', 0),
+                'is_viewed': True
+            }
         elif event_type in ('like', 'unlike', 'toggle_like'):
             if not user_id:
                 return {'success': False, 'message': '로그인이 필요합니다.'}
@@ -1005,19 +1040,25 @@ class PawStarService:
                     return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
                 round_no = r_info['ROUND_NO']
 
+                # 1. DB에 댓글 먼저 저장
                 cur.execute("""
                     INSERT INTO pst_contest_cmt (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT)
                     VALUES (%s, %s, %s, %s)
                 """, (contest_id, round_no, cmt_user_id, comment_text))
 
-                cur.execute("""
-                    UPDATE pst_contest_round
-                    SET CMT_CNT = CMT_CNT + 1, SCORE = SCORE + 10
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (contest_id, round_no))
+                # 2, 3, 4. DB에서 3요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
+                stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
                 conn.commit()
                 conn.close()
-                return {'success': True}
+
+                return {
+                    'success': True,
+                    'stats': stats,
+                    'view_count': stats['view_count'],
+                    'like_count': stats['like_count'],
+                    'comment_count': stats['comment_count'],
+                    'score': stats['score']
+                }
         except Exception as e:
             print("add_comment error:", e)
             err_str = str(e)

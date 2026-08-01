@@ -801,30 +801,45 @@ function submitDetailComment() {
             if (icon) icon.className = 'fa-solid fa-comment';
         }
 
-        // 메인 피드 카드 및 팝업 모달 수치 & 댓글 상태 실시간 갱신 (+1 댓글, +10 점수)
+        // 서버 DB에서 최종 재계산된 3요소 및 SCORE 데이터 활용
+        const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
+        const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
+        const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+        const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
+
         const postId = window.currentDetailPostId;
         if (postId) {
             if (window.postsDataStore && window.postsDataStore[postId]) {
                 const storeItem = window.postsDataStore[postId];
-                storeItem.comment_count = (storeItem.comment_count || 0) + 1;
-                storeItem.CMT_CNT = (storeItem.CMT_CNT || 0) + 1;
-                storeItem.score = (storeItem.score || 0) + 10;
-                storeItem.SCORE = (storeItem.SCORE || 0) + 10;
+                if (finalComment !== undefined) storeItem.comment_count = finalComment;
+                if (finalComment !== undefined) storeItem.CMT_CNT = finalComment;
+                if (finalScore) {
+                    storeItem.score = finalScore;
+                    storeItem.SCORE = finalScore;
+                }
                 storeItem.is_commented = true;
                 storeItem.actions = storeItem.actions || {};
                 storeItem.actions.is_commented = true;
             }
 
             const commentCountEl = document.getElementById('detailCommentCount');
-            if (commentCountEl) {
-                const currentCnt = parseInt(commentCountEl.textContent, 10) || 0;
-                commentCountEl.textContent = currentCnt + 1;
+            if (commentCountEl && finalComment !== undefined) {
+                commentCountEl.textContent = finalComment;
+            }
+
+            const viewCountEl = document.getElementById('detailViewCount');
+            if (viewCountEl && finalView !== undefined) {
+                viewCountEl.textContent = finalView;
+            }
+
+            const likeCountEl = document.getElementById('detailLikeCount');
+            if (likeCountEl && finalLike !== undefined) {
+                likeCountEl.textContent = finalLike;
             }
 
             const scoreNumEl = document.getElementById('detailScoreNum');
-            if (scoreNumEl) {
-                const currentScore = parseInt(scoreNumEl.textContent.replace(/,/g, ''), 10) || 0;
-                scoreNumEl.textContent = (currentScore + 10).toLocaleString();
+            if (scoreNumEl && finalScore) {
+                scoreNumEl.textContent = finalScore.toLocaleString();
             }
 
             const cleanId = String(postId);
@@ -844,34 +859,25 @@ function submitDetailComment() {
                 }
 
                 const cardComment = card.querySelector('.comment-count');
-                if (cardComment) {
-                    const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;
-                    cardComment.textContent = currentCardCnt + 1;
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = finalComment;
                 }
                 const cardScore = card.querySelector('.score-num');
-                if (cardScore) {
-                    const currentScore = parseInt(cardScore.textContent.replace(/,/g, ''), 10) || 0;
-                    cardScore.textContent = (currentScore + 10).toLocaleString();
+                if (cardScore && finalScore) {
+                    cardScore.textContent = finalScore.toLocaleString();
+                }
+                const cardView = card.querySelector('.view-count');
+                if (cardView && finalView !== undefined) {
+                    cardView.textContent = finalView;
+                }
+                const cardLike = card.querySelector('.like-count');
+                if (cardLike && finalLike !== undefined) {
+                    cardLike.textContent = finalLike;
                 }
             }
         }
 
         loadComments(window.currentDetailPostId);
-        
-        if (data.event_res) {
-            const scoreEl = document.getElementById('detailScoreNum');
-            const commentEl = document.getElementById('detailCommentCount');
-            if (scoreEl) scoreEl.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-            if (commentEl) commentEl.textContent = data.event_res.comment_count || 0;
-            
-            const card = document.getElementById(`post-card-${window.currentDetailPostId}`);
-            if (card) {
-                const cardScore = card.querySelector('.score-num');
-                const cardComment = card.querySelector('.comment-count');
-                if (cardScore) cardScore.textContent = Number(data.event_res.new_score || 0).toLocaleString();
-                if (cardComment) cardComment.textContent = data.event_res.comment_count || 0;
-            }
-        }
     })
     .catch(err => {
         console.error('댓글 작성 오류:', err);
