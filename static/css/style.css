@@ -217,6 +217,12 @@ body {
     color: #ffffff;
 }
 
+.hero-round-badge {
+    color: #fde047;
+    margin-right: 0.35rem;
+    font-weight: 900;
+}
+
 .hero-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;

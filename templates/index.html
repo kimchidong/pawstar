@@ -12,7 +12,7 @@
                 <span class="live-dot"></span>
                 <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
             </div>
-            <h2 class="hero-title">{{ current_contest.THEME_NM or current_contest.title }}</h2>
+            <h2 class="hero-title"><span class="hero-round-badge">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</h2>
             <p class="hero-desc">{{ current_contest.THEME_MENT or current_contest.description }}</p>
             
             <div class="hero-actions">
