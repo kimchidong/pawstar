@@ -324,9 +324,9 @@ async function triggerEvent(postId, eventType) {
             }
         }
         const dComment = document.getElementById('detailCommentCount');
-        if (dComment) dComment.textContent = data.comment_count;
+        if (dComment && data && data.comment_count !== undefined) dComment.textContent = data.comment_count;
         const dShare = document.getElementById('detailShareCount');
-        if (dShare) dShare.textContent = data.share_count;
+        if (dShare && data && data.share_count !== undefined) dShare.textContent = data.share_count;
 
         if (eventType !== 'view') {
             const messages = {
@@ -496,13 +496,13 @@ function openDetailModal(post) {
     if (createdAtEl) createdAtEl.textContent = post.created_at || '2026-07-28 00:00:00';
 
     const viewCountEl = document.getElementById('detailViewCount');
-    if (viewCountEl) viewCountEl.textContent = post.view_count || 0;
+    if (viewCountEl) viewCountEl.textContent = (post.view_count !== undefined ? post.view_count : (post.VW_CNT !== undefined ? post.VW_CNT : 0));
 
     const likeCountEl = document.getElementById('detailLikeCount');
-    if (likeCountEl) likeCountEl.textContent = post.like_count || 0;
+    if (likeCountEl) likeCountEl.textContent = (post.like_count !== undefined ? post.like_count : (post.LIKE_CNT !== undefined ? post.LIKE_CNT : 0));
 
     const commentCountEl = document.getElementById('detailCommentCount');
-    if (commentCountEl) commentCountEl.textContent = post.comment_count || 0;
+    if (commentCountEl) commentCountEl.textContent = (post.comment_count !== undefined ? post.comment_count : (post.CMT_CNT !== undefined ? post.CMT_CNT : 0));
 
     const shareCountEl = document.getElementById('detailShareCount');
     if (shareCountEl) shareCountEl.textContent = post.share_count || 0;
