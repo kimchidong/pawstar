@@ -1,5 +1,5 @@
 """
-Paw Star Contest Service (THEME_MENT Explicit Binding Fix)
+Paw Star Contest Service (Google Login/Register Support Added)
 """
 
 from datetime import datetime, timedelta
@@ -201,6 +201,68 @@ class PawStarService:
         except Exception as e:
             print("authenticate_user error:", e)
             return False, str(e)
+
+    def google_login_or_register(self, google_id, email, name, picture="", **kwargs):
+        """ 구글 소셜 로그인 / 회원가입 연동 메서드 """
+        user_id = f"google_{google_id}" if google_id else (email or "google_user")
+        nickname = name or (email.split('@')[0] if email else "구글집사")
+        profile_img = picture or '/static/image/profile/default_profile.png'
+
+        conn = self.get_db_connection()
+        if not conn:
+            return {
+                'USER_ID': user_id,
+                'NK_NM': nickname,
+                'PROFILE_URL': profile_img,
+                'user_id': user_id,
+                'nickname': nickname,
+                'profile_img': profile_img
+            }
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                user = cur.fetchone()
+
+                if not user:
+                    cur.execute("""
+                        INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                        VALUES (%s, %s, %s, 1, NOW(), NOW())
+                        ON DUPLICATE KEY UPDATE LGN_CNT = LGN_CNT + 1, LGN_DT = NOW()
+                    """, (user_id, nickname, profile_img))
+                    conn.commit()
+                    user_info = {
+                        'USER_ID': user_id,
+                        'NK_NM': nickname,
+                        'PROFILE_URL': profile_img,
+                        'user_id': user_id,
+                        'nickname': nickname,
+                        'profile_img': profile_img
+                    }
+                else:
+                    cur.execute("UPDATE pst_user SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() WHERE USER_ID = %s", (user_id,))
+                    conn.commit()
+                    user_info = {
+                        'USER_ID': user['USER_ID'],
+                        'NK_NM': user.get('NK_NM', nickname),
+                        'PROFILE_URL': user.get('PROFILE_URL', profile_img),
+                        'user_id': user['USER_ID'],
+                        'nickname': user.get('NK_NM', nickname),
+                        'profile_img': user.get('PROFILE_URL', profile_img)
+                    }
+
+                conn.close()
+                return user_info
+        except Exception as e:
+            print("google_login_or_register error:", e)
+            return {
+                'USER_ID': user_id,
+                'NK_NM': nickname,
+                'PROFILE_URL': profile_img,
+                'user_id': user_id,
+                'nickname': nickname,
+                'profile_img': profile_img
+            }
 
     def delete_user(self, user_id):
         conn = self.get_db_connection()
