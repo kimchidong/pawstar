@@ -102,6 +102,23 @@ function openMobileDetailModal(postData) {
     document.getElementById('mDetailTitle').textContent = postData.title || '';
     document.getElementById('mDetailContent').textContent = postData.content || '';
 
+    const isCommented = (postData.actions && postData.actions.is_commented) || postData.is_commented || false;
+    window.currentMobileDetailPost = postData;
+    window.currentMobileDetailPostIsCommented = isCommented;
+
+    const btnCommentPopup = document.getElementById('mDetailBtnComment');
+    if (btnCommentPopup) {
+        if (isCommented) {
+            btnCommentPopup.classList.add('active');
+            const icon = btnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-comment';
+        } else {
+            btnCommentPopup.classList.remove('active');
+            const icon = btnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-comment';
+        }
+    }
+
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
@@ -137,6 +154,38 @@ function renderMobileDetailComments(comments) {
     const headerCountEl = document.getElementById('mDetailCommentHeaderCount');
     if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
     
+    // 댓글 목록에서 현재 접속 유저가 쓴 댓글이 포함되어 있는지 점검 (초기 isCommented 상태 유지)
+    const isInitiallyCommented = window.currentMobileDetailPostIsCommented === true || (window.currentMobileDetailPost && window.currentMobileDetailPost.actions && window.currentMobileDetailPost.actions.is_commented);
+    let hasMyComment = !!isInitiallyCommented;
+
+    if (!hasMyComment && comments && comments.length > 0) {
+        const rawCurrentId = String(window.CURRENT_USER_ID || '');
+        const currentUserId = rawCurrentId.split('_post_')[0];
+        const currentNickname = window.CURRENT_USER_NICKNAME;
+
+        hasMyComment = comments.some(c => {
+            const rawCUserId = String(c.user_id || c.USER_ID || c.CMT_USER_ID || '');
+            const cUserId = rawCUserId.split('_post_')[0];
+            const cNickname = c.user_nickname || c.NK_NM;
+
+            return (currentUserId && cUserId && cUserId === currentUserId) ||
+                   (currentNickname && cNickname && cNickname === currentNickname);
+        });
+    }
+
+    const btnCommentPopup = document.getElementById('mDetailBtnComment');
+    if (btnCommentPopup) {
+        if (hasMyComment) {
+            btnCommentPopup.classList.add('active');
+            const icon = btnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-comment';
+        } else {
+            btnCommentPopup.classList.remove('active');
+            const icon = btnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-comment';
+        }
+    }
+
     if (!listEl) return;
     if (!comments || comments.length === 0) {
         listEl.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 0.5rem 0;">첫 한줄 댓글의 주인공이 되어보세요! 💬</div>';
@@ -195,8 +244,8 @@ function submitMobileDetailComment() {
                 mScoreEl.textContent = (currentScore + 10).toLocaleString();
             }
 
-            const cards = document.querySelectorAll(`[onclick*="${mPostId}"]`);
-            cards.forEach(card => {
+            const card = document.getElementById(`m-post-card-${mPostId}`);
+            if (card) {
                 const btnCardComment = card.querySelector('.btn-comment');
                 if (btnCardComment) {
                     btnCardComment.classList.add('active');
@@ -214,7 +263,7 @@ function submitMobileDetailComment() {
                     const currentScore = parseInt(cardScore.textContent.replace(/,/g, '').replace('⭐', '').trim(), 10) || 0;
                     cardScore.textContent = `⭐ ${(currentScore + 10).toLocaleString()}`;
                 }
-            });
+            }
         }
 
         loadMobileComments(window.currentMobileDetailPostId);

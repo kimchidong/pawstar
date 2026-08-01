@@ -24,7 +24,7 @@
 <!-- 2열 피드 그리드 -->
 <div class="m-feed-grid">
     {% for p in posts %}
-        <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+        <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
                 <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 {% if p.rank_candidate %}
