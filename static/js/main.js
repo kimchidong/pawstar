@@ -700,6 +700,14 @@ function submitDetailComment() {
         
         inputEl.value = '';
         showToast('한줄 댓글 작성 완료! (+10점 반영)', 'success');
+        
+        window.currentDetailPostIsCommented = true;
+        if (window.currentDetailPost) {
+            window.currentDetailPost.is_commented = true;
+            window.currentDetailPost.actions = window.currentDetailPost.actions || {};
+            window.currentDetailPost.actions.is_commented = true;
+        }
+
         const btnComment = document.getElementById('detailBtnComment');
         if (btnComment) {
             btnComment.classList.add('active');
@@ -707,7 +715,7 @@ function submitDetailComment() {
             if (icon) icon.className = 'fa-solid fa-comment';
         }
 
-        // 메인 피드 카드 및 팝업 모달 수치 실시간 갱신 (+1 댓글, +10 점수)
+        // 메인 피드 카드 및 팝업 모달 수치 & 댓글 상태 실시간 갱신 (+1 댓글, +10 점수)
         const postId = window.currentDetailPostId;
         if (postId) {
             if (window.postsDataStore && window.postsDataStore[postId]) {
@@ -716,6 +724,9 @@ function submitDetailComment() {
                 storeItem.CMT_CNT = (storeItem.CMT_CNT || 0) + 1;
                 storeItem.score = (storeItem.score || 0) + 10;
                 storeItem.SCORE = (storeItem.SCORE || 0) + 10;
+                storeItem.is_commented = true;
+                storeItem.actions = storeItem.actions || {};
+                storeItem.actions.is_commented = true;
             }
 
             const commentCountEl = document.getElementById('detailCommentCount');

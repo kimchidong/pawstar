@@ -235,6 +235,20 @@ function submitMobileDetailComment() {
         
         inputEl.value = '';
         
+        window.currentMobileDetailPostIsCommented = true;
+        if (window.currentMobileDetailPost) {
+            window.currentMobileDetailPost.is_commented = true;
+            window.currentMobileDetailPost.actions = window.currentMobileDetailPost.actions || {};
+            window.currentMobileDetailPost.actions.is_commented = true;
+        }
+
+        const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
+        if (mBtnCommentPopup) {
+            mBtnCommentPopup.classList.add('active');
+            const icon = mBtnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-comment';
+        }
+        
         // 메인 피드 카드 및 모바일 모달 수치 실시간 갱신 (+1 댓글, +10 점수)
         const mPostId = window.currentMobileDetailPostId;
         if (mPostId) {
