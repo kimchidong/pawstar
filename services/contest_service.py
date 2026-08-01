@@ -1,5 +1,5 @@
 """
-Paw Star Contest Service (create_post method added)
+Paw Star Contest Service (Complete Integration with get_user_profile & 5-Entry Limit)
 """
 
 from datetime import datetime, timedelta
@@ -41,6 +41,23 @@ class PawStarService:
         else:
             contest['d_day_str'] = f"D-{diff_days}"
         return contest
+
+    def get_user_contest_entry_count(self, contest_id, base_user_id):
+        conn = self.get_db_connection()
+        if not conn:
+            return 0
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT COUNT(*) AS cnt FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND (ENT_USER_ID = %s OR ENT_USER_ID LIKE %s)
+                """, (contest_id, base_user_id, f"{base_user_id}_post_%"))
+                r = cur.fetchone()
+                conn.close()
+                return r['cnt'] if r else 0
+        except Exception as e:
+            print("get_user_contest_entry_count error:", e)
+            return 0
 
     def get_next_post_id(self):
         conn = self.get_db_connection()
@@ -296,8 +313,8 @@ class PawStarService:
             return False
         try:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s", (user_id,))
-                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s OR ENT_USER_ID LIKE %s", (user_id, f"{user_id}_post_%"))
+                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s OR USER_ID LIKE %s", (user_id, f"{user_id}_post_%"))
                 conn.commit()
                 conn.close()
                 return True
@@ -308,7 +325,12 @@ class PawStarService:
     def get_user_profile(self, user_id):
         conn = self.get_db_connection()
         if not conn:
-            return {'user_info': {'USER_ID': user_id, 'NK_NM': '프로필', 'PROFILE_URL': '/static/image/profile/default_profile.png'}, 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0}, 'my_posts': [], 'my_awards': []}
+            return {
+                'user_info': {'USER_ID': user_id, 'NK_NM': '프로필', 'PROFILE_URL': '/static/image/profile/default_profile.png', 'user_id': user_id, 'nickname': '프로필', 'profile_img': '/static/image/profile/default_profile.png'},
+                'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0},
+                'my_posts': [],
+                'my_awards': []
+            }
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -327,9 +349,9 @@ class PawStarService:
                         r.VW_CNT, r.LIKE_CNT, r.CMT_CNT, r.SCORE, r.ENT_DT,
                         r.CONTEST_ROUND AS contest_id, r.ENT_USER_ID AS user_id, r.PET_NM AS pet_name, r.TITLE AS title, r.SCORE AS score
                     FROM pst_contest_round r
-                    WHERE r.ENT_USER_ID = %s
+                    WHERE r.ENT_USER_ID = %s OR r.ENT_USER_ID LIKE %s
                     ORDER BY r.ENT_DT DESC
-                """, (user_id,))
+                """, (user_id, f"{user_id}_post_%"))
                 my_posts = cur.fetchall()
 
                 my_post_count = len(my_posts)
@@ -342,8 +364,8 @@ class PawStarService:
                         ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    WHERE ca.ENT_USER_ID = %s
-                """, (user_id,))
+                    WHERE ca.ENT_USER_ID = %s OR ca.ENT_USER_ID LIKE %s
+                """, (user_id, f"{user_id}_post_%"))
                 my_awards = cur.fetchall()
 
                 conn.close()
@@ -367,7 +389,87 @@ class PawStarService:
                 }
         except Exception as e:
             print("get_user_profile error:", e)
-            return {'user_info': {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}, 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0}, 'my_posts': [], 'my_awards': []}
+            return {
+                'user_info': {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png', 'user_id': user_id, 'nickname': user_id, 'profile_img': '/static/image/profile/default_profile.png'},
+                'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0},
+                'my_posts': [],
+                'my_awards': []
+            }
+
+    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2=""):
+        conn = self.get_db_connection()
+        if not conn:
+            return {'success': False, 'message': 'DB 연결 실패'}
+        
+        # 1인 5회 출전 제한 체크
+        entry_cnt = self.get_user_contest_entry_count(contest_id, user_id)
+        if entry_cnt >= 5:
+            return {
+                'success': False,
+                'message': f'해당 회차에는 회원 1인당 최대 5회까지만 출전이 가능합니다. (현재 {entry_cnt}/5회 출전 완료)'
+            }
+
+        actual_ent_user_id = user_id if entry_cnt == 0 else f"{user_id}_post_{entry_cnt + 1}"
+
+        if not self.is_user_exists(user_id):
+            self.register_user(user_id, user_id)
+        if actual_ent_user_id != user_id and not self.is_user_exists(actual_ent_user_id):
+            self.register_user(actual_ent_user_id, user_id)
+
+        if kind_cd and not kind_cd.startswith('K'):
+            kinds = self.get_pet_kinds()
+            for k in kinds:
+                if k['KIND_NM'] in kind_cd or kind_cd in k['KIND_NM']:
+                    kind_cd = k['KIND_CD']
+                    break
+            else:
+                kind_cd = 'K008'
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO pst_contest_round 
+                    (CONTEST_ROUND, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_PATH, PHT_FILE1, PHT_FILE2)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE
+                        KIND_CD=VALUES(KIND_CD), PET_NM=VALUES(PET_NM), TITLE=VALUES(TITLE),
+                        CONTS=VALUES(CONTS), PHT_PATH=VALUES(PHT_PATH), PHT_FILE1=VALUES(PHT_FILE1), PHT_FILE2=VALUES(PHT_FILE2)
+                """, (contest_id, actual_ent_user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2))
+                conn.commit()
+                conn.close()
+                return {'success': True, 'ent_user_id': actual_ent_user_id}
+        except Exception as e:
+            print("create_contest_entry error:", e)
+            return {'success': False, 'message': str(e)}
+
+    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path="", list_file_name="", popup_file_name="", **kwargs):
+        pht_path = file_path or "/static/image/post"
+        pht_file1 = list_file_name
+
+        if media_url and not pht_file1:
+            if "/" in media_url:
+                parts = media_url.rsplit('/', 1)
+                pht_path = parts[0]
+                pht_file1 = parts[1]
+            else:
+                pht_file1 = media_url
+
+        if not pht_file1:
+            pht_file1 = "default_pet.jpg"
+
+        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, pht_path, pht_file1, popup_file_name)
+        if not res.get('success'):
+            return res
+
+        actual_user_id = res.get('ent_user_id', user_id)
+        return {
+            'success': True,
+            'CONTEST_ROUND': contest_id,
+            'ENT_USER_ID': actual_user_id,
+            'post_id': f"{contest_id}_{actual_user_id}",
+            'PET_NM': pet_name,
+            'TITLE': title
+        }
 
     def get_posts(self, contest_id=None, pet_type='all', sort_type='latest', search_q='', search_query='', current_user_id=None, user_id=None, page=1, per_page=12, **kwargs):
         search_q = search_query or search_q
@@ -679,68 +781,6 @@ class PawStarService:
         except Exception as e:
             print("add_comment error:", e)
             return {'success': False, 'message': str(e)}
-
-    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2=""):
-        conn = self.get_db_connection()
-        if not conn:
-            return {'success': False, 'message': 'DB 연결 실패'}
-        
-        # 유저가 DB에 없으면 자동 가입
-        if not self.is_user_exists(user_id):
-            self.register_user(user_id, user_id)
-
-        # kind_cd가 'K001' 형태가 아닐 때 역추적 매핑
-        if kind_cd and not kind_cd.startswith('K'):
-            kinds = self.get_pet_kinds()
-            for k in kinds:
-                if k['KIND_NM'] in kind_cd or kind_cd in k['KIND_NM']:
-                    kind_cd = k['KIND_CD']
-                    break
-            else:
-                kind_cd = 'K008'
-
-        try:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO pst_contest_round 
-                    (CONTEST_ROUND, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_PATH, PHT_FILE1, PHT_FILE2)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE
-                        KIND_CD=VALUES(KIND_CD), PET_NM=VALUES(PET_NM), TITLE=VALUES(TITLE),
-                        CONTS=VALUES(CONTS), PHT_PATH=VALUES(PHT_PATH), PHT_FILE1=VALUES(PHT_FILE1), PHT_FILE2=VALUES(PHT_FILE2)
-                """, (contest_id, user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2))
-                conn.commit()
-                conn.close()
-                return {'success': True}
-        except Exception as e:
-            print("create_contest_entry error:", e)
-            return {'success': False, 'message': str(e)}
-
-    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path="", list_file_name="", popup_file_name="", **kwargs):
-        """ create_post 별칭 트랜잭션 메서드 """
-        pht_path = file_path or "/static/image/post"
-        pht_file1 = list_file_name
-
-        if media_url and not pht_file1:
-            if "/" in media_url:
-                parts = media_url.rsplit('/', 1)
-                pht_path = parts[0]
-                pht_file1 = parts[1]
-            else:
-                pht_file1 = media_url
-
-        if not pht_file1:
-            pht_file1 = "default_pet.jpg"
-
-        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, pht_path, pht_file1, popup_file_name)
-        return {
-            'success': True,
-            'CONTEST_ROUND': contest_id,
-            'ENT_USER_ID': user_id,
-            'post_id': f"{contest_id}_{user_id}",
-            'PET_NM': pet_name,
-            'TITLE': title
-        }
 
     def get_hall_of_fame(self, contest_id=None):
         conn = self.get_db_connection()

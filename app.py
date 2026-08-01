@@ -626,7 +626,16 @@ def upload_page():
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
         return redirect('/profile')
 
-    return render_template('upload.html', current_contest=current_contest, contests=contests)
+    contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
+    my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
+    remaining_entry_count = max(0, 5 - my_entry_count)
+    return render_template(
+        'upload.html', 
+        current_contest=current_contest, 
+        contests=contests,
+        my_entry_count=my_entry_count,
+        remaining_entry_count=remaining_entry_count
+    )
 
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
@@ -640,7 +649,7 @@ def m_upload_page():
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
 
     if request.method == 'POST':
-        contest_id = current_contest['contest_id'] if current_contest else 1
+        contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
         user_id = session.get('user_id') or 'user1'
         pet_name = request.form.get('pet_name', '우리 아이')
         pet_type = request.form.get('pet_type', '🐕 강아지')
@@ -662,7 +671,16 @@ def m_upload_page():
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
         return redirect('/m/profile')
 
-    return render_template('m_upload.html', current_contest=current_contest, contests=contests)
+    contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
+    my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
+    remaining_entry_count = max(0, 5 - my_entry_count)
+    return render_template(
+        'm_upload.html', 
+        current_contest=current_contest, 
+        contests=contests,
+        my_entry_count=my_entry_count,
+        remaining_entry_count=remaining_entry_count
+    )
 
 
 
@@ -966,6 +984,9 @@ def create_post():
             contest_id, user_id, pet_name, pet_type, title, content, 
             file_path, list_file_name, popup_file_name, force_post_id=next_post_id
         )
+        if isinstance(new_post, dict) and not new_post.get('success'):
+            return jsonify({'success': False, 'message': new_post.get('message', '출전 등록에 실패했습니다.')}), 400
+
         return jsonify({'success': True, 'post': new_post})
     except Exception as e:
         print("게시물 등록 오류:", e)

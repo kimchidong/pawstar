@@ -115,6 +115,21 @@
             <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); width: 100%; padding: 0.9rem; font-weight: 900; font-size: 1rem; border-radius: var(--radius-md);">
                 <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료
             </button>
+
+            <!-- 출전 제한 안내 하단 팁 카드 (모바일) -->
+            <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-circle-info" style="color: #4f46e5; font-size: 1.1rem; flex-shrink: 0;"></i>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
+                        💡 한 회차당 최대 5회 출전 가능 (현재 <strong style="color: #4f46e5;">{{ my_entry_count if my_entry_count is not none else 0 }}회</strong> 출전중)
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: flex-end;">
+                    <span style="font-size: 0.8rem; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 0.25rem 0.75rem; border-radius: 15px;">
+                        🏆 {{ remaining_entry_count if remaining_entry_count is not none else 5 }}회 남음 / 총 5회
+                    </span>
+                </div>
+            </div>
         </form>
     </div>
 </div>
