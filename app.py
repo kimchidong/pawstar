@@ -15,6 +15,8 @@ from services.contest_service import service
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pawstar_secret_key_2026'
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
+SESSION_TIMEOUT_SECONDS = 1800  # 30분 (1800초) 무활동 타임아웃
 
 def finalize_temp_profile_image(avatar_icon):
     """
@@ -65,12 +67,12 @@ def finalize_temp_profile_image(avatar_icon):
 
 @app.before_request
 def check_session_timeout():
-    """ 웹 서비스 이용(요청) 중 세션 활성화 및 2시간 타임아웃 처리 """
+    """ 웹 서비스 이용(요청) 중 아무런 액션 없이 30분(1800초) 경과 시 세션 자동 만료 파기 처리 """
     now_ts = datetime.datetime.now().timestamp()
     last_act = session.get('last_activity')
 
     if session.get('user_id'):
-        if last_act and (now_ts - last_act > 7200):
+        if last_act and (now_ts - last_act > SESSION_TIMEOUT_SECONDS):
             session.clear()
             session['logged_out_reason'] = 'timeout'
         else:
