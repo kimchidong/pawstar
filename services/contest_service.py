@@ -491,7 +491,7 @@ class PawStarService:
                     r.LIKE_CNT,
                     r.CMT_CNT,
                     r.SCORE,
-                    DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS ENT_DT,
+                    r.ENT_DT AS ENT_DT,
                     r.TOTAL_RANKING,
                     r.KIND_RANKING,
                     -- 호환용
@@ -514,7 +514,7 @@ class PawStarService:
                     r.LIKE_CNT AS like_count,
                     r.CMT_CNT AS comment_count,
                     r.SCORE AS score,
-                    DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
+                    r.ENT_DT AS created_at
                 FROM pst_contest_round r
                 JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
                 LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
@@ -561,6 +561,13 @@ class PawStarService:
 
                 posts = []
                 for row in paged_rows:
+                    dt_val = row.get('ENT_DT')
+                    if hasattr(dt_val, 'strftime'):
+                        dt_str = dt_val.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        dt_str = str(dt_val or '')
+                    row['ENT_DT'] = dt_str
+                    row['created_at'] = dt_str
                     row['rank_candidate'] = top_scores.get(row['ENT_USER_ID'], None)
                     row['actions'] = {'is_liked': row['ENT_USER_ID'] in liked_user_ids}
                     posts.append(row)
@@ -616,7 +623,7 @@ class PawStarService:
                         r.LIKE_CNT,
                         r.CMT_CNT,
                         r.SCORE,
-                        DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS ENT_DT,
+                        r.ENT_DT AS ENT_DT,
                         -- 호환용
                         r.CONTEST_ROUND AS contest_id,
                         r.ENT_USER_ID AS user_id,
@@ -637,7 +644,7 @@ class PawStarService:
                         r.LIKE_CNT AS like_count,
                         r.CMT_CNT AS comment_count,
                         r.SCORE AS score,
-                        DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
+                        r.ENT_DT AS created_at
                     FROM pst_contest_round r
                     JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
@@ -654,13 +661,13 @@ class PawStarService:
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
                         c.CMT AS CONTS,
-                        DATE_FORMAT(c.CMD_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS CMD_DT,
+                        c.CMD_DT AS CMD_DT,
                         -- 호환용
                         c.CMT_USER_ID AS user_id,
                         u.NK_NM AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         c.CMT AS content,
-                        DATE_FORMAT(c.CMD_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
+                        c.CMD_DT AS created_at
                     FROM pst_contest_cmt c
                     JOIN pst_user u ON SUBSTRING_INDEX(c.CMT_USER_ID, '_post_', 1) = u.USER_ID
                     WHERE c.CONTEST_ROUND = %s AND c.ENT_USER_ID = %s
@@ -676,7 +683,26 @@ class PawStarService:
                     """, (contest_id, ent_user_id, current_user_id))
                     is_liked = bool(cur.fetchone())
 
-                post['comments'] = comments
+                dt_p = post.get('ENT_DT')
+                if hasattr(dt_p, 'strftime'):
+                    p_str = dt_p.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    p_str = str(dt_p or '')
+                post['ENT_DT'] = p_str
+                post['created_at'] = p_str
+
+                cmt_list = []
+                for c in comments:
+                    dt_c = c.get('CMD_DT')
+                    if hasattr(dt_c, 'strftime'):
+                        c_str = dt_c.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        c_str = str(dt_c or '')
+                    c['CMD_DT'] = c_str
+                    c['created_at'] = c_str
+                    cmt_list.append(c)
+
+                post['comments'] = cmt_list
                 post['actions'] = {'is_liked': is_liked}
                 conn.close()
                 return post

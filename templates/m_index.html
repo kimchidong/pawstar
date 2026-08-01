@@ -33,9 +33,17 @@
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
             </div>
             <div class="m-card-content">
-                <div class="m-card-author">
-                    <img src="{{ p.PROFILE_URL or p.user_profile }}" alt="profile">
-                    <span>{{ p.NK_NM or p.user_nickname }}</span>
+                <div class="m-card-author" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                        <img src="{{ p.PROFILE_URL or p.user_profile }}" alt="profile">
+                        <span style="font-weight: 800; font-size: 0.9rem;">{{ p.NK_NM or p.user_nickname }}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; margin-top: 0.1rem; padding-left: 0.1rem;">
+                        <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                        {% if p.PET_NM or p.pet_name %}
+                            <span style="color: #6d28d9; font-weight: 700;">{{ p.PET_NM or p.pet_name }}</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="m-card-title">{{ p.title }}</div>
                 <div class="m-card-footer card-actions" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; align-items: center; font-size: 0.75rem;">

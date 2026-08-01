@@ -121,7 +121,12 @@
                         <img src="{{ p.PROFILE_URL or p.user_profile }}" class="author-img" alt="profile">
                         <div class="author-detail">
                             <div class="nickname">{{ p.NK_NM or p.user_nickname }}</div>
-                            <div class="pet-tag"><span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span> · <span>{{ p.PET_NM or p.pet_name }}</span></div>
+                            <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
+                                <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                                {% if p.PET_NM or p.pet_name %}
+                                    <span style="color: #6d28d9; font-weight: 700;">{{ p.PET_NM or p.pet_name }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
