@@ -500,16 +500,21 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
+                    SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_round_no 
+                    FROM pst_contest_round 
+                    WHERE CONTEST_ROUND = %s
+                """, (contest_id,))
+                row_r = cur.fetchone()
+                next_round_no = row_r['next_round_no'] if row_r else 1
+
+                cur.execute("""
                     INSERT INTO pst_contest_round 
-                    (CONTEST_ROUND, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE
-                        KIND_CD=VALUES(KIND_CD), PET_NM=VALUES(PET_NM), TITLE=VALUES(TITLE),
-                        CONTS=VALUES(CONTS), PHT_FILE_PATH1=VALUES(PHT_FILE_PATH1), PHT_FILE_PATH2=VALUES(PHT_FILE_PATH2)
-                """, (contest_id, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2))
+                    (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2))
                 conn.commit()
                 conn.close()
-                return {'success': True, 'ent_user_id': actual_ent_user_id}
+                return {'success': True, 'ent_user_id': actual_ent_user_id, 'round_no': next_round_no}
         except Exception as e:
             print("create_contest_entry error:", e)
             return {'success': False, 'message': str(e)}
@@ -523,11 +528,13 @@ class PawStarService:
             return res
 
         actual_user_id = res.get('ent_user_id', user_id)
+        round_no = res.get('round_no', 1)
         return {
             'success': True,
             'CONTEST_ROUND': contest_id,
+            'ROUND_NO': round_no,
             'ENT_USER_ID': actual_user_id,
-            'post_id': f"{contest_id}_{actual_user_id}",
+            'post_id': f"{contest_id}_{round_no}",
             'PET_NM': pet_name,
             'TITLE': title
         }
@@ -549,6 +556,7 @@ class PawStarService:
             query = """
                 SELECT 
                     r.CONTEST_ROUND,
+                    r.ROUND_NO,
                     r.ENT_USER_ID,
                     r.ENT_USER_ID AS USER_ID,
                     u.NK_NM,
@@ -570,8 +578,9 @@ class PawStarService:
                     r.KIND_RANKING,
                     -- 호환용
                     r.CONTEST_ROUND AS contest_id,
+                    r.ROUND_NO AS round_no,
                     r.ENT_USER_ID AS user_id,
-                    CONCAT(r.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id,
+                    CONCAT(r.CONTEST_ROUND, '_', r.ROUND_NO) AS post_id,
                     u.NK_NM AS user_nickname,
                     COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                     k.KIND_NM AS pet_type,
@@ -582,9 +591,9 @@ class PawStarService:
                     r.PHT_FILE_PATH1 AS list_file_name,
                     r.PHT_FILE_PATH1 AS image_path,
                     COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
-                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ENT_USER_ID = r.ENT_USER_ID) AS view_count,
-                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ENT_USER_ID = r.ENT_USER_ID) AS like_count,
-                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ENT_USER_ID = r.ENT_USER_ID) AS comment_count,
+                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
+                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
+                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
                     r.SCORE AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
@@ -613,30 +622,30 @@ class PawStarService:
                 cur.execute(query, params)
                 all_rows = cur.fetchall()
 
-                liked_user_ids = set()
-                commented_user_ids = set()
-                viewed_user_ids = set()
+                liked_round_nos = set()
+                commented_round_nos = set()
+                viewed_round_nos = set()
                 if current_user_id:
                     cur.execute("""
-                        SELECT ENT_USER_ID FROM pst_contest_like
+                        SELECT ROUND_NO FROM pst_contest_like
                         WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
                     """, (contest_id, current_user_id))
                     liked_rows = cur.fetchall()
-                    liked_user_ids = {r['ENT_USER_ID'] for r in liked_rows}
+                    liked_round_nos = {r['ROUND_NO'] for r in liked_rows}
 
                     cur.execute("""
-                        SELECT DISTINCT ENT_USER_ID FROM pst_contest_cmt
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_cmt
                         WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
                     """, (contest_id, current_user_id))
                     commented_rows = cur.fetchall()
-                    commented_user_ids = {r['ENT_USER_ID'] for r in commented_rows}
+                    commented_round_nos = {r['ROUND_NO'] for r in commented_rows}
 
                     cur.execute("""
-                        SELECT DISTINCT ENT_USER_ID FROM pst_contest_vw
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_vw
                         WHERE CONTEST_ROUND = %s AND VW_USER_ID = %s
                     """, (contest_id, current_user_id))
                     viewed_rows = cur.fetchall()
-                    viewed_user_ids = {r['ENT_USER_ID'] for r in viewed_rows}
+                    viewed_round_nos = {r['ROUND_NO'] for r in viewed_rows}
 
                 total_count = len(all_rows)
                 total_pages = max(1, (total_count + per_page - 1) // per_page)
@@ -645,7 +654,7 @@ class PawStarService:
                 paged_rows = all_rows[start_idx:start_idx + per_page]
 
                 score_sorted = sorted(all_rows, key=lambda x: x['SCORE'], reverse=True)
-                top_scores = {r['ENT_USER_ID']: idx + 1 for idx, r in enumerate(score_sorted[:3])}
+                top_scores = {r['ROUND_NO']: idx + 1 for idx, r in enumerate(score_sorted[:3])}
 
                 posts = []
                 for row in paged_rows:
@@ -656,11 +665,11 @@ class PawStarService:
                         dt_str = str(dt_val or '')
                     row['ENT_DT'] = dt_str
                     row['created_at'] = dt_str
-                    row['rank_candidate'] = top_scores.get(row['ENT_USER_ID'], None)
+                    row['rank_candidate'] = top_scores.get(row['ROUND_NO'], None)
                     row['actions'] = {
-                        'is_liked': row['ENT_USER_ID'] in liked_user_ids,
-                        'is_commented': row['ENT_USER_ID'] in commented_user_ids,
-                        'is_viewed': row['ENT_USER_ID'] in viewed_user_ids
+                        'is_liked': row['ROUND_NO'] in liked_round_nos,
+                        'is_commented': row['ROUND_NO'] in commented_round_nos,
+                        'is_viewed': row['ROUND_NO'] in viewed_round_nos
                     }
                     posts.append(row)
 
@@ -686,7 +695,7 @@ class PawStarService:
             empty_pag = {'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page}
             return {'posts': [], 'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page, 'pagination': empty_pag}
 
-    def get_post_detail(self, contest_id, ent_user_id, current_user_id=None):
+    def get_post_detail(self, contest_id, target_id, current_user_id=None):
         conn = self.get_db_connection()
         if not conn:
             return None
@@ -695,6 +704,7 @@ class PawStarService:
                 cur.execute("""
                     SELECT 
                         r.CONTEST_ROUND,
+                        r.ROUND_NO,
                         r.ENT_USER_ID,
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
@@ -714,8 +724,9 @@ class PawStarService:
                         r.ENT_DT AS ENT_DT,
                         -- 호환용
                         r.CONTEST_ROUND AS contest_id,
+                        r.ROUND_NO AS round_no,
                         r.ENT_USER_ID AS user_id,
-                        CONCAT(r.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id,
+                        CONCAT(r.CONTEST_ROUND, '_', r.ROUND_NO) AS post_id,
                         u.NK_NM AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         k.KIND_NM AS pet_type,
@@ -726,20 +737,24 @@ class PawStarService:
                         r.PHT_FILE_PATH1 AS list_file_name,
                         r.PHT_FILE_PATH1 AS image_path,
                         COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
-                        (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ENT_USER_ID = r.ENT_USER_ID) AS view_count,
-                        (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ENT_USER_ID = r.ENT_USER_ID) AS like_count,
-                        (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ENT_USER_ID = r.ENT_USER_ID) AS comment_count,
+                        (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
+                        (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
+                        (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
                         r.SCORE AS score,
                         r.ENT_DT AS created_at
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
-                    WHERE r.CONTEST_ROUND = %s AND r.ENT_USER_ID = %s
-                """, (contest_id, ent_user_id))
+                    WHERE r.CONTEST_ROUND = %s AND (r.ROUND_NO = %s OR r.ENT_USER_ID = %s)
+                    ORDER BY r.ENT_DT DESC
+                    LIMIT 1
+                """, (contest_id, target_id, target_id))
                 post = cur.fetchone()
                 if not post:
                     conn.close()
                     return None
+
+                round_no = post['ROUND_NO']
 
                 cur.execute("""
                     SELECT 
@@ -756,9 +771,9 @@ class PawStarService:
                         c.CMD_DT AS created_at
                     FROM pst_contest_cmt c
                     JOIN pst_user u ON c.CMT_USER_ID = u.USER_ID
-                    WHERE c.CONTEST_ROUND = %s AND c.ENT_USER_ID = %s
+                    WHERE c.CONTEST_ROUND = %s AND c.ROUND_NO = %s
                     ORDER BY c.CMD_DT ASC
-                """, (contest_id, ent_user_id))
+                """, (contest_id, round_no))
                 comments = cur.fetchall()
 
                 is_liked = False
@@ -767,20 +782,20 @@ class PawStarService:
                 if current_user_id:
                     cur.execute("""
                         SELECT 1 FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
-                    """, (contest_id, ent_user_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
+                    """, (contest_id, round_no, current_user_id))
                     is_liked = bool(cur.fetchone())
 
                     cur.execute("""
                         SELECT 1 FROM pst_contest_cmt
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND CMT_USER_ID = %s
-                    """, (contest_id, ent_user_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND CMT_USER_ID = %s
+                    """, (contest_id, round_no, current_user_id))
                     is_commented = bool(cur.fetchone())
 
                     cur.execute("""
                         SELECT 1 FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
-                    """, (contest_id, ent_user_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
+                    """, (contest_id, round_no, current_user_id))
                     is_viewed = bool(cur.fetchone())
 
                 dt_p = post.get('ENT_DT')
@@ -810,48 +825,56 @@ class PawStarService:
             print("get_post_detail error:", e)
             return None
 
-    def increase_view_count(self, contest_id, ent_user_id, view_user_id=None):
+    def increase_view_count(self, contest_id, target_id, view_user_id=None):
         conn = self.get_db_connection()
         if not conn:
             return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
 
         try:
             with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT ROUND_NO FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
+                    ORDER BY ENT_DT DESC LIMIT 1
+                """, (contest_id, target_id, target_id))
+                r_info = cur.fetchone()
+                if not r_info:
+                    conn.close()
+                    return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
+                round_no = r_info['ROUND_NO']
+
                 already_viewed = False
                 if view_user_id:
-                    # 동일 유저 조회 이력 중복 점검
                     cur.execute("""
                         SELECT 1 FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
-                    """, (contest_id, ent_user_id, view_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
+                    """, (contest_id, round_no, view_user_id))
                     exists = cur.fetchone()
 
                     if not exists:
-                        # 최초 1회 조회시 pst_contest_vw 기록 추가 및 VW_CNT / SCORE 카운트 증가
                         cur.execute("""
-                            INSERT INTO pst_contest_vw (CONTEST_ROUND, ENT_USER_ID, VW_USER_ID, VW_DT)
+                            INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
                             VALUES (%s, %s, %s, NOW())
                             ON DUPLICATE KEY UPDATE VW_DT = NOW()
-                        """, (contest_id, ent_user_id, view_user_id))
+                        """, (contest_id, round_no, view_user_id))
                         cur.execute("""
                             UPDATE pst_contest_round
                             SET VW_CNT = VW_CNT + 1, SCORE = SCORE + 1
-                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                        """, (contest_id, ent_user_id))
+                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                        """, (contest_id, round_no))
                         conn.commit()
                     else:
-                        # 이미 조회가 되었더라도 조회 일시(VW_DT)는 최신 시각(NOW())으로 실시간 갱신!
                         cur.execute("""
                             UPDATE pst_contest_vw
                             SET VW_DT = NOW()
-                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
-                        """, (contest_id, ent_user_id, view_user_id))
+                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
+                        """, (contest_id, round_no, view_user_id))
                         conn.commit()
                         already_viewed = True
                 else:
                     already_viewed = True
 
-                cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
+                cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
                 r = cur.fetchone()
                 conn.close()
                 return {'view_count': r['VW_CNT'] if r else 0, 'new_score': r['SCORE'] if r else 0, 'already_viewed': already_viewed}
@@ -859,7 +882,7 @@ class PawStarService:
             print("increase_view_count error:", e)
             return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
 
-    def toggle_like(self, contest_id, ent_user_id, like_user_id):
+    def toggle_like(self, contest_id, target_id, like_user_id):
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
@@ -870,52 +893,63 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
+                    SELECT ROUND_NO FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
+                    ORDER BY ENT_DT DESC LIMIT 1
+                """, (contest_id, target_id, target_id))
+                r_info = cur.fetchone()
+                if not r_info:
+                    conn.close()
+                    return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
+                round_no = r_info['ROUND_NO']
+
+                cur.execute("""
                     SELECT 1 FROM pst_contest_like
-                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
-                """, (contest_id, ent_user_id, like_user_id))
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
+                """, (contest_id, round_no, like_user_id))
                 exists = cur.fetchone()
 
                 if exists:
                     cur.execute("""
                         DELETE FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
-                    """, (contest_id, ent_user_id, like_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
+                    """, (contest_id, round_no, like_user_id))
                     cur.execute("""
                         UPDATE pst_contest_round
                         SET LIKE_CNT = GREATEST(0, LIKE_CNT - 1)
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                    """, (contest_id, ent_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                    """, (contest_id, round_no))
                     is_liked = False
                 else:
                     cur.execute("""
-                        INSERT INTO pst_contest_like (CONTEST_ROUND, ENT_USER_ID, LIKE_USER_ID)
+                        INSERT INTO pst_contest_like (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID)
                         VALUES (%s, %s, %s)
-                    """, (contest_id, ent_user_id, like_user_id))
+                    """, (contest_id, round_no, like_user_id))
                     cur.execute("""
                         UPDATE pst_contest_round
                         SET LIKE_CNT = LIKE_CNT + 1
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                    """, (contest_id, ent_user_id))
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                    """, (contest_id, round_no))
                     is_liked = True
 
                 # 카운트 및 SCORE 실시간 동기화 보정
                 cur.execute("""
                     UPDATE pst_contest_round
-                    SET VW_CNT = (SELECT COUNT(*) FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s),
-                        LIKE_CNT = (SELECT COUNT(*) FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s),
-                        CMT_CNT = (SELECT COUNT(*) FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s)
-                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s;
-                """, (contest_id, ent_user_id, contest_id, ent_user_id, contest_id, ent_user_id, contest_id, ent_user_id))
+                    SET VW_CNT = (SELECT COUNT(*) FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s),
+                        LIKE_CNT = (SELECT COUNT(*) FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s),
+                        CMT_CNT = (SELECT COUNT(*) FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s)
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s;
+                """, (contest_id, round_no, contest_id, round_no, contest_id, round_no, contest_id, round_no))
 
                 cur.execute("""
                     UPDATE pst_contest_round
                     SET SCORE = (VW_CNT * 1) + (LIKE_CNT * 5) + (CMT_CNT * 10)
-                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s;
-                """, (contest_id, ent_user_id))
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s;
+                """, (contest_id, round_no))
 
                 conn.commit()
 
-                cur.execute("SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
+                cur.execute("SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
                 r = cur.fetchone() or {}
                 conn.close()
 
@@ -934,23 +968,23 @@ class PawStarService:
 
     def trigger_event(self, post_id, event_type, user_id=None, **kwargs):
         contest_id = 1
-        ent_user_id = str(post_id)
+        target_id = str(post_id)
         if '_' in str(post_id):
             parts = str(post_id).split('_', 1)
             if parts[0].isdigit():
                 contest_id = int(parts[0])
-                ent_user_id = parts[1]
+                target_id = parts[1]
 
         if event_type == 'view':
-            res_vw = self.increase_view_count(contest_id, ent_user_id, view_user_id=user_id)
+            res_vw = self.increase_view_count(contest_id, target_id, view_user_id=user_id)
             return {'success': True, 'action': 'view', 'view_count': res_vw.get('view_count', 0), 'new_score': res_vw.get('new_score', 0), 'is_viewed': True}
         elif event_type in ('like', 'unlike', 'toggle_like'):
             if not user_id:
                 return {'success': False, 'message': '로그인이 필요합니다.'}
-            return self.toggle_like(contest_id, ent_user_id, user_id)
+            return self.toggle_like(contest_id, target_id, user_id)
         return {'success': True}
 
-    def add_comment(self, contest_id, ent_user_id, cmt_user_id, comment_text):
+    def add_comment(self, contest_id, target_id, cmt_user_id, comment_text):
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
@@ -961,15 +995,26 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO pst_contest_cmt (CONTEST_ROUND, ENT_USER_ID, CMT_USER_ID, CMT)
+                    SELECT ROUND_NO FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
+                    ORDER BY ENT_DT DESC LIMIT 1
+                """, (contest_id, target_id, target_id))
+                r_info = cur.fetchone()
+                if not r_info:
+                    conn.close()
+                    return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
+                round_no = r_info['ROUND_NO']
+
+                cur.execute("""
+                    INSERT INTO pst_contest_cmt (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT)
                     VALUES (%s, %s, %s, %s)
-                """, (contest_id, ent_user_id, cmt_user_id, comment_text))
+                """, (contest_id, round_no, cmt_user_id, comment_text))
 
                 cur.execute("""
                     UPDATE pst_contest_round
                     SET CMT_CNT = CMT_CNT + 1, SCORE = SCORE + 10
-                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                """, (contest_id, ent_user_id))
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                """, (contest_id, round_no))
                 conn.commit()
                 conn.close()
                 return {'success': True}
@@ -994,6 +1039,7 @@ class PawStarService:
                 cur.execute("""
                     SELECT 
                         ca.CONTEST_ROUND,
+                        ca.ROUND_NO,
                         ca.AWARD_PART,
                         ca.AWARD_CD,
                         a.AWARD_NM,
@@ -1013,6 +1059,7 @@ class PawStarService:
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
                         -- 호환용
                         ca.CONTEST_ROUND AS contest_id,
+                        ca.ROUND_NO AS round_no,
                         t.THEME_NM AS contest_title,
                         ca.AWARD_PART AS award_part,
                         ca.AWARD_CD AS award_cd,
@@ -1031,7 +1078,7 @@ class PawStarService:
                     JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ENT_USER_ID = r.ENT_USER_ID
+                    JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
                     JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s

@@ -7,6 +7,7 @@
     <select id="selectPostsByPopularity" resultType="PostVo">
         SELECT 
             r.CONTEST_ROUND,
+            r.ROUND_NO,
             r.ENT_USER_ID AS USER_ID,
             u.NK_NM AS NICKNAME,
             u.PROFILE_URL AS PROFILE_IMG,
@@ -37,6 +38,7 @@
     <select id="selectHallOfFameByContest" resultType="ContestWinnerVo">
         SELECT 
             ca.CONTEST_ROUND,
+            ca.ROUND_NO,
             t.THEME_NM AS CONTEST_TITLE,
             ca.AWARD_PART,
             ca.AWARD_CD,
@@ -56,7 +58,7 @@
         JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
         JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
         JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-        JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ENT_USER_ID = r.ENT_USER_ID
+        JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
         JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
         LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
         WHERE ca.CONTEST_ROUND = #{contestId}
@@ -71,7 +73,7 @@
             VW_CNT = VW_CNT + #{viewDelta},
             LIKE_CNT = LIKE_CNT + #{likeDelta},
             CMT_CNT = CMT_CNT + #{commentDelta}
-        WHERE CONTEST_ROUND = #{contestId} AND ENT_USER_ID = #{userId};
+        WHERE CONTEST_ROUND = #{contestId} AND ROUND_NO = #{roundNo};
     </update>
 
 </mapper>
