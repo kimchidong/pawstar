@@ -1,6 +1,7 @@
 import pymysql
 import random
 import hashlib
+import os
 from datetime import datetime, timedelta
 from config import db_config
 
@@ -12,11 +13,26 @@ def seed_database():
     cur = conn.cursor()
 
     try:
-        # 외래키 체크 비활성화 후 기존 데이터 정리
+        cur.execute("SET NAMES utf8mb4;")
         cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
-        tables = ["USER_BADGE", "BADGE", "CONTEST_WINNER", "POST", "CONTEST", "USERS"]
+
+        # 1. db_schema.sql 파일 실행 (테이블 DDL 및 초깃값 생성)
+        schema_path = os.path.join(os.path.dirname(__file__), 'db_schema.sql')
+        if os.path.exists(schema_path):
+            with open(schema_path, 'r', encoding='utf-8') as f:
+                sql_statements = f.read().split(';')
+                for stmt in sql_statements:
+                    stmt = stmt.strip()
+                    if stmt:
+                        cur.execute(stmt)
+
+        # 2. 기존 샘플 데이터 정리
+        tables = ["USER_BADGE", "CONTEST_WINNER", "POST", "CONTEST", "USERS", "BADGE", "PST_CD"]
         for table in tables:
-            cur.execute(f"TRUNCATE TABLE {table};")
+            try:
+                cur.execute(f"TRUNCATE TABLE {table};")
+            except Exception:
+                pass
 
         cur.execute("SHOW COLUMNS FROM USERS LIKE 'LAST_LOGIN_AT'")
         if not cur.fetchone():
@@ -27,7 +43,7 @@ def seed_database():
 
         cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
-        # 1. Users (USER_ID를 복호화 불가능한 단방향 SHA-256 해시로 저장)
+        # 3. Users (USER_ID를 복호화 불가능한 단방향 SHA-256 해시로 저장)
         DEFAULT_AVATAR = '/static/image/profile/default_profile.png'
         users_data = [
             (hash_id('user1'), '뽀삐아빠', DEFAULT_AVATAR, '골든리트리버 뽀삐와 함께 살고 있습니다 🦮', 'USER', '2026-07-30 22:00:00', 5),
@@ -39,7 +55,7 @@ def seed_database():
                       VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_user, users_data)
 
-        # 2. Contests (7월부터 제1회 시작)
+        # 4. Contests (7월부터 제1회 시작)
         contests_data = [
             (1, '제1회 썸머 파라다이스 펫 콘테스트', '무더위를 싹 씻어줄 시원하고 러블리한 썸머 펫 스타 🌊🍦', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'IN_PROGRESS', ''),
             (2, '제2회 한여름 밤의 바캉스 펫 챔피언십', '뜨거운 여름 열기보다 더 핫한 인플루언서 펫 축제 🏖️⭐', '2026-08-01 00:00:00', '2026-08-31 23:59:59', 'SCHEDULED', ''),
@@ -58,7 +74,7 @@ def seed_database():
                          VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_contest, contests_data)
 
-        # 3. Badges & User Badges
+        # 5. Badges & User Badges
         badges = [
             (1, '🥇 1위 슈퍼스타', 'trophy-gold', '콘테스트 1위 슈퍼스타'),
             (2, '🥈 2위 라이징스타', 'trophy-silver', '콘테스트 2위 라이징스타'),
@@ -79,8 +95,19 @@ def seed_database():
         sql_ubadge = """INSERT INTO USER_BADGE (USER_ID, CONTEST_ID, BADGE_ID) VALUES (%s, %s, %s)"""
         cur.executemany(sql_ubadge, user_badges)
 
+        # 6. 공통 코드 테이블 (PST_CD) 데이터 시딩
+        pst_cd_data = [
+            ('G001C001', 'G001', '진행중'),
+            ('G001C002', 'G001', '종료'),
+            ('G002P001', 'G002', '전체'),
+            ('G002P002', 'G002', '품종')
+        ]
+        sql_pst_cd = """INSERT INTO PST_CD (CD, GRP, CD_NM) VALUES (%s, %s, %s)
+                        ON DUPLICATE KEY UPDATE GRP=VALUES(GRP), CD_NM=VALUES(CD_NM)"""
+        cur.executemany(sql_pst_cd, pst_cd_data)
+
         conn.commit()
-        print("Successfully seeded all data into DB_PST!")
+        print("Successfully seeded all data including PST_CD into DB_PST!")
 
     except Exception as e:
         conn.rollback()

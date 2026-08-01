@@ -90,6 +90,27 @@ class PawStarService:
                     except Exception as err_u2:
                         print("USERS LOGIN_COUNT alter error:", err_u2)
 
+                cur.execute("SHOW COLUMNS FROM POST LIKE 'SCORE'")
+                if not cur.fetchone():
+                    try:
+                        cur.execute("ALTER TABLE POST ADD COLUMN SCORE INT DEFAULT 0")
+                    except Exception as err_p1:
+                        print("POST SCORE alter error:", err_p1)
+
+                cur.execute("SHOW COLUMNS FROM POST LIKE 'RANKING'")
+                if not cur.fetchone():
+                    try:
+                        cur.execute("ALTER TABLE POST ADD COLUMN RANKING INT DEFAULT NULL")
+                    except Exception as err_p2:
+                        print("POST RANKING alter error:", err_p2)
+
+                cur.execute("SHOW COLUMNS FROM POST LIKE 'BADGE_ID'")
+                if not cur.fetchone():
+                    try:
+                        cur.execute("ALTER TABLE POST ADD COLUMN BADGE_ID INT DEFAULT NULL")
+                    except Exception as err_p3:
+                        print("POST BADGE_ID alter error:", err_p3)
+
                 conn.commit()
             conn.close()
         except Exception as e:

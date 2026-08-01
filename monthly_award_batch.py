@@ -44,7 +44,12 @@ def ensure_schema(conn):
             print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블의 RANK 컬럼을 RANKING으로 변경 중...")
             cur.execute("ALTER TABLE POST CHANGE COLUMN `RANK` RANKING INT DEFAULT NULL")
 
-        # POST 테이블에 RANKING 컬럼 존재 여부 체크 및 추가
+        # POST 테이블에 SCORE, RANKING, BADGE_ID 컬럼 존재 여부 체크 및 추가
+        cur.execute("SHOW COLUMNS FROM POST LIKE 'SCORE'")
+        if not cur.fetchone():
+            print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블에 SCORE 컬럼 추가 중...")
+            cur.execute("ALTER TABLE POST ADD COLUMN SCORE INT DEFAULT 0")
+
         cur.execute("SHOW COLUMNS FROM POST LIKE 'RANKING'")
         if not cur.fetchone():
             print(f"[{datetime.datetime.now()}] ⚙️ POST 테이블에 RANKING 컬럼 추가 중...")
