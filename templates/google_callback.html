@@ -18,8 +18,7 @@
         const serverError = authDataElem ? authDataElem.dataset.error : '';
         const customTarget = authDataElem ? authDataElem.dataset.target : '';
 
-        const isMobile = /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent);
-        const targetProfileUrl = customTarget || (isMobile ? '/m/profile' : '/profile');
+        const targetProfileUrl = customTarget || '/';
 
         if (isSuccess) {
             if (window.opener && !window.opener.closed) {

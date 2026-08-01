@@ -265,9 +265,8 @@ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI = get_google_config(
 @app.route('/auth/google')
 def auth_google_redirect():
     """ 팝업 창을 구글 공식 OAuth 2.0 Authorization Code 인증 페이지로 직접 리다이렉트 (response_type=code) """
-    next_url = request.args.get('next') or request.args.get('return_url')
-    if next_url:
-        session['next_url'] = next_url
+    next_url = request.args.get('next') or request.args.get('return_url') or '/'
+    session['next_url'] = next_url
     client_id, client_secret, redirect_uri = get_google_config()
     google_auth_url = (
         f"https://accounts.google.com/o/oauth2/v2/auth?"
@@ -332,15 +331,14 @@ def auth_google_callback():
         # 3. PawStar 서비스 회원 가입/로그인 처리
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
-        saved_next_url = session.get('next_url')
+        saved_next_url = session.get('next_url') or '/'
         session.clear()
         session['user_id'] = user_info['user_id']
         session['access_token'] = access_token
         session['is_logged_in'] = True
         session['last_activity'] = datetime.datetime.now().timestamp()
         session.pop('logged_out', None)
-        if saved_next_url:
-            session['next_url'] = saved_next_url
+        session['next_url'] = saved_next_url
 
         msg = f"{user_info['nickname']}님, Google 계정({email}) 인증으로 로그인되었습니다!"
         return render_template('google_callback.html', success=True, message=msg, user=user_info, target_url=saved_next_url)
