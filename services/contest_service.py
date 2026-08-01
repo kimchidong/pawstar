@@ -288,6 +288,60 @@ class PawStarService:
                 'profile_img': profile_img
             }
 
+    def update_user_profile(self, user_id, nickname, bio="", profile_img="", **kwargs):
+        conn = self.get_db_connection()
+        if not conn:
+            return {
+                'USER_ID': user_id,
+                'NK_NM': nickname,
+                'PROFILE_URL': profile_img or '/static/image/profile/default_profile.png',
+                'user_id': user_id,
+                'nickname': nickname,
+                'profile_img': profile_img or '/static/image/profile/default_profile.png'
+            }
+        try:
+            with conn.cursor() as cur:
+                if profile_img:
+                    cur.execute("""
+                        UPDATE pst_user
+                        SET NK_NM = %s, PROFILE_URL = %s
+                        WHERE USER_ID = %s OR USER_ID LIKE %s
+                    """, (nickname, profile_img, user_id, f"{user_id}_post_%"))
+                else:
+                    cur.execute("""
+                        UPDATE pst_user
+                        SET NK_NM = %s
+                        WHERE USER_ID = %s OR USER_ID LIKE %s
+                    """, (nickname, user_id, f"{user_id}_post_%"))
+
+                conn.commit()
+
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                user = cur.fetchone()
+                conn.close()
+
+                final_nk = user.get('NK_NM', nickname) if user else nickname
+                final_img = user.get('PROFILE_URL', profile_img or '/static/image/profile/default_profile.png') if user else (profile_img or '/static/image/profile/default_profile.png')
+
+                return {
+                    'USER_ID': user_id,
+                    'NK_NM': final_nk,
+                    'PROFILE_URL': final_img,
+                    'user_id': user_id,
+                    'nickname': final_nk,
+                    'profile_img': final_img
+                }
+        except Exception as e:
+            print("update_user_profile error:", e)
+            return {
+                'USER_ID': user_id,
+                'NK_NM': nickname,
+                'PROFILE_URL': profile_img or '/static/image/profile/default_profile.png',
+                'user_id': user_id,
+                'nickname': nickname,
+                'profile_img': profile_img or '/static/image/profile/default_profile.png'
+            }
+
     def delete_user(self, user_id):
         conn = self.get_db_connection()
         if not conn:
