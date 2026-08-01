@@ -857,6 +857,17 @@ body {
     color: #7c3aed !important;
 }
 
+/* 조회(View) active 상태 스타일 (시안/블루 하이라이트) */
+.action-btn.btn-view.active, #detailBtnView.active {
+    background: #e0f2fe !important;
+    border-color: #38bdf8 !important;
+    color: #0284c7 !important;
+}
+.action-btn.btn-view.active i, #detailBtnView.active i,
+.action-btn.btn-view.active span, #detailBtnView.active span {
+    color: #0284c7 !important;
+}
+
 .action-btn .score-plus {
     font-size: 0.68rem;
     color: var(--text-muted);

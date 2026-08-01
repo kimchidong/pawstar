@@ -138,6 +138,22 @@ function openMobileDetailModal(postData) {
         triggerEvent(postData.post_id, 'view');
     }
 
+    const mCleanId = String(postData.post_id);
+    const mRawEntId = mCleanId.replace(/^\d+_/, '');
+    const mCard = document.getElementById(`m-post-card-${mCleanId}`) || 
+                  document.getElementById(`m-post-card-${mRawEntId}`) ||
+                  document.querySelector(`[data-post-id="${mCleanId}"]`) ||
+                  document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
+                  document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
+    if (mCard) {
+        const mBtnView = mCard.querySelector('.btn-view');
+        if (mBtnView) {
+            mBtnView.classList.add('active');
+            const icon = mBtnView.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-eye';
+        }
+    }
+
     detailModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }

@@ -146,8 +146,8 @@
 
                 <!-- 수치 표시 현황 (조회, 좋아요, 댓글) -->
                 <div class="card-actions">
-                    <div class="action-btn btn-view" title="조회수" onclick="event.stopPropagation(); triggerEvent('{{ p.ENT_USER_ID or p.post_id }}', 'view');">
-                        <i class="fa-regular fa-eye"></i>
+                    <div class="action-btn btn-view {% if p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수" onclick="event.stopPropagation(); triggerEvent('{{ p.ENT_USER_ID or p.post_id }}', 'view');">
+                        <i class="fa-{% if p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i>
                         <span class="view-count">{{ p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0) }}</span>
                     </div>
                     <div class="action-btn btn-like {% if p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요" onclick="event.stopPropagation(); toggleLikeCard(this, '{{ p.ENT_USER_ID or p.post_id }}');">

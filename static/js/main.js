@@ -279,6 +279,22 @@ async function triggerEvent(postId, eventType) {
             }
         }
 
+        // 팝업 모달 내부 수치도 동시 실시간 갱신
+        const detailViewCountEl = document.getElementById('detailViewCount');
+        if (detailViewCountEl && data.view_count !== undefined) {
+            detailViewCountEl.textContent = data.view_count;
+        }
+        const mDetailViewCountEl = document.getElementById('mDetailViewCount');
+        if (mDetailViewCountEl && data.view_count !== undefined) {
+            mDetailViewCountEl.textContent = data.view_count;
+        }
+
+        const detailScoreNumEl = document.getElementById('detailScoreNum');
+        if (detailScoreNumEl && (data.new_score !== undefined || data.score !== undefined)) {
+            const scoreVal = Number(data.new_score !== undefined ? data.new_score : data.score);
+            detailScoreNumEl.textContent = scoreVal.toLocaleString();
+        }
+
         // 모달 내부 수치 동기화 갱신
         const detailScore = document.getElementById('detailScoreNum');
         if (detailScore) {
@@ -378,10 +394,10 @@ function openDetailModal(post) {
     post = window.postsDataStore[post.post_id];
 
     // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정
-    const card = document.getElementById(`post-card-${post.post_id}`);
-    if (card) {
-        const cardLike = card.querySelector('.like-count');
-        const cardScore = card.querySelector('.score-num');
+    const feedCard = document.getElementById(`post-card-${post.post_id}`);
+    if (feedCard) {
+        const cardLike = feedCard.querySelector('.like-count');
+        const cardScore = feedCard.querySelector('.score-num');
         if (cardLike && cardLike.textContent !== '') {
             post.like_count = parseInt(cardLike.textContent, 10) || post.like_count;
         }
@@ -390,8 +406,31 @@ function openDetailModal(post) {
         }
     }
 
-    // 게시물 상세 팝업 오픈시 조회수 1회 자동 증가 (+1점)
+    // 게시물 상세 팝업 오픈시 조회수 1회 자동 증가 (+1점) 및 피드 카드 조회 영향력 실시간 하이라이트 반영
     triggerEvent(post.post_id, 'view');
+    const cleanId = String(post.post_id);
+    const rawEntId = cleanId.replace(/^\d+_/, '');
+    const card = document.getElementById(`post-card-${cleanId}`) || 
+                 document.getElementById(`post-card-${rawEntId}`) ||
+                 document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                 document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                 document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+    if (card) {
+        const btnView = card.querySelector('.btn-view');
+        if (btnView) {
+            btnView.classList.add('active');
+            const icon = btnView.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-eye';
+        }
+    }
+
+    // 팝업 모달 내부의 조회수 버튼 박스도 조회 완료(active) 상태로 테두리/배경 즉시 하이라이트
+    const detailBtnViewPopup = document.getElementById('detailBtnView');
+    if (detailBtnViewPopup) {
+        detailBtnViewPopup.classList.add('active');
+        const icon = detailBtnViewPopup.querySelector('i');
+        if (icon) icon.className = 'fa-solid fa-eye';
+    }
 
     // 데이터 채우기 (팝업용 고화질 이미지 바인딩)
     const imgEl = document.getElementById('detailImg');

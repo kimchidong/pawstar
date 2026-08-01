@@ -643,20 +643,30 @@ class PawStarService:
 
                 liked_user_ids = set()
                 commented_user_ids = set()
+                viewed_user_ids = set()
                 if current_user_id:
+                    clean_uid = str(current_user_id).split('_post_')[0]
+
                     cur.execute("""
                         SELECT ENT_USER_ID FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
-                    """, (contest_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND (LIKE_USER_ID = %s OR SUBSTRING_INDEX(LIKE_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, current_user_id, clean_uid))
                     liked_rows = cur.fetchall()
                     liked_user_ids = {r['ENT_USER_ID'] for r in liked_rows}
 
                     cur.execute("""
                         SELECT DISTINCT ENT_USER_ID FROM pst_contest_cmt
-                        WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
-                    """, (contest_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND (CMT_USER_ID = %s OR SUBSTRING_INDEX(CMT_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, current_user_id, clean_uid))
                     commented_rows = cur.fetchall()
                     commented_user_ids = {r['ENT_USER_ID'] for r in commented_rows}
+
+                    cur.execute("""
+                        SELECT DISTINCT ENT_USER_ID FROM pst_contest_vw
+                        WHERE CONTEST_ROUND = %s AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, current_user_id, clean_uid))
+                    viewed_rows = cur.fetchall()
+                    viewed_user_ids = {r['ENT_USER_ID'] for r in viewed_rows}
 
                 total_count = len(all_rows)
                 total_pages = max(1, (total_count + per_page - 1) // per_page)
@@ -679,7 +689,8 @@ class PawStarService:
                     row['rank_candidate'] = top_scores.get(row['ENT_USER_ID'], None)
                     row['actions'] = {
                         'is_liked': row['ENT_USER_ID'] in liked_user_ids,
-                        'is_commented': row['ENT_USER_ID'] in commented_user_ids
+                        'is_commented': row['ENT_USER_ID'] in commented_user_ids,
+                        'is_viewed': row['ENT_USER_ID'] in viewed_user_ids
                     }
                     posts.append(row)
 
@@ -788,18 +799,27 @@ class PawStarService:
 
                 is_liked = False
                 is_commented = False
+                is_viewed = False
                 if current_user_id:
+                    clean_uid = str(current_user_id).split('_post_')[0]
+
                     cur.execute("""
                         SELECT 1 FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
-                    """, (contest_id, ent_user_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (LIKE_USER_ID = %s OR SUBSTRING_INDEX(LIKE_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
                     is_liked = bool(cur.fetchone())
 
                     cur.execute("""
                         SELECT 1 FROM pst_contest_cmt
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND CMT_USER_ID = %s
-                    """, (contest_id, ent_user_id, current_user_id))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (CMT_USER_ID = %s OR SUBSTRING_INDEX(CMT_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
                     is_commented = bool(cur.fetchone())
+
+                    cur.execute("""
+                        SELECT 1 FROM pst_contest_vw
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
+                    is_viewed = bool(cur.fetchone())
 
                 dt_p = post.get('ENT_DT')
                 if hasattr(dt_p, 'strftime'):
@@ -821,7 +841,7 @@ class PawStarService:
                     cmt_list.append(c)
 
                 post['comments'] = cmt_list
-                post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented}
+                post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented, 'is_viewed': is_viewed}
                 conn.close()
                 return post
         except Exception as e:
@@ -831,26 +851,58 @@ class PawStarService:
     def increase_view_count(self, contest_id, ent_user_id, view_user_id=None):
         conn = self.get_db_connection()
         if not conn:
-            return False
+            return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
+
+        # 본인 자신의 출전 게시물인 경우 조회수 카운트 제외
+        clean_ent = str(ent_user_id).split('_post_')[0]
+        clean_vw = str(view_user_id or '').split('_post_')[0]
+        if view_user_id and clean_ent == clean_vw:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
+                    r = cur.fetchone()
+                    conn.close()
+                    return {'view_count': r['VW_CNT'] if r else 0, 'new_score': r['SCORE'] if r else 0, 'is_owner': True, 'already_viewed': True}
+            except Exception:
+                if conn: conn.close()
+                return {'view_count': 0, 'new_score': 0, 'already_viewed': True}
+
         try:
             with conn.cursor() as cur:
+                already_viewed = False
                 if view_user_id:
+                    # 동일 유저 조회 이력 중복 점검
                     cur.execute("""
-                        INSERT IGNORE INTO pst_contest_vw (CONTEST_ROUND, ENT_USER_ID, VW_USER_ID)
-                        VALUES (%s, %s, %s)
-                    """, (contest_id, ent_user_id, view_user_id))
+                        SELECT 1 FROM pst_contest_vw
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                        AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
+                    """, (contest_id, ent_user_id, view_user_id, clean_vw))
+                    exists = cur.fetchone()
 
-                cur.execute("""
-                    UPDATE pst_contest_round
-                    SET VW_CNT = VW_CNT + 1, SCORE = SCORE + 1
-                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                """, (contest_id, ent_user_id))
-                conn.commit()
+                    if not exists:
+                        # 최초 1회 조회시에만 기록 추가 및 VW_CNT / SCORE 카운트 증가
+                        cur.execute("""
+                            INSERT IGNORE INTO pst_contest_vw (CONTEST_ROUND, ENT_USER_ID, VW_USER_ID)
+                            VALUES (%s, %s, %s)
+                        """, (contest_id, ent_user_id, view_user_id))
+                        cur.execute("""
+                            UPDATE pst_contest_round
+                            SET VW_CNT = VW_CNT + 1, SCORE = SCORE + 1
+                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                        """, (contest_id, ent_user_id))
+                        conn.commit()
+                    else:
+                        already_viewed = True
+                else:
+                    already_viewed = True
+
+                cur.execute("SELECT VW_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
+                r = cur.fetchone()
                 conn.close()
-                return True
+                return {'view_count': r['VW_CNT'] if r else 0, 'new_score': r['SCORE'] if r else 0, 'already_viewed': already_viewed}
         except Exception as e:
             print("increase_view_count error:", e)
-            return False
+            return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
 
     def toggle_like(self, contest_id, ent_user_id, like_user_id):
         conn = self.get_db_connection()
@@ -912,8 +964,8 @@ class PawStarService:
                 ent_user_id = parts[1]
 
         if event_type == 'view':
-            self.increase_view_count(contest_id, ent_user_id, view_user_id=user_id)
-            return {'success': True, 'action': 'view'}
+            res_vw = self.increase_view_count(contest_id, ent_user_id, view_user_id=user_id)
+            return {'success': True, 'action': 'view', 'view_count': res_vw.get('view_count', 0), 'new_score': res_vw.get('new_score', 0), 'is_viewed': True}
         elif event_type in ('like', 'unlike', 'toggle_like'):
             if not user_id:
                 return {'success': False, 'message': '로그인이 필요합니다.'}
