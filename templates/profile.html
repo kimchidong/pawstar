@@ -103,10 +103,10 @@
                             <img src="{{ p.PROFILE_URL or p.user_profile or user_info.profile_img }}" class="author-img" alt="profile">
                             <div class="author-detail">
                                 <div class="nickname">{{ p.NK_NM or p.user_nickname or user_info.nickname }}</div>
-                                <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
-                                    <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                                <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
+                                    <span style="color: #e11d48; font-weight: 800; white-space: nowrap; flex-shrink: 0;">{{ p.KIND_NM or p.pet_type }}</span>
                                     {% if p.PET_NM or p.pet_name %}
-                                        <span style="color: #6d28d9; font-weight: 700;">{{ p.PET_NM or p.pet_name }}</span>
+                                        <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.PET_NM or p.pet_name }}</span>
                                     {% endif %}
                                 </div>
                             </div>

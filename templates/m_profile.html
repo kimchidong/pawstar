@@ -67,10 +67,10 @@
                             <img src="{{ p.PROFILE_URL or p.user_profile or user_info.profile_img }}" alt="profile" style="width: 22px; height: 22px; border-radius: 50%;">
                             <span style="font-weight: 800; font-size: 0.88rem;">{{ p.NK_NM or p.user_nickname or user_info.nickname }}</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; margin-top: 0.1rem;">
-                            <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
+                            <span style="color: #e11d48; font-weight: 800; white-space: nowrap; flex-shrink: 0;">{{ p.KIND_NM or p.pet_type }}</span>
                             {% if p.PET_NM or p.pet_name %}
-                                <span style="color: #6d28d9; font-weight: 700;">{{ p.PET_NM or p.pet_name }}</span>
+                                <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.PET_NM or p.pet_name }}</span>
                             {% endif %}
                         </div>
                     </div>

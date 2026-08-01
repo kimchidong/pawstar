@@ -741,16 +741,33 @@ body {
     border: 1px solid var(--border-light);
 }
 
+.author-detail {
+    min-width: 0;
+    overflow: hidden;
+}
+
 .author-detail .nickname {
     font-size: 0.92rem;
     font-weight: 800;
     color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .author-detail .pet-tag {
-    font-size: 0.78rem;
-    color: var(--accent-pink);
+    font-size: 0.8rem;
     font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.author-detail .pet-tag span {
+    white-space: nowrap;
 }
 
 .post-title {
