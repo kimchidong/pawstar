@@ -1075,7 +1075,11 @@ class PawStarService:
                 if not contest_id:
                     cur.execute("SELECT CONTEST_ROUND FROM pst_contest_award ORDER BY CONTEST_ROUND DESC LIMIT 1")
                     r = cur.fetchone()
-                    contest_id = r['CONTEST_ROUND'] if r else 1
+                    contest_id = r['CONTEST_ROUND'] if r else None
+
+                if not contest_id:
+                    conn.close()
+                    return []
 
                 cur.execute("""
                     SELECT 
@@ -1083,20 +1087,20 @@ class PawStarService:
                         ca.ROUND_NO,
                         ca.AWARD_PART,
                         ca.AWARD_CD,
-                        a.AWARD_NM,
+                        COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
                         a.BADGE_IMG_PATH_FILE,
                         ca.SCORE,
                         ca.RANKING,
+                        ca.VW_CNT,
+                        ca.LIKE_CNT,
+                        ca.CMT_CNT,
                         r.PET_NM,
-                        k.KIND_NM,
+                        COALESCE(k.KIND_NM, '반려동물') AS KIND_NM,
                         k.KIND_CLASS,
                         r.TITLE,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                        END AS IMAGE_PATH,
+                        COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
                         u.USER_ID,
-                        u.NK_NM,
+                        COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
                         -- 호환용
                         ca.CONTEST_ROUND AS contest_id,
@@ -1104,28 +1108,85 @@ class PawStarService:
                         t.THEME_NM AS contest_title,
                         ca.AWARD_PART AS award_part,
                         ca.AWARD_CD AS award_cd,
-                        a.AWARD_NM AS prize_name,
+                        COALESCE(a.AWARD_NM, '당선작') AS prize_name,
                         a.BADGE_IMG_PATH_FILE AS badge_img,
                         ca.SCORE AS score,
                         ca.RANKING AS ranking,
                         r.PET_NM AS pet_name,
-                        k.KIND_NM AS pet_type,
+                        COALESCE(k.KIND_NM, '반려동물') AS pet_type,
                         r.TITLE AS title,
-                        r.PHT_FILE_PATH1 AS image_path,
+                        COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS image_path,
                         u.USER_ID AS user_id,
-                        u.NK_NM AS user_nickname,
+                        COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
                     FROM pst_contest_award ca
-                    JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
-                    JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-                    JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
-                    JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+                    LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                    LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                    LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                 """, (contest_id,))
                 winners = cur.fetchall()
+
+                # 혹시 해당 contest_id로 검색했을 때 결과가 없으면 가장 최근 수상 회차로 1회 재시도
+                if not winners:
+                    cur.execute("SELECT CONTEST_ROUND FROM pst_contest_award ORDER BY CONTEST_ROUND DESC LIMIT 1")
+                    r = cur.fetchone()
+                    latest_id = r['CONTEST_ROUND'] if r else None
+                    if latest_id and latest_id != contest_id:
+                        cur.execute("""
+                            SELECT 
+                                ca.CONTEST_ROUND,
+                                ca.ROUND_NO,
+                                ca.AWARD_PART,
+                                ca.AWARD_CD,
+                                COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
+                                a.BADGE_IMG_PATH_FILE,
+                                ca.SCORE,
+                                ca.RANKING,
+                                ca.VW_CNT,
+                                ca.LIKE_CNT,
+                                ca.CMT_CNT,
+                                r.PET_NM,
+                                COALESCE(k.KIND_NM, '반려동물') AS KIND_NM,
+                                k.KIND_CLASS,
+                                r.TITLE,
+                                COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
+                                u.USER_ID,
+                                COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
+                                COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
+                                -- 호환용
+                                ca.CONTEST_ROUND AS contest_id,
+                                ca.ROUND_NO AS round_no,
+                                t.THEME_NM AS contest_title,
+                                ca.AWARD_PART AS award_part,
+                                ca.AWARD_CD AS award_cd,
+                                COALESCE(a.AWARD_NM, '당선작') AS prize_name,
+                                a.BADGE_IMG_PATH_FILE AS badge_img,
+                                ca.SCORE AS score,
+                                ca.RANKING AS ranking,
+                                r.PET_NM AS pet_name,
+                                COALESCE(k.KIND_NM, '반려동물') AS pet_type,
+                                r.TITLE AS title,
+                                COALESCE(r.PHT_FILE_PATH1, r.PHT_PATH, '/static/image/paw/default_pet.jpg') AS image_path,
+                                u.USER_ID AS user_id,
+                                COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
+                                COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
+                            FROM pst_contest_award ca
+                            LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                            LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+                            LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                            LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                            LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
+                            LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                            WHERE ca.CONTEST_ROUND = %s
+                            ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
+                        """, (latest_id,))
+                        winners = cur.fetchall()
+
                 conn.close()
                 return winners
         except Exception as e:

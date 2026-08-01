@@ -65,7 +65,7 @@ def run_monthly_award_batch():
                 print(f"[{now}] 진행 중인 회차가 없어 회차 #1 자동 생성을 진행합니다.")
                 cur.execute("""
                     INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
-                    VALUES (1, 'T001', NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH), 'G001C001')
+                    VALUES (1, 'T001', NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
                 """)
                 conn.commit()
                 cur.execute("""
@@ -196,19 +196,25 @@ def run_monthly_award_batch():
                 WHERE CONTEST_ROUND = %s
             """, (round_id,))
 
-            # 7. 다음 회차 (CONTEST_ROUND + 1) 생성 (G001C001)
+            # 7. 다음 회차 (CONTEST_ROUND + 1) 생성 (G001C001) - 실행 시점 기준 월의 테마 적용
             next_round = round_id + 1
-            next_month = (now.month % 12) + 1
-            next_theme_cd = f'T{next_month:03d}'
+            current_month = now.month
+            target_theme_cd = f'T{current_month:03d}'
+
+            # DB에 해당 테마가 존재하는지 확인
+            cur.execute("SELECT THEME_CD FROM pst_theme WHERE THEME_CD = %s", (target_theme_cd,))
+            theme_row = cur.fetchone()
+            if not theme_row:
+                target_theme_cd = 'T001'
 
             cur.execute("""
                 INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
-                VALUES (%s, %s, NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH), 'G001C001')
-                ON DUPLICATE KEY UPDATE CONTEST_STAT = 'G001C001'
-            """, (next_round, next_theme_cd))
+                VALUES (%s, %s, NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
+                ON DUPLICATE KEY UPDATE THEME_CD = VALUES(THEME_CD), ED_DT = VALUES(ED_DT), CONTEST_STAT = 'G001C001'
+            """, (next_round, target_theme_cd))
 
             conn.commit()
-            print(f"[{now}] 제{round_id}회 마감 및 당선자 선정 완료! 제{next_round}회(테마: {next_theme_cd}) 진행중으로 새로 오픈되었습니다.")
+            print(f"[{now}] 제{round_id}회 마감 및 당선자 선정 완료! 제{next_round}회(테마: {target_theme_cd}) 진행중으로 새로 오픈되었습니다.")
             conn.close()
 
     except Exception as e:

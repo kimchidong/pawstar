@@ -399,7 +399,13 @@ def index():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_index', **request.args))
 
-    contest_id = request.args.get('contest_id', 1, type=int)
+    contest_id_arg = request.args.get('contest_id', type=int)
+    if not contest_id_arg:
+        active_c = service.get_current_contest()
+        contest_id = active_c.get('CONTEST_ROUND') if active_c else 1
+    else:
+        contest_id = contest_id_arg
+
     sort_type = request.args.get('sort', 'latest') # latest(최신등록순), popular(인기순), trending(최근급상승)
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
@@ -433,15 +439,18 @@ def hall_of_fame():
     contests = service.get_closed_contests()
     contest_id_arg = request.args.get('contest_id', type=int)
     
-    if contest_id_arg and any(c['contest_id'] == contest_id_arg for c in contests):
+    if contest_id_arg and any((c.get('CONTEST_ROUND') == contest_id_arg or c.get('contest_id') == contest_id_arg) for c in contests):
         contest_id = contest_id_arg
     elif contests:
-        contest_id = contests[0]['contest_id']
+        contest_id = contests[0].get('CONTEST_ROUND') or contests[0].get('contest_id')
     else:
-        contest_id = 4
+        contest_id = None
 
-    current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
+    if winners and winners[0].get('CONTEST_ROUND'):
+        contest_id = winners[0].get('CONTEST_ROUND')
+
+    current_contest = service.get_contest(contest_id) if contest_id else (contests[0] if contests else None)
 
     return render_template(
         'hall_of_fame.html',
@@ -472,7 +481,13 @@ def profile():
 @app.route('/m/')
 @app.route('/m')
 def m_index():
-    contest_id = request.args.get('contest_id', 1, type=int)
+    contest_id_arg = request.args.get('contest_id', type=int)
+    if not contest_id_arg:
+        active_c = service.get_current_contest()
+        contest_id = active_c.get('CONTEST_ROUND') if active_c else 1
+    else:
+        contest_id = contest_id_arg
+
     sort_type = request.args.get('sort', 'latest')
     search_q = request.args.get('q', '')
     pet_type = request.args.get('pet_type', 'all')
@@ -502,15 +517,18 @@ def m_hall_of_fame():
     contests = service.get_closed_contests()
     contest_id_arg = request.args.get('contest_id', type=int)
     
-    if contest_id_arg and any(c['contest_id'] == contest_id_arg for c in contests):
+    if contest_id_arg and any((c.get('CONTEST_ROUND') == contest_id_arg or c.get('contest_id') == contest_id_arg) for c in contests):
         contest_id = contest_id_arg
     elif contests:
-        contest_id = contests[0]['contest_id']
+        contest_id = contests[0].get('CONTEST_ROUND') or contests[0].get('contest_id')
     else:
-        contest_id = 4
+        contest_id = None
 
-    current_contest = service.get_contest(contest_id)
     winners = service.get_hall_of_fame(contest_id=contest_id)
+    if winners and winners[0].get('CONTEST_ROUND'):
+        contest_id = winners[0].get('CONTEST_ROUND')
+
+    current_contest = service.get_contest(contest_id) if contest_id else (contests[0] if contests else None)
 
     return render_template(
         'm_hall_of_fame.html',
