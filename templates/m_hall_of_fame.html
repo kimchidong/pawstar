@@ -60,7 +60,7 @@
                         <span>👀 {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span>
                         <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span>
                         <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span>
-                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">({{ "{:,}".format(w.SCORE or w.score or 0) }} P)</span>
+                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">(Score {{ "{:,}".format(w.SCORE or w.score or 0) }})</span>
                     </div>
                 </div>
             </div>
