@@ -882,7 +882,7 @@ class PawStarService:
                     """, (contest_id, ent_user_id, like_user_id))
                     cur.execute("""
                         UPDATE pst_contest_round
-                        SET LIKE_CNT = GREATEST(0, LIKE_CNT - 1), SCORE = GREATEST(0, SCORE - 5)
+                        SET LIKE_CNT = GREATEST(0, LIKE_CNT - 1)
                         WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
                     """, (contest_id, ent_user_id))
                     is_liked = False
@@ -893,18 +893,41 @@ class PawStarService:
                     """, (contest_id, ent_user_id, like_user_id))
                     cur.execute("""
                         UPDATE pst_contest_round
-                        SET LIKE_CNT = LIKE_CNT + 1, SCORE = SCORE + 5
+                        SET LIKE_CNT = LIKE_CNT + 1
                         WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
                     """, (contest_id, ent_user_id))
                     is_liked = True
 
-                conn.commit()
-                cur.execute("SELECT LIKE_CNT FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
-                r = cur.fetchone()
-                like_count = r['LIKE_CNT'] if r else 0
+                # 카운트 및 SCORE 실시간 동기화 보정
+                cur.execute("""
+                    UPDATE pst_contest_round
+                    SET VW_CNT = (SELECT COUNT(*) FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s),
+                        LIKE_CNT = (SELECT COUNT(*) FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s),
+                        CMT_CNT = (SELECT COUNT(*) FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s)
+                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s;
+                """, (contest_id, ent_user_id, contest_id, ent_user_id, contest_id, ent_user_id, contest_id, ent_user_id))
 
+                cur.execute("""
+                    UPDATE pst_contest_round
+                    SET SCORE = (VW_CNT * 1) + (LIKE_CNT * 5) + (CMT_CNT * 10)
+                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s;
+                """, (contest_id, ent_user_id))
+
+                conn.commit()
+
+                cur.execute("SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s", (contest_id, ent_user_id))
+                r = cur.fetchone() or {}
                 conn.close()
-                return {'success': True, 'is_liked': is_liked, 'like_count': like_count}
+
+                return {
+                    'success': True,
+                    'is_liked': is_liked,
+                    'like_count': r.get('LIKE_CNT', 0),
+                    'view_count': r.get('VW_CNT', 0),
+                    'comment_count': r.get('CMT_CNT', 0),
+                    'new_score': r.get('SCORE', 0),
+                    'score': r.get('SCORE', 0)
+                }
         except Exception as e:
             print("toggle_like error:", e)
             return {'success': False, 'message': str(e)}
