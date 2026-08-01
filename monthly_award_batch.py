@@ -77,12 +77,21 @@ def run_monthly_award_batch():
             round_id = current_contest['CONTEST_ROUND']
             print(f"[{now}] 대상 콘테스트 회차: 제{round_id}회")
 
-            # 2. 해당 회차 모든 참가물의 실시간 점수(SCORE) 재집계 및 순위 산출
+            # 2. 해당 회차 모든 참가물의 실시간 DB 이력(조회/좋아요/댓글) 재집계 및 점수(SCORE) 산출
             cur.execute("""
-                SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT,
-                       (LIKE_CNT * 5 + CMT_CNT * 10 + VW_CNT * 1) AS CALC_SCORE
-                FROM pst_contest_round
-                WHERE CONTEST_ROUND = %s
+                SELECT 
+                    r.CONTEST_ROUND, 
+                    r.ROUND_NO, 
+                    r.ENT_USER_ID, 
+                    r.KIND_CD,
+                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS REAL_VW_CNT,
+                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS REAL_LIKE_CNT,
+                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS REAL_CMT_CNT,
+                    ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
+                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
+                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS CALC_SCORE
+                FROM pst_contest_round r
+                WHERE r.CONTEST_ROUND = %s
             """, (round_id,))
             participants = cur.fetchall()
 
@@ -90,11 +99,14 @@ def run_monthly_award_batch():
 
             for p in participants:
                 calc_score = p['CALC_SCORE']
+                real_vw = p['REAL_VW_CNT']
+                real_like = p['REAL_LIKE_CNT']
+                real_cmt = p['REAL_CMT_CNT']
                 cur.execute("""
                     UPDATE pst_contest_round
-                    SET SCORE = %s
+                    SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SCORE = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (calc_score, round_id, p['ROUND_NO']))
+                """, (real_vw, real_like, real_cmt, calc_score, round_id, p['ROUND_NO']))
 
             # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장
             cur.execute("""
