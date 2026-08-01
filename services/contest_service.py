@@ -1,5 +1,5 @@
 """
-Paw Star Contest Service (Complete Integration with get_user_profile & 5-Entry Limit)
+Paw Star Contest Service (get_posts & get_post_detail query rewrite)
 """
 
 from datetime import datetime, timedelta
@@ -227,25 +227,6 @@ class PawStarService:
             print("register_user error:", e)
             return None
 
-    def authenticate_user(self, user_id, password=""):
-        conn = self.get_db_connection()
-        if not conn:
-            return False, "DB 연결 실패"
-        try:
-            with conn.cursor() as cur:
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
-                user = cur.fetchone()
-                if not user:
-                    user = self.register_user(user_id, user_id)
-                else:
-                    cur.execute("UPDATE pst_user SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() WHERE USER_ID = %s", (user_id,))
-                    conn.commit()
-                conn.close()
-                return True, {'USER_ID': user['USER_ID'], 'NK_NM': user.get('NK_NM', user_id), 'user_id': user['USER_ID'], 'nickname': user.get('NK_NM', user_id)}
-        except Exception as e:
-            print("authenticate_user error:", e)
-            return False, str(e)
-
     def google_login_or_register(self, google_id, email, name, picture="", **kwargs):
         user_id = f"google_{google_id}" if google_id else (email or "google_user")
         nickname = name or (email.split('@')[0] if email else "구글집사")
@@ -345,7 +326,10 @@ class PawStarService:
                 cur.execute("""
                     SELECT 
                         r.CONTEST_ROUND, r.ENT_USER_ID, r.PET_NM, r.TITLE, r.CONTS,
-                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                        END AS IMAGE_PATH,
                         r.VW_CNT, r.LIKE_CNT, r.CMT_CNT, r.SCORE, r.ENT_DT,
                         r.CONTEST_ROUND AS contest_id, r.ENT_USER_ID AS user_id, r.PET_NM AS pet_name, r.TITLE AS title, r.SCORE AS score
                     FROM pst_contest_round r
@@ -401,7 +385,6 @@ class PawStarService:
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
         
-        # 1인 5회 출전 제한 체크
         entry_cnt = self.get_user_contest_entry_count(contest_id, user_id)
         if entry_cnt >= 5:
             return {
@@ -500,12 +483,15 @@ class PawStarService:
                     r.PHT_PATH,
                     r.PHT_FILE1,
                     r.PHT_FILE2,
-                    CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
+                    CASE 
+                        WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                        ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                    END AS IMAGE_PATH,
                     r.VW_CNT,
                     r.LIKE_CNT,
                     r.CMT_CNT,
                     r.SCORE,
-                    DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS ENT_DT,
+                    DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS ENT_DT,
                     r.TOTAL_RANKING,
                     r.KIND_RANKING,
                     -- 호환용
@@ -520,14 +506,17 @@ class PawStarService:
                     r.CONTS AS content,
                     r.PHT_PATH AS file_path,
                     r.PHT_FILE1 AS list_file_name,
-                    CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS image_path,
+                    CASE 
+                        WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                        ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                    END AS image_path,
                     r.VW_CNT AS view_count,
                     r.LIKE_CNT AS like_count,
                     r.CMT_CNT AS comment_count,
                     r.SCORE AS score,
-                    DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at
+                    DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
                 FROM pst_contest_round r
-                JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
+                JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
                 LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                 WHERE r.CONTEST_ROUND = %s
             """
@@ -619,12 +608,15 @@ class PawStarService:
                         r.PHT_PATH,
                         r.PHT_FILE1,
                         r.PHT_FILE2,
-                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                        END AS IMAGE_PATH,
                         r.VW_CNT,
                         r.LIKE_CNT,
                         r.CMT_CNT,
                         r.SCORE,
-                        DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS ENT_DT,
+                        DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS ENT_DT,
                         -- 호환용
                         r.CONTEST_ROUND AS contest_id,
                         r.ENT_USER_ID AS user_id,
@@ -637,14 +629,17 @@ class PawStarService:
                         r.CONTS AS content,
                         r.PHT_PATH AS file_path,
                         r.PHT_FILE1 AS list_file_name,
-                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS image_path,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                        END AS image_path,
                         r.VW_CNT AS view_count,
                         r.LIKE_CNT AS like_count,
                         r.CMT_CNT AS comment_count,
                         r.SCORE AS score,
-                        DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at
+                        DATE_FORMAT(r.ENT_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
                     FROM pst_contest_round r
-                    JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
+                    JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE r.CONTEST_ROUND = %s AND r.ENT_USER_ID = %s
                 """, (contest_id, ent_user_id))
@@ -659,15 +654,15 @@ class PawStarService:
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
                         c.CMT AS CONTS,
-                        DATE_FORMAT(c.CMD_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS CMD_DT,
+                        DATE_FORMAT(c.CMD_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS CMD_DT,
                         -- 호환용
                         c.CMT_USER_ID AS user_id,
                         u.NK_NM AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         c.CMT AS content,
-                        DATE_FORMAT(c.CMD_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at
+                        DATE_FORMAT(c.CMD_DT, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s') AS created_at
                     FROM pst_contest_cmt c
-                    JOIN pst_user u ON c.CMT_USER_ID = u.USER_ID
+                    JOIN pst_user u ON SUBSTRING_INDEX(c.CMT_USER_ID, '_post_', 1) = u.USER_ID
                     WHERE c.CONTEST_ROUND = %s AND c.ENT_USER_ID = %s
                     ORDER BY c.CMD_DT ASC
                 """, (contest_id, ent_user_id))
@@ -806,7 +801,10 @@ class PawStarService:
                         k.KIND_NM,
                         k.KIND_CLASS,
                         r.TITLE,
-                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS IMAGE_PATH,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                        END AS IMAGE_PATH,
                         u.USER_ID,
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
@@ -822,7 +820,10 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         k.KIND_NM AS pet_type,
                         r.TITLE AS title,
-                        CONCAT(r.PHT_PATH, '/', r.PHT_FILE1) AS image_path,
+                        CASE 
+                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
+                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
+                        END AS image_path,
                         u.USER_ID AS user_id,
                         u.NK_NM AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
@@ -831,7 +832,7 @@ class PawStarService:
                     JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ENT_USER_ID = r.ENT_USER_ID
-                    JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
+                    JOIN pst_user u ON SUBSTRING_INDEX(ca.ENT_USER_ID, '_post_', 1) = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC

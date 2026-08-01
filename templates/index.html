@@ -121,7 +121,7 @@
                         <img src="{{ p.PROFILE_URL or p.user_profile }}" class="author-img" alt="profile">
                         <div class="author-detail">
                             <div class="nickname">{{ p.NK_NM or p.user_nickname }}</div>
-                            <div class="pet-tag">{% if p.PET_NM and p.PET_NM != '강아지' and p.PET_NM != '우리 강아지' and p.PET_NM != '아이 이름' %}{{ p.KIND_NM or p.pet_type }} {{ p.PET_NM or p.pet_name }}{% else %}{{ p.KIND_NM or p.pet_type }}{% endif %}</div>
+                            <div class="pet-tag"><span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span> · <span>{{ p.PET_NM or p.pet_name }}</span></div>
                         </div>
                     </div>
                 </div>

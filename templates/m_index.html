@@ -26,16 +26,16 @@
     {% for p in posts %}
         <div class="m-feed-card" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
-                <img src="{% if p.file_path and p.list_file_name %}{{ p.file_path }}{{ p.list_file_name }}{% else %}{{ p.image_path or p.media_url }}{% endif %}" alt="{{ p.title }}" loading="lazy">
+                <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 {% if p.rank_candidate %}
                     <div class="m-card-badge">🏆 {{ p.rank_candidate }}위 후보</div>
                 {% endif %}
-                <div class="m-card-score">⭐ {{ "{:,}".format(p.score) }}</div>
+                <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
             </div>
             <div class="m-card-content">
                 <div class="m-card-author">
-                    <img src="{{ p.user_profile }}" alt="profile">
-                    <span>{{ p.user_nickname }}</span>
+                    <img src="{{ p.PROFILE_URL or p.user_profile }}" alt="profile">
+                    <span>{{ p.NK_NM or p.user_nickname }}</span>
                 </div>
                 <div class="m-card-title">{{ p.title }}</div>
                 <div class="m-card-footer card-actions" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; align-items: center; font-size: 0.75rem;">
