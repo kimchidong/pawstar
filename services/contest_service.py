@@ -2,7 +2,8 @@
 Paw Star Contest Service (get_posts & get_post_detail query rewrite)
 """
 
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 import pymysql
 from config import db_config
 
@@ -50,8 +51,8 @@ class PawStarService:
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT COUNT(*) AS cnt FROM pst_contest_round
-                    WHERE CONTEST_ROUND = %s AND (ENT_USER_ID = %s OR ENT_USER_ID LIKE %s)
-                """, (contest_id, base_user_id, f"{base_user_id}_post_%"))
+                    WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                """, (contest_id, base_user_id))
                 r = cur.fetchone()
                 conn.close()
                 return r['cnt'] if r else 0
@@ -305,14 +306,14 @@ class PawStarService:
                     cur.execute("""
                         UPDATE pst_user
                         SET NK_NM = %s, PROFILE_URL = %s
-                        WHERE USER_ID = %s OR USER_ID LIKE %s
-                    """, (nickname, profile_img, user_id, f"{user_id}_post_%"))
+                        WHERE USER_ID = %s
+                    """, (nickname, profile_img, user_id))
                 else:
                     cur.execute("""
                         UPDATE pst_user
                         SET NK_NM = %s
-                        WHERE USER_ID = %s OR USER_ID LIKE %s
-                    """, (nickname, user_id, f"{user_id}_post_%"))
+                        WHERE USER_ID = %s
+                    """, (nickname, user_id))
 
                 conn.commit()
 
@@ -348,8 +349,8 @@ class PawStarService:
             return False
         try:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s OR ENT_USER_ID LIKE %s", (user_id, f"{user_id}_post_%"))
-                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s OR USER_ID LIKE %s", (user_id, f"{user_id}_post_%"))
+                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s", (user_id,))
                 conn.commit()
                 conn.close()
                 return True
@@ -389,14 +390,9 @@ class PawStarService:
                         r.PET_NM,
                         r.TITLE,
                         r.CONTS,
-                        r.PHT_PATH,
-                        r.PHT_FILE1,
-                        r.PHT_FILE2,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN 
-                                IF(RIGHT(r.PHT_PATH, 1) = '/', CONCAT(r.PHT_PATH, r.PHT_FILE1), CONCAT(r.PHT_PATH, '/', r.PHT_FILE1))
-                            ELSE CONCAT('/static/image/paw/2026/08/', r.PHT_FILE1)
-                        END AS IMAGE_PATH,
+                        r.PHT_FILE_PATH1,
+                        r.PHT_FILE_PATH2,
+                        r.PHT_FILE_PATH1 AS IMAGE_PATH,
                         r.VW_CNT,
                         r.LIKE_CNT,
                         r.CMT_CNT,
@@ -412,21 +408,17 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         r.TITLE AS title,
                         r.CONTS AS content,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN 
-                                IF(RIGHT(r.PHT_PATH, 1) = '/', CONCAT(r.PHT_PATH, r.PHT_FILE1), CONCAT(r.PHT_PATH, '/', r.PHT_FILE1))
-                            ELSE CONCAT('/static/image/paw/2026/08/', r.PHT_FILE1)
-                        END AS image_path,
+                        r.PHT_FILE_PATH1 AS image_path,
                         r.VW_CNT AS view_count,
                         r.LIKE_CNT AS like_count,
                         r.CMT_CNT AS comment_count,
                         r.SCORE AS score
                     FROM pst_contest_round r
-                    JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
+                    JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
-                    WHERE r.ENT_USER_ID = %s OR r.ENT_USER_ID LIKE %s
+                    WHERE r.ENT_USER_ID = %s
                     ORDER BY r.ENT_DT DESC
-                """, (user_id, f"{user_id}_post_%"))
+                """, (user_id,))
                 my_posts = cur.fetchall()
 
                 for p in my_posts:
@@ -448,8 +440,8 @@ class PawStarService:
                         ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    WHERE ca.ENT_USER_ID = %s OR ca.ENT_USER_ID LIKE %s
-                """, (user_id, f"{user_id}_post_%"))
+                    WHERE ca.ENT_USER_ID = %s
+                """, (user_id,))
                 my_awards = cur.fetchall()
 
                 conn.close()
@@ -480,7 +472,7 @@ class PawStarService:
                 'my_awards': []
             }
 
-    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2=""):
+    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, file_path1, file_path2=""):
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
@@ -492,12 +484,10 @@ class PawStarService:
                 'message': f'해당 회차에는 회원 1인당 최대 5회까지만 출전이 가능합니다. (현재 {entry_cnt}/5회 출전 완료)'
             }
 
-        actual_ent_user_id = user_id if entry_cnt == 0 else f"{user_id}_post_{entry_cnt + 1}"
+        actual_ent_user_id = user_id
 
         if not self.is_user_exists(user_id):
             self.register_user(user_id, user_id)
-        if actual_ent_user_id != user_id and not self.is_user_exists(actual_ent_user_id):
-            self.register_user(actual_ent_user_id, user_id)
 
         if kind_cd and not kind_cd.startswith('K'):
             kinds = self.get_pet_kinds()
@@ -512,12 +502,12 @@ class PawStarService:
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO pst_contest_round 
-                    (CONTEST_ROUND, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_PATH, PHT_FILE1, PHT_FILE2)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (CONTEST_ROUND, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY UPDATE
                         KIND_CD=VALUES(KIND_CD), PET_NM=VALUES(PET_NM), TITLE=VALUES(TITLE),
-                        CONTS=VALUES(CONTS), PHT_PATH=VALUES(PHT_PATH), PHT_FILE1=VALUES(PHT_FILE1), PHT_FILE2=VALUES(PHT_FILE2)
-                """, (contest_id, actual_ent_user_id, kind_cd, pet_name, title, content, pht_path, pht_file1, pht_file2))
+                        CONTS=VALUES(CONTS), PHT_FILE_PATH1=VALUES(PHT_FILE_PATH1), PHT_FILE_PATH2=VALUES(PHT_FILE_PATH2)
+                """, (contest_id, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2))
                 conn.commit()
                 conn.close()
                 return {'success': True, 'ent_user_id': actual_ent_user_id}
@@ -525,22 +515,11 @@ class PawStarService:
             print("create_contest_entry error:", e)
             return {'success': False, 'message': str(e)}
 
-    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path="", list_file_name="", popup_file_name="", **kwargs):
-        pht_path = file_path or "/static/image/post"
-        pht_file1 = list_file_name
+    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path1="", file_path2="", **kwargs):
+        path1 = file_path1 or media_url or "/static/image/paw/default_pet.jpg"
+        path2 = file_path2 or path1
 
-        if media_url and not pht_file1:
-            if "/" in media_url:
-                parts = media_url.rsplit('/', 1)
-                pht_path = parts[0]
-                pht_file1 = parts[1]
-            else:
-                pht_file1 = media_url
-
-        if not pht_file1:
-            pht_file1 = "default_pet.jpg"
-
-        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, pht_path, pht_file1, popup_file_name)
+        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, path1, path2)
         if not res.get('success'):
             return res
 
@@ -580,13 +559,9 @@ class PawStarService:
                     r.PET_NM,
                     r.TITLE,
                     r.CONTS,
-                    r.PHT_PATH,
-                    r.PHT_FILE1,
-                    r.PHT_FILE2,
-                    CASE 
-                        WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                        ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                    END AS IMAGE_PATH,
+                    r.PHT_FILE_PATH1,
+                    r.PHT_FILE_PATH2,
+                    r.PHT_FILE_PATH1 AS IMAGE_PATH,
                     r.VW_CNT,
                     r.LIKE_CNT,
                     r.CMT_CNT,
@@ -604,19 +579,17 @@ class PawStarService:
                     r.PET_NM AS pet_name,
                     r.TITLE AS title,
                     r.CONTS AS content,
-                    r.PHT_PATH AS file_path,
-                    r.PHT_FILE1 AS list_file_name,
-                    CASE 
-                        WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                        ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                    END AS image_path,
-                    r.VW_CNT AS view_count,
-                    r.LIKE_CNT AS like_count,
-                    r.CMT_CNT AS comment_count,
+                    r.PHT_FILE_PATH1 AS file_path,
+                    r.PHT_FILE_PATH1 AS list_file_name,
+                    r.PHT_FILE_PATH1 AS image_path,
+                    COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
+                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ENT_USER_ID = r.ENT_USER_ID) AS view_count,
+                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ENT_USER_ID = r.ENT_USER_ID) AS like_count,
+                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ENT_USER_ID = r.ENT_USER_ID) AS comment_count,
                     r.SCORE AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
-                JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
+                JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                 LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                 WHERE r.CONTEST_ROUND = %s
             """
@@ -645,26 +618,24 @@ class PawStarService:
                 commented_user_ids = set()
                 viewed_user_ids = set()
                 if current_user_id:
-                    clean_uid = str(current_user_id).split('_post_')[0]
-
                     cur.execute("""
                         SELECT ENT_USER_ID FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND (LIKE_USER_ID = %s OR SUBSTRING_INDEX(LIKE_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
+                    """, (contest_id, current_user_id))
                     liked_rows = cur.fetchall()
                     liked_user_ids = {r['ENT_USER_ID'] for r in liked_rows}
 
                     cur.execute("""
                         SELECT DISTINCT ENT_USER_ID FROM pst_contest_cmt
-                        WHERE CONTEST_ROUND = %s AND (CMT_USER_ID = %s OR SUBSTRING_INDEX(CMT_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
+                    """, (contest_id, current_user_id))
                     commented_rows = cur.fetchall()
                     commented_user_ids = {r['ENT_USER_ID'] for r in commented_rows}
 
                     cur.execute("""
                         SELECT DISTINCT ENT_USER_ID FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND VW_USER_ID = %s
+                    """, (contest_id, current_user_id))
                     viewed_rows = cur.fetchall()
                     viewed_user_ids = {r['ENT_USER_ID'] for r in viewed_rows}
 
@@ -734,13 +705,9 @@ class PawStarService:
                         r.PET_NM,
                         r.TITLE,
                         r.CONTS,
-                        r.PHT_PATH,
-                        r.PHT_FILE1,
-                        r.PHT_FILE2,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                        END AS IMAGE_PATH,
+                        r.PHT_FILE_PATH1,
+                        r.PHT_FILE_PATH2,
+                        r.PHT_FILE_PATH1 AS IMAGE_PATH,
                         r.VW_CNT,
                         r.LIKE_CNT,
                         r.CMT_CNT,
@@ -756,19 +723,17 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         r.TITLE AS title,
                         r.CONTS AS content,
-                        r.PHT_PATH AS file_path,
-                        r.PHT_FILE1 AS list_file_name,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                        END AS image_path,
-                        r.VW_CNT AS view_count,
-                        r.LIKE_CNT AS like_count,
-                        r.CMT_CNT AS comment_count,
+                        r.PHT_FILE_PATH1 AS file_path,
+                        r.PHT_FILE_PATH1 AS list_file_name,
+                        r.PHT_FILE_PATH1 AS image_path,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
+                        (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ENT_USER_ID = r.ENT_USER_ID) AS view_count,
+                        (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ENT_USER_ID = r.ENT_USER_ID) AS like_count,
+                        (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ENT_USER_ID = r.ENT_USER_ID) AS comment_count,
                         r.SCORE AS score,
                         r.ENT_DT AS created_at
                     FROM pst_contest_round r
-                    JOIN pst_user u ON SUBSTRING_INDEX(r.ENT_USER_ID, '_post_', 1) = u.USER_ID
+                    JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE r.CONTEST_ROUND = %s AND r.ENT_USER_ID = %s
                 """, (contest_id, ent_user_id))
@@ -791,7 +756,7 @@ class PawStarService:
                         c.CMT AS content,
                         c.CMD_DT AS created_at
                     FROM pst_contest_cmt c
-                    JOIN pst_user u ON SUBSTRING_INDEX(c.CMT_USER_ID, '_post_', 1) = u.USER_ID
+                    JOIN pst_user u ON c.CMT_USER_ID = u.USER_ID
                     WHERE c.CONTEST_ROUND = %s AND c.ENT_USER_ID = %s
                     ORDER BY c.CMD_DT ASC
                 """, (contest_id, ent_user_id))
@@ -801,24 +766,22 @@ class PawStarService:
                 is_commented = False
                 is_viewed = False
                 if current_user_id:
-                    clean_uid = str(current_user_id).split('_post_')[0]
-
                     cur.execute("""
                         SELECT 1 FROM pst_contest_like
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (LIKE_USER_ID = %s OR SUBSTRING_INDEX(LIKE_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND LIKE_USER_ID = %s
+                    """, (contest_id, ent_user_id, current_user_id))
                     is_liked = bool(cur.fetchone())
 
                     cur.execute("""
                         SELECT 1 FROM pst_contest_cmt
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (CMT_USER_ID = %s OR SUBSTRING_INDEX(CMT_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND CMT_USER_ID = %s
+                    """, (contest_id, ent_user_id, current_user_id))
                     is_commented = bool(cur.fetchone())
 
                     cur.execute("""
                         SELECT 1 FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, ent_user_id, current_user_id, clean_uid))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
+                    """, (contest_id, ent_user_id, current_user_id))
                     is_viewed = bool(cur.fetchone())
 
                 dt_p = post.get('ENT_DT')
@@ -853,8 +816,6 @@ class PawStarService:
         if not conn:
             return {'view_count': 0, 'new_score': 0, 'already_viewed': False}
 
-        clean_vw = str(view_user_id or '').split('_post_')[0]
-
         try:
             with conn.cursor() as cur:
                 already_viewed = False
@@ -862,9 +823,8 @@ class PawStarService:
                     # 동일 유저 조회 이력 중복 점검
                     cur.execute("""
                         SELECT 1 FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                        AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
-                    """, (contest_id, ent_user_id, view_user_id, clean_vw))
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
+                    """, (contest_id, ent_user_id, view_user_id))
                     exists = cur.fetchone()
 
                     if not exists:
@@ -885,9 +845,8 @@ class PawStarService:
                         cur.execute("""
                             UPDATE pst_contest_vw
                             SET VW_DT = NOW()
-                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
-                            AND (VW_USER_ID = %s OR SUBSTRING_INDEX(VW_USER_ID, '_post_', 1) = %s)
-                        """, (contest_id, ent_user_id, view_user_id, clean_vw))
+                            WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s AND VW_USER_ID = %s
+                        """, (contest_id, ent_user_id, view_user_id))
                         conn.commit()
                         already_viewed = True
                 else:
@@ -1042,10 +1001,7 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         k.KIND_NM AS pet_type,
                         r.TITLE AS title,
-                        CASE 
-                            WHEN r.PHT_PATH LIKE '/%%%%' THEN CONCAT(r.PHT_PATH, '/', r.PHT_FILE1)
-                            ELSE CONCAT('/static/image/post/', r.PHT_FILE1)
-                        END AS image_path,
+                        r.PHT_FILE_PATH1 AS image_path,
                         u.USER_ID AS user_id,
                         u.NK_NM AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
@@ -1054,7 +1010,7 @@ class PawStarService:
                     JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ENT_USER_ID = r.ENT_USER_ID
-                    JOIN pst_user u ON SUBSTRING_INDEX(ca.ENT_USER_ID, '_post_', 1) = u.USER_ID
+                    JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC

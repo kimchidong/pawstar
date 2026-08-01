@@ -434,7 +434,7 @@ function openDetailModal(post) {
 
     // 데이터 채우기 (팝업용 고화질 이미지 바인딩)
     const imgEl = document.getElementById('detailImg');
-    const imgSrc = post.IMAGE_PATH || post.image_path || post.media_url || 
+    const imgSrc = post.popup_image_path || post.POPUP_IMAGE_PATH || post.IMAGE_PATH || post.image_path || post.media_url || 
         ((post.file_path && post.list_file_name) ? (post.file_path.endsWith('/') ? post.file_path : post.file_path + '/') + post.list_file_name : '');
     if (imgEl) {
         imgEl.src = imgSrc;

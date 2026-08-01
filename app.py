@@ -821,23 +821,24 @@ def get_post_liked_status(post_id):
 
 def process_paw_images_dual(src_file_or_path, contest_id, post_id):
     """
-    1. 임시 폴더 : static/image/temp/paw
-    2. 저장 폴더 : static/image/paw/yyyy/mm
-    3. 파일명 : contest_id-post_id.webp
+    1. 저장 폴더 : /static/image/paw/yyyy/mm/
+    2. 목록용 전체경로 (PHT_FILE_PATH1) : /static/image/paw/yyyy/mm/[CONTEST_ID]_[UUID]_1.webp
+    3. 팝업용 전체경로 (PHT_FILE_PATH2) : /static/image/paw/yyyy/mm/[CONTEST_ID]_[UUID]_2.webp
     """
     now = datetime.datetime.now()
     yyyy = now.strftime('%Y')
     mm = now.strftime('%m')
     
-    file_path = f"/static/image/paw/{yyyy}/{mm}/"
+    file_dir = f"/static/image/paw/{yyyy}/{mm}/"
     perm_dir = os.path.join(PERM_PAW_BASE_DIR, yyyy, mm)
     os.makedirs(perm_dir, exist_ok=True)
 
-    file_name = f"{contest_id}-{post_id}.webp"
-    list_file_name = file_name
-    popup_file_name = file_name
+    file_uuid = uuid.uuid4().hex[:12]
+    list_file_name = f"{contest_id}_{file_uuid}_1.webp"
+    popup_file_name = f"{contest_id}_{file_uuid}_2.webp"
 
-    perm_file_path = os.path.join(perm_dir, file_name)
+    perm_list_path = os.path.join(perm_dir, list_file_name)
+    perm_popup_path = os.path.join(perm_dir, popup_file_name)
 
     temp_filepath = None
     src_img_path = None
@@ -863,12 +864,17 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
                 else:
                     img_base = img.convert('RGB')
                 
-                # contest_id-post_id.webp 저장
-                img_conv = img_base.copy()
-                img_conv.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
-                img_conv.save(perm_file_path, 'WEBP', quality=90)
+                # 1. 목록용 리사이즈 (max 600x600)
+                img_list = img_base.copy()
+                img_list.thumbnail((600, 600), Image.Resampling.LANCZOS)
+                img_list.save(perm_list_path, 'WEBP', quality=85)
+
+                # 2. 팝업용 리사이즈 (max 1200x1200)
+                img_popup = img_base.copy()
+                img_popup.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
+                img_popup.save(perm_popup_path, 'WEBP', quality=92)
     except Exception as e:
-        print("WebP 이미지 생성 중 오류:", e)
+        print("process_paw_images_dual error:", e)
     finally:
         if temp_filepath and os.path.exists(temp_filepath):
             try:
@@ -876,7 +882,9 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
             except Exception:
                 pass
 
-    return file_path, list_file_name, popup_file_name
+    full_path1 = f"{file_dir}{list_file_name}"
+    full_path2 = f"{file_dir}{popup_file_name}"
+    return full_path1, full_path2
 
 @app.route('/api/comments/<path:post_id>', methods=['GET'])
 def get_comments(post_id):
@@ -1007,11 +1015,11 @@ def create_post():
         if not src_target:
             return jsonify({'success': False, 'message': '출전시킬 반려동물 사진 이미지 파일을 반드시 첨부해주세요.'}), 400
 
-        file_path, list_file_name, popup_file_name = process_paw_images_dual(src_target, contest_id, next_post_id)
+        full_path1, full_path2 = process_paw_images_dual(src_target, contest_id, next_post_id)
 
         new_post = service.create_post(
             contest_id, user_id, pet_name, pet_type, title, content, 
-            file_path, list_file_name, popup_file_name, force_post_id=next_post_id
+            file_path1=full_path1, file_path2=full_path2, force_post_id=next_post_id
         )
         if isinstance(new_post, dict) and not new_post.get('success'):
             return jsonify({'success': False, 'message': new_post.get('message', '출전 등록에 실패했습니다.')}), 400
