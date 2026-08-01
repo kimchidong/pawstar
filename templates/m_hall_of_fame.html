@@ -33,12 +33,9 @@
                 <!-- 이미지 및 좌측 상단 메달 뱃지 -->
                 <div style="position: relative; flex-shrink: 0;">
                     <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
-                    <div style="position: absolute; top: -8px; left: -8px; font-size: 1.5rem; line-height: 1; z-index: 2; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
-                        {% if part == 'G002P001' and rk == 1 %}🥇
-                        {% elif part == 'G002P001' and rk == 2 %}🥈
-                        {% elif part == 'G002P001' and rk == 3 %}🥉
-                        {% else %}🏆
-                        {% endif %}
+                    <div style="position: absolute; top: -10px; left: -10px; z-index: 2; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));">
+                        {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk if part == 'G002P001' else ('P002A90' ~ (rk if rk <= 3 else 3))) %}
+                        <img src="/static/image/badge/{{ badge_file }}.png" style="width: 32px; height: 32px; object-fit: contain;" alt="수상 메달">
                     </div>
                 </div>
 
