@@ -130,19 +130,19 @@
                     {% for star in ns.rising_stars %}
                         <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Rising Star">
-                            <div style="margin-top: 0.6rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
-                                <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--text-primary); margin: 0; line-height: 1.2;">
-                                    {{ star.PET_NM or star.pet_name }}
-                                </h3>
-                                <span style="display: inline-block; background: #f1f5f9; color: #475569; font-size: 0.76rem; font-weight: 800; padding: 0.18rem 0.65rem; border-radius: 12px; border: 1px solid #cbd5e1;">
-                                    🐾 {{ star.KIND_NM or star.pet_type }}
-                                </span>
-                            </div>
+                            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--text-primary); text-align: center; margin-top: 0.6rem; margin-bottom: 0.4rem; line-height: 1.2;">
+                                {{ star.PET_NM or star.pet_name }}
+                            </h3>
 
-                            <!-- 집사 프로필 아바타 칩 -->
-                            <div style="margin-top: 0.6rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; background: #ffffff; padding: 0.3rem 0.8rem 0.3rem 0.4rem; border-radius: 20px; border: 1px solid var(--border-light); box-shadow: var(--shadow-soft);">
-                                <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" alt="집사 프로필">
-                                <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: var(--text-primary); font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                            <!-- 집사(좌측 정렬) & 동물종류(우측 정렬) 바 -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.45rem 0.75rem; background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-light); box-shadow: var(--shadow-soft);">
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: var(--text-primary); font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                                </div>
+                                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">
+                                    {{ star.KIND_NM or star.pet_type }}
+                                </div>
                             </div>
 
                             <div style="margin-top: 0.85rem; padding: 0.75rem 0.5rem; background: var(--bg-primary); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
@@ -186,19 +186,19 @@
                     {% for star in ns.super_stars %}
                         <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="width: 150px; height: 150px;" alt="Super Star">
-                            <div style="margin-top: 0.6rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
-                                <h3 style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold); margin: 0; line-height: 1.2;">
-                                    {{ star.PET_NM or star.pet_name }}
-                                </h3>
-                                <span style="display: inline-block; background: #fffbeb; color: #b45309; font-size: 0.78rem; font-weight: 800; padding: 0.18rem 0.65rem; border-radius: 12px; border: 1px solid #fde68a;">
-                                    👑 {{ star.KIND_NM or star.pet_type }}
-                                </span>
-                            </div>
+                            <h3 style="font-size: 1.55rem; font-weight: 900; color: var(--accent-gold); text-align: center; margin-top: 0.6rem; margin-bottom: 0.4rem; line-height: 1.2;">
+                                {{ star.PET_NM or star.pet_name }}
+                            </h3>
 
-                            <!-- 집사 프로필 아바타 칩 -->
-                            <div style="margin-top: 0.6rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; background: #ffffff; padding: 0.35rem 0.85rem 0.35rem 0.45rem; border-radius: 20px; border: 1.5px solid #fde68a; box-shadow: 0 2px 6px rgba(251, 191, 36, 0.2);">
-                                <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid #f59e0b;" alt="집사 프로필">
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: #b45309; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                            <!-- 집사(좌측 정렬) & 동물종류(우측 정렬) 바 -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.45rem 0.75rem; background: #ffffff; border-radius: var(--radius-md); border: 1.5px solid #fde68a; box-shadow: 0 2px 6px rgba(251, 191, 36, 0.2);">
+                                <div style="display: flex; align-items: center; gap: 0.45rem;">
+                                    <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid #f59e0b; flex-shrink: 0;" alt="집사 프로필">
+                                    <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: #b45309; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                                </div>
+                                <div style="font-size: 0.82rem; font-weight: 800; color: #b45309;">
+                                    {{ star.KIND_NM or star.pet_type }}
+                                </div>
                             </div>
 
                             <div style="margin-top: 0.85rem; padding: 0.85rem 0.5rem; background: #fffbeb; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
@@ -242,19 +242,19 @@
                     {% for star in ns.bright_stars %}
                         <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Bright Star">
-                            <div style="margin-top: 0.6rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
-                                <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--text-primary); margin: 0; line-height: 1.2;">
-                                    {{ star.PET_NM or star.pet_name }}
-                                </h3>
-                                <span style="display: inline-block; background: #fff7ed; color: #c2410c; font-size: 0.76rem; font-weight: 800; padding: 0.18rem 0.65rem; border-radius: 12px; border: 1px solid #ffedd5;">
-                                    🐾 {{ star.KIND_NM or star.pet_type }}
-                                </span>
-                            </div>
+                            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--text-primary); text-align: center; margin-top: 0.6rem; margin-bottom: 0.4rem; line-height: 1.2;">
+                                {{ star.PET_NM or star.pet_name }}
+                            </h3>
 
-                            <!-- 집사 프로필 아바타 칩 -->
-                            <div style="margin-top: 0.6rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; background: #ffffff; padding: 0.3rem 0.8rem 0.3rem 0.4rem; border-radius: 20px; border: 1px solid #ffedd5; box-shadow: var(--shadow-soft);">
-                                <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1.5px solid #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" alt="집사 프로필">
-                                <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: #c2410c; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                            <!-- 집사(좌측 정렬) & 동물종류(우측 정렬) 바 -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.45rem 0.75rem; background: #ffffff; border-radius: var(--radius-md); border: 1px solid #ffedd5; box-shadow: var(--shadow-soft);">
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <img src="{{ star.PROFILE_URL or star.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">집사: <strong style="color: #c2410c; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
+                                </div>
+                                <div style="font-size: 0.8rem; font-weight: 700; color: #c2410c;">
+                                    {{ star.KIND_NM or star.pet_type }}
+                                </div>
                             </div>
 
                             <div style="margin-top: 0.85rem; padding: 0.75rem 0.5rem; background: #fff7ed; border-radius: var(--radius-sm); border: 1px solid #ffedd5;">
