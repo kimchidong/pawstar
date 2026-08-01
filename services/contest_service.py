@@ -1071,7 +1071,14 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 if not contest_id:
-                    cur.execute("SELECT CONTEST_ROUND FROM pst_contest_award ORDER BY CONTEST_ROUND DESC LIMIT 1")
+                    cur.execute("""
+                        SELECT ca.CONTEST_ROUND 
+                        FROM pst_contest_award ca
+                        JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                        WHERE c.CONTEST_STAT = 'G001C002'
+                        ORDER BY ca.CONTEST_ROUND DESC 
+                        LIMIT 1
+                    """)
                     r = cur.fetchone()
                     contest_id = r['CONTEST_ROUND'] if r else None
 
@@ -1130,9 +1137,16 @@ class PawStarService:
                 """, (contest_id,))
                 winners = cur.fetchall()
 
-                # 혹시 해당 contest_id로 검색했을 때 결과가 없으면 가장 최근 수상 회차로 1회 재시도
+                # 혹시 해당 contest_id로 검색했을 때 결과가 없으면 가장 최근 마감 수상 회차로 1회 재시도
                 if not winners:
-                    cur.execute("SELECT CONTEST_ROUND FROM pst_contest_award ORDER BY CONTEST_ROUND DESC LIMIT 1")
+                    cur.execute("""
+                        SELECT ca.CONTEST_ROUND 
+                        FROM pst_contest_award ca
+                        JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                        WHERE c.CONTEST_STAT = 'G001C002'
+                        ORDER BY ca.CONTEST_ROUND DESC 
+                        LIMIT 1
+                    """)
                     r = cur.fetchone()
                     latest_id = r['CONTEST_ROUND'] if r else None
                     if latest_id and latest_id != contest_id:
