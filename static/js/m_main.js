@@ -185,6 +185,31 @@ function submitMobileDetailComment() {
         }
         
         inputEl.value = '';
+        
+        // 메인 피드 카드 및 모바일 모달 수치 실시간 갱신 (+1 댓글, +10 점수)
+        const mPostId = window.currentMobileDetailPostId;
+        if (mPostId) {
+            const mScoreEl = document.getElementById('mDetailScoreNum');
+            if (mScoreEl) {
+                const currentScore = parseInt(mScoreEl.textContent.replace(/,/g, ''), 10) || 0;
+                mScoreEl.textContent = (currentScore + 10).toLocaleString();
+            }
+
+            const cards = document.querySelectorAll(`[onclick*="${mPostId}"]`);
+            cards.forEach(card => {
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment) {
+                    const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;
+                    cardComment.textContent = currentCardCnt + 1;
+                }
+                const cardScore = card.querySelector('.m-card-score, .score-num');
+                if (cardScore) {
+                    const currentScore = parseInt(cardScore.textContent.replace(/,/g, '').replace('⭐', '').trim(), 10) || 0;
+                    cardScore.textContent = `⭐ ${(currentScore + 10).toLocaleString()}`;
+                }
+            });
+        }
+
         loadMobileComments(window.currentMobileDetailPostId);
         if (data.event_res) {
             const scoreEl = document.getElementById('mDetailScoreNum');

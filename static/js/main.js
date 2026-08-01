@@ -657,6 +657,45 @@ function submitDetailComment() {
             const icon = btnComment.querySelector('i');
             if (icon) icon.className = 'fa-solid fa-comment';
         }
+
+        // 메인 피드 카드 및 팝업 모달 수치 실시간 갱신 (+1 댓글, +10 점수)
+        const postId = window.currentDetailPostId;
+        if (postId) {
+            if (window.postsDataStore && window.postsDataStore[postId]) {
+                const storeItem = window.postsDataStore[postId];
+                storeItem.comment_count = (storeItem.comment_count || 0) + 1;
+                storeItem.CMT_CNT = (storeItem.CMT_CNT || 0) + 1;
+                storeItem.score = (storeItem.score || 0) + 10;
+                storeItem.SCORE = (storeItem.SCORE || 0) + 10;
+            }
+
+            const commentCountEl = document.getElementById('detailCommentCount');
+            if (commentCountEl) {
+                const currentCnt = parseInt(commentCountEl.textContent, 10) || 0;
+                commentCountEl.textContent = currentCnt + 1;
+            }
+
+            const scoreNumEl = document.getElementById('detailScoreNum');
+            if (scoreNumEl) {
+                const currentScore = parseInt(scoreNumEl.textContent.replace(/,/g, ''), 10) || 0;
+                scoreNumEl.textContent = (currentScore + 10).toLocaleString();
+            }
+
+            const card = document.getElementById(`post-card-${postId}`) || document.querySelector(`[onclick*="${postId}"]`);
+            if (card) {
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment) {
+                    const currentCardCnt = parseInt(cardComment.textContent, 10) || 0;
+                    cardComment.textContent = currentCardCnt + 1;
+                }
+                const cardScore = card.querySelector('.score-num');
+                if (cardScore) {
+                    const currentScore = parseInt(cardScore.textContent.replace(/,/g, ''), 10) || 0;
+                    cardScore.textContent = (currentScore + 10).toLocaleString();
+                }
+            }
+        }
+
         loadComments(window.currentDetailPostId);
         
         if (data.event_res) {
