@@ -47,7 +47,7 @@
                 </div>
                 <div class="m-card-title">{{ p.title }}</div>
                 <div class="m-card-footer card-actions" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; align-items: center; font-size: 0.75rem;">
-                    <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수" onclick="event.stopPropagation(); triggerEvent({{ p.post_id }}, 'view');">
+                    <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ p.view_count or 0 }}</span>
                     </div>
                     <div class="action-btn btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요" onclick="event.stopPropagation(); toggleLikeCard(this, {{ p.post_id }});">

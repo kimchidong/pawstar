@@ -146,7 +146,7 @@
 
                 <!-- 수치 표시 현황 (조회, 좋아요, 댓글) -->
                 <div class="card-actions">
-                    <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수" onclick="event.stopPropagation(); triggerEvent('{{ p.ENT_USER_ID or p.post_id }}', 'view');">
+                    <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i>
                         <span class="view-count">{{ p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0) }}</span>
                     </div>
