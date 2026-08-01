@@ -58,7 +58,7 @@
             {% for c in contests %}
                 {% if '예정' not in (c.CONTEST_STAT_NM or c.status) and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
                     <option value="{{ c.CONTEST_ROUND or c.contest_id }}" {{ 'selected' if (c.CONTEST_ROUND or c.contest_id) == (current_contest.CONTEST_ROUND or current_contest.contest_id) }}>
-                        {{ c.THEME_NM or c.title }} ({{ c.CONTEST_STAT_NM or c.status }})
+                        제{{ c.CONTEST_ROUND or c.contest_id }}회 {{ c.THEME_NM or c.title }} ({{ c.CONTEST_STAT_NM or c.status }})
                     </option>
                 {% endif %}
             {% endfor %}
