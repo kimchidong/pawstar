@@ -119,6 +119,18 @@ function openMobileDetailModal(postData) {
         }
     }
 
+    const mIsLiked = !!((postData.actions && postData.actions.is_liked) || postData.is_liked);
+    const mBtnLikePopup = document.getElementById('mDetailBtnLike');
+    const mHeartIcon = document.getElementById('mDetailHeartIcon');
+    if (mBtnLikePopup) {
+        if (mIsLiked) mBtnLikePopup.classList.add('active');
+        else mBtnLikePopup.classList.remove('active');
+    }
+    if (mHeartIcon) {
+        mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
+    }
+
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 

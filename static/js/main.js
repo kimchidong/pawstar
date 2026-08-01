@@ -501,31 +501,45 @@ function openDetailModal(post) {
     const heartIcon = document.getElementById('detailHeartIcon');
     const btnLike = document.getElementById('detailBtnLike');
 
-    let isLiked = false;
+    let isLiked = !!((post.actions && post.actions.is_liked) || post.is_liked);
+
+    // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화
+    if (heartIcon) {
+        heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        heartIcon.style.color = isLiked ? '#e11d48' : '';
+    }
+    if (btnLike) {
+        if (isLiked) btnLike.classList.add('active');
+        else btnLike.classList.remove('active');
+    }
 
     fetch(`/api/post/user_actions/${post.post_id}`)
         .then(res => res.json())
         .then(data => {
             if (data && data.success && data.actions) {
                 const act = data.actions;
-                if (act.is_liked) {
-                    isLiked = true;
-                    if (btnLike) btnLike.classList.add('active');
-                    if (heartIcon) {
-                        heartIcon.className = 'fa-solid fa-heart';
-                        heartIcon.style.color = '#e11d48';
-                    }
-                } else {
-                    isLiked = false;
-                    if (btnLike) btnLike.classList.remove('active');
-                    if (heartIcon) {
-                        heartIcon.className = 'fa-regular fa-heart';
-                        heartIcon.style.color = '';
-                    }
+                isLiked = !!act.is_liked;
+                if (btnLike) {
+                    if (isLiked) btnLike.classList.add('active');
+                    else btnLike.classList.remove('active');
+                }
+                if (heartIcon) {
+                    heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                    heartIcon.style.color = isLiked ? '#e11d48' : '';
                 }
             }
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            if (heartIcon) {
+                heartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                heartIcon.style.color = isLiked ? '#e11d48' : '';
+            }
+            if (btnLike) {
+                if (isLiked) btnLike.classList.add('active');
+                else btnLike.classList.remove('active');
+            }
+        });
 
     const toggleLikeHandler = async () => {
         if (!isLiked) {
