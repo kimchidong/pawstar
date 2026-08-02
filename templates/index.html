@@ -116,33 +116,22 @@
             <div class="card-media">
                 <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 
-                <!-- 과거 회차 수상작 메달 & 타이틀 배지 정밀 오버레이 (좌측 상단: 3D 실물 메달, 우측 상단: 수상 타이틀 배지) -->
+                <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
-                    <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; left: 0.65rem; right: 0.65rem; display: flex; flex-direction: column; gap: 0.45rem; z-index: 10; pointer-events: none;">
+                    <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; right: 0.65rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
-                            {% set b_file = (aw.badge_img or aw.award_cd or 'P001A101.png')|string %}
-                            {% set b_raw = b_file if (b_file.startswith('/') or b_file.startswith('http')) else ('/static/image/badge/' ~ (b_file.split('/')[-1] ~ ('' if (b_file.endswith('.png') or b_file.endswith('.jpg')) else '.png'))) %}
-                            {% set b_url = b_raw.replace('.webp', '.png') %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
                             
-                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                                <!-- 좌측 상단: 3D 실물 메달 이미지 -->
-                                <div class="crown-badge" style="position: relative; top: 0; left: 0; margin: 0;">
-                                    <img src="{{ b_url }}" class="hall-medal-effect" style="width: 44px; height: 44px; object-fit: contain;" alt="{{ award_nm_str }}" title="{{ award_nm_str }}">
-                                </div>
-                                
-                                <!-- 우측 상단: 글래스모피즘 타이틀 배지 -->
-                                {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
-                                    <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
-                                {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                    <div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
-                                {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
-                                    <div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
-                                {% else %}
-                                    <div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
-                                {% endif %}
-                            </div>
+                            {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
+                                <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
+                            {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
+                                <div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
+                            {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
+                                <div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
+                            {% else %}
+                                <div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}

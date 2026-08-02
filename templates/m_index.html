@@ -33,29 +33,22 @@
         <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
                 <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
-                <!-- 과거 회차 수상작 메달 & 타이틀 배지 정밀 오버레이 (좌측 상단: 3D 실물 메달, 우측 상단: 수상 타이틀 배지) -->
+                <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
-                    <div style="position: absolute; top: 0.4rem; left: 0.4rem; right: 0.4rem; display: flex; flex-direction: column; gap: 0.35rem; z-index: 10; pointer-events: none;">
+                    <div style="position: absolute; top: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.3rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
-                            {% set b_file = (aw.badge_img or aw.award_cd or 'P001A101.png')|string %}
-                            {% set b_raw = b_file if (b_file.startswith('/') or b_file.startswith('http')) else ('/static/image/badge/' ~ (b_file.split('/')[-1] ~ ('' if (b_file.endswith('.png') or b_file.endswith('.jpg')) else '.png'))) %}
-                            {% set b_url = b_raw.replace('.webp', '.png') %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
                             
-                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                                <img src="{{ b_url }}" class="hall-medal-effect" style="width: 32px; height: 32px; object-fit: contain;" alt="{{ award_nm_str }}" title="{{ award_nm_str }}">
-                                
-                                {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
-                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>
-                                {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🥈 라이징스타</div>
-                                {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
-                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">🥉 브라이트스타</div>
-                                {% else %}
-                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타</div>
-                                {% endif %}
-                            </div>
+                            {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>
+                            {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>
+                            {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
+                            {% else %}
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타</div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
