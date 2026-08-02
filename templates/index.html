@@ -91,16 +91,16 @@
         </div>
     </div>
 
-    <!-- 3. 정렬 탭 (우측: 최신등록순, 인기순, 최근 급상승) -->
+    <!-- 3. 정렬 탭 (우측: 최신등록순, 높은점수순, 낮은점수순) -->
     <div class="tab-sort-group">
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' }}">
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'latest' or not sort_type }}">
             <i class="fa-solid fa-clock"></i> 최신등록순
         </a>
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'score' }}">
-            <i class="fa-solid fa-star"></i> 종합순위순
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'score' or sort_type == 'high_score' }}">
+            <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
         </a>
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=popular&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'popular' }}">
-            <i class="fa-solid fa-heart"></i> 하트인기순
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=low_score&q={{ search_q }}&pet_type={{ pet_type }}" class="sort-btn {{ 'active' if sort_type == 'low_score' }}">
+            <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
         </a>
     </div>
 </div>

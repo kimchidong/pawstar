@@ -708,8 +708,10 @@ class PawStarService:
                 query += " AND (r.TITLE LIKE %s OR r.CONTS LIKE %s OR r.PET_NM LIKE %s OR u.NK_NM LIKE %s)"
                 params.extend([f"%{search_q}%", f"%{search_q}%", f"%{search_q}%", f"%{search_q}%"])
 
-            if sort_type == 'popular' or sort_type == 'score':
+            if sort_type == 'popular' or sort_type == 'score' or sort_type == 'high_score':
                 query += " ORDER BY r.SCORE DESC, r.CMT_CNT DESC, r.LIKE_CNT DESC, r.VW_CNT DESC, r.ENT_DT DESC"
+            elif sort_type == 'low_score':
+                query += " ORDER BY r.SCORE ASC, r.ENT_DT ASC"
             else:
                 query += " ORDER BY r.ENT_DT DESC"
 
