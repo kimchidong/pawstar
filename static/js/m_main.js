@@ -94,7 +94,11 @@ function openMobileDetailModal(postData) {
     const detailModal = document.getElementById('mDetailModal');
     if (!detailModal) return;
 
-    const mPopupSrc = postData.IMAGE_PATH || postData.image_path || postData.media_url || 
+    postData.post_id = postData.post_id || postData.POST_ID || ((postData.CONTEST_ROUND || postData.contest_id) && (postData.ROUND_NO || postData.round_no) ? `${postData.CONTEST_ROUND || postData.contest_id}_${postData.ROUND_NO || postData.round_no}` : (postData.ROUND_NO || postData.round_no));
+    postData.title = postData.title || postData.TITLE || '';
+    postData.content = postData.content || postData.CONTS || postData.conts || '';
+
+    const mPopupSrc = postData.popup_image_path || postData.IMAGE_PATH || postData.image_path || postData.media_url || 
         ((postData.file_path && postData.list_file_name) ? (postData.file_path.endsWith('/') ? postData.file_path : postData.file_path + '/') + postData.list_file_name : '');
     document.getElementById('mDetailImg').src = mPopupSrc;
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';

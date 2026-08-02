@@ -107,7 +107,7 @@
                 {% if ns.rising_stars %}
                     <div class="co-winner-wrapper">
                         {% for star in ns.rising_stars %}
-                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }})" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
@@ -180,7 +180,7 @@
                 {% if ns.super_stars %}
                     <div class="co-winner-wrapper">
                         {% for star in ns.super_stars %}
-                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }})" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A101.png" style="width: 52px; height: 52px; object-fit: contain;" alt="슈퍼스타 메달">
@@ -253,7 +253,7 @@
                 {% if ns.bright_stars %}
                     <div class="co-winner-wrapper">
                         {% for star in ns.bright_stars %}
-                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                            <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }})" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
@@ -373,7 +373,8 @@
 
             // 유저 탭 클릭 시 수동 전환 및 타이머 리셋
             tabs.forEach((tab, origIdx) => {
-                tab.addEventListener('click', function() {
+                tab.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     clearInterval(autoTimer);
                     const pos = indices.indexOf(origIdx);
                     if (pos !== -1) {
@@ -439,7 +440,7 @@
                                         {% if stars %}
                                             <div class="co-winner-wrapper">
                                                 {% for star in stars %}
-                                                    <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                                                    <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }})" style="cursor: pointer;">
                                                         <div class="podium-media" style="height: 270px;">
                                                             <div class="crown-badge">
                                                                 <img src="/static/image/badge/P002A90{{ rk }}.png" style="width: 40px; height: 40px; object-fit: contain;" alt="{{ rk }}위 메달">

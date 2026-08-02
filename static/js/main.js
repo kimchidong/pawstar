@@ -413,6 +413,13 @@ function openDetailModal(post) {
     const modal = document.getElementById('postDetailModal');
     if (!modal || !post) return;
 
+    // 객체 데이터 속성 표준화
+    post.post_id = post.post_id || post.POST_ID || ((post.CONTEST_ROUND || post.contest_id) && (post.ROUND_NO || post.round_no) ? `${post.CONTEST_ROUND || post.contest_id}_${post.ROUND_NO || post.round_no}` : (post.ROUND_NO || post.round_no));
+    post.title = post.title || post.TITLE || '';
+    post.content = post.content || post.CONTS || post.conts || '';
+    post.score = post.score !== undefined ? post.score : (post.SCORE !== undefined ? post.SCORE : 0);
+    post.created_at = post.created_at || post.ENT_DT || '';
+
     // 최신 메모리 데이터 객체 동기화
     if (!window.postsDataStore[post.post_id]) {
         window.postsDataStore[post.post_id] = Object.assign({}, post);
