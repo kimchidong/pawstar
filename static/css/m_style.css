@@ -294,15 +294,15 @@ body.m-body {
     border-radius: 20px;
     font-size: 0.72rem;
     font-weight: 800;
-    color: #451a03;
-    background: linear-gradient(135deg, rgba(254, 240, 138, 0.45) 0%, rgba(245, 158, 11, 0.48) 50%, rgba(217, 119, 6, 0.5) 100%);
+    color: #713f12;
+    background: linear-gradient(135deg, #fffbeb 0%, #fde047 35%, #eab308 75%, #ca8a04 100%);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: none !important;
     white-space: nowrap;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 14px rgba(234, 179, 8, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
     pointer-events: none;
 }
 
