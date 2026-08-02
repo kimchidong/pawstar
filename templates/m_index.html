@@ -43,7 +43,8 @@
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
-                    {% set rank_prefix = '공동 ' if p.is_co_rank else '' %}
+                    {% set category_prefix = '패밀리 ' if (pet_type and pet_type != 'all') else '전체 ' %}
+                    {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
                     <div class="m-card-badge">🏆 {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>

@@ -631,7 +631,10 @@ function openDetailModal(post, isHallOfFame = false) {
     } else {
         if (badgeEl) {
             if (post.rank_candidate && !isClosedRound) {
-                const prefix = post.is_co_rank ? '공동 ' : '';
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPetType = urlParams.get('pet_type') || 'all';
+                const catPrefix = (currentPetType && currentPetType !== 'all') ? '패밀리 ' : '전체 ';
+                const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
                 if (post.rank_candidate === 1) {
                     badgeEl.innerHTML = `<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;

@@ -169,7 +169,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     } else {
         if (mBadgeEl) {
             if (postData.rank_candidate) {
-                const prefix = postData.is_co_rank ? '공동 ' : '';
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPetType = urlParams.get('pet_type') || 'all';
+                const catPrefix = (currentPetType && currentPetType !== 'all') ? '패밀리 ' : '전체 ';
+                const prefix = (postData.is_co_rank ? '공동 ' : '') + catPrefix;
                 mBadgeEl.innerHTML = `<div class="m-card-badge">🏆 ${prefix}${postData.rank_candidate}위 후보</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
