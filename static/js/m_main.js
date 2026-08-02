@@ -195,21 +195,30 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     const mCommentFormContainer = document.getElementById('mDetailCommentFormContainer');
     const mCommentScoreNotice = document.getElementById('mDetailCommentScoreNotice');
 
+    const mBtnViewPopup = document.getElementById('mDetailBtnView');
+    const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
+
     if (isHallOfFame) {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = 'none';
-        if (mBtnLikePopup) {
-            mBtnLikePopup.style.display = 'flex';
-            mBtnLikePopup.style.pointerEvents = 'none';
-            mBtnLikePopup.onclick = null;
-        }
+        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
+            if (el) {
+                el.style.display = 'flex';
+                el.style.pointerEvents = 'none';
+                el.style.cursor = 'default';
+                el.onclick = null;
+            }
+        });
     } else {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'flex';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = '';
-        if (mBtnLikePopup) {
-            mBtnLikePopup.style.display = 'flex';
-            mBtnLikePopup.style.pointerEvents = '';
-        }
+        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
+            if (el) {
+                el.style.display = 'flex';
+                el.style.pointerEvents = '';
+                el.style.cursor = '';
+            }
+        });
 
         if (typeof triggerEvent === 'function') {
             triggerEvent(postData.post_id, 'view');

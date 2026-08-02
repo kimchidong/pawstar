@@ -445,22 +445,31 @@ function openDetailModal(post, isHallOfFame = false) {
     const heartLikeBtn = document.getElementById('detailHeartLikeBtn');
     let btnLike = document.getElementById('detailBtnLike');
 
+    let btnViewPopup = document.getElementById('detailBtnView');
+    let btnCommentPopup = document.getElementById('detailBtnComment');
+
     if (isHallOfFame) {
         if (commentFormContainer) commentFormContainer.style.display = 'none';
         if (commentScoreNotice) commentScoreNotice.style.display = 'none';
         if (heartLikeBtn) heartLikeBtn.style.display = 'none';
-        if (btnLike) {
-            btnLike.style.display = 'flex';
-            btnLike.style.pointerEvents = 'none';
-        }
+        [btnViewPopup, btnLike, btnCommentPopup].forEach(el => {
+            if (el) {
+                el.style.display = 'flex';
+                el.style.pointerEvents = 'none';
+                el.style.cursor = 'default';
+            }
+        });
     } else {
         if (commentFormContainer) commentFormContainer.style.display = 'flex';
         if (commentScoreNotice) commentScoreNotice.style.display = '';
         if (heartLikeBtn) heartLikeBtn.style.display = 'flex';
-        if (btnLike) {
-            btnLike.style.display = 'flex';
-            btnLike.style.pointerEvents = '';
-        }
+        [btnViewPopup, btnLike, btnCommentPopup].forEach(el => {
+            if (el) {
+                el.style.display = 'flex';
+                el.style.pointerEvents = '';
+                el.style.cursor = '';
+            }
+        });
         
         // 일반 피드/대회목록 팝업 시만 자동 조회수 증가
         triggerEvent(post.post_id, 'view');
@@ -543,7 +552,7 @@ function openDetailModal(post, isHallOfFame = false) {
     window.currentDetailPost = post;
     window.currentDetailPostIsCommented = isCommented;
 
-    const btnCommentPopup = document.getElementById('detailBtnComment');
+    btnCommentPopup = document.getElementById('detailBtnComment');
     if (btnCommentPopup) {
         if (isCommented) {
             btnCommentPopup.classList.add('active');
