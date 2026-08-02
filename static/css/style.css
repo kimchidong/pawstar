@@ -1003,10 +1003,18 @@ body {
    ========================================================================== */
 @keyframes elegantShimmer {
     0% {
-        transform: translateX(-150%) rotate(25deg);
+        transform: translateX(-160%) rotate(25deg);
+        opacity: 0;
     }
-    40%, 100% {
-        transform: translateX(180%) rotate(25deg);
+    8% {
+        opacity: 1;
+    }
+    42% {
+        opacity: 0.9;
+    }
+    55%, 100% {
+        transform: translateX(220%) rotate(25deg);
+        opacity: 0;
     }
 }
 
@@ -1043,11 +1051,11 @@ body {
     background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0.45) 50%,
         rgba(255, 255, 255, 0) 100%
     );
     transform: rotate(25deg);
-    animation: elegantShimmer 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    animation: elegantShimmer 4.5s ease-in-out infinite;
     pointer-events: none;
 }
 
