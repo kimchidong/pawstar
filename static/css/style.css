@@ -754,6 +754,116 @@ body {
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
+/* Custom Animal Monochrome Icon Select Dropdown Component */
+.custom-pet-dropdown {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+    min-width: 170px;
+    z-index: 100;
+}
+
+.custom-pet-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.65rem 1.1rem;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1e293b;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-pet-trigger:hover {
+    border-color: #6366f1;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+}
+
+.custom-pet-trigger i.pet-icon {
+    color: #475569;
+    font-size: 0.95rem;
+}
+
+.custom-pet-trigger i.arrow-icon {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    transition: transform 0.25s ease;
+}
+
+.custom-pet-dropdown.open .custom-pet-trigger i.arrow-icon {
+    transform: rotate(180deg);
+}
+
+.custom-pet-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    padding: 0.4rem;
+    z-index: 999;
+}
+
+.custom-pet-dropdown.open .custom-pet-options {
+    display: flex;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-pet-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.custom-pet-option i {
+    color: #64748b;
+    font-size: 0.92rem;
+    width: 1.1rem;
+    text-align: center;
+}
+
+.custom-pet-option:hover {
+    background: #f1f5f9;
+    color: #4f46e5;
+}
+
+.custom-pet-option:hover i {
+    color: #4f46e5;
+}
+
+.custom-pet-option.selected {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.custom-pet-option.selected i {
+    color: #4338ca;
+}
+
 .score-badge {
     position: absolute;
     top: 12px;

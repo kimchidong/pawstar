@@ -71,17 +71,33 @@
             {% endfor %}
         </select>
 
-        <!-- 동물 종류 콤보 박스 (PST_PET_KIND 테이블 데이터 기반 동적 렌더링) -->
-        <select id="petTypeSelect" class="select-custom" title="동물 종류 선택">
-            <option value="all" {{ 'selected' if pet_type == 'all' or not pet_type }}>🐾 전체 동물</option>
-            {% for k in pet_kinds %}
-                {% set k_nm = k.KIND_NM %}
-                {% set k_display = k.DISPLAY_NM or k_nm %}
-                <option value="{{ k_nm }}" {{ 'selected' if (pet_type == k_nm or pet_type == k.KIND_CD or (pet_type and pet_type in k_nm)) }}>
-                    {{ k_display }}
-                </option>
-            {% endfor %}
-        </select>
+        <!-- 동물 종류 콤보 박스 (단색 FontAwesome 아이콘 적용 커스텀 셀렉트 드롭다운) -->
+        {% set sel_kind = pet_type or '' %}
+        {% set sel_icon = 'fa-solid fa-dog' if ('강아지' in sel_kind or '개' in sel_kind) else ('fa-solid fa-cat' if '고양이' in sel_kind else ('fa-solid fa-otter' if ('햄스터' in sel_kind or '소동물' in sel_kind or '토끼' in sel_kind or '고슴도치' in sel_kind) else ('fa-solid fa-frog' if ('거북이' in sel_kind or '파충류' in sel_kind or '도마뱀' in sel_kind) else ('fa-solid fa-fish' if ('어류' in sel_kind or '관상어' in sel_kind or '물고기' in sel_kind) else ('fa-solid fa-crow' if ('새' in sel_kind or '앵무새' in sel_kind or '조류' in sel_kind) else ('fa-solid fa-horse' if ('말' in sel_kind or '큰동물' in sel_kind) else 'fa-solid fa-paw')))))) %}
+        {% set sel_display = '전체 동물' if (pet_type == 'all' or not pet_type) else (sel_kind|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '')) %}
+        
+        <div class="custom-pet-dropdown" id="customPetTypeDropdown">
+            <div class="custom-pet-trigger">
+                <span style="display: inline-flex; align-items: center; gap: 0.6rem;">
+                    <i class="pet-icon {{ sel_icon }}"></i>
+                    <span class="selected-text">{{ sel_display }}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </div>
+            <div class="custom-pet-options">
+                <div class="custom-pet-option {{ 'selected' if pet_type == 'all' or not pet_type }}" data-value="all">
+                    <i class="fa-solid fa-paw"></i> <span>전체 동물</span>
+                </div>
+                {% for k in pet_kinds %}
+                    {% set k_nm = k.KIND_NM %}
+                    {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
+                    {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
+                    <div class="custom-pet-option {{ 'selected' if (pet_type == k_nm or pet_type == k.KIND_CD or (pet_type and pet_type in k_nm)) }}" data-value="{{ k_nm }}">
+                        <i class="{{ k_icon }}"></i> <span>{{ k_clean }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
 
         <!-- 검색창 (동물종류 콤보 바로 옆에 나란히 배치) -->
         <div class="search-box">
@@ -119,7 +135,7 @@
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% set p_kind = p.KIND_NM or p.pet_type or '' %}
-                {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))) %}
+                {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-otter' if ('햄스터' in p_kind or '소동물' in p_kind or '토끼' in p_kind or '고슴도치' in p_kind) else ('fa-solid fa-frog' if ('거북이' in p_kind or '파충류' in p_kind or '도마뱀' in p_kind) else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind or '조류' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))))) %}
                 
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}

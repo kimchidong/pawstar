@@ -29,14 +29,30 @@ function initEventHandlers() {
         });
     }
 
-    // 동물 종류 선택 변경 이벤트
-    const petTypeSelect = document.getElementById('petTypeSelect');
-    if (petTypeSelect) {
-        petTypeSelect.addEventListener('change', (e) => {
-            const petType = e.target.value;
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set('pet_type', petType);
-            window.location.href = currentUrl.toString();
+    // 단색 FontAwesome 동물 아이콘 지원 커스텀 드롭다운 핸들러
+    const customDropdown = document.getElementById('customPetTypeDropdown');
+    if (customDropdown) {
+        const trigger = customDropdown.querySelector('.custom-pet-trigger');
+        const options = customDropdown.querySelectorAll('.custom-pet-option');
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            customDropdown.classList.toggle('open');
+        });
+
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                const val = opt.getAttribute('data-value');
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('pet_type', val);
+                window.location.href = currentUrl.toString();
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!customDropdown.contains(e.target)) {
+                customDropdown.classList.remove('open');
+            }
         });
     }
 
@@ -647,8 +663,10 @@ function openDetailModal(post, isHallOfFame = false) {
         let petIconClass = 'fa-solid fa-paw';
         if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
         else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+        else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치')) petIconClass = 'fa-solid fa-otter';
+        else if (kindNm.includes('거북이') || kindNm.includes('파충류') || kindNm.includes('도마뱀')) petIconClass = 'fa-solid fa-frog';
         else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
-        else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+        else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
         else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
 
         if (badgeEl) {
@@ -687,8 +705,10 @@ function openDetailModal(post, isHallOfFame = false) {
                 let petIconClass = 'fa-solid fa-paw';
                 if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
                 else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+                else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치')) petIconClass = 'fa-solid fa-otter';
+                else if (kindNm.includes('거북이') || kindNm.includes('파충류') || kindNm.includes('도마뱀')) petIconClass = 'fa-solid fa-frog';
                 else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
-                else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+                else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
                 else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
 
                 const urlParams = new URLSearchParams(window.location.search);
