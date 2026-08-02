@@ -401,7 +401,7 @@ if (!window.postsDataStore) {
 /**
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
-function openDetailModal(post) {
+function openDetailModal(post, isHallOfFame = false) {
     if (!window.isUserLoggedIn) {
         showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
         setTimeout(() => {
@@ -439,8 +439,33 @@ function openDetailModal(post) {
         }
     }
 
-    // 게시물 상세 팝업 오픈시 조회수 1회 자동 증가 (+1점) 및 피드 카드 조회 영향력 실시간 하이라이트 반영
-    triggerEvent(post.post_id, 'view');
+    // 명예의 전당 전용 팝업 조작: 점수 변동 이벤트 및 좋아요/댓글등록 영역 숨김 제어
+    const commentFormContainer = document.getElementById('detailCommentFormContainer');
+    const commentScoreNotice = document.getElementById('detailCommentScoreNotice');
+    const heartLikeBtn = document.getElementById('detailHeartLikeBtn');
+    let btnLike = document.getElementById('detailBtnLike');
+
+    if (isHallOfFame) {
+        if (commentFormContainer) commentFormContainer.style.display = 'none';
+        if (commentScoreNotice) commentScoreNotice.style.display = 'none';
+        if (heartLikeBtn) heartLikeBtn.style.display = 'none';
+        if (btnLike) {
+            btnLike.style.display = 'flex';
+            btnLike.style.pointerEvents = 'none';
+        }
+    } else {
+        if (commentFormContainer) commentFormContainer.style.display = 'flex';
+        if (commentScoreNotice) commentScoreNotice.style.display = '';
+        if (heartLikeBtn) heartLikeBtn.style.display = 'flex';
+        if (btnLike) {
+            btnLike.style.display = 'flex';
+            btnLike.style.pointerEvents = '';
+        }
+        
+        // 일반 피드/대회목록 팝업 시만 자동 조회수 증가
+        triggerEvent(post.post_id, 'view');
+    }
+
     const cleanId = String(post.post_id);
     const rawEntId = cleanId.replace(/^\d+_/, '');
     const card = document.getElementById(`post-card-${cleanId}`) || 
@@ -561,7 +586,7 @@ function openDetailModal(post) {
     // 모달 내부 버튼 이벤트 바인딩 & 좋아요 토글 처리
     const heartBtn = document.getElementById('detailHeartLikeBtn');
     const heartIcon = document.getElementById('detailHeartIcon');
-    const btnLike = document.getElementById('detailBtnLike');
+    btnLike = document.getElementById('detailBtnLike');
 
     let isLiked = !!((post.actions && post.actions.is_liked) || post.is_liked);
 
@@ -582,6 +607,21 @@ function openDetailModal(post) {
         }
     };
 
+    const updatePopupCommentUI = (commentedState) => {
+        const btnCommentPopup = document.getElementById('detailBtnComment');
+        if (btnCommentPopup) {
+            if (commentedState) {
+                btnCommentPopup.classList.add('active');
+                const icon = btnCommentPopup.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-comment';
+            } else {
+                btnCommentPopup.classList.remove('active');
+                const icon = btnCommentPopup.querySelector('i');
+                if (icon) icon.className = 'fa-regular fa-comment';
+            }
+        }
+    };
+
     // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화 및 색상 채우기
     updatePopupLikeUI(isLiked);
 
@@ -591,6 +631,10 @@ function openDetailModal(post) {
             if (data && data.success && data.actions) {
                 isLiked = !!data.actions.is_liked;
                 updatePopupLikeUI(isLiked);
+                if (data.actions.is_commented !== undefined) {
+                    window.currentDetailPostIsCommented = !!data.actions.is_commented;
+                    updatePopupCommentUI(!!data.actions.is_commented);
+                }
             }
         })
         .catch(err => {
@@ -614,8 +658,13 @@ function openDetailModal(post) {
         }
     };
 
-    if (heartBtn) heartBtn.onclick = toggleLikeHandler;
-    if (btnLike) btnLike.onclick = toggleLikeHandler;
+    if (!isHallOfFame) {
+        if (heartBtn) heartBtn.onclick = toggleLikeHandler;
+        if (btnLike) btnLike.onclick = toggleLikeHandler;
+    } else {
+        if (heartBtn) heartBtn.onclick = null;
+        if (btnLike) btnLike.onclick = null;
+    }
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';

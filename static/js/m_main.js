@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 3. 모바일 전용 게시물 상세보기 모달 open
-function openMobileDetailModal(postData) {
+function openMobileDetailModal(postData, isHallOfFame = false) {
     if (!window.isUserLoggedIn) {
         if (typeof showToast === 'function') {
             showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
@@ -153,11 +153,67 @@ function openMobileDetailModal(postData) {
         mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
     }
 
+    fetch(`/api/post/user_actions/${postData.post_id}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success && data.actions) {
+                const mIsLiked = !!data.actions.is_liked;
+                if (mBtnLikePopup) {
+                    const icon = mBtnLikePopup.querySelector('i');
+                    if (mIsLiked) {
+                        mBtnLikePopup.classList.add('active');
+                        if (icon) icon.className = 'fa-solid fa-heart';
+                    } else {
+                        mBtnLikePopup.classList.remove('active');
+                        if (icon) icon.className = 'fa-regular fa-heart';
+                    }
+                }
+                if (mHeartIcon) {
+                    mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                    mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
+                }
+                const mIsCommented = !!data.actions.is_commented;
+                if (btnCommentPopup) {
+                    if (mIsCommented) {
+                        btnCommentPopup.classList.add('active');
+                        const icon = btnCommentPopup.querySelector('i');
+                        if (icon) icon.className = 'fa-solid fa-comment';
+                    } else {
+                        btnCommentPopup.classList.remove('active');
+                        const icon = btnCommentPopup.querySelector('i');
+                        if (icon) icon.className = 'fa-regular fa-comment';
+                    }
+                }
+            }
+        })
+        .catch(err => console.error(err));
+
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
-    if (typeof triggerEvent === 'function') {
-        triggerEvent(postData.post_id, 'view');
+    // 명예의 전당 전용 팝업 조작: 점수 변동 이벤트 및 좋아요/댓글등록 영역 숨김 제어
+    const mCommentFormContainer = document.getElementById('mDetailCommentFormContainer');
+    const mCommentScoreNotice = document.getElementById('mDetailCommentScoreNotice');
+
+    if (isHallOfFame) {
+        if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';
+        if (mCommentScoreNotice) mCommentScoreNotice.style.display = 'none';
+        if (mBtnLikePopup) {
+            mBtnLikePopup.style.display = 'flex';
+            mBtnLikePopup.style.pointerEvents = 'none';
+            mBtnLikePopup.onclick = null;
+        }
+    } else {
+        if (mCommentFormContainer) mCommentFormContainer.style.display = 'flex';
+        if (mCommentScoreNotice) mCommentScoreNotice.style.display = '';
+        if (mBtnLikePopup) {
+            mBtnLikePopup.style.display = 'flex';
+            mBtnLikePopup.style.pointerEvents = '';
+        }
+
+        if (typeof triggerEvent === 'function') {
+            triggerEvent(postData.post_id, 'view');
+        }
     }
 
     const mCleanId = String(postData.post_id);
