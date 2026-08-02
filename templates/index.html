@@ -169,7 +169,7 @@
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i>
                         <span class="view-count">{{ p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요" onclick="event.stopPropagation(); toggleLikeCard(this, '{{ p.ENT_USER_ID or p.post_id }}');">
+                    <div class="action-btn btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 (상세 팝업에서 가능)">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i>
                         <span class="like-count">{{ p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0) }}</span>
                     </div>

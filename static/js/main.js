@@ -1002,29 +1002,10 @@ async function handleShareClick() {
 }
 
 async function toggleLikeCard(btn, postId) {
-    if (!btn) return;
-    const icon = btn.querySelector('i');
-    const isLiked = icon ? icon.classList.contains('fa-solid') : btn.classList.contains('active');
-    
-    if (isLiked) {
-        const success = await triggerEvent(postId, 'unlike');
-        if (success !== false) {
-            btn.classList.remove('active');
-            if (icon) {
-                icon.className = 'fa-regular fa-heart';
-                icon.style.color = '';
-            }
-        }
-    } else {
-        const success = await triggerEvent(postId, 'like');
-        if (success !== false) {
-            btn.classList.add('active');
-            if (icon) {
-                icon.className = 'fa-solid fa-heart';
-                icon.style.color = '#e11d48';
-            }
-        }
+    if (typeof showToast === 'function') {
+        showToast('💡 좋아요는 게시물을 클릭하여 상세 팝업창에서만 누르실 수 있습니다.');
     }
+    return false;
 }
 
 // 전역 스코프 바인딩
