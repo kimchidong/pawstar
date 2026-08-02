@@ -426,16 +426,18 @@ function openDetailModal(post, isHallOfFame = false) {
     }
     post = window.postsDataStore[post.post_id];
 
-    // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정
-    const feedCard = document.getElementById(`post-card-${post.post_id}`);
-    if (feedCard) {
-        const cardLike = feedCard.querySelector('.like-count');
-        const cardScore = feedCard.querySelector('.score-num');
-        if (cardLike && cardLike.textContent !== '') {
-            post.like_count = parseInt(cardLike.textContent, 10) || post.like_count;
-        }
-        if (cardScore && cardScore.textContent !== '') {
-            post.score = parseInt(cardScore.textContent.replace(/,/g, ''), 10) || post.score;
+    // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정 (명예의 전당은 PST_CONTEST_AWARD 수치 100% 보존)
+    if (!isHallOfFame) {
+        const feedCard = document.getElementById(`post-card-${post.post_id}`);
+        if (feedCard) {
+            const cardLike = feedCard.querySelector('.like-count');
+            const cardScore = feedCard.querySelector('.score-num');
+            if (cardLike && cardLike.textContent !== '') {
+                post.like_count = parseInt(cardLike.textContent, 10) || post.like_count;
+            }
+            if (cardScore && cardScore.textContent !== '') {
+                post.score = parseInt(cardScore.textContent.replace(/,/g, ''), 10) || post.score;
+            }
         }
     }
 
