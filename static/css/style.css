@@ -664,12 +664,13 @@ body {
 /* Rank Ribbon 3D Metallic Emblem Badges (Transparent Crystal Shimmer Glass) */
 .rank-ribbon {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    padding: 0.42rem 1.15rem;
+    top: 0.65rem;
+    left: 0.65rem;
+    padding: 0.35rem 0.85rem;
     border-radius: 30px;
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
     letter-spacing: 0.2px;
     display: inline-flex;
     align-items: center;
@@ -703,8 +704,9 @@ body {
     pointer-events: none;
 }
 
-.rank-ribbon i {
-    font-size: 0.88rem;
+.rank-ribbon i,
+.rank-ribbon .pet-emoji-icon i {
+    font-size: 0.9em !important;
     line-height: 1;
 }
 

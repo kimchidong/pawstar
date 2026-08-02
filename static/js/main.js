@@ -698,14 +698,18 @@ function openDetailModal(post, isHallOfFame = false) {
                 const iconClass = isFamily ? petIconClass : 'fa-solid fa-medal';
                 const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
-                if (post.rank_candidate === 1) {
-                    badgeEl.innerHTML = `<div class="rank-ribbon rank-1"><i class="${iconClass}"></i> ${rankTitle}</div>`;
-                } else if (post.rank_candidate === 2) {
-                    badgeEl.innerHTML = `<div class="rank-ribbon rank-2"><i class="${iconClass}"></i> ${rankTitle}</div>`;
-                } else if (post.rank_candidate === 3) {
-                    badgeEl.innerHTML = `<div class="rank-ribbon rank-3"><i class="${iconClass}"></i> ${rankTitle}</div>`;
+                if (isFamily) {
+                    badgeEl.innerHTML = `<div class="winner-title-badge family-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>${rankTitle}</span></div>`;
                 } else {
-                    badgeEl.innerHTML = '';
+                    if (post.rank_candidate === 1) {
+                        badgeEl.innerHTML = `<div class="rank-ribbon rank-1" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                    } else if (post.rank_candidate === 2) {
+                        badgeEl.innerHTML = `<div class="rank-ribbon rank-2" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                    } else if (post.rank_candidate === 3) {
+                        badgeEl.innerHTML = `<div class="rank-ribbon rank-3" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                    } else {
+                        badgeEl.innerHTML = '';
+                    }
                 }
             } else {
                 badgeEl.innerHTML = '';

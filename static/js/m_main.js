@@ -218,7 +218,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
                 const iconHtml = isFamily ? `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>` : '🏆';
                 const prefix = (postData.is_co_rank ? '공동 ' : '') + catPrefix;
-                mBadgeEl.innerHTML = `<div class="m-card-badge">${iconHtml} ${prefix}${postData.rank_candidate}위 후보</div>`;
+                const bgStyle = isFamily ? 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;' : '';
+                mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; margin: 0; position: relative; top: 0; left: 0; ${bgStyle}">${iconHtml} ${prefix}${postData.rank_candidate}위 후보</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
             }
