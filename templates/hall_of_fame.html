@@ -113,7 +113,8 @@
                                         <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
                                     </div>
                                     <div class="winner-title-badge">
-                                        라이징스타
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        <span>라이징스타</span>
                                         {% if ns.rising_stars|length > 1 %}
                                             <span class="co-winner-tag">공동 2위 {{ ns.rising_stars|length }}명</span>
                                         {% endif %}
@@ -154,7 +155,7 @@
                         <div class="crown-badge">
                             <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
                         </div>
-                        <div class="winner-title-badge">라이징스타</div>
+                        <div class="winner-title-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
                     </div>
                     <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
@@ -185,9 +186,10 @@
                                         <img src="/static/image/badge/P001A101.png" style="width: 52px; height: 52px; object-fit: contain;" alt="슈퍼스타 메달">
                                     </div>
                                     <div class="winner-title-badge">
-                                        슈퍼스타
+                                        <i class="fa-solid fa-crown"></i>
+                                        <span>슈퍼스타</span>
                                         {% if ns.super_stars|length > 1 %}
-                                            <span class="co-winner-tag" style="color: #b45309; border-color: #fde68a;">공동 1위 {{ ns.super_stars|length }}명</span>
+                                            <span class="co-winner-tag">공동 1위 {{ ns.super_stars|length }}명</span>
                                         {% endif %}
                                     </div>
                                     <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Super Star">
@@ -226,7 +228,7 @@
                         <div class="crown-badge">
                             <img src="/static/image/badge/P001A101.png" style="width: 52px; height: 52px; object-fit: contain;" alt="슈퍼스타 메달">
                         </div>
-                        <div class="winner-title-badge">슈퍼스타</div>
+                        <div class="winner-title-badge"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
                     </div>
                     <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
@@ -257,7 +259,8 @@
                                         <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
                                     </div>
                                     <div class="winner-title-badge">
-                                        브라이트스타
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>브라이트스타</span>
                                         {% if ns.bright_stars|length > 1 %}
                                             <span class="co-winner-tag">공동 3위 {{ ns.bright_stars|length }}명</span>
                                         {% endif %}
@@ -298,7 +301,7 @@
                         <div class="crown-badge">
                             <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
                         </div>
-                        <div class="winner-title-badge">브라이트스타</div>
+                        <div class="winner-title-badge"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
                     </div>
                     <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
@@ -441,8 +444,9 @@
                                                             <div class="crown-badge">
                                                                 <img src="/static/image/badge/P002A90{{ rk }}.png" style="width: 40px; height: 40px; object-fit: contain;" alt="{{ rk }}위 메달">
                                                             </div>
-                                                            <div class="winner-title-badge">
-                                                                패밀리스타
+                                                            <div class="winner-title-badge family-star-badge">
+                                                                <i class="fa-solid fa-paw"></i>
+                                                                <span>패밀리스타</span>
                                                                 {% if stars|length > 1 %}
                                                                     <span class="co-winner-tag">공동 {{ rk }}위 {{ stars|length }}명</span>
                                                                 {% endif %}
@@ -483,7 +487,7 @@
                                                 <div class="crown-badge">
                                                     <img src="/static/image/badge/P002A90{{ rk }}.png" style="width: 40px; height: 40px; object-fit: contain;" alt="{{ rk }}위 메달">
                                                 </div>
-                                                <div class="winner-title-badge">패밀리스타</div>
+                                                <div class="winner-title-badge family-star-badge"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
                                             </div>
                                             <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
                                                 <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">수상자가 없습니다.</p>

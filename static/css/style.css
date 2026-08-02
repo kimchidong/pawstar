@@ -998,44 +998,134 @@ body {
             drop-shadow(0 0 4.5px rgba(255, 255, 255, 0.7));
 }
 
+/* ==========================================================================
+   🏆 명예의 전당 우측 상단 "... 스타" 럭셔리 뱃지 디자인 (Elegant Star Badge)
+   ========================================================================== */
+@keyframes elegantShimmer {
+    0% {
+        transform: translateX(-150%) rotate(25deg);
+    }
+    40%, 100% {
+        transform: translateX(180%) rotate(25deg);
+    }
+}
+
 .winner-title-badge {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 0.8rem;
+    right: 0.8rem;
     left: auto;
-    display: inline-block;
-    padding: 0.38rem 1.15rem;
-    border-radius: 20px;
-    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 1.15rem;
+    border-radius: 30px;
+    font-weight: 800;
     font-size: 0.85rem;
-    letter-spacing: -0.3px;
-    z-index: 3;
-    border: 1.5px solid #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.2px;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: default;
+    user-select: none;
 }
 
-/* 🥇 슈퍼스타 - 솔리드 골드 */
-.super-star .winner-title-badge { 
-    background: #fef08a; 
-    color: #713f12; 
-    border: 1.5px solid #d97706;
-    box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+/* 럭셔리 은은한 광택 shimmer 레이어 */
+.winner-title-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(25deg);
+    animation: elegantShimmer 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
 }
 
-/* 🥈 라이징스타 - 솔리드 실버/화이트 */
-.rising-star .winner-title-badge { 
-    background: #ffffff; 
-    color: #0f172a; 
-    border: 1.5px solid #94a3b8;
-    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.3);
+.winner-title-badge:hover {
+    transform: translateY(-2px) scale(1.03);
 }
 
-/* 🥉 브라이트스타 - 솔리드 브론즈 */
-.bright-star .winner-title-badge { 
-    background: #ffedd5; 
-    color: #7c2d12; 
-    border: 1.5px solid #f97316;
-    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+.winner-title-badge i {
+    font-size: 0.88rem;
+    line-height: 1;
+}
+
+/* 🥇 1위 슈퍼스타 (Royal Gold & Champagne) */
+.super-star .winner-title-badge {
+    background: linear-gradient(135deg, rgba(254, 240, 138, 0.95) 0%, rgba(245, 158, 11, 0.95) 50%, rgba(217, 119, 6, 0.95) 100%);
+    color: #451a03;
+    border: 1.5px solid rgba(253, 230, 138, 0.95);
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.42), 
+                inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.super-star .winner-title-badge i {
+    color: #78350f;
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.6));
+}
+
+/* 🥈 2위 라이징스타 (Platinum Silver & Pearl White) */
+.rising-star .winner-title-badge {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.95) 60%, rgba(203, 213, 225, 0.92) 100%);
+    color: #0f172a;
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 18px rgba(148, 163, 184, 0.38), 
+                inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+.rising-star .winner-title-badge i {
+    color: #475569;
+}
+
+/* 🥉 3위 브라이트스타 (Rose Gold & Warm Amber) */
+.bright-star .winner-title-badge {
+    background: linear-gradient(135deg, rgba(255, 237, 213, 0.95) 0%, rgba(251, 146, 60, 0.92) 60%, rgba(234, 88, 12, 0.95) 100%);
+    color: #431407;
+    border: 1.5px solid rgba(254, 215, 170, 0.95);
+    box-shadow: 0 4px 18px rgba(234, 88, 12, 0.38), 
+                inset 0 1px 2px rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.bright-star .winner-title-badge i {
+    color: #7c2d12;
+}
+
+/* 🐾 패밀리스타 (Noble Sapphire Violet & Crystal Magenta) */
+.winner-title-badge.family-star-badge,
+.podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge {
+    background: linear-gradient(135deg, rgba(243, 232, 255, 0.95) 0%, rgba(192, 132, 252, 0.92) 50%, rgba(147, 51, 234, 0.95) 100%);
+    color: #3b0764;
+    border: 1.5px solid rgba(233, 213, 255, 0.95);
+    box-shadow: 0 4px 18px rgba(168, 85, 247, 0.38), 
+                inset 0 1px 2px rgba(255, 255, 255, 0.75);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.winner-title-badge.family-star-badge i,
+.podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge i {
+    color: #581c87;
+}
+
+/* 공동 수상 태그 (co-winner-tag) 우아한 통합 스타일 */
+.winner-title-badge .co-winner-tag {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(4px);
+    color: inherit;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.12rem 0.45rem;
+    border-radius: 12px;
+    margin-left: 0.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .winner-img {

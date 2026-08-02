@@ -529,3 +529,24 @@ body.m-body {
 .action-btn.btn-like.active span {
     color: #e11d48 !important;
 }
+
+/* ==========================================================================
+   🏆 모바일 명예의 전당 우측 상단 "... 스타" 럭셔리 뱃지 디자인 (Mobile Star Badge)
+   ========================================================================== */
+.m-winner-card .winner-title-badge,
+.m-body .winner-title-badge {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.72rem;
+    gap: 0.35rem;
+    border-radius: 20px;
+    z-index: 5;
+}
+
+.m-winner-card .winner-title-badge i,
+.m-body .winner-title-badge i {
+    font-size: 0.75rem;
+}
+

@@ -29,7 +29,18 @@
         {% for w in winners %}
             {% set part = w.AWARD_PART or w.award_part %}
             {% set rk = w.RANKING or w.ranking %}
-            <div style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if (part == 'G002P001' and rk == 1) else ('#e2e8f0' if (part == 'G002P001' and rk == 2) else ('#ffedd5' if (part == 'G002P001' and rk == 3) else 'var(--border-light)')) }}; border-radius: var(--radius-md); padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; box-shadow: var(--shadow-soft); position: relative;">
+            <div class="m-winner-card {{ 'super-star' if (part == 'G002P001' and rk == 1) else ('rising-star' if (part == 'G002P001' and rk == 2) else ('bright-star' if (part == 'G002P001' and rk == 3) else '')) }}" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if (part == 'G002P001' and rk == 1) else ('#e2e8f0' if (part == 'G002P001' and rk == 2) else ('#ffedd5' if (part == 'G002P001' and rk == 3) else 'var(--border-light)')) }}; border-radius: var(--radius-md); padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; box-shadow: var(--shadow-soft); position: relative; overflow: hidden;">
+                <!-- 이미지 우측 상단 우아한 .. 스타 뱃지 -->
+                {% if part == 'G002P001' and rk == 1 %}
+                    <div class="winner-title-badge"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
+                {% elif part == 'G002P001' and rk == 2 %}
+                    <div class="winner-title-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
+                {% elif part == 'G002P001' and rk == 3 %}
+                    <div class="winner-title-badge"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
+                {% else %}
+                    <div class="winner-title-badge family-star-badge"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
+                {% endif %}
+
                 <!-- 이미지 및 좌측 상단 메달 뱃지 -->
                 <div style="position: relative; flex-shrink: 0;">
                     <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
@@ -40,7 +51,7 @@
                 </div>
 
                 <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if (part == 'G002P001' and rk == 1) else ('#64748b' if (part == 'G002P001' and rk == 2) else ('#b45309' if (part == 'G002P001' and rk == 3) else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem;">
+                    <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if (part == 'G002P001' and rk == 1) else ('#64748b' if (part == 'G002P001' and rk == 2) else ('#b45309' if (part == 'G002P001' and rk == 3) else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem; padding-right: 4.5rem;">
                         {% if part == 'G002P001' and rk == 1 %}🥇 슈퍼 스타 (전체 1위)
                         {% elif part == 'G002P001' and rk == 2 %}🥈 라이징 스타 (전체 2위)
                         {% elif part == 'G002P001' and rk == 3 %}🥉 브라이트 스타 (전체 3위)
