@@ -905,11 +905,34 @@ body {
     background: var(--bg-surface);
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
-    padding: 4.2rem 1.5rem 2.2rem 1.5rem;
+    padding: 0 0 1.25rem 0;
     text-align: center;
     position: relative;
     transition: var(--transition);
     box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.podium-media {
+    position: relative;
+    width: 100%;
+    height: 210px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.podium-card.super-star .podium-media {
+    height: 240px;
+}
+
+.podium-body {
+    padding: 1rem 1.25rem 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .podium-card.super-star {
@@ -930,8 +953,8 @@ body {
 
 .crown-badge {
     position: absolute;
-    top: 1.2rem;
-    left: 1.2rem;
+    top: 0.75rem;
+    left: 0.75rem;
     font-size: 2.7rem;
     margin: 0;
     line-height: 1;
@@ -939,13 +962,13 @@ body {
     background: transparent;
     border: none;
     box-shadow: none;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12));
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
 }
 
 .winner-title-badge {
     position: absolute;
-    top: 1.2rem;
-    right: 1.2rem;
+    top: 0.75rem;
+    right: 0.75rem;
     left: auto;
     display: inline-block;
     padding: 0.38rem 1.15rem;
@@ -955,6 +978,7 @@ body {
     letter-spacing: -0.3px;
     z-index: 3;
     text-shadow: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* 🥇 슈퍼스타 - 화사한 명확한 리얼 골드 */
@@ -983,12 +1007,12 @@ body {
 
 .winner-img {
     width: 100%;
-    height: 200px;
-    border-radius: var(--radius-md, 14px);
+    height: 100%;
+    border-radius: 0;
     object-fit: cover;
-    margin: 0.8rem 0 1rem 0;
-    border: 1.5px solid var(--border-light);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    margin: 0;
+    border: none;
+    box-shadow: none;
     display: block;
 }
 
