@@ -43,9 +43,11 @@
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
-                    {% set category_prefix = '패밀리 ' if (pet_type and pet_type != 'all') else '전체 ' %}
+                    {% set is_family = (pet_type and pet_type != 'all') %}
+                    {% set category_prefix = '패밀리 ' if is_family else '전체 ' %}
                     {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
-                    <div class="m-card-badge">🏆 {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
+                    {% set rank_icon_str = '🛡️' if is_family else '🏆' %}
+                    <div class="m-card-badge">{{ rank_icon_str }} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
             </div>

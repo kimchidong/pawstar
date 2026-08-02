@@ -123,14 +123,16 @@
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
-                    {% set category_prefix = '패밀리 ' if (pet_type and pet_type != 'all') else '전체 ' %}
+                    {% set is_family = (pet_type and pet_type != 'all') %}
+                    {% set category_prefix = '패밀리 ' if is_family else '전체 ' %}
                     {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
+                    {% set rank_icon = 'fa-solid fa-shield-halved' if is_family else 'fa-solid fa-medal' %}
                     {% if p.rank_candidate == 1 %}
-                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}1위 후보</div>
+                        <div class="rank-ribbon rank-1"><i class="{{ rank_icon }}"></i> {{ rank_prefix }}1위 후보</div>
                     {% elif p.rank_candidate == 2 %}
-                        <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}2위 후보</div>
+                        <div class="rank-ribbon rank-2"><i class="{{ rank_icon }}"></i> {{ rank_prefix }}2위 후보</div>
                     {% elif p.rank_candidate == 3 %}
-                        <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}3위 후보</div>
+                        <div class="rank-ribbon rank-3"><i class="{{ rank_icon }}"></i> {{ rank_prefix }}3위 후보</div>
                     {% endif %}
                 {% endif %}
             </div>
