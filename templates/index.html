@@ -112,13 +112,24 @@
             <div class="card-media">
                 <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 
-                <!-- 랭킹 배지 (실시간 점수 SCORE 기준 1~3위 게시물에 배지 표시) -->
-                {% if p.rank_candidate == 1 %}
-                    <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
-                {% elif p.rank_candidate == 2 %}
-                    <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>
-                {% elif p.rank_candidate == 3 %}
-                    <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>
+                <!-- 실물 메달/배지 이미지 목록 (좌측 상단, 전체부문 -> 품종부문 순서로 가로 나란히 배치) -->
+                {% if p.awards %}
+                    <div class="award-medals-container" style="position: absolute; top: 0.65rem; left: 0.65rem; display: flex; align-items: center; gap: 0.4rem; z-index: 10;">
+                        {% for aw in p.awards %}
+                            {% set b_file = (aw.badge_img or aw.award_cd or 'P001A101.png')|string %}
+                            {% set b_raw = b_file if (b_file.startswith('/') or b_file.startswith('http')) else ('/static/image/badge/' ~ (b_file.split('/')[-1] ~ ('' if (b_file.endswith('.png') or b_file.endswith('.jpg')) else '.png'))) %}
+                            {% set b_url = b_raw.replace('.webp', '.png') %}
+                            <img src="{{ b_url }}" style="width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));" alt="{{ aw.award_nm }}" title="{{ aw.award_nm }}">
+                        {% endfor %}
+                    </div>
+                {% elif p.rank_candidate and not is_closed %}
+                    {% if p.rank_candidate == 1 %}
+                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
+                    {% elif p.rank_candidate == 2 %}
+                        <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>
+                    {% elif p.rank_candidate == 3 %}
+                        <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>
+                    {% endif %}
                 {% endif %}
             </div>
 

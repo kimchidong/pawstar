@@ -118,6 +118,44 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     document.getElementById('mDetailTitle').textContent = postData.title || '';
     document.getElementById('mDetailContent').textContent = postData.content || '';
 
+    // 모바일 팝업 랭킹 / 수상 배지 채우기 (오직 실물 메달/배지 이미지들만 전체부문 -> 품종부문 순서로 가로 나란히 표시)
+    const mMedalsLeftEl = document.getElementById('mDetailMedalsLeft');
+    const mBadgeEl = document.getElementById('mDetailRankBadge');
+
+    if (mMedalsLeftEl) mMedalsLeftEl.innerHTML = '';
+
+    if (postData.awards && postData.awards.length > 0) {
+        const sortedAwards = [...postData.awards].sort((a, b) => {
+            const partA = a.award_part || a.AWARD_PART || '';
+            const partB = b.award_part || b.AWARD_PART || '';
+            return partA.localeCompare(partB);
+        });
+
+        if (mBadgeEl) {
+            let html = '';
+            sortedAwards.forEach(aw => {
+                let badgeImg = aw.badge_img || aw.BADGE_IMG_PATH_FILE || aw.award_cd || aw.AWARD_CD || '';
+                if (badgeImg && !badgeImg.startsWith('/') && !badgeImg.startsWith('http')) {
+                    let fn = badgeImg.split('/').pop();
+                    if (!fn.toLowerCase().match(/\.(png|jpg|jpeg|svg)$/)) fn += '.png';
+                    badgeImg = '/static/image/badge/' + fn;
+                }
+                badgeImg = badgeImg.replace(/\.webp$/i, '.png');
+                const name = aw.award_nm || aw.AWARD_NM || '수상작';
+                html += `<img src="${badgeImg}" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));" alt="${name}" title="${name}">`;
+            });
+            mBadgeEl.innerHTML = html;
+        }
+    } else {
+        if (mBadgeEl) {
+            if (postData.rank_candidate) {
+                mBadgeEl.innerHTML = `<div class="m-card-badge">🏆 ${postData.rank_candidate}위 후보</div>`;
+            } else {
+                mBadgeEl.innerHTML = '';
+            }
+        }
+    }
+
     const isCommented = (postData.actions && postData.actions.is_commented) || postData.is_commented || false;
     window.currentMobileDetailPost = postData;
     window.currentMobileDetailPostIsCommented = isCommented;

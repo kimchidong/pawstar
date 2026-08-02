@@ -587,17 +587,50 @@ function openDetailModal(post, isHallOfFame = false) {
         if (submitBtn) submitBtn.disabled = false;
     }
 
-    // 랭킹 배지 채우기
+    // 랭킹 / 수상 배지 채우기 (오직 실물 메달/배지 이미지들만 전체부문 -> 품종부문 순서로 가로 나란히 표시)
+    const medalsLeftEl = document.getElementById('detailMedalsLeft');
     const badgeEl = document.getElementById('detailRankBadge');
-    if (badgeEl) {
-        if (post.rank_candidate === 1) {
-            badgeEl.innerHTML = '<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>';
-        } else if (post.rank_candidate === 2) {
-            badgeEl.innerHTML = '<div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>';
-        } else if (post.rank_candidate === 3) {
-            badgeEl.innerHTML = '<div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>';
-        } else {
-            badgeEl.innerHTML = '';
+
+    if (medalsLeftEl) medalsLeftEl.innerHTML = '';
+
+    if (post.awards && post.awards.length > 0) {
+        const sortedAwards = [...post.awards].sort((a, b) => {
+            const partA = a.award_part || a.AWARD_PART || '';
+            const partB = b.award_part || b.AWARD_PART || '';
+            return partA.localeCompare(partB);
+        });
+
+        if (badgeEl) {
+            let html = '<div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">';
+            sortedAwards.forEach(aw => {
+                let badgeImg = aw.badge_img || aw.BADGE_IMG_PATH_FILE || aw.award_cd || aw.AWARD_CD || '';
+                if (badgeImg && !badgeImg.startsWith('/') && !badgeImg.startsWith('http')) {
+                    let fn = badgeImg.split('/').pop();
+                    if (!fn.toLowerCase().match(/\.(png|jpg|jpeg|svg)$/)) fn += '.png';
+                    badgeImg = '/static/image/badge/' + fn;
+                }
+                badgeImg = badgeImg.replace(/\.webp$/i, '.png');
+                const name = aw.award_nm || aw.AWARD_NM || '수상작';
+                html += `<img src="${badgeImg}" style="width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));" alt="${name}" title="${name}">`;
+            });
+            html += '</div>';
+            badgeEl.innerHTML = html;
+        }
+    } else {
+        if (badgeEl) {
+            if (post.rank_candidate && !isClosedRound) {
+                if (post.rank_candidate === 1) {
+                    badgeEl.innerHTML = '<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>';
+                } else if (post.rank_candidate === 2) {
+                    badgeEl.innerHTML = '<div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>';
+                } else if (post.rank_candidate === 3) {
+                    badgeEl.innerHTML = '<div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>';
+                } else {
+                    badgeEl.innerHTML = '';
+                }
+            } else {
+                badgeEl.innerHTML = '';
+            }
         }
     }
 

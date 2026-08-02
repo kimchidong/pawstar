@@ -649,6 +649,49 @@ class PawStarService:
                     viewed_rows = cur.fetchall()
                     viewed_round_nos = {r['ROUND_NO'] for r in viewed_rows}
 
+                # 3. 해당 회차의 모든 수상 기록 조회 (전체부문 G002P001 -> 품종부문 G002P002 순서 정렬)
+                cur.execute("""
+                    SELECT 
+                        ca.CONTEST_ROUND,
+                        ca.ROUND_NO,
+                        ca.AWARD_PART,
+                        ca.AWARD_CD,
+                        COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
+                        a.BADGE_IMG_PATH_FILE,
+                        ca.RANKING
+                    FROM pst_contest_award ca
+                    LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                    WHERE ca.CONTEST_ROUND = %s
+                    ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
+                """, (contest_id,))
+                award_rows = cur.fetchall()
+
+                awards_map = {}
+                for a_row in award_rows:
+                    r_no = a_row['ROUND_NO']
+                    if r_no not in awards_map:
+                        awards_map[r_no] = []
+                    
+                    b_file = a_row.get('BADGE_IMG_PATH_FILE') or a_row.get('AWARD_CD') or ''
+                    if b_file and not b_file.startswith('/') and not b_file.startswith('http'):
+                        b_fn = b_file.split('/')[-1]
+                        if not b_fn.lower().endswith(('.png', '.jpg', '.svg', '.jpeg')):
+                            b_fn += '.png'
+                        b_url = f'/static/image/badge/{b_fn}'
+                    else:
+                        b_url = b_file or '/static/image/badge/P001A101.png'
+                    
+                    b_url = b_url.replace('.webp', '.png')
+
+                    awards_map[r_no].append({
+                        'award_part': a_row['AWARD_PART'],
+                        'award_part_nm': '전체부문' if a_row['AWARD_PART'] == 'G002P001' else '품종부문',
+                        'award_cd': a_row['AWARD_CD'],
+                        'award_nm': a_row['AWARD_NM'],
+                        'badge_img': b_url,
+                        'ranking': a_row['RANKING']
+                    })
+
                 total_count = len(all_rows)
                 total_pages = max(1, (total_count + per_page - 1) // per_page)
                 page = max(1, min(page, total_pages))
@@ -668,6 +711,7 @@ class PawStarService:
                     row['ENT_DT'] = dt_str
                     row['created_at'] = dt_str
                     row['rank_candidate'] = top_scores.get(row['ROUND_NO'], None)
+                    row['awards'] = awards_map.get(row['ROUND_NO'], [])
                     row['actions'] = {
                         'is_liked': row['ROUND_NO'] in liked_round_nos,
                         'is_commented': row['ROUND_NO'] in commented_round_nos,
@@ -1253,6 +1297,46 @@ class PawStarService:
                             ORDER BY ca.AWARD_PART ASC, ca.KIND_CD ASC, ca.RANKING ASC
                         """, (latest_id,))
                         winners = cur.fetchall()
+
+                if winners:
+                    for w in winners:
+                        w_c_id = w['CONTEST_ROUND']
+                        w_r_no = w['ROUND_NO']
+                        cur.execute("""
+                            SELECT 
+                                ca.AWARD_PART,
+                                ca.AWARD_CD,
+                                COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
+                                a.BADGE_IMG_PATH_FILE,
+                                ca.RANKING
+                            FROM pst_contest_award ca
+                            LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                            WHERE ca.CONTEST_ROUND = %s AND ca.ROUND_NO = %s
+                            ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
+                        """, (w_c_id, w_r_no))
+                        w_awards = cur.fetchall()
+                        w_awards_list = []
+                        for wa in w_awards:
+                            wb_file = wa.get('BADGE_IMG_PATH_FILE') or wa.get('AWARD_CD') or ''
+                            if wb_file and not wb_file.startswith('/') and not wb_file.startswith('http'):
+                                wb_fn = wb_file.split('/')[-1]
+                                if not wb_fn.lower().endswith(('.png', '.jpg', '.svg', '.jpeg')):
+                                    wb_fn += '.png'
+                                wb_url = f'/static/image/badge/{wb_fn}'
+                            else:
+                                wb_url = wb_file or '/static/image/badge/P001A101.png'
+
+                            wb_url = wb_url.replace('.webp', '.png')
+
+                            w_awards_list.append({
+                                'award_part': wa['AWARD_PART'],
+                                'award_part_nm': '전체부문' if wa['AWARD_PART'] == 'G002P001' else '품종부문',
+                                'award_cd': wa['AWARD_CD'],
+                                'award_nm': wa['AWARD_NM'],
+                                'badge_img': wb_url,
+                                'ranking': wa['RANKING']
+                            })
+                        w['awards'] = w_awards_list
 
                 conn.close()
                 return winners

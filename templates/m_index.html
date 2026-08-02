@@ -32,7 +32,17 @@
         <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
                 <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
-                {% if p.rank_candidate %}
+                <!-- 실물 메달/배지 이미지 목록 (좌측 상단, 전체부문 -> 품종부문 순서로 가로 나란히 배치) -->
+                {% if p.awards %}
+                    <div style="position: absolute; top: 0.4rem; left: 0.4rem; display: flex; align-items: center; gap: 0.25rem; z-index: 10;">
+                        {% for aw in p.awards %}
+                            {% set b_file = (aw.badge_img or aw.award_cd or 'P001A101.png')|string %}
+                            {% set b_raw = b_file if (b_file.startswith('/') or b_file.startswith('http')) else ('/static/image/badge/' ~ (b_file.split('/')[-1] ~ ('' if (b_file.endswith('.png') or b_file.endswith('.jpg')) else '.png'))) %}
+                            {% set b_url = b_raw.replace('.webp', '.png') %}
+                            <img src="{{ b_url }}" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));" alt="{{ aw.award_nm }}" title="{{ aw.award_nm }}">
+                        {% endfor %}
+                    </div>
+                {% elif p.rank_candidate and not is_closed %}
                     <div class="m-card-badge">🏆 {{ p.rank_candidate }}위 후보</div>
                 {% endif %}
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
