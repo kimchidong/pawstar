@@ -577,6 +577,7 @@ class PawStarService:
                     r.TOTAL_RANKING,
                     r.KIND_RANKING,
                     -- 호환용
+                    c.CONTEST_STAT AS contest_stat,
                     r.CONTEST_ROUND AS contest_id,
                     r.ROUND_NO AS round_no,
                     r.ENT_USER_ID AS user_id,
@@ -599,6 +600,7 @@ class PawStarService:
                      (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
+                LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
                 JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                 LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                 WHERE r.CONTEST_ROUND = %s

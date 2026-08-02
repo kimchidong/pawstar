@@ -426,8 +426,15 @@ function openDetailModal(post, isHallOfFame = false) {
     }
     post = window.postsDataStore[post.post_id];
 
-    // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정 (명예의 전당은 PST_CONTEST_AWARD 수치 100% 보존)
-    if (!isHallOfFame) {
+    // 회차 종료/마감 여부 판별
+    const isClosedRound = isHallOfFame || 
+                          post.contest_stat === 'G001C002' || 
+                          post.CONTEST_STAT === 'G001C002' || 
+                          post.is_ended === true || 
+                          post.IS_ENDED === true;
+
+    // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정 (종료 회차는 DB 확정 수치 100% 보존)
+    if (!isClosedRound) {
         const feedCard = document.getElementById(`post-card-${post.post_id}`);
         if (feedCard) {
             const cardLike = feedCard.querySelector('.like-count');
@@ -441,7 +448,7 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    // 명예의 전당 전용 팝업 조작: 점수 변동 이벤트 및 좋아요/댓글등록 영역 숨김 제어
+    // 마감된 회차 데이터 제어: 점수 변동 이벤트 차단, 하트/댓글입력 영역 숨김, 수치 박스 손모양 제거
     const commentFormContainer = document.getElementById('detailCommentFormContainer');
     const commentScoreNotice = document.getElementById('detailCommentScoreNotice');
     const heartLikeBtn = document.getElementById('detailHeartLikeBtn');
@@ -450,7 +457,7 @@ function openDetailModal(post, isHallOfFame = false) {
     let btnViewPopup = document.getElementById('detailBtnView');
     let btnCommentPopup = document.getElementById('detailBtnComment');
 
-    if (isHallOfFame) {
+    if (isClosedRound) {
         if (commentFormContainer) commentFormContainer.style.display = 'none';
         if (commentScoreNotice) commentScoreNotice.style.display = 'none';
         if (heartLikeBtn) heartLikeBtn.style.display = 'none';
@@ -473,7 +480,7 @@ function openDetailModal(post, isHallOfFame = false) {
             }
         });
         
-        // 일반 피드/대회목록 팝업 시만 자동 조회수 증가
+        // 진행 중인 회차 팝업 시만 자동 조회수 증가
         triggerEvent(post.post_id, 'view');
     }
 
@@ -669,7 +676,7 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     };
 
-    if (!isHallOfFame) {
+    if (!isClosedRound) {
         if (heartBtn) heartBtn.onclick = toggleLikeHandler;
         if (btnLike) btnLike.onclick = toggleLikeHandler;
     } else {

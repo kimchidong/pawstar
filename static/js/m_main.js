@@ -191,14 +191,20 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
-    // 명예의 전당 전용 팝업 조작: 점수 변동 이벤트 및 좋아요/댓글등록 영역 숨김 제어
+    // 회차 종료/마감 여부 판별
+    const isClosedRound = isHallOfFame || 
+                          postData.contest_stat === 'G001C002' || 
+                          postData.CONTEST_STAT === 'G001C002' || 
+                          postData.is_ended === true || 
+                          postData.IS_ENDED === true;
+
     const mCommentFormContainer = document.getElementById('mDetailCommentFormContainer');
     const mCommentScoreNotice = document.getElementById('mDetailCommentScoreNotice');
 
     const mBtnViewPopup = document.getElementById('mDetailBtnView');
     const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
 
-    if (isHallOfFame) {
+    if (isClosedRound) {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = 'none';
         [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
