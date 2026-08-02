@@ -1024,15 +1024,15 @@ body {
     font-size: 0.85rem;
     letter-spacing: 0.2px;
     z-index: 5;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     overflow: hidden;
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: default;
     user-select: none;
 }
 
-/* 럭셔리 은은한 광택 shimmer 레이어 */
+/* 럭셔리 은은한 크리스탈 광택 shimmer 레이어 */
 .winner-title-badge::before {
     content: '';
     position: absolute;
@@ -1043,7 +1043,7 @@ body {
     background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.35) 50%,
         rgba(255, 255, 255, 0) 100%
     );
     transform: rotate(25deg);
@@ -1060,58 +1060,66 @@ body {
     line-height: 1;
 }
 
-/* 🥇 1위 슈퍼스타 (Royal Gold & Champagne) */
+/* 🥇 1위 슈퍼스타 (Royal Gold Crystal Glass - 시스루 크리스탈) */
 .super-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(254, 240, 138, 0.95) 0%, rgba(245, 158, 11, 0.95) 50%, rgba(217, 119, 6, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(254, 240, 138, 0.38) 0%, rgba(245, 158, 11, 0.42) 50%, rgba(217, 119, 6, 0.45) 100%);
     color: #451a03;
-    border: 1.5px solid rgba(253, 230, 138, 0.95);
-    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.42), 
-                inset 0 1px 2px rgba(255, 255, 255, 0.8);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
+                0 2px 10px rgba(245, 158, 11, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 .super-star .winner-title-badge i {
     color: #78350f;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.6));
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
-/* 🥈 2위 라이징스타 (Platinum Silver & Pearl White) */
+/* 🥈 2위 라이징스타 (Platinum Silver Crystal Glass - 시스루 크리스탈) */
 .rising-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.95) 60%, rgba(203, 213, 225, 0.92) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(241, 245, 249, 0.38) 60%, rgba(203, 213, 225, 0.35) 100%);
     color: #0f172a;
-    border: 1.5px solid rgba(255, 255, 255, 0.95);
-    box-shadow: 0 4px 18px rgba(148, 163, 184, 0.38), 
-                inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
+                0 2px 10px rgba(148, 163, 184, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 .rising-star .winner-title-badge i {
-    color: #475569;
+    color: #334155;
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
-/* 🥉 3위 브라이트스타 (Rose Gold & Warm Amber) */
+/* 🥉 3위 브라이트스타 (Rose Gold Amber Crystal Glass - 시스루 크리스탈) */
 .bright-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(255, 237, 213, 0.95) 0%, rgba(251, 146, 60, 0.92) 60%, rgba(234, 88, 12, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(255, 237, 213, 0.4) 0%, rgba(251, 146, 60, 0.38) 60%, rgba(234, 88, 12, 0.42) 100%);
     color: #431407;
-    border: 1.5px solid rgba(254, 215, 170, 0.95);
-    box-shadow: 0 4px 18px rgba(234, 88, 12, 0.38), 
-                inset 0 1px 2px rgba(255, 255, 255, 0.7);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
+                0 2px 10px rgba(234, 88, 12, 0.22),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
 }
 .bright-star .winner-title-badge i {
     color: #7c2d12;
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
-/* 🐾 패밀리스타 (Noble Sapphire Violet & Crystal Magenta) */
+/* 🐾 패밀리스타 (Noble Sapphire Violet Crystal Glass - 시스루 크리스탈) */
 .winner-title-badge.family-star-badge,
 .podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge {
-    background: linear-gradient(135deg, rgba(243, 232, 255, 0.95) 0%, rgba(192, 132, 252, 0.92) 50%, rgba(147, 51, 234, 0.95) 100%);
+    background: linear-gradient(135deg, rgba(243, 232, 255, 0.4) 0%, rgba(192, 132, 252, 0.38) 50%, rgba(147, 51, 234, 0.42) 100%);
     color: #3b0764;
-    border: 1.5px solid rgba(233, 213, 255, 0.95);
-    box-shadow: 0 4px 18px rgba(168, 85, 247, 0.38), 
-                inset 0 1px 2px rgba(255, 255, 255, 0.75);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
+                0 2px 10px rgba(168, 85, 247, 0.22),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
 }
 .winner-title-badge.family-star-badge i,
 .podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge i {
     color: #581c87;
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
 /* 공동 수상 태그 (co-winner-tag) 우아한 통합 스타일 */
