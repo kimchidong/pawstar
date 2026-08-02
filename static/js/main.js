@@ -503,21 +503,39 @@ function openDetailModal(post, isHallOfFame = false) {
                  document.querySelector(`[data-post-id="${cleanId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${cleanId}"]`);
-    if (card) {
-        const btnView = card.querySelector('.btn-view');
-        if (btnView) {
-            btnView.classList.add('active');
-            const icon = btnView.querySelector('i');
+    if (!isClosedRound) {
+        if (card) {
+            const btnView = card.querySelector('.btn-view');
+            if (btnView) {
+                btnView.classList.add('active');
+                const icon = btnView.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        // 팝업 모달 내부의 조회수 버튼 박스도 진행 중 회차에서만 활성화(active) 하이라이트
+        const detailBtnViewPopup = document.getElementById('detailBtnView');
+        if (detailBtnViewPopup) {
+            detailBtnViewPopup.classList.add('active');
+            const icon = detailBtnViewPopup.querySelector('i');
             if (icon) icon.className = 'fa-solid fa-eye';
         }
-    }
-
-    // 팝업 모달 내부의 조회수 버튼 박스도 조회 완료(active) 상태로 테두리/배경 즉시 하이라이트
-    const detailBtnViewPopup = document.getElementById('detailBtnView');
-    if (detailBtnViewPopup) {
-        detailBtnViewPopup.classList.add('active');
-        const icon = detailBtnViewPopup.querySelector('i');
-        if (icon) icon.className = 'fa-solid fa-eye';
+    } else {
+        // 종료된 회차인 경우 DB 저장이 진행되지 않으므로 active 클래스를 제거하고 비활성화 상태 유지
+        const detailBtnViewPopup = document.getElementById('detailBtnView');
+        if (detailBtnViewPopup) {
+            detailBtnViewPopup.classList.remove('active');
+            const icon = detailBtnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-eye';
+        }
+        if (card) {
+            const btnView = card.querySelector('.btn-view');
+            if (btnView) {
+                btnView.classList.remove('active');
+                const icon = btnView.querySelector('i');
+                if (icon) icon.className = 'fa-regular fa-eye';
+            }
+        }
     }
 
     // 데이터 채우기 (팝업용 고화질 이미지 바인딩)

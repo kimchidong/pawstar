@@ -205,8 +205,11 @@ body {
 /* Contest Hero Banner & Glassmorphic Live Contest Block */
 .contest-hero {
     width: 1280px;
+    height: 340px;
+    min-height: 340px;
+    max-height: 340px;
     margin: 2rem auto;
-    padding: 3.5rem 3rem;
+    padding: 2.5rem 3rem;
     background-position: center center !important;
     background-size: cover !important;
     background-repeat: no-repeat !important;
@@ -215,6 +218,9 @@ body {
     position: relative;
     overflow: hidden;
     color: #ffffff;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
 .hero-round-badge {

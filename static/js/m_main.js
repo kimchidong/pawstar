@@ -315,12 +315,33 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                   document.querySelector(`[data-post-id="${mCleanId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
-    if (mCard) {
-        const mBtnView = mCard.querySelector('.btn-view');
-        if (mBtnView) {
-            mBtnView.classList.add('active');
-            const icon = mBtnView.querySelector('i');
+    if (!isClosedRound) {
+        if (mCard) {
+            const mBtnView = mCard.querySelector('.btn-view');
+            if (mBtnView) {
+                mBtnView.classList.add('active');
+                const icon = mBtnView.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-eye';
+            }
+        }
+        if (mBtnViewPopup) {
+            mBtnViewPopup.classList.add('active');
+            const icon = mBtnViewPopup.querySelector('i');
             if (icon) icon.className = 'fa-solid fa-eye';
+        }
+    } else {
+        if (mCard) {
+            const mBtnView = mCard.querySelector('.btn-view');
+            if (mBtnView) {
+                mBtnView.classList.remove('active');
+                const icon = mBtnView.querySelector('i');
+                if (icon) icon.className = 'fa-regular fa-eye';
+            }
+        }
+        if (mBtnViewPopup) {
+            mBtnViewPopup.classList.remove('active');
+            const icon = mBtnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-eye';
         }
     }
 

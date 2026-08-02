@@ -83,24 +83,12 @@ def run_seed():
 
             print("✅ 사용자(pst_user) 시딩 완료!")
 
-            # 2. 테마 (pst_theme) 시딩
-            themes = [
-                ('T001', '06', '🌊 제1회 썸머 파라다이스 펫 콘테스트', '무더위를 싹 씻어줄 시원하고 러블리한 썸머 펫 스타 🏖️', '/static/image/banner/banner1.jpg'),
-                ('T002', '07', '🏖️ 제2회 한여름 밤의 바캉스 펫 챔피언십', '뜨거운 여름 열기보다 더 핫한 인플루언서 펫 축제 ⭐', '/static/image/banner/banner2.jpg'),
-                ('T003', '08', '🍁 제3회 가을 힐링 & 감성 펫스타 콘테스트', '마음까지 넉넉해지는 풍성한 가을 둥글둥글 귀요미들 🍂', '/static/image/banner/banner3.jpg'),
-            ]
-            for t_cd, mnth, t_nm, t_ment, t_banner in themes:
-                cur.execute("""
-                    INSERT INTO pst_theme (THEME_CD, MNTH, THEME_NM, THEME_MENT, BANNER_IMG_FILE_PATH)
-                    VALUES (%s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE MNTH=%s, THEME_NM=%s, THEME_MENT=%s, BANNER_IMG_FILE_PATH=%s
-                """, (t_cd, mnth, t_nm, t_ment, t_banner, mnth, t_nm, t_ment, t_banner))
-
+            # 2. 테마 (pst_theme)는 원본 12종 표준 테마 유지 (T001~T012)
             # 3. 콘테스트 회차 (pst_contest) 시딩 (지난 회차 2개 + 진행 중 회차 1개)
             contests = [
-                (1, 'T001', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'G001C002'), # 지난 회차 1 (종료)
-                (2, 'T002', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'G001C002'), # 지난 회차 2 (종료)
-                (3, 'T003', '2026-08-01 00:00:00', '2026-08-31 23:59:59', 'G001C001'), # 현재 진행 회차 3 (진행중)
+                (1, 'T006', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'G001C002'), # 지난 회차 1 (청량 힐링)
+                (2, 'T007', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'G001C002'), # 지난 회차 2 (썸머 파라다이스)
+                (3, 'T008', '2026-08-01 00:00:00', '2026-08-31 23:59:59', 'G001C001'), # 현재 진행 회차 3 (한여름 밤의 바캉스)
             ]
             cur.execute("DELETE FROM pst_contest WHERE CONTEST_ROUND IN (1, 2, 3);")
             for c_round, t_cd, st_dt, ed_dt, stat in contests:
@@ -109,7 +97,7 @@ def run_seed():
                     VALUES (%s, %s, %s, %s, %s)
                 """, (c_round, t_cd, st_dt, ed_dt, stat))
 
-            print("✅ 콘테스트 회차(pst_contest) 시딩 완료! (1회차: 종료, 2회차: 종료, 3회차: 진행중)")
+            print("✅ 콘테스트 회차(pst_contest) 시딩 완료! (1회차: T006, 2회차: T007, 3회차: T008)")
 
             # 4. 품종 정보 (pst_pet_kind) 확보
             cur.execute("SELECT KIND_CD, KIND_NM FROM pst_pet_kind;")
