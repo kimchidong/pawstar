@@ -15,10 +15,9 @@
                 {% for c in contests %}
                     {% set c_id = c.CONTEST_ROUND or c.contest_id %}
                     {% set c_title = c.THEME_NM or c.title %}
-                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or ('진행중' if (c.CONTEST_STAT == 'G001C001') else '종료') %}
                     {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
                     <option value="{{ c_id }}" {{ 'selected' if c_id == cur_id }}>
-                        제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm }})
+                        제{{ c_id }}회 {{ c_title }}
                     </option>
                 {% endfor %}
             </select>
