@@ -103,26 +103,55 @@
                 </div>
 
                 <!-- 미리보기 캔버스 (넉넉한 전폭 공간 제공으로 모달 깨짐 완전 방지) -->
-                <div style="background: var(--bg-primary); border: 2px dashed var(--border-light); border-radius: var(--radius-lg); padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 480px; width: 100%;">
-                    <!-- 1. 목록 카드 미리보기 (Feed List Card Preview) -->
-                    <div id="previewListContainer" style="width: 100%; max-width: 320px;">
-                        <div class="post-card" style="box-shadow: 0 12px 30px rgba(0,0,0,0.12); cursor: pointer;" onclick="switchPreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
+                <div style="background: var(--bg-primary); border: 2px dashed var(--border-light); border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; display: flex; align-items: center; justify-content: center; min-height: 480px; width: 100%;">
+                    <!-- 1. 목록 카드 미리보기 (Feed List Card Preview - 메인 피드 카드 100% 동일 규격) -->
+                    <div id="previewListContainer" style="width: 100%; max-width: 340px;">
+                        <div class="post-card" style="box-shadow: 0 15px 35px rgba(0,0,0,0.12); cursor: pointer;" onclick="switchPreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
                             <div class="card-media">
                                 <img id="previewCardImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
+                                <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 전체 1위 후보</div>
                             </div>
+
                             <div class="card-body">
                                 <div class="author-info">
-                                    <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
-                                    <div class="author-detail">
-                                        <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
-                                        <div class="pet-tag" id="previewCardPetTag">🐕 강아지 뽀삐</div>
+                                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
+                                        <div class="author-detail">
+                                            <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                            <div class="pet-tag" id="previewCardPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
+                                                <span style="color: #e11d48; font-weight: 800; white-space: nowrap;">🐕 강아지</span>
+                                                <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">우리 아이</span>
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+
+                                <h3 class="post-title" id="previewCardTitle">자랑 제목이 여기에 표시됩니다</h3>
+                                <p class="post-desc" id="previewCardDesc">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
+                                    <span style="font-size: 0.78rem; color: var(--text-muted);" id="previewCardDate">
+                                        방금 전
+                                    </span>
                                     <div class="card-total-score">
                                         <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
                                     </div>
                                 </div>
-                                <h3 class="post-title" id="previewCardTitle">자랑 제목이 여기에 표시됩니다</h3>
-                                <p class="post-desc" id="previewCardDesc">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+
+                                <div class="card-actions">
+                                    <div class="action-btn btn-view" title="조회수">
+                                        <i class="fa-regular fa-eye"></i>
+                                        <span class="view-count">0</span>
+                                    </div>
+                                    <div class="action-btn btn-like" title="좋아요 수">
+                                        <i class="fa-regular fa-heart"></i>
+                                        <span class="like-count">0</span>
+                                    </div>
+                                    <div class="action-btn btn-comment" title="댓글 수">
+                                        <i class="fa-regular fa-comment"></i>
+                                        <span class="comment-count">0</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div style="text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
@@ -130,27 +159,72 @@
                         </div>
                     </div>
 
-                    <!-- 2. 클릭 팝업 모달 미리보기 (Full Size Detail Modal Preview) -->
+                    <!-- 2. 클릭 팝업 모달 미리보기 (Full Size Detail Modal Preview - 실제 상세 레이어 팝업 100% 동일 규격) -->
                     <div id="previewModalContainer" style="width: 100%; max-width: 860px; display: none;">
-                        <div class="modal-content detail-modal-content" style="width: 100%; max-width: 860px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; background: #ffffff;">
-                            <div class="detail-modal-body" style="height: 480px;">
-                                <div class="detail-media-container" style="height: 100%;">
+                        <div class="modal-content detail-modal-content" style="width: 100%; max-width: 860px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; background: #ffffff; position: relative;">
+                            <div class="detail-modal-body" style="min-height: 460px;">
+                                <div class="detail-media-container" style="position: relative;">
                                     <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
+                                    <div class="rank-ribbon rank-1" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10;"><i class="fa-solid fa-medal"></i> 전체 1위 후보</div>
                                 </div>
-                                <div class="detail-info-container" style="padding: 2rem;">
-                                    <div>
-                                        <div class="author-info" style="margin-bottom: 1rem;">
+
+                                <div class="detail-info-container" style="padding: 1.5rem 1.8rem;">
+                                    <div class="author-info" style="margin-bottom: 1rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.65rem;">
                                             <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
                                             <div class="author-detail">
                                                 <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
-                                                <div class="pet-tag" id="previewModalPetTag">🐕 강아지 뽀삐</div>
+                                                <div class="pet-tag" id="previewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
+                                                    <span style="color: #e11d48; font-weight: 800; white-space: nowrap;">🐕 강아지</span>
+                                                    <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">우리 아이</span>
+                                                </div>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <h2 class="detail-title" id="previewModalTitle" style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-primary);">자랑 제목이 여기에 표시됩니다</h2>
+                                    <p class="detail-content" id="previewModalDesc" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                                    
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                                        <span style="font-size: 0.82rem; color: var(--text-muted);" id="previewModalDate">
+                                            방금 전
+                                        </span>
+                                        <div style="display: flex; align-items: center; gap: 0.6rem;">
                                             <div class="card-total-score">
                                                 <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
                                             </div>
+                                            <button type="button" class="btn-heart-action" title="좋아요" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </button>
                                         </div>
-                                        <h2 class="detail-title" id="previewModalTitle" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.6rem; color: var(--text-primary);">자랑 제목이 여기에 표시됩니다</h2>
-                                        <p class="detail-content" id="previewModalDesc" style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                                    </div>
+
+                                    <div class="card-actions detail-actions">
+                                        <div class="action-btn btn-view" title="조회수">
+                                            <i class="fa-regular fa-eye"></i>
+                                            <span class="view-count">0</span>
+                                        </div>
+                                        <div class="action-btn btn-like" title="좋아요 수">
+                                            <i class="fa-regular fa-heart"></i>
+                                            <span class="like-count">0</span>
+                                        </div>
+                                        <div class="action-btn btn-comment" title="댓글 수">
+                                            <i class="fa-regular fa-comment"></i>
+                                            <span class="comment-count">0</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
+                                        <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                                            <span>💬 한줄 댓글 <span style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">작성 시 +10점 획득!</span>
+                                        </h4>
+                                        <div style="display: flex; gap: 0.4rem;">
+                                            <input type="text" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" disabled style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); background: #f8fafc;">
+                                            <button type="button" disabled style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; opacity: 0.7;">
+                                                등록
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -224,11 +298,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
-        const petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
+        let petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
         const title = inputTitle ? inputTitle.value.trim() : '';
         const content = textareaContent ? textareaContent.value.trim() : '';
 
-        const petTagText = petName ? `${petType} ${petName}` : petType;
+        let petTagHTML = '';
+        if (petName) {
+            petTagHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${petType}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petName}</span>`;
+        } else {
+            petTagHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${petType}</span>`;
+        }
+
         const titleText = title || '자랑 제목이 여기에 표시됩니다';
         const descText = content || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
 
@@ -239,8 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const previewCardDesc = document.getElementById('previewCardDesc');
         const previewModalDesc = document.getElementById('previewModalDesc');
 
-        if (previewCardPetTag) previewCardPetTag.textContent = petTagText;
-        if (previewModalPetTag) previewModalPetTag.textContent = petTagText;
+        if (previewCardPetTag) previewCardPetTag.innerHTML = petTagHTML;
+        if (previewModalPetTag) previewModalPetTag.innerHTML = petTagHTML;
         if (previewCardTitle) previewCardTitle.textContent = titleText;
         if (previewModalTitle) previewModalTitle.textContent = titleText;
         if (previewCardDesc) previewCardDesc.textContent = descText;
