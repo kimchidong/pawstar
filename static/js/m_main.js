@@ -126,7 +126,20 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     
     const mPetTagEl = document.getElementById('mDetailPetTag');
     if (mPetTagEl) {
-        const mKindNm = postData.KIND_NM || postData.pet_type || '🐕 강아지';
+        let mKindNm = postData.KIND_NM || postData.pet_type || '반려동물';
+        if (!/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰]/.test(mKindNm)) {
+            let icon = '🐾';
+            if (mKindNm.includes('강아지') || mKindNm.includes('개')) icon = '🐕';
+            else if (mKindNm.includes('고양이')) icon = '🐈';
+            else if (mKindNm.includes('햄스터')) icon = '🐹';
+            else if (mKindNm.includes('앵무새') || mKindNm.includes('새')) icon = '🦜';
+            else if (mKindNm.includes('토끼')) icon = '🐇';
+            else if (mKindNm.includes('고슴도치')) icon = '🦔';
+            else if (mKindNm.includes('파충류')) icon = '🦎';
+            else if (mKindNm.includes('어류') || mKindNm.includes('관상어')) icon = '🐠';
+            else if (mKindNm.includes('페럿')) icon = '🦦';
+            mKindNm = `${icon} ${mKindNm}`;
+        }
         const mPetNm = postData.PET_NM || postData.pet_name || '';
         if (mPetNm) {
             mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${mPetNm}</span>`;

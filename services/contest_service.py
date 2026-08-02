@@ -68,9 +68,36 @@ class PawStarService:
                 cur.execute("SELECT COUNT(*) + 1 AS next_id FROM pst_contest_round")
                 r = cur.fetchone()
                 conn.close()
-                return r['next_id'] if r else 1
         except Exception:
             return 1
+
+    def format_pet_kind(self, kind_nm):
+        if not kind_nm:
+            return '🐾 반려동물'
+        nm = str(kind_nm).strip()
+        if any(c in nm for c in ['🐕', '🐈', '🐹', '🦜', '🐇', '🦔', '🦎', '🐠', '🦦', '🐾', '🐶', '🐱', '🐰']):
+            return nm
+        if '강아지' in nm or '개' in nm:
+            icon = '🐕'
+        elif '고양이' in nm:
+            icon = '🐈'
+        elif '햄스터' in nm:
+            icon = '🐹'
+        elif '앵무새' in nm or '새' in nm or '조류' in nm:
+            icon = '🦜'
+        elif '토끼' in nm:
+            icon = '🐇'
+        elif '고슴도치' in nm:
+            icon = '🦔'
+        elif '파충류' in nm or '도마뱀' in nm:
+            icon = '🦎'
+        elif '어류' in nm or '물고기' in nm or '관상어' in nm:
+            icon = '🐠'
+        elif '페럿' in nm:
+            icon = '🦦'
+        else:
+            icon = '🐾'
+        return f"{icon} {nm}"
 
     def get_pet_kinds(self):
         conn = self.get_db_connection()
@@ -462,6 +489,9 @@ class PawStarService:
                         dt_str = str(dt_val or '')
                     p['ENT_DT'] = dt_str
                     p['created_at'] = dt_str
+                    k_fmt = self.format_pet_kind(p.get('KIND_NM') or p.get('pet_type'))
+                    p['KIND_NM'] = k_fmt
+                    p['pet_type'] = k_fmt
 
                 my_post_count = len(my_posts)
                 total_score = sum(p.get('SCORE', 0) for p in my_posts)
@@ -862,6 +892,10 @@ class PawStarService:
                     else:
                         row['rank_candidate'] = None
                         row['is_co_rank'] = False
+
+                    k_formatted = self.format_pet_kind(row.get('KIND_NM') or row.get('pet_type'))
+                    row['KIND_NM'] = k_formatted
+                    row['pet_type'] = k_formatted
 
                     row['awards'] = awards_map.get(row['ROUND_NO'], [])
                     row['actions'] = {

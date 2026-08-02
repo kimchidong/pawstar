@@ -536,7 +536,20 @@ function openDetailModal(post, isHallOfFame = false) {
 
     const petTagEl = document.getElementById('detailPetTag');
     if (petTagEl) {
-        const kindNm = post.KIND_NM || post.pet_type || '🐕 강아지';
+        let kindNm = post.KIND_NM || post.pet_type || '반려동물';
+        if (!/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰]/.test(kindNm)) {
+            let icon = '🐾';
+            if (kindNm.includes('강아지') || kindNm.includes('개')) icon = '🐕';
+            else if (kindNm.includes('고양이')) icon = '🐈';
+            else if (kindNm.includes('햄스터')) icon = '🐹';
+            else if (kindNm.includes('앵무새') || kindNm.includes('새')) icon = '🦜';
+            else if (kindNm.includes('토끼')) icon = '🐇';
+            else if (kindNm.includes('고슴도치')) icon = '🦔';
+            else if (kindNm.includes('파충류')) icon = '🦎';
+            else if (kindNm.includes('어류') || kindNm.includes('관상어')) icon = '🐠';
+            else if (kindNm.includes('페럿')) icon = '🦦';
+            kindNm = `${icon} ${kindNm}`;
+        }
         const petNm = post.PET_NM || post.pet_name || '';
         if (petNm) {
             petTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${kindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petNm}</span>`;
