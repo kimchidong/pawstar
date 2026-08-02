@@ -164,7 +164,19 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             return partA.localeCompare(partB);
         });
 
+        const kindNm = postData.KIND_NM || postData.pet_type || '';
+        let petIconClass = 'fa-solid fa-paw';
+        if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
+        else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+        else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
+        else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+        else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
+
         if (mBadgeEl) {
+            mBadgeEl.style.justifyContent = 'flex-end';
+            mBadgeEl.style.right = '0.5rem';
+            mBadgeEl.style.left = 'auto';
+
             let html = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; flex-wrap: wrap;">';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
@@ -179,7 +191,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                     html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타${rankSuffix}</div>`;
+                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
                 }
             });
             html += '</div>';
@@ -188,13 +200,25 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     } else {
         if (mBadgeEl) {
             if (postData.rank_candidate) {
+                mBadgeEl.style.justifyContent = 'flex-start';
+                mBadgeEl.style.left = '0.5rem';
+                mBadgeEl.style.right = 'auto';
+
+                const kindNm = postData.KIND_NM || postData.pet_type || '';
+                let petIconClass = 'fa-solid fa-paw';
+                if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
+                else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+                else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
+                else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+                else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
+
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
-                const iconStr = isFamily ? '🛡️' : '🏆';
+                const iconHtml = isFamily ? `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>` : '🏆';
                 const prefix = (postData.is_co_rank ? '공동 ' : '') + catPrefix;
-                mBadgeEl.innerHTML = `<div class="m-card-badge">${iconStr} ${prefix}${postData.rank_candidate}위 후보</div>`;
+                mBadgeEl.innerHTML = `<div class="m-card-badge">${iconHtml} ${prefix}${postData.rank_candidate}위 후보</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
             }

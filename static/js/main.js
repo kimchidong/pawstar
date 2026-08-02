@@ -643,7 +643,19 @@ function openDetailModal(post, isHallOfFame = false) {
             return partA.localeCompare(partB);
         });
 
+        const kindNm = post.KIND_NM || post.pet_type || '';
+        let petIconClass = 'fa-solid fa-paw';
+        if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
+        else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+        else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
+        else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+        else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
+
         if (badgeEl) {
+            badgeEl.style.justifyContent = 'flex-end';
+            badgeEl.style.right = '0.75rem';
+            badgeEl.style.left = 'auto';
+
             let html = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; flex-wrap: wrap;">';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
@@ -658,7 +670,7 @@ function openDetailModal(post, isHallOfFame = false) {
                     html += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    html += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타${rankSuffix}</span></div>`;
+                    html += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>패밀리스타${rankSuffix}</span></div>`;
                 }
             });
             html += '</div>';
@@ -667,11 +679,23 @@ function openDetailModal(post, isHallOfFame = false) {
     } else {
         if (badgeEl) {
             if (post.rank_candidate && !isClosedRound) {
+                badgeEl.style.justifyContent = 'flex-start';
+                badgeEl.style.left = '0.75rem';
+                badgeEl.style.right = 'auto';
+
+                const kindNm = post.KIND_NM || post.pet_type || '';
+                let petIconClass = 'fa-solid fa-paw';
+                if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
+                else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
+                else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
+                else if (kindNm.includes('앵무새') || kindNm.includes('새')) petIconClass = 'fa-solid fa-crow';
+                else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
+
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
-                const iconClass = isFamily ? 'fa-solid fa-shield-halved' : 'fa-solid fa-medal';
+                const iconClass = isFamily ? petIconClass : 'fa-solid fa-medal';
                 const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
                 if (post.rank_candidate === 1) {

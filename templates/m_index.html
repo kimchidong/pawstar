@@ -33,6 +33,8 @@
         <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
                 <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
+                {% set p_kind = p.KIND_NM or p.pet_type or '' %}
+                {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))) %}
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
                     <div style="position: absolute; top: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.3rem; z-index: 10; pointer-events: none;">
@@ -48,7 +50,7 @@
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
                                 <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
                             {% else %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span> 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -56,8 +58,7 @@
                     {% set is_family = (pet_type and pet_type != 'all') %}
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
-                    {% set rank_icon_str = '🛡️' if is_family else '🏆' %}
-                    <div class="m-card-badge">{{ rank_icon_str }} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
+                    <div class="m-card-badge">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
             </div>
