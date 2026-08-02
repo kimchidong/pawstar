@@ -873,7 +873,31 @@ class PawStarService:
             'new_score': row['SCORE']
         }
 
+    def is_contest_closed(self, contest_id):
+        """ 백엔드 서버사이드 검증: 특정 회차가 마감/종료(G001C002) 상태인지 확인 """
+        conn = self.get_db_connection()
+        if not conn:
+            return False
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT CONTEST_STAT FROM pst_contest
+                    WHERE CONTEST_ROUND = %s
+                """, (contest_id,))
+                r = cur.fetchone()
+                conn.close()
+                if r and r.get('CONTEST_STAT') == 'G001C002':
+                    return True
+                return False
+        except Exception as e:
+            print("is_contest_closed check error:", e)
+            if conn: conn.close()
+            return False
+
     def increase_view_count(self, contest_id, target_id, view_user_id=None):
+        if self.is_contest_closed(contest_id):
+            return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': True, 'is_ended': True}
+
         conn = self.get_db_connection()
         if not conn:
             return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
@@ -934,6 +958,9 @@ class PawStarService:
             return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
 
     def toggle_like(self, contest_id, target_id, like_user_id):
+        if self.is_contest_closed(contest_id):
+            return {'success': False, 'is_ended': True, 'message': '마감(종료)된 콘테스트 회차에는 좋아요를 누를 수 없습니다.'}
+
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
@@ -1001,6 +1028,9 @@ class PawStarService:
                 contest_id = int(parts[0])
                 target_id = parts[1]
 
+        if self.is_contest_closed(contest_id):
+            return {'success': False, 'is_ended': True, 'message': '마감(종료)된 콘테스트 회차에는 평가 이벤트에 참여할 수 없습니다.'}
+
         if event_type == 'view':
             res_vw = self.increase_view_count(contest_id, target_id, view_user_id=user_id)
             return {
@@ -1020,6 +1050,9 @@ class PawStarService:
         return {'success': True}
 
     def add_comment(self, contest_id, target_id, cmt_user_id, comment_text):
+        if self.is_contest_closed(contest_id):
+            return {'success': False, 'is_ended': True, 'message': '마감(종료)된 콘테스트 회차에는 댓글을 추가할 수 없습니다.'}
+
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
