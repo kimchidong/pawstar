@@ -63,7 +63,7 @@
                     </div>
                     <div style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.35rem;">
                         <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);" alt="집사 프로필">
-                        <span>집사: <strong>{{ w.NK_NM or w.user_nickname }}</strong></span>
+                        <span><strong style="color: var(--text-primary); font-weight: 800;">{{ w.NK_NM or w.user_nickname }}</strong></span>
                     </div>
                     <div style="font-size: 0.73rem; color: var(--text-secondary); font-weight: 700; display: flex; align-items: center; gap: 0.65rem; margin-top: 0.25rem; flex-wrap: wrap;">
                         <span>👀 {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span>
