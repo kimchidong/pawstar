@@ -484,6 +484,18 @@ function openDetailModal(post, isHallOfFame = false) {
         triggerEvent(post.post_id, 'view');
     }
 
+    // 출전 포기(삭제) 버튼 제어 (진행 중인 회차 + 본인 출전물인 경우 노출)
+    const deleteBtn = document.getElementById('detailDeleteBtn');
+    if (deleteBtn) {
+        const currentUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
+        if (!isClosedRound && currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
+            deleteBtn.style.display = 'inline-flex';
+        } else {
+            deleteBtn.style.display = 'none';
+        }
+    }
+
     const cleanId = String(post.post_id);
     const rawEntId = cleanId.replace(/^\d+_/, '');
     const card = document.getElementById(`post-card-${cleanId}`) || 
@@ -1008,9 +1020,49 @@ async function toggleLikeCard(btn, postId) {
     return false;
 }
 
+async function deleteCurrentPost() {
+    const postId = window.currentDetailPostId;
+    if (!postId) {
+        showToast('게시물 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    if (!confirm('정말 이 출전물을 포기(삭제)하시겠습니까?\n삭제 후에는 해당 출전물과 관련 점수가 모두 제거되며 복구할 수 없습니다.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/post/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ post_id: postId })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('🗑️ 출전이 성공적으로 포기(삭제)되었습니다.');
+            closeDetailModal();
+            const cardEl = document.getElementById(`post-card-${postId}`);
+            if (cardEl) {
+                cardEl.remove();
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            showToast(result.message || '출전 포기 처리 중 오류가 발생했습니다.', 'error');
+        }
+    } catch (e) {
+        console.error('deleteCurrentPost error:', e);
+        showToast('서버 통신 중 오류가 발생했습니다.', 'error');
+    }
+}
+
 // 전역 스코프 바인딩
 window.openDetailModal = openDetailModal;
 window.closeDetailModal = closeDetailModal;
+window.deleteCurrentPost = deleteCurrentPost;
 window.triggerEvent = triggerEvent;
 window.toggleLikeCard = toggleLikeCard;
 window.submitDetailComment = submitDetailComment;

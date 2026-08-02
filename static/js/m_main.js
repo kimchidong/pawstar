@@ -97,6 +97,26 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     postData.post_id = postData.post_id || postData.POST_ID || ((postData.CONTEST_ROUND || postData.contest_id) && (postData.ROUND_NO || postData.round_no) ? `${postData.CONTEST_ROUND || postData.contest_id}_${postData.ROUND_NO || postData.round_no}` : (postData.ROUND_NO || postData.round_no));
     postData.title = postData.title || postData.TITLE || '';
     postData.content = postData.content || postData.CONTS || postData.conts || '';
+    window.currentMobileDetailPostId = postData.post_id;
+
+    // 회차 마감 여부 판별
+    const isClosedRound = isHallOfFame || 
+                          postData.contest_stat === 'G001C002' || 
+                          postData.CONTEST_STAT === 'G001C002' || 
+                          postData.is_ended === true || 
+                          postData.IS_ENDED === true;
+
+    // 모바일 출전 포기(삭제) 버튼 제어
+    const mDeleteBtn = document.getElementById('mDetailDeleteBtn');
+    if (mDeleteBtn) {
+        const currentUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
+        if (!isClosedRound && currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
+            mDeleteBtn.style.display = 'inline-flex';
+        } else {
+            mDeleteBtn.style.display = 'none';
+        }
+    }
 
     const mPopupSrc = postData.popup_image_path || postData.IMAGE_PATH || postData.image_path || postData.media_url || 
         ((postData.file_path && postData.list_file_name) ? (postData.file_path.endsWith('/') ? postData.file_path : postData.file_path + '/') + postData.list_file_name : '');
@@ -455,3 +475,46 @@ function submitMobileDetailComment() {
         console.error('모바일 댓글 작성 오류:', err);
     });
 }
+
+async function deleteMobileCurrentPost() {
+    const postId = window.currentMobileDetailPostId;
+    if (!postId) {
+        if (typeof showToast === 'function') showToast('게시물 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    if (!confirm('정말 이 출전물을 포기(삭제)하시겠습니까?\n삭제 후에는 해당 출전물과 관련 점수가 모두 제거되며 복구할 수 없습니다.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/post/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ post_id: postId })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            if (typeof showToast === 'function') showToast('🗑️ 출전이 성공적으로 포기(삭제)되었습니다.');
+            closeMobileDetailModal();
+            const cardEl = document.getElementById(`m-post-card-${postId}`);
+            if (cardEl) {
+                cardEl.remove();
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            if (typeof showToast === 'function') showToast(result.message || '출전 포기 처리 중 오류가 발생했습니다.', 'error');
+        }
+    } catch (e) {
+        console.error('deleteMobileCurrentPost error:', e);
+        if (typeof showToast === 'function') showToast('서버 통신 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+window.openMobileDetailModal = openMobileDetailModal;
+window.closeMobileDetailModal = closeMobileDetailModal;
+window.deleteMobileCurrentPost = deleteMobileCurrentPost;

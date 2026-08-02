@@ -539,6 +539,87 @@ class PawStarService:
             'TITLE': title
         }
 
+    def delete_contest_entry(self, post_id, user_id):
+        """ 콘테스트 출전물 삭제 (출전 포기) """
+        conn = self.get_db_connection()
+        if not conn:
+            return {'success': False, 'message': 'DB 연결 실패'}
+
+        try:
+            contest_round = None
+            round_no = None
+            ent_user_id = None
+
+            post_id_str = str(post_id)
+            if '_' in post_id_str:
+                parts = post_id_str.split('_', 1)
+                contest_round = parts[0]
+                if parts[1].isdigit():
+                    round_no = int(parts[1])
+                else:
+                    ent_user_id = parts[1]
+            else:
+                ent_user_id = post_id_str
+
+            with conn.cursor() as cur:
+                # 1. 해당 출전물 정보 조회
+                if contest_round and round_no:
+                    cur.execute("""
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        FROM pst_contest_round 
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                    """, (contest_round, round_no))
+                elif contest_round and ent_user_id:
+                    cur.execute("""
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        FROM pst_contest_round 
+                        WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
+                    """, (contest_round, ent_user_id))
+                else:
+                    cur.execute("""
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        FROM pst_contest_round 
+                        WHERE ENT_USER_ID = %s
+                    """, (ent_user_id,))
+                
+                entry = cur.fetchone()
+                if not entry:
+                    conn.close()
+                    return {'success': False, 'message': '존재하지 않거나 이미 삭제된 출전물입니다.'}
+
+                c_round = entry['CONTEST_ROUND']
+                r_no = entry['ROUND_NO']
+                owner_id = entry['ENT_USER_ID']
+
+                # 2. 본인 소유 확인 (단, 관리자인 경우 허용)
+                if owner_id != user_id and user_id != 'admin':
+                    conn.close()
+                    return {'success': False, 'message': '본인의 출전물만 포기(삭제)할 수 있습니다.'}
+
+                # 3. 회차 마감 여부 검증 (종료된 회차는 삭제 불가)
+                cur.execute("""
+                    SELECT CONTEST_STAT FROM pst_contest WHERE CONTEST_ROUND = %s
+                """, (c_round,))
+                c_info = cur.fetchone()
+                if c_info and c_info.get('CONTEST_STAT') == 'G001C002':
+                    conn.close()
+                    return {'success': False, 'message': '이미 마감(종료)된 회차의 출전물은 포기(삭제)할 수 없습니다.'}
+
+                # 4. 관련 하위 레코드 및 출전물 삭제
+                cur.execute("DELETE FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+
+                conn.commit()
+                conn.close()
+                return {'success': True, 'message': '출전이 성공적으로 포기(삭제)되었습니다.', 'post_id': post_id_str, 'contest_round': c_round, 'round_no': r_no}
+        except Exception as e:
+            print("delete_contest_entry error:", e)
+            if conn:
+                conn.close()
+            return {'success': False, 'message': str(e)}
+
     def get_posts(self, contest_id=None, pet_type='all', sort_type='latest', search_q='', search_query='', current_user_id=None, user_id=None, page=1, per_page=12, **kwargs):
         search_q = search_query or search_q
         current_user_id = user_id or current_user_id

@@ -779,6 +779,25 @@ def post_event():
         print("post_event 오류:", e)
         return jsonify({'success': False, 'message': f'이벤트 처리 중 오류: {str(e)}'}), 200
 
+@app.route('/api/post/delete', methods=['POST'])
+def delete_post_entry():
+    """ 출전물 삭제 (출전 포기) API """
+    try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({'success': False, 'message': '로그인이 필요합니다. 먼저 로그인해 주세요! 🐾', 'require_login': True}), 401
+
+        data = request.get_json() or {}
+        post_id = data.get('post_id')
+        if not post_id:
+            return jsonify({'success': False, 'message': '게시물 식별자(post_id)가 필요합니다.'}), 400
+
+        res = service.delete_contest_entry(post_id, user_id)
+        return jsonify(res)
+    except Exception as e:
+        print("delete_post_entry 오류:", e)
+        return jsonify({'success': False, 'message': f'출전 포기 처리 중 오류: {str(e)}'}), 500
+
 @app.route('/api/post/user_actions/<path:post_id>', methods=['GET'])
 def get_user_post_actions(post_id):
     """ 특정 게시물에 대해 사용자가 4가지 영향력(조회, 좋아요, 댓글, 공유)을 반영했는지 여부 조회 """
