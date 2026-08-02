@@ -937,18 +937,19 @@ body {
 
 .podium-card.super-star {
     border-color: var(--accent-gold);
-    background: linear-gradient(180deg, #fffdf5 0%, #ffffff 100%);
+    background: #ffffff;
     box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2);
     transform: scale(1.05);
 }
 
 .podium-card.rising-star {
     border-color: var(--accent-silver);
+    background: #ffffff;
 }
 
 .podium-card.bright-star {
     border-color: var(--accent-bronze);
-    background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
+    background: #ffffff;
 }
 
 .crown-badge {
@@ -961,8 +962,11 @@ body {
     z-index: 3;
     background: transparent;
     border: none;
+    border-radius: 0;
+    padding: 0;
     box-shadow: none;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+    filter: drop-shadow(0 0 2.5px rgba(255, 255, 255, 0.95)) 
+            drop-shadow(0 0 4.5px rgba(255, 255, 255, 0.7));
 }
 
 .winner-title-badge {
@@ -977,29 +981,29 @@ body {
     font-size: 0.85rem;
     letter-spacing: -0.3px;
     z-index: 3;
-    text-shadow: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 🥇 슈퍼스타 - 화사한 명확한 리얼 골드 */
+/* 🥇 슈퍼스타 - 솔리드 골드 */
 .super-star .winner-title-badge { 
-    background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #eab308 100%); 
+    background: #fef08a; 
     color: #713f12; 
     border: 1.5px solid #d97706;
     box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
 }
 
-/* 🥈 라이징스타 - 시원하고 화사한 명확한 브라이트 실버 */
+/* 🥈 라이징스타 - 솔리드 실버/화이트 */
 .rising-star .winner-title-badge { 
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #cbd5e1 100%); 
+    background: #ffffff; 
     color: #0f172a; 
     border: 1.5px solid #94a3b8;
     box-shadow: 0 4px 14px rgba(148, 163, 184, 0.3);
 }
 
-/* 🥉 브라이트스타 - 포근하고 선명한 명확한 코퍼 브론즈 */
+/* 🥉 브라이트스타 - 솔리드 브론즈 */
 .bright-star .winner-title-badge { 
-    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fdba74 100%); 
+    background: #ffedd5; 
     color: #7c2d12; 
     border: 1.5px solid #f97316;
     box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
