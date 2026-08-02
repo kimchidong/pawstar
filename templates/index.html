@@ -8,10 +8,17 @@
     <div class="hero-container">
         <!-- 좌측: 타이틀 & 대형 슬로건 -->
         <div class="hero-main-info">
-            <div class="contest-badge-live">
-                <span class="live-dot"></span>
-                <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
-            </div>
+            {% set is_closed = (current_contest.CONTEST_STAT == 'G001C002' or current_contest.status == '종료' or current_contest.CONTEST_STAT_NM == '종료' or current_contest.d_day_str == '종료됨') %}
+            {% if is_closed %}
+                <div class="contest-badge-closed">
+                    <span>회차 마감</span>
+                </div>
+            {% else %}
+                <div class="contest-badge-live">
+                    <span class="live-dot"></span>
+                    <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
+                </div>
+            {% endif %}
             <h2 class="hero-title"><span class="hero-round-badge">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</h2>
             <p class="hero-desc">{{ current_contest.THEME_MENT or current_contest.description }}</p>
             

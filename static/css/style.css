@@ -261,6 +261,28 @@ body {
     letter-spacing: -0.01em;
 }
 
+.contest-badge-closed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.3rem;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.85));
+    color: #cbd5e1;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    margin-bottom: 1.25rem;
+    border: 1.5px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.3);
+    letter-spacing: -0.01em;
+    backdrop-filter: blur(8px);
+}
+
+.contest-badge-closed i {
+    color: #94a3b8;
+    font-size: 1rem;
+}
+
 .live-dot {
     width: 10px;
     height: 10px;
