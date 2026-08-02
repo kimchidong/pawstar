@@ -39,6 +39,7 @@
                         {% for aw in p.awards %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
+                            {% set aw_rank = aw.ranking or aw.RANKING %}
                             
                             {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
                                 <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>
@@ -47,13 +48,13 @@
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
                                 <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
                             {% else %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">🐾 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
-                    {% set category_prefix = '패밀리 ' if is_family else '전체 ' %}
+                    {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
                     {% set rank_icon_str = '🛡️' if is_family else '🏆' %}
                     <div class="m-card-badge">{{ rank_icon_str }} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>

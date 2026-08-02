@@ -117,11 +117,13 @@
                 <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
+                <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
                     <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; right: 0.65rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
+                            {% set aw_rank = aw.ranking or aw.RANKING %}
                             
                             {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
                                 <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
@@ -130,13 +132,13 @@
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
                                 <div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
                             {% else %}
-                                <div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
+                                <div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</span></div>
                             {% endif %}
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
-                    {% set category_prefix = '패밀리 ' if is_family else '전체 ' %}
+                    {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
                     {% set rank_icon = 'fa-solid fa-shield-halved' if is_family else 'fa-solid fa-medal' %}
                     {% if p.rank_candidate == 1 %}
