@@ -357,7 +357,7 @@ class PawStarService:
             print("delete_user error:", e)
             return False
 
-    def get_user_profile(self, user_id):
+    def get_user_profile(self, user_id, contest_id='all'):
         conn = self.get_db_connection()
         if not conn:
             return {
@@ -377,7 +377,7 @@ class PawStarService:
                 if not user_info:
                     user_info = {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}
 
-                cur.execute("""
+                query = """
                     SELECT 
                         r.CONTEST_ROUND,
                         r.ENT_USER_ID,
@@ -416,8 +416,14 @@ class PawStarService:
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     WHERE r.ENT_USER_ID = %s
-                    ORDER BY r.ENT_DT DESC
-                """, (user_id,))
+                """
+                params = [user_id]
+                if contest_id and str(contest_id) != 'all':
+                    query += " AND r.CONTEST_ROUND = %s"
+                    params.append(contest_id)
+
+                query += " ORDER BY r.ENT_DT DESC"
+                cur.execute(query, tuple(params))
                 my_posts = cur.fetchall()
 
                 for p in my_posts:
@@ -433,14 +439,20 @@ class PawStarService:
                 total_score = sum(p.get('SCORE', 0) for p in my_posts)
                 total_likes = sum(p.get('LIKE_CNT', 0) for p in my_posts)
 
-                cur.execute("""
+                award_query = """
                     SELECT 
                         ca.CONTEST_ROUND, ca.AWARD_CD, a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
                         ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     WHERE ca.ENT_USER_ID = %s
-                """, (user_id,))
+                """
+                award_params = [user_id]
+                if contest_id and str(contest_id) != 'all':
+                    award_query += " AND ca.CONTEST_ROUND = %s"
+                    award_params.append(contest_id)
+
+                cur.execute(award_query, tuple(award_params))
                 my_awards = cur.fetchall()
 
                 conn.close()

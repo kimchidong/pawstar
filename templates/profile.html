@@ -43,8 +43,25 @@
         </div>
     </div>
 
+    <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일) -->
+    <div style="margin: 1.5rem 0 1rem 0; display: flex; justify-content: center;">
+        <select id="profileContestSelect" class="select-custom" onchange="location.href='?user_id={{ user.user_id }}&contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; font-weight: 800; width: fit-content; width: -moz-fit-content; min-width: max-content; cursor: pointer; border-radius: 16px; border: 1px solid #e2e8f0; background-color: #f8fafc; color: #0f172a; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
+            <option value="all" {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}>
+                🏆 전체 회차 종합 보기
+            </option>
+            {% for c in contests %}
+                {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                {% set c_title = c.THEME_NM or c.title %}
+                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or ('진행중' if (c.CONTEST_STAT == 'G001C001') else '종료') %}
+                <option value="{{ c_id }}" {{ 'selected' if c_id == (selected_contest_id|string) }}>
+                    제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
     <!-- 활동 통계 4종 카드 (Stats Grid) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 2rem 0;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem 0;">
         <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 1rem;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(124, 58, 237, 0.1); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
                 <i class="fa-solid fa-paw"></i>
@@ -87,13 +104,37 @@
     </div>
 
     <!-- 내가 출전시킨 자랑 게시물 갤러리 -->
-    <h3 style="font-size: 1.4rem; font-weight: 800; margin: 2.5rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-paw" style="color: var(--accent-purple);"></i> 내 펫 출전 게시물 ({{ my_posts|length }})
-    </h3>
+    {% set round_map = {} %}
+    {% for p in my_posts %}
+        {% set c_id = (p.CONTEST_ROUND or p.contest_id)|string %}
+        {% if c_id not in round_map %}
+            {% set _ = round_map.update({c_id: 1}) %}
+        {% else %}
+            {% set _ = round_map.update({c_id: round_map[c_id] + 1}) %}
+        {% endif %}
+    {% endfor %}
 
-    <div class="posts-grid">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin: 2.5rem 0 1rem 0; flex-wrap: wrap; gap: 0.75rem;">
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-paw" style="color: var(--accent-purple);"></i> 내 펫 출전 게시물 ({{ my_posts|length }})
+        </h3>
+
+        <!-- 회차 선택 콤보박스 -->
+        {% if my_posts %}
+        <div>
+            <select id="myPostContestSelect" class="select-custom" style="padding: 0.4rem 0.85rem; font-size: 0.88rem; border-radius: 12px; border: 1.5px solid var(--border-light); background: #ffffff; font-weight: 700; color: var(--text-primary); cursor: pointer; min-width: 170px;" onchange="filterMyPostsByRound(this.value)">
+                <option value="all">전체 회차 ({{ my_posts|length }}개)</option>
+                {% for r_id, count in round_map.items()|sort %}
+                    <option value="{{ r_id }}">제{{ r_id }}회 콘테스트 ({{ count }}개)</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="posts-grid" id="myPostsGrid">
         {% for p in my_posts %}
-            <div class="post-card" id="post-card-{{ p.post_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
+            <div class="post-card my-post-card-item" id="post-card-{{ p.post_id }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
                     <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 </div>
@@ -133,7 +174,35 @@
                 <p>아직 출전 등록한 자랑 게시물이 없습니다.</p>
             </div>
         {% endfor %}
+
+        <!-- 회차 필터 결과 없음 메시지 -->
+        <div id="myPostsEmptyFilterMsg" style="display: none; grid-column: 1 / -1; text-align: center; padding: 3.5rem; background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); color: var(--text-muted);">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; margin-bottom: 0.8rem; color: var(--accent-purple);"></i>
+            <p style="font-size: 0.95rem; font-weight: 700;">선택하신 회차에는 출전한 게시물이 없습니다.</p>
+        </div>
     </div>
+
+    <script>
+    function filterMyPostsByRound(selectedRound) {
+        const cards = document.querySelectorAll('.my-post-card-item');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const roundId = String(card.getAttribute('data-contest-id') || '').trim();
+            if (selectedRound === 'all' || roundId === String(selectedRound)) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const emptyMsg = document.getElementById('myPostsEmptyFilterMsg');
+        if (emptyMsg) {
+            emptyMsg.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
+        }
+    }
+    </script>
 
     <!-- 역대 수상 기록 (CONTEST_WINNER) -->
     <h3 style="font-size: 1.4rem; font-weight: 800; margin: 3rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">

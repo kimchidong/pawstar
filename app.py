@@ -468,14 +468,17 @@ def profile():
         return redirect(url_for('m_profile', **request.args))
 
     user_id = request.args.get('user_id') or session.get('user_id') or 'user1'
-    profile_data = service.get_user_profile(user_id)
+    contest_id = request.args.get('contest_id', 'all')
+    profile_data = service.get_user_profile(user_id, contest_id=contest_id)
 
     return render_template(
         'profile.html',
         user=profile_data['user_info'],
         stats=profile_data['stats'],
         my_posts=profile_data['my_posts'],
-        my_awards=profile_data['my_awards']
+        my_awards=profile_data['my_awards'],
+        contests=service.get_contests(),
+        selected_contest_id=contest_id
     )
 
 # --- 모바일 전용 별도 라우트 (m_ 접두사 템플릿 독립 제공) ---
@@ -544,14 +547,17 @@ def m_hall_of_fame():
 @app.route('/m/profile')
 def m_profile():
     user_id = request.args.get('user_id') or session.get('user_id') or 'user1'
-    profile_data = service.get_user_profile(user_id)
+    contest_id = request.args.get('contest_id', 'all')
+    profile_data = service.get_user_profile(user_id, contest_id=contest_id)
 
     return render_template(
         'm_profile.html',
         user=profile_data['user_info'],
         stats=profile_data['stats'],
         my_posts=profile_data['my_posts'],
-        my_awards=profile_data['my_awards']
+        my_awards=profile_data['my_awards'],
+        contests=service.get_contests(),
+        selected_contest_id=contest_id
     )
 
 @app.route('/m/admin')
