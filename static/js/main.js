@@ -644,17 +644,22 @@ function openDetailModal(post, isHallOfFame = false) {
         });
 
         if (badgeEl) {
-            let html = '<div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">';
+            let html = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; flex-wrap: wrap;">';
             sortedAwards.forEach(aw => {
-                let badgeImg = aw.badge_img || aw.BADGE_IMG_PATH_FILE || aw.award_cd || aw.AWARD_CD || '';
-                if (badgeImg && !badgeImg.startsWith('/') && !badgeImg.startsWith('http')) {
-                    let fn = badgeImg.split('/').pop();
-                    if (!fn.toLowerCase().match(/\.(png|jpg|jpeg|svg)$/)) fn += '.png';
-                    badgeImg = '/static/image/badge/' + fn;
+                const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
+                const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const awRank = aw.ranking || aw.RANKING;
+
+                if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
+                    html += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
+                } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
+                    html += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
+                } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
+                    html += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
+                } else {
+                    const rankSuffix = awRank ? ` ${awRank}위` : '';
+                    html += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-paw"></i> <span>패밀리스타${rankSuffix}</span></div>`;
                 }
-                badgeImg = badgeImg.replace(/\.webp$/i, '.png');
-                const name = aw.award_nm || aw.AWARD_NM || '수상작';
-                html += `<img src="${badgeImg}" class="hall-medal-effect" style="width: 48px; height: 48px; object-fit: contain;" alt="${name}" title="${name}">`;
             });
             html += '</div>';
             badgeEl.innerHTML = html;
@@ -665,7 +670,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
-                const catPrefix = isFamily ? '패밀리 ' : '전체 ';
+                const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
                 const iconClass = isFamily ? 'fa-solid fa-shield-halved' : 'fa-solid fa-medal';
                 const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
