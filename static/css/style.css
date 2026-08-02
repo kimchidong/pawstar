@@ -673,6 +673,7 @@ body {
     overflow: hidden;
     z-index: 10;
     border: none !important;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
     white-space: nowrap;
     user-select: none;
     pointer-events: none;
@@ -1180,11 +1181,11 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
                 0 2px 10px rgba(245, 158, 11, 0.25),
                 inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .super-star .winner-title-badge i {
     color: #78350f;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 /* 🥈 2위 라이징스타 (Platinum Silver Crystal Glass - 시스루 크리스탈) */
@@ -1195,11 +1196,11 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
                 0 2px 10px rgba(148, 163, 184, 0.2),
                 inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .rising-star .winner-title-badge i {
     color: #334155;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 /* 🥉 3위 브라이트스타 (Rose Gold Amber Crystal Glass - 시스루 크리스탈) */
@@ -1210,11 +1211,11 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
                 0 2px 10px rgba(234, 88, 12, 0.22),
                 inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .bright-star .winner-title-badge i {
     color: #7c2d12;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 /* 🐾 패밀리스타 (Noble Sapphire Violet Crystal Glass - 시스루 크리스탈) */
@@ -1226,12 +1227,12 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
                 0 2px 10px rgba(168, 85, 247, 0.22),
                 inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .winner-title-badge.family-star-badge i,
 .podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge i {
     color: #581c87;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 /* 공동 수상 태그 (co-winner-tag) 우아한 통합 스타일 */
