@@ -675,7 +675,7 @@ body {
     border: none !important;
     white-space: nowrap;
     user-select: none;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
 }
 
 .rank-ribbon::before {
@@ -694,10 +694,6 @@ body {
     transform: rotate(25deg);
     animation: elegantShimmer 4.5s ease-in-out infinite;
     pointer-events: none;
-}
-
-.rank-ribbon:hover {
-    transform: translateY(-2px) scale(1.03);
 }
 
 .rank-ribbon i {
