@@ -85,22 +85,11 @@
             width: 100%;
         }
         .co-winner-content {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
-                        visibility 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-            position: absolute;
-            top: 0;
-            left: 0;
+            display: none;
             width: 100%;
-            pointer-events: none;
-            will-change: opacity;
         }
         .co-winner-content.active {
-            opacity: 1;
-            visibility: visible;
-            position: relative;
-            pointer-events: auto;
+            display: block;
         }
     </style>
 
