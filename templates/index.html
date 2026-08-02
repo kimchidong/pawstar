@@ -73,9 +73,13 @@
 
         <!-- 동물 종류 콤보 박스 (PST_PET_KIND 테이블 데이터 기반 동적 렌더링) -->
         <select id="petTypeSelect" class="select-custom" title="동물 종류 선택">
-            <option value="all" {{ 'selected' if pet_type == 'all' }}>🐾 전체 동물</option>
+            <option value="all" {{ 'selected' if pet_type == 'all' or not pet_type }}>🐾 전체 동물</option>
             {% for k in pet_kinds %}
-                <option value="{{ k.KIND_NM }}" {{ 'selected' if pet_type == k.KIND_NM or pet_type == k.KIND_CD }}>{{ k.KIND_NM }}</option>
+                {% set k_nm = k.KIND_NM %}
+                {% set k_display = k.DISPLAY_NM or k_nm %}
+                <option value="{{ k_nm }}" {{ 'selected' if (pet_type == k_nm or pet_type == k.KIND_CD or (pet_type and pet_type in k_nm)) }}>
+                    {{ k_display }}
+                </option>
             {% endfor %}
         </select>
 

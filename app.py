@@ -509,7 +509,8 @@ def m_index():
         pagination=paginated_res,
         sort_type=sort_type,
         search_q=search_q,
-        pet_type=pet_type
+        pet_type=pet_type,
+        pet_kinds=service.get_pet_kinds()
     ))
     if current_user_id:
         response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)

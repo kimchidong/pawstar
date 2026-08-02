@@ -81,6 +81,34 @@ class PawStarService:
                 cur.execute("SELECT KIND_CD, KIND_NM, KIND_CLASS FROM pst_pet_kind ORDER BY KIND_CD ASC")
                 rows = cur.fetchall()
                 conn.close()
+                for k in rows:
+                    nm = k.get('KIND_NM', '')
+                    if '강아지' in nm or '개' in nm:
+                        icon = '🐕'
+                    elif '고양이' in nm:
+                        icon = '🐈'
+                    elif '햄스터' in nm:
+                        icon = '🐹'
+                    elif '앵무새' in nm or '새' in nm:
+                        icon = '🦜'
+                    elif '토끼' in nm:
+                        icon = '🐇'
+                    elif '고슴도치' in nm:
+                        icon = '🦔'
+                    elif '파충류' in nm or '도마뱀' in nm:
+                        icon = '🦎'
+                    elif '어류' in nm or '물고기' in nm or '관상어' in nm:
+                        icon = '🐠'
+                    elif '페럿' in nm:
+                        icon = '🦦'
+                    else:
+                        icon = '🐾'
+
+                    if not any(c in nm for c in ['🐕', '🐈', '🐹', '🦜', '🐇', '🦔', '🦎', '🐠', '🦦', '🐾']):
+                        k['DISPLAY_NM'] = f"{icon} {nm}"
+                    else:
+                        k['DISPLAY_NM'] = nm
+                    k['ICON'] = icon
                 return rows
         except Exception as e:
             print("get_pet_kinds error:", e)

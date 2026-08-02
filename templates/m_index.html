@@ -19,11 +19,12 @@
 
 <!-- 필터 스크롤바 -->
 <div class="m-filter-scroll">
-    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' }}">전체보기 🐾</a>
-    <a href="/m/?pet_type=🐕 강아지&sort={{ sort_type }}" class="m-chip {{ 'active' if '강아지' in pet_type }}">🐕 강아지</a>
-    <a href="/m/?pet_type=🐈 고양이&sort={{ sort_type }}" class="m-chip {{ 'active' if '고양이' in pet_type }}">🐈 고양이</a>
-    <a href="/m/?pet_type=🐹 햄스터&sort={{ sort_type }}" class="m-chip {{ 'active' if '햄스터' in pet_type }}">🐹 햄스터</a>
-    <a href="/m/?pet_type=🦜 앵무새&sort={{ sort_type }}" class="m-chip {{ 'active' if '앵무새' in pet_type }}">🦜 앵무새</a>
+    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}">전체보기 🐾</a>
+    {% for k in pet_kinds %}
+        {% set k_nm = k.KIND_NM %}
+        {% set k_display = k.DISPLAY_NM or k_nm %}
+        <a href="/m/?pet_type={{ k_nm }}&sort={{ sort_type }}" class="m-chip {{ 'active' if (pet_type and (pet_type in k_nm or k_nm in pet_type)) }}">{{ k_display }}</a>
+    {% endfor %}
 </div>
 
 <!-- 2열 피드 그리드 -->
