@@ -123,12 +123,13 @@
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}
+                    {% set rank_prefix = '공동 ' if p.is_co_rank else '' %}
                     {% if p.rank_candidate == 1 %}
-                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>
+                        <div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}1위 후보</div>
                     {% elif p.rank_candidate == 2 %}
-                        <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>
+                        <div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}2위 후보</div>
                     {% elif p.rank_candidate == 3 %}
-                        <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>
+                        <div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> {{ rank_prefix }}3위 후보</div>
                     {% endif %}
                 {% endif %}
             </div>

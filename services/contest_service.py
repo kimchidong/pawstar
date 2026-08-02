@@ -698,8 +698,29 @@ class PawStarService:
                 start_idx = (page - 1) * per_page
                 paged_rows = all_rows[start_idx:start_idx + per_page]
 
-                score_sorted = sorted(all_rows, key=lambda x: x['SCORE'], reverse=True)
-                top_scores = {r['ROUND_NO']: idx + 1 for idx, r in enumerate(score_sorted[:3])}
+                # 월배치 순위 산출 규칙과 100% 동일한 정렬 & 동률 처리
+                # (우선순위: SCORE DESC -> CMT_CNT DESC -> LIKE_CNT DESC -> VW_CNT DESC)
+                sorted_all = sorted(all_rows, key=lambda x: (
+                    x.get('SCORE', 0),
+                    x.get('CMT_CNT', 0),
+                    x.get('LIKE_CNT', 0),
+                    x.get('VW_CNT', 0)
+                ), reverse=True)
+
+                current_rank = 1
+                prev_key = None
+                rank_info_map = {}
+                rank_counts = {}
+
+                for item in sorted_all:
+                    key = (item.get('SCORE', 0), item.get('CMT_CNT', 0), item.get('LIKE_CNT', 0), item.get('VW_CNT', 0))
+                    if prev_key is not None and key != prev_key:
+                        current_rank += 1
+                    
+                    prev_key = key
+                    r_no = item['ROUND_NO']
+                    rank_info_map[r_no] = current_rank
+                    rank_counts[current_rank] = rank_counts.get(current_rank, 0) + 1
 
                 posts = []
                 for row in paged_rows:
@@ -710,7 +731,15 @@ class PawStarService:
                         dt_str = str(dt_val or '')
                     row['ENT_DT'] = dt_str
                     row['created_at'] = dt_str
-                    row['rank_candidate'] = top_scores.get(row['ROUND_NO'], None)
+                    
+                    r_val = rank_info_map.get(row['ROUND_NO'], None)
+                    if r_val and r_val <= 3:
+                        row['rank_candidate'] = r_val
+                        row['is_co_rank'] = (rank_counts.get(r_val, 1) > 1)
+                    else:
+                        row['rank_candidate'] = None
+                        row['is_co_rank'] = False
+
                     row['awards'] = awards_map.get(row['ROUND_NO'], [])
                     row['actions'] = {
                         'is_liked': row['ROUND_NO'] in liked_round_nos,

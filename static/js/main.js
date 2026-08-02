@@ -619,12 +619,14 @@ function openDetailModal(post, isHallOfFame = false) {
     } else {
         if (badgeEl) {
             if (post.rank_candidate && !isClosedRound) {
+                const prefix = post.is_co_rank ? '공동 ' : '';
+                const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
                 if (post.rank_candidate === 1) {
-                    badgeEl.innerHTML = '<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> 1위 후보</div>';
+                    badgeEl.innerHTML = `<div class="rank-ribbon rank-1"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
                 } else if (post.rank_candidate === 2) {
-                    badgeEl.innerHTML = '<div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> 2위 후보</div>';
+                    badgeEl.innerHTML = `<div class="rank-ribbon rank-2"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
                 } else if (post.rank_candidate === 3) {
-                    badgeEl.innerHTML = '<div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> 3위 후보</div>';
+                    badgeEl.innerHTML = `<div class="rank-ribbon rank-3"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
                 } else {
                     badgeEl.innerHTML = '';
                 }

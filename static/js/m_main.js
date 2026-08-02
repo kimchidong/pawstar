@@ -149,7 +149,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     } else {
         if (mBadgeEl) {
             if (postData.rank_candidate) {
-                mBadgeEl.innerHTML = `<div class="m-card-badge">🏆 ${postData.rank_candidate}위 후보</div>`;
+                const prefix = postData.is_co_rank ? '공동 ' : '';
+                mBadgeEl.innerHTML = `<div class="m-card-badge">🏆 ${prefix}${postData.rank_candidate}위 후보</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
             }
