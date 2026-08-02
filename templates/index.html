@@ -119,7 +119,7 @@
                             {% set b_file = (aw.badge_img or aw.award_cd or 'P001A101.png')|string %}
                             {% set b_raw = b_file if (b_file.startswith('/') or b_file.startswith('http')) else ('/static/image/badge/' ~ (b_file.split('/')[-1] ~ ('' if (b_file.endswith('.png') or b_file.endswith('.jpg')) else '.png'))) %}
                             {% set b_url = b_raw.replace('.webp', '.png') %}
-                            <img src="{{ b_url }}" style="width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));" alt="{{ aw.award_nm }}" title="{{ aw.award_nm }}">
+                            <img src="{{ b_url }}" class="hall-medal-effect" style="width: 48px; height: 48px; object-fit: contain;" alt="{{ aw.award_nm }}" title="{{ aw.award_nm }}">
                         {% endfor %}
                     </div>
                 {% elif p.rank_candidate and not is_closed %}

@@ -142,7 +142,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 badgeImg = badgeImg.replace(/\.webp$/i, '.png');
                 const name = aw.award_nm || aw.AWARD_NM || '수상작';
-                html += `<img src="${badgeImg}" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));" alt="${name}" title="${name}">`;
+                html += `<img src="${badgeImg}" class="hall-medal-effect" style="width: 40px; height: 40px; object-fit: contain;" alt="${name}" title="${name}">`;
             });
             mBadgeEl.innerHTML = html;
         }

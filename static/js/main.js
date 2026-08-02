@@ -611,7 +611,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 }
                 badgeImg = badgeImg.replace(/\.webp$/i, '.png');
                 const name = aw.award_nm || aw.AWARD_NM || '수상작';
-                html += `<img src="${badgeImg}" style="width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.4));" alt="${name}" title="${name}">`;
+                html += `<img src="${badgeImg}" class="hall-medal-effect" style="width: 48px; height: 48px; object-fit: contain;" alt="${name}" title="${name}">`;
             });
             html += '</div>';
             badgeEl.innerHTML = html;
