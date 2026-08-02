@@ -189,7 +189,7 @@
                 <div class="co-winner-wrapper">
                     {% for star in ns.super_stars %}
                         <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
-                            <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="width: 150px; height: 150px;" alt="Super Star">
+                            <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="height: 220px;" alt="Super Star">
                             <h3 style="font-size: 1.55rem; font-weight: 900; color: var(--accent-gold); text-align: center; margin-top: 0.6rem; margin-bottom: 0.4rem; line-height: 1.2;">
                                 {{ star.PET_NM or star.pet_name }}
                             </h3>
@@ -419,7 +419,7 @@
                                             <div class="co-winner-wrapper">
                                                 {% for star in stars %}
                                                     <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
-                                                        <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="width: 100px; height: 100px;" alt="{{ star.PET_NM or star.pet_name }}">
+                                                        <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" style="height: 180px;" alt="{{ star.PET_NM or star.pet_name }}">
                                                         <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--text-primary); text-align: center; margin-top: 0.5rem; margin-bottom: 0.35rem; line-height: 1.2;">
                                                             {{ star.PET_NM or star.pet_name }}
                                                         </h3>
