@@ -717,11 +717,11 @@ body {
     box-shadow: 0 4px 16px rgba(234, 179, 8, 0.35), 
                 0 2px 8px rgba(0, 0, 0, 0.12),
                 inset 0 1px 2px rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .rank-ribbon.rank-1 i {
     color: #78350f;
-    filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.7));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 .rank-ribbon.rank-2 {
@@ -731,11 +731,11 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18), 
                 0 2px 10px rgba(148, 163, 184, 0.22),
                 inset 0 1px 2px rgba(255, 255, 255, 0.7);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .rank-ribbon.rank-2 i {
     color: #334155;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 .rank-ribbon.rank-3 {
@@ -745,11 +745,11 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18), 
                 0 2px 10px rgba(234, 88, 12, 0.22),
                 inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 .rank-ribbon.rank-3 i {
     color: #7c2d12;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 .score-badge {
