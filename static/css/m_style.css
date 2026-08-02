@@ -550,3 +550,9 @@ body.m-body {
     font-size: 0.75rem;
 }
 
+/* 모바일 메달 윤기 반짝임 애니메이션 */
+.m-winner-card img[alt="수상 메달"] {
+    animation: medalShimmerGlow 4.5s ease-in-out infinite;
+    display: inline-block;
+}
+
