@@ -47,7 +47,7 @@
                             <select name="pet_type" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
                                 <option value="" selected>선택</option>
                                 {% for k in pet_kinds %}
-                                    <option value="{{ k.KIND_CD }}">{{ k.KIND_NM }}</option>
+                                    <option value="{{ k.KIND_CD }}">{{ k.DISPLAY_NM or k.KIND_NM }}</option>
                                 {% endfor %}
                             </select>
                         </div>

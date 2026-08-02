@@ -642,7 +642,8 @@ def upload_page():
         current_contest=current_contest, 
         contests=contests,
         my_entry_count=my_entry_count,
-        remaining_entry_count=remaining_entry_count
+        remaining_entry_count=remaining_entry_count,
+        pet_kinds=service.get_pet_kinds()
     )
 
 @app.route('/m/upload', methods=['GET', 'POST'])
@@ -687,7 +688,8 @@ def m_upload_page():
         current_contest=current_contest, 
         contests=contests,
         my_entry_count=my_entry_count,
-        remaining_entry_count=remaining_entry_count
+        remaining_entry_count=remaining_entry_count,
+        pet_kinds=service.get_pet_kinds()
     )
 
 
