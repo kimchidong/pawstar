@@ -898,6 +898,21 @@ body {
 .action-btn.btn-score:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
 .action-btn.btn-share:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
 
+/* 회차 목록 피드 카드 3요소 정보상자 마우스 오버 효과 & 손가락 커서 제거 */
+.post-card .action-btn,
+.m-feed-card .action-btn {
+    cursor: default !important;
+}
+
+.post-card .action-btn:hover,
+.m-feed-card .action-btn:hover {
+    background: var(--bg-primary) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
 /* 좋아요 active 상태 스타일 */
 .action-btn.btn-like.active, #detailBtnLike.active {
     background: #fff0f3 !important;
