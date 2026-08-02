@@ -59,7 +59,10 @@
                         {% endif %}
                     </div>
                     <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        {{ w.PET_NM or w.pet_name }} ({{ w.KIND_NM or w.pet_type }})
+                        {% set w_kind = w.KIND_NM or w.pet_type %}
+                        {% set w_icon = '🐕' if ('강아지' in w_kind or '개' in w_kind) else ('🐈' if '고양이' in w_kind else ('🐹' if '햄스터' in w_kind else ('🦜' if ('새' in w_kind or '앵무새' in w_kind) else ('🐴' if ('말' in w_kind or '큰동물' in w_kind) else ('🐇' if '토끼' in w_kind else ('🦔' if '고슴도치' in w_kind else ('🦎' if '파충류' in w_kind else ('🐠' if '관상어' in w_kind else ('🐷' if '돼지' in w_kind else ('🦦' if '페럿' in w_kind else '🐾')))))))))) %}
+                        {% set w_kind_str = (w_icon ~ ' ' ~ w_kind) if not ('🐕' in w_kind or '🐈' in w_kind or '🐹' in w_kind or '🦜' in w_kind or '🐴' in w_kind or '🐇' in w_kind or '🦔' in w_kind or '🦎' in w_kind or '🐠' in w_kind or '🐷' in w_kind or '🦦' in w_kind or '🐾' in w_kind) else w_kind %}
+                        {{ w.PET_NM or w.pet_name }} ({{ w_kind_str }})
                     </div>
                     <div style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.35rem;">
                         <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);" alt="집사 프로필">

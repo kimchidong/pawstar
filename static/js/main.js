@@ -645,6 +645,7 @@ function openDetailModal(post, isHallOfFame = false) {
         if (badgeEl) {
             if (post.rank_candidate && !isClosedRound) {
                 const urlParams = new URLSearchParams(window.location.search);
+                const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리 ' : '전체 ';
                 const iconClass = isFamily ? 'fa-solid fa-shield-halved' : 'fa-solid fa-medal';

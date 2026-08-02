@@ -134,7 +134,13 @@
                                             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;"><strong style="color: var(--text-primary); font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
                                         </div>
                                         <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">
-                                            {{ star.KIND_NM or star.pet_type }}
+                                            {% set s_kind = star.KIND_NM or star.pet_type %}
+                                            {% set s_icon = '🐕' if ('강아지' in s_kind or '개' in s_kind) else ('🐈' if '고양이' in s_kind else ('🐹' if '햄스터' in s_kind else ('🦜' if ('새' in s_kind or '앵무새' in s_kind) else ('🐴' if ('말' in s_kind or '큰동물' in s_kind) else ('🐇' if '토끼' in s_kind else ('🦔' if '고슴도치' in s_kind else ('🦎' if '파충류' in s_kind else ('🐠' if '관상어' in s_kind else ('🐷' if '돼지' in s_kind else ('🦦' if '페럿' in s_kind else '🐾')))))))))) %}
+                                            {% if not ('🐕' in s_kind or '🐈' in s_kind or '🐹' in s_kind or '🦜' in s_kind or '🐴' in s_kind or '🐇' in s_kind or '🦔' in s_kind or '🦎' in s_kind or '🐠' in s_kind or '🐷' in s_kind or '🦦' in s_kind or '🐾' in s_kind) %}
+                                                {{ s_icon }} {{ s_kind }}
+                                            {% else %}
+                                                {{ s_kind }}
+                                            {% endif %}
                                         </div>
                                     </div>
 
@@ -207,7 +213,13 @@
                                             <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;"><strong style="color: #b45309; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
                                         </div>
                                         <div style="font-size: 0.82rem; font-weight: 800; color: #b45309;">
-                                            {{ star.KIND_NM or star.pet_type }}
+                                            {% set s_kind = star.KIND_NM or star.pet_type %}
+                                            {% set s_icon = '🐕' if ('강아지' in s_kind or '개' in s_kind) else ('🐈' if '고양이' in s_kind else ('🐹' if '햄스터' in s_kind else ('🦜' if ('새' in s_kind or '앵무새' in s_kind) else ('🐴' if ('말' in s_kind or '큰동물' in s_kind) else ('🐇' if '토끼' in s_kind else ('🦔' if '고슴도치' in s_kind else ('🦎' if '파충류' in s_kind else ('🐠' if '관상어' in s_kind else ('🐷' if '돼지' in s_kind else ('🦦' if '페럿' in s_kind else '🐾')))))))))) %}
+                                            {% if not ('🐕' in s_kind or '🐈' in s_kind or '🐹' in s_kind or '🦜' in s_kind or '🐴' in s_kind or '🐇' in s_kind or '🦔' in s_kind or '🦎' in s_kind or '🐠' in s_kind or '🐷' in s_kind or '🦦' in s_kind or '🐾' in s_kind) %}
+                                                {{ s_icon }} {{ s_kind }}
+                                            {% else %}
+                                                {{ s_kind }}
+                                            {% endif %}
                                         </div>
                                     </div>
 
@@ -280,7 +292,13 @@
                                             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;"><strong style="color: #c2410c; font-weight: 800;">{{ star.NK_NM or star.user_nickname }}</strong></span>
                                         </div>
                                         <div style="font-size: 0.8rem; font-weight: 700; color: #c2410c;">
-                                            {{ star.KIND_NM or star.pet_type }}
+                                            {% set s_kind = star.KIND_NM or star.pet_type %}
+                                            {% set s_icon = '🐕' if ('강아지' in s_kind or '개' in s_kind) else ('🐈' if '고양이' in s_kind else ('🐹' if '햄스터' in s_kind else ('🦜' if ('새' in s_kind or '앵무새' in s_kind) else ('🐴' if ('말' in s_kind or '큰동물' in s_kind) else ('🐇' if '토끼' in s_kind else ('🦔' if '고슴도치' in s_kind else ('🦎' if '파충류' in s_kind else ('🐠' if '관상어' in s_kind else ('🐷' if '돼지' in s_kind else ('🦦' if '페럿' in s_kind else '🐾')))))))))) %}
+                                            {% if not ('🐕' in s_kind or '🐈' in s_kind or '🐹' in s_kind or '🦜' in s_kind or '🐴' in s_kind or '🐇' in s_kind or '🦔' in s_kind or '🦎' in s_kind or '🐠' in s_kind or '🐷' in s_kind or '🦦' in s_kind or '🐾' in s_kind) %}
+                                                {{ s_icon }} {{ s_kind }}
+                                            {% else %}
+                                                {{ s_kind }}
+                                            {% endif %}
                                         </div>
                                     </div>
 

@@ -91,6 +91,10 @@ class PawStarService:
             icon = '🦔'
         elif '파충류' in nm or '도마뱀' in nm:
             icon = '🦎'
+        elif '말' in nm or '큰동물' in nm:
+            icon = '🐴'
+        elif '돼지' in nm or '피그' in nm:
+            icon = '🐷'
         elif '어류' in nm or '물고기' in nm or '관상어' in nm:
             icon = '🐠'
         elif '페럿' in nm:
