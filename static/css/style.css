@@ -999,7 +999,7 @@ body {
     background: var(--bg-surface);
     border: 2px solid var(--border-light);
     border-radius: var(--radius-lg);
-    padding: 0 0 1.25rem 0;
+    padding: 0;
     text-align: center;
     position: relative;
     transition: var(--transition);
@@ -1007,27 +1007,26 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 480px;
-    min-height: 480px;
-    max-height: 480px;
+    height: auto;
 }
 
 .podium-media {
     position: relative;
     width: 100%;
-    height: 270px;
+    height: 250px;
     overflow: hidden;
     background: #f1f5f9;
 }
 
 .podium-card.super-star .podium-media {
-    height: 320px;
+    height: 290px;
 }
 
 .podium-body {
-    padding: 1rem 1.25rem 0 1.25rem;
+    padding: 0.85rem 1rem 0.85rem 1rem;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     flex: 1;
 }
 
@@ -1036,16 +1035,12 @@ body {
     background: #ffffff;
     box-shadow: 0 15px 35px rgba(245, 158, 11, 0.25);
     transform: none;
-    height: 530px;
-    min-height: 530px;
-    max-height: 530px;
+    height: auto;
 }
 
 .podium-card.rising-star,
 .podium-card.bright-star {
-    height: 480px;
-    min-height: 480px;
-    max-height: 480px;
+    height: auto;
     background: #ffffff;
 }
 
