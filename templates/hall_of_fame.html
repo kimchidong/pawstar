@@ -382,8 +382,9 @@
                     {% set group = ns_kinds.groups[k_cd] %}
                     <div style="background: #ffffff; border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-soft);">
                         <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--bg-primary); padding-bottom: 0.75rem;">
+                            {% set kind_icon = '🐶' if '강아지' in group.kind_nm else ('🐱' if '고양이' in group.kind_nm else ('🐹' if '햄스터' in group.kind_nm else ('🐠' if ('물고기' in group.kind_nm or '관상어' in group.kind_nm) else ('🦜' if ('새' in group.kind_nm or '조류' in group.kind_nm) else ('🐰' if '토끼' in group.kind_nm else '🐾'))))) %}
                             <h4 style="font-size: 1.3rem; font-weight: 900; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.45rem;">
-                                <span style="background: var(--gradient-brand); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">🐾</span>
+                                <span style="font-size: 1.25rem; line-height: 1;">{{ kind_icon }}</span>
                                 {{ group.kind_nm }}
                             </h4>
                         </div>
