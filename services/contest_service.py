@@ -1133,7 +1133,7 @@ class PawStarService:
                     LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
-                    ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
+                    ORDER BY ca.AWARD_PART ASC, ca.KIND_CD ASC, ca.RANKING ASC
                 """, (contest_id,))
                 winners = cur.fetchall()
 
@@ -1197,7 +1197,7 @@ class PawStarService:
                             LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
                             LEFT JOIN pst_pet_kind k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
                             WHERE ca.CONTEST_ROUND = %s
-                            ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
+                            ORDER BY ca.AWARD_PART ASC, ca.KIND_CD ASC, ca.RANKING ASC
                         """, (latest_id,))
                         winners = cur.fetchall()
 
