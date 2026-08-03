@@ -669,42 +669,43 @@ function openDetailModal(post, isHallOfFame = false) {
         else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
         else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
 
-        if (badgeEl) {
-            badgeEl.style.justifyContent = 'flex-start';
-            badgeEl.style.left = '0.75rem';
-            badgeEl.style.right = 'auto';
-
-            let html = '<div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.5rem; flex-wrap: wrap;">';
-
-            // 1. 실물 메달 / 배찌 이미지 나란히 배치
+        if (medalsLeftEl) {
+            let leftHtml = '';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    html += `<img src="${badgeImgSrc}" style="width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); flex-shrink: 0;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" style="width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); flex-shrink: 0;" alt="${awardNmStr}">`;
                 }
             });
+            medalsLeftEl.innerHTML = leftHtml;
+        }
 
-            // 2. 텍스트 수상 배지 나란히 배치
+        if (badgeEl) {
+            badgeEl.style.justifyContent = 'flex-end';
+            badgeEl.style.right = '0.75rem';
+            badgeEl.style.left = 'auto';
+
+            let rightHtml = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; flex-wrap: wrap;">';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    html += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    html += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    html += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    html += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>패밀리스타${rankSuffix}</span></div>`;
+                    rightHtml += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>패밀리스타${rankSuffix}</span></div>`;
                 }
             });
-            html += '</div>';
-            badgeEl.innerHTML = html;
+            rightHtml += '</div>';
+            badgeEl.innerHTML = rightHtml;
         }
     } else {
         if (badgeEl) {

@@ -174,42 +174,43 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
         else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
 
-        if (mBadgeEl) {
-            mBadgeEl.style.justifyContent = 'flex-start';
-            mBadgeEl.style.left = '0.5rem';
-            mBadgeEl.style.right = 'auto';
-
-            let html = '<div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.35rem; flex-wrap: wrap;">';
-
-            // 1. 실물 메달 / 배찌 이미지 나란히 배치
+        if (mMedalsLeftEl) {
+            let leftHtml = '';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    html += `<img src="${badgeImgSrc}" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35)); flex-shrink: 0;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35)); flex-shrink: 0;" alt="${awardNmStr}">`;
                 }
             });
+            mMedalsLeftEl.innerHTML = leftHtml;
+        }
 
-            // 2. 텍스트 수상 배지 나란히 배치
+        if (mBadgeEl) {
+            mBadgeEl.style.justifyContent = 'flex-end';
+            mBadgeEl.style.right = '0.5rem';
+            mBadgeEl.style.left = 'auto';
+
+            let rightHtml = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; flex-wrap: wrap;">';
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    html += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
                 }
             });
-            html += '</div>';
-            mBadgeEl.innerHTML = html;
+            rightHtml += '</div>';
+            mBadgeEl.innerHTML = rightHtml;
         }
     } else {
         if (mBadgeEl) {
