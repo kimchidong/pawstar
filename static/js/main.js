@@ -18,7 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initEventHandlers() {
-    // 회차 선택 변경 이벤트
+    // 회차 선택 셀렉트박스 배경색 실시간 동기화 (진행중 VS 종료)
+    document.querySelectorAll('.select-custom, .m-select-custom').forEach(selectEl => {
+        const updateSelectBg = () => {
+            const selectedOpt = selectEl.options[selectEl.selectedIndex];
+            if (selectedOpt) {
+                const isInProg = selectedOpt.classList.contains('opt-in-progress') || selectedOpt.getAttribute('data-is-in-progress') === 'true' || selectedOpt.textContent.includes('진행중');
+                if (isInProg) {
+                    selectEl.classList.add('stat-in-progress');
+                    selectEl.classList.remove('stat-closed');
+                } else {
+                    selectEl.classList.add('stat-closed');
+                    selectEl.classList.remove('stat-in-progress');
+                }
+            }
+        };
+        updateSelectBg();
+        selectEl.addEventListener('change', updateSelectBg);
+    });
+
     const contestSelect = document.getElementById('contestSelect');
     if (contestSelect) {
         contestSelect.addEventListener('change', (e) => {
@@ -31,12 +49,38 @@ function initEventHandlers() {
 
     // 단색 FontAwesome 동물 아이콘 지원 커스텀 드롭다운 핸들러
     const customDropdown = document.getElementById('customPetTypeDropdown');
+    const customContestDropdown = document.getElementById('customContestDropdown');
+
+    if (customContestDropdown) {
+        const cTrigger = customContestDropdown.querySelector('.custom-contest-trigger');
+        const cOptions = customContestDropdown.querySelectorAll('.custom-contest-option');
+
+        if (cTrigger) {
+            cTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (customDropdown) customDropdown.classList.remove('open');
+                customContestDropdown.classList.toggle('open');
+            });
+        }
+
+        cOptions.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const contestId = opt.getAttribute('data-value');
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('contest_id', contestId);
+                window.location.href = currentUrl.toString();
+            });
+        });
+    }
+
     if (customDropdown) {
         const trigger = customDropdown.querySelector('.custom-pet-trigger');
         const options = customDropdown.querySelectorAll('.custom-pet-option');
 
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
+            if (customContestDropdown) customContestDropdown.classList.remove('open');
             customDropdown.classList.toggle('open');
         });
 
@@ -48,13 +92,16 @@ function initEventHandlers() {
                 window.location.href = currentUrl.toString();
             });
         });
-
-        document.addEventListener('click', (e) => {
-            if (!customDropdown.contains(e.target)) {
-                customDropdown.classList.remove('open');
-            }
-        });
     }
+
+    document.addEventListener('click', (e) => {
+        if (customDropdown && !customDropdown.contains(e.target)) {
+            customDropdown.classList.remove('open');
+        }
+        if (customContestDropdown && !customContestDropdown.contains(e.target)) {
+            customContestDropdown.classList.remove('open');
+        }
+    });
 
     // 모달 제어 (/upload 전용 페이지 전환 적용)
     const modalBackdrop = document.getElementById('uploadModal');

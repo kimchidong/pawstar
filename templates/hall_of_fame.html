@@ -11,13 +11,17 @@
 
         <!-- 회차 선택 (회차 정보 추가) -->
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-            <select id="contestSelect" class="select-custom" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; width: fit-content; width: -moz-fit-content; min-width: max-content; font-weight: 800; cursor: pointer; border-radius: 16px; border: 1px solid #e2e8f0; background-color: #f8fafc; color: #0f172a; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
+            {% set curr_stat = (current_contest.CONTEST_STAT_NM or current_contest.status or '') if current_contest else '' %}
+            {% set is_curr_in_prog = ('진행' in curr_stat or curr_stat == 'IN_PROGRESS' or (current_contest and current_contest.CONTEST_STAT == 'G001C001')) %}
+            <select id="contestSelect" class="select-custom {{ 'stat-in-progress' if is_curr_in_prog else 'stat-closed' }}" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; width: fit-content; width: -moz-fit-content; min-width: max-content; font-weight: 800; cursor: pointer; border-radius: 16px;">
                 {% for c in contests %}
                     {% set c_id = c.CONTEST_ROUND or c.contest_id %}
                     {% set c_title = c.THEME_NM or c.title %}
+                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
                     {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
-                    <option value="{{ c_id }}" {{ 'selected' if c_id == cur_id }}>
-                        제{{ c_id }}회 {{ c_title }}
+                    <option value="{{ c_id }}" class="{{ 'opt-in-progress' if is_in_prog else 'opt-closed' }}" {{ 'selected' if c_id == cur_id }}>
+                        제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm or ('진행중' if is_in_prog else '종료') }})
                     </option>
                 {% endfor %}
             </select>

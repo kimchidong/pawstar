@@ -45,15 +45,16 @@
 
     <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일) -->
     <div style="margin: 1.5rem 0 1rem 0; display: flex; justify-content: center;">
-        <select id="profileContestSelect" class="select-custom" onchange="location.href='?user_id={{ user.user_id }}&contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; font-weight: 800; width: fit-content; width: -moz-fit-content; min-width: max-content; cursor: pointer; border-radius: 16px; border: 1px solid #e2e8f0; background-color: #f8fafc; color: #0f172a; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
-            <option value="all" {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}>
+        <select id="profileContestSelect" class="select-custom" onchange="location.href='?user_id={{ user.user_id }}&contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; font-weight: 800; width: fit-content; width: -moz-fit-content; min-width: max-content; cursor: pointer; border-radius: 16px;">
+            <option value="all" class="opt-closed" {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}>
                 🏆 전체 회차 종합 보기
             </option>
             {% for c in contests %}
                 {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
                 {% set c_title = c.THEME_NM or c.title %}
                 {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or ('진행중' if (c.CONTEST_STAT == 'G001C001') else '종료') %}
-                <option value="{{ c_id }}" {{ 'selected' if c_id == (selected_contest_id|string) }}>
+                {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                <option value="{{ c_id }}" class="{{ 'opt-in-progress' if is_in_prog else 'opt-closed' }}" {{ 'selected' if c_id == (selected_contest_id|string) }}>
                     제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm }})
                 </option>
             {% endfor %}

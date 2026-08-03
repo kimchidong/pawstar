@@ -554,6 +554,42 @@ body {
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
+/* 🏆 회차 상태별 (진행중 vs 종료) 셀렉트 박스 및 옵션 배경색 다형성 디자인 */
+.select-custom.stat-in-progress,
+.m-select-custom.stat-in-progress {
+    background-color: #ecfdf5 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23065f46' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    border: 1.5px solid #34d399 !important;
+    color: #065f46 !important;
+    box-shadow: 0 3px 12px rgba(52, 211, 153, 0.22) !important;
+}
+
+.select-custom.stat-closed,
+.m-select-custom.stat-closed {
+    background-color: #f1f5f9 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Option 항목별 배경색 및 폰트 구별 */
+select.select-custom option.opt-in-progress,
+select.m-select-custom option.opt-in-progress,
+option.opt-in-progress {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+    font-weight: 800 !important;
+}
+
+select.select-custom option.opt-closed,
+select.m-select-custom option.opt-closed,
+option.opt-closed {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    font-weight: 500 !important;
+}
+
 .tab-sort-group {
     display: flex;
     align-items: center;
@@ -881,6 +917,163 @@ body {
 
 .custom-pet-option.selected i {
     color: #4338ca;
+}
+
+/* 🏆 회차 전용 커스텀 드롭다운 (우측 동물 콤보와 100% 동일한 고급 드랍다운 디자인) */
+.custom-contest-dropdown {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+    min-width: 250px;
+    height: 51.05px;
+    z-index: 101;
+}
+
+.custom-contest-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    height: 51.05px;
+    box-sizing: border-box;
+    padding: 0 1.1rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+}
+
+/* 진행중 회차 trigger 스타일 */
+.custom-contest-dropdown.stat-in-progress .custom-contest-trigger {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1.5px solid #34d399;
+    color: #065f46;
+    box-shadow: 0 3px 12px rgba(52, 211, 153, 0.2);
+}
+
+.custom-contest-dropdown.stat-in-progress .custom-contest-trigger:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* 종료된 회차 trigger 스타일 */
+.custom-contest-dropdown.stat-closed .custom-contest-trigger {
+    background: #f1f5f9;
+    border: 1.5px solid #cbd5e1;
+    color: #475569;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.custom-contest-dropdown.stat-closed .custom-contest-trigger:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.2);
+}
+
+.custom-contest-trigger i.arrow-icon {
+    font-size: 0.8rem;
+    transition: transform 0.25s ease;
+}
+
+.custom-contest-dropdown.stat-in-progress .custom-contest-trigger i.arrow-icon {
+    color: #059669;
+}
+
+.custom-contest-dropdown.stat-closed .custom-contest-trigger i.arrow-icon {
+    color: #64748b;
+}
+
+.custom-contest-dropdown.open .custom-contest-trigger i.arrow-icon {
+    transform: rotate(180deg);
+}
+
+/* 드랍다운 팝업 리스트 (custom-pet-options와 100% 동일) */
+.custom-contest-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 100%;
+    width: max-content;
+    max-width: 380px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    padding: 0.45rem;
+    z-index: 999;
+}
+
+.custom-contest-dropdown.open .custom-contest-options {
+    display: flex;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 칩 스타일 (진행중 vs 종료) */
+.status-chip {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.status-chip.in-progress {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.status-chip.closed {
+    background: #e2e8f0;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+/* 드롭다운 옵션 항목 */
+.custom-contest-option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.custom-contest-option.opt-in-progress {
+    color: #065f46;
+}
+
+.custom-contest-option.opt-closed {
+    color: #334155;
+}
+
+.custom-contest-option:hover {
+    background: #f1f5f9;
+}
+
+.custom-contest-option.opt-in-progress:hover {
+    background: #ecfdf5;
+}
+
+.custom-contest-option.selected {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.custom-contest-option.opt-in-progress.selected {
+    background: #d1fae5;
+    color: #065f46;
 }
 
 .score-badge {

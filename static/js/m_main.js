@@ -14,6 +14,25 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 회차 선택 셀렉트박스 배경색 실시간 동기화 (진행중 VS 종료)
+    document.querySelectorAll('.select-custom, .m-select-custom').forEach(selectEl => {
+        const updateSelectBg = () => {
+            const selectedOpt = selectEl.options[selectEl.selectedIndex];
+            if (selectedOpt) {
+                const isInProg = selectedOpt.classList.contains('opt-in-progress') || selectedOpt.getAttribute('data-is-in-progress') === 'true' || selectedOpt.textContent.includes('진행중');
+                if (isInProg) {
+                    selectEl.classList.add('stat-in-progress');
+                    selectEl.classList.remove('stat-closed');
+                } else {
+                    selectEl.classList.add('stat-closed');
+                    selectEl.classList.remove('stat-in-progress');
+                }
+            }
+        };
+        updateSelectBg();
+        selectEl.addEventListener('change', updateSelectBg);
+    });
+
     // 1. 모바일 자랑하기 (/m/upload 전용 페이지 전환 적용)
     const mBtnUploadNav = document.getElementById('mBtnUploadNav');
     const mUploadModal = document.getElementById('mUploadModal');

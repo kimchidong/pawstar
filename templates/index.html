@@ -61,15 +61,41 @@
 <div class="filter-bar">
     <!-- 좌측 그룹: 회차 선택 + 동물종류 콤보 + 검색창 (바로 옆에 연결) -->
     <div class="filter-left-group">
-        <select id="contestSelect" class="select-custom" title="콘테스트 회차 선택">
-            {% for c in contests %}
-                {% if '예정' not in (c.CONTEST_STAT_NM or c.status) and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
-                    <option value="{{ c.CONTEST_ROUND or c.contest_id }}" {{ 'selected' if (c.CONTEST_ROUND or c.contest_id) == (current_contest.CONTEST_ROUND or current_contest.contest_id) }}>
-                        제{{ c.CONTEST_ROUND or c.contest_id }}회 {{ c.THEME_NM or c.title }} ({{ c.CONTEST_STAT_NM or c.status }})
-                    </option>
-                {% endif %}
-            {% endfor %}
-        </select>
+        {% set curr_stat = (current_contest.CONTEST_STAT_NM or current_contest.status or '') if current_contest else '' %}
+        {% set is_curr_in_prog = ('진행' in curr_stat or curr_stat == 'IN_PROGRESS' or (current_contest and current_contest.CONTEST_STAT == 'G001C001')) %}
+        
+        <!-- 커스텀 회차 선택 드롭다운 (우측 동물 콤보와 100% 동일한 고급 드랍다운 비주얼) -->
+        <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_curr_in_prog else 'stat-closed' }}" id="customContestDropdown">
+            <div class="custom-contest-trigger">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
+                    {% if is_curr_in_prog %}
+                        <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                    {% else %}
+                        <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                    {% endif %}
+                    <span class="selected-text" style="font-weight: 800;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회 {{ current_contest.THEME_NM or current_contest.title }}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </div>
+            <div class="custom-contest-options">
+                {% for c in contests %}
+                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                    {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                        {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                        {% set c_id = c.CONTEST_ROUND or c.contest_id %}
+                        {% set is_sel = (c_id == (current_contest.CONTEST_ROUND or current_contest.contest_id)) %}
+                        <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}">
+                            {% if is_in_prog %}
+                                <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                            {% else %}
+                                <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                            {% endif %}
+                            <span class="option-text">제{{ c_id }}회 {{ c.THEME_NM or c.title }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
 
         <!-- 동물 종류 콤보 박스 (단색 FontAwesome 아이콘 적용 커스텀 셀렉트 드롭다운) -->
         {% set sel_kind = pet_type or '' %}
