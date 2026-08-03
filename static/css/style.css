@@ -554,31 +554,31 @@ body {
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
-/* 🏆 회차 상태별 (진행중 vs 종료) 셀렉트 박스 및 옵션 배경색 다형성 디자인 */
+/* 🏆 회차 상태별 (진행중 vs 종료) 셀렉트 박스 및 옵션 배경색 디자인 (단색 연한 연노랑 / 연한 회색) */
 .select-custom.stat-in-progress,
 .m-select-custom.stat-in-progress {
-    background-color: #ecfdf5 !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23065f46' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-    border: 1.5px solid #34d399 !important;
-    color: #065f46 !important;
-    box-shadow: 0 3px 12px rgba(52, 211, 153, 0.22) !important;
+    background-color: #fefce8 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23713f12' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    border: 1.5px solid #fde047 !important;
+    color: #713f12 !important;
+    box-shadow: 0 2px 8px rgba(250, 204, 21, 0.15) !important;
 }
 
 .select-custom.stat-closed,
 .m-select-custom.stat-closed {
-    background-color: #f1f5f9 !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #475569 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    background-color: #f8fafc !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #64748b !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
 /* Option 항목별 배경색 및 폰트 구별 */
 select.select-custom option.opt-in-progress,
 select.m-select-custom option.opt-in-progress,
 option.opt-in-progress {
-    background-color: #d1fae5 !important;
-    color: #065f46 !important;
+    background-color: #fefce8 !important;
+    color: #713f12 !important;
     font-weight: 800 !important;
 }
 
@@ -586,7 +586,7 @@ select.select-custom option.opt-closed,
 select.m-select-custom option.opt-closed,
 option.opt-closed {
     background-color: #ffffff !important;
-    color: #475569 !important;
+    color: #64748b !important;
     font-weight: 500 !important;
 }
 
@@ -945,30 +945,30 @@ option.opt-closed {
     white-space: nowrap;
 }
 
-/* 진행중 회차 trigger 스타일 */
+/* 진행중 회차 trigger 스타일 (단색 소프트 연노랑) */
 .custom-contest-dropdown.stat-in-progress .custom-contest-trigger {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border: 1.5px solid #34d399;
-    color: #065f46;
-    box-shadow: 0 3px 12px rgba(52, 211, 153, 0.2);
+    background: #fefce8;
+    border: 1.5px solid #fde047;
+    color: #713f12;
+    box-shadow: 0 2px 8px rgba(250, 204, 21, 0.15);
 }
 
 .custom-contest-dropdown.stat-in-progress .custom-contest-trigger:hover {
-    border-color: #10b981;
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    background: #fef9c3;
+    border-color: #facc15;
 }
 
-/* 종료된 회차 trigger 스타일 */
+/* 종료된 회차 trigger 스타일 (단색 소프트 연회색) */
 .custom-contest-dropdown.stat-closed .custom-contest-trigger {
-    background: #f1f5f9;
-    border: 1.5px solid #cbd5e1;
-    color: #475569;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    color: #64748b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .custom-contest-dropdown.stat-closed .custom-contest-trigger:hover {
-    border-color: #94a3b8;
-    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.2);
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }
 
 .custom-contest-trigger i.arrow-icon {
@@ -977,7 +977,7 @@ option.opt-closed {
 }
 
 .custom-contest-dropdown.stat-in-progress .custom-contest-trigger i.arrow-icon {
-    color: #059669;
+    color: #854d0e;
 }
 
 .custom-contest-dropdown.stat-closed .custom-contest-trigger i.arrow-icon {
@@ -1025,14 +1025,14 @@ option.opt-closed {
 }
 
 .status-chip.in-progress {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #6ee7b7;
+    background: #ffffff;
+    color: #854d0e;
+    border: 1px solid #fde047;
 }
 
 .status-chip.closed {
-    background: #e2e8f0;
-    color: #475569;
+    background: #ffffff;
+    color: #64748b;
     border: 1px solid #cbd5e1;
 }
 
@@ -1051,11 +1051,11 @@ option.opt-closed {
 }
 
 .custom-contest-option.opt-in-progress {
-    color: #065f46;
+    color: #854d0e;
 }
 
 .custom-contest-option.opt-closed {
-    color: #334155;
+    color: #475569;
 }
 
 .custom-contest-option:hover {
@@ -1063,17 +1063,17 @@ option.opt-closed {
 }
 
 .custom-contest-option.opt-in-progress:hover {
-    background: #ecfdf5;
+    background: #fefce8;
 }
 
 .custom-contest-option.selected {
-    background: #e0e7ff;
-    color: #4338ca;
+    background: #f1f5f9;
+    color: #334155;
 }
 
 .custom-contest-option.opt-in-progress.selected {
-    background: #d1fae5;
-    color: #065f46;
+    background: #fef08a;
+    color: #713f12;
 }
 
 .score-badge {
