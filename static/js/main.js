@@ -1263,14 +1263,18 @@ window.openGoogleLoginModal = openGoogleLoginModal;
 function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
     if (!imgSrc) return;
 
-    // 메달/배지가 확대되어 표시된 경우에만 문구 변경 (띄어쓰기 적용)
-    let displayTitle = title || '수상 메달 / 배지';
-    if (displayTitle.includes('슈퍼스타')) {
-        displayTitle = '전체 1위 슈퍼스타';
-    } else if (displayTitle.includes('라이징스타')) {
-        displayTitle = '전체 2위 라이징스타';
-    } else if (displayTitle.includes('브라이트스타')) {
-        displayTitle = '전체 3위 브라이트스타';
+    // 메달/배지가 확대되어 표시된 경우 문구 및 글자 색상 분리 적용
+    let displayHtml = '';
+    let rawTitle = title || '수상 메달 / 배지';
+
+    if (rawTitle.includes('슈퍼스타')) {
+        displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 1위</span><span style="color: #fbbf24; font-weight: 900; text-shadow: 0 0 12px rgba(251, 191, 36, 0.85);">슈퍼스타</span>';
+    } else if (rawTitle.includes('라이징스타')) {
+        displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 2위</span><span style="color: #38bdf8; font-weight: 900; text-shadow: 0 0 12px rgba(56, 189, 248, 0.85);">라이징스타</span>';
+    } else if (rawTitle.includes('브라이트스타')) {
+        displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 3위</span><span style="color: #fb923c; font-weight: 900; text-shadow: 0 0 12px rgba(251, 146, 60, 0.85);">브라이트스타</span>';
+    } else {
+        displayHtml = `<span style="color: #ffffff; font-weight: 800;">${rawTitle}</span>`;
     }
 
     let modal = document.getElementById('globalBadgeZoomModal');
@@ -1295,7 +1299,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
     const titleEl = modal.querySelector('.zoom-title');
 
     if (img) img.src = imgSrc;
-    if (titleEl) titleEl.textContent = displayTitle;
+    if (titleEl) titleEl.innerHTML = displayHtml;
 
     modal.style.display = 'flex';
     requestAnimationFrame(() => {
