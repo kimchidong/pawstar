@@ -801,14 +801,14 @@ function openDetailModal(post, isHallOfFame = false) {
                 const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
                 if (isFamily) {
-                    badgeEl.innerHTML = `<div class="winner-title-badge family-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem; font-weight: 800;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>${rankTitle}</span></div>`;
+                    badgeEl.innerHTML = `<div class="winner-title-badge family-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; font-weight: 800;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>${rankTitle}</span></div>`;
                 } else {
                     if (post.rank_candidate === 1) {
-                        badgeEl.innerHTML = `<div class="rank-ribbon rank-1" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0; font-weight: 800;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                        badgeEl.innerHTML = `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; font-weight: 800;"><i class="fa-solid fa-crown"></i> <span>${rankTitle}</span></div>`;
                     } else if (post.rank_candidate === 2) {
-                        badgeEl.innerHTML = `<div class="rank-ribbon rank-2" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0; font-weight: 800;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                        badgeEl.innerHTML = `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; font-weight: 800;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>${rankTitle}</span></div>`;
                     } else if (post.rank_candidate === 3) {
-                        badgeEl.innerHTML = `<div class="rank-ribbon rank-3" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; margin: 0; font-weight: 800;"><i class="fa-solid fa-medal"></i> ${rankTitle}</div>`;
+                        badgeEl.innerHTML = `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; font-weight: 800;"><i class="fa-solid fa-star"></i> <span>${rankTitle}</span></div>`;
                     } else {
                         badgeEl.innerHTML = '';
                     }

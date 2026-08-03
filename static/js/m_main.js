@@ -274,10 +274,30 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
-                const iconHtml = isFamily ? `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>` : '🏆';
                 const prefix = (postData.is_co_rank ? '공동 ' : '') + catPrefix;
-                const bgStyle = isFamily ? 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;' : '';
-                mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; margin: 0; position: relative; top: 0; left: 0; font-weight: 800; ${bgStyle}">${iconHtml} ${prefix}${postData.rank_candidate}위 후보</div>`;
+                const rankTitle = `${prefix}${postData.rank_candidate}위 후보`;
+                let bgStyle = '';
+                let iconHtml = '';
+
+                if (isFamily) {
+                    iconHtml = `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>`;
+                    bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.4) 0%, rgba(192,132,252,0.38) 50%, rgba(147,51,234,0.42) 100%); color: #3b0764;';
+                } else {
+                    if (postData.rank_candidate === 1) {
+                        iconHtml = '👑';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.38) 0%, rgba(245,158,11,0.42) 50%, rgba(217,119,6,0.45) 100%); color: #451a03;';
+                    } else if (postData.rank_candidate === 2) {
+                        iconHtml = '🪄';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(241,245,249,0.38) 60%, rgba(203,213,225,0.35) 100%); color: #0f172a;';
+                    } else if (postData.rank_candidate === 3) {
+                        iconHtml = '⭐';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.4) 0%, rgba(251,146,60,0.38) 60%, rgba(234,88,12,0.42) 100%); color: #431407;';
+                    } else {
+                        iconHtml = '🏆';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.4) 0%, rgba(192,132,252,0.38) 50%, rgba(147,51,234,0.42) 100%); color: #3b0764;';
+                    }
+                }
+                mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; margin: 0; position: relative; top: 0; left: 0; font-weight: 800; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
             }
