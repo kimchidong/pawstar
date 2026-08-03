@@ -126,8 +126,8 @@
         </div>
 
         <!-- 검색창 (동물종류 콤보 바로 옆에 나란히 배치) -->
-        <div class="search-container" style="display: flex; align-items: center; gap: 0.45rem;">
-            <form method="GET" action="/" style="display: flex; align-items: center; gap: 0.45rem; margin: 0;">
+        <div class="search-container" style="display: flex; align-items: center;">
+            <form method="GET" action="/" style="display: flex; align-items: center; gap: 0.65rem; margin: 0;">
                 <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
                 <input type="hidden" name="sort" value="{{ sort_type }}">
                 <input type="hidden" name="pet_type" value="{{ pet_type }}">
