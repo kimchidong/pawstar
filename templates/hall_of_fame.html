@@ -9,22 +9,27 @@
             역대 콘테스트를 빛낸 최고의 전설적인 반려동물 스타들을 소개합니다!
         </p>
 
-        <!-- 회차 선택 (회차 정보 추가) -->
+        <!-- 회차 선택 (우측 검색 콤보와 동일한 커스텀 드롭다운 디자인 적용) -->
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-            {% set curr_stat = (current_contest.CONTEST_STAT_NM or current_contest.status or '') if current_contest else '' %}
-            {% set is_curr_in_prog = ('진행' in curr_stat or curr_stat == 'IN_PROGRESS' or (current_contest and current_contest.CONTEST_STAT == 'G001C001')) %}
-            <select id="contestSelect" class="select-custom {{ 'stat-in-progress' if is_curr_in_prog else 'stat-closed' }}" onchange="location.href='/hall-of-fame?contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; width: fit-content; width: -moz-fit-content; min-width: max-content; font-weight: 800; cursor: pointer; border-radius: 16px;">
-                {% for c in contests %}
-                    {% set c_id = c.CONTEST_ROUND or c.contest_id %}
-                    {% set c_title = c.THEME_NM or c.title %}
-                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
-                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
-                    {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
-                    <option value="{{ c_id }}" class="{{ 'opt-in-progress' if is_in_prog else 'opt-closed' }}" {{ 'selected' if c_id == cur_id }}>
-                        제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm or ('진행중' if is_in_prog else '종료') }})
-                    </option>
-                {% endfor %}
-            </select>
+            <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 385px;">
+                <div class="custom-contest-trigger">
+                    <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
+                        <span class="selected-text" style="font-weight: 800;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회 {{ current_contest.THEME_NM or current_contest.title }}</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </div>
+                <div class="custom-contest-options">
+                    {% for c in contests %}
+                        {% set c_id = c.CONTEST_ROUND or c.contest_id %}
+                        {% set c_title = c.THEME_NM or c.title %}
+                        {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
+                        {% set is_sel = (c_id == cur_id) %}
+                        <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="/hall-of-fame?contest_id={{ c_id }}">
+                            <span class="option-text">제{{ c_id }}회 {{ c_title }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 

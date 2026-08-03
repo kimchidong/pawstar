@@ -43,22 +43,36 @@
         </div>
     </div>
 
-    <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일) -->
+    <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일 커스텀 드롭다운) -->
     <div style="margin: 1.5rem 0 1rem 0; display: flex; justify-content: center;">
-        <select id="profileContestSelect" class="select-custom" onchange="location.href='?user_id={{ user.user_id }}&contest_id=' + this.value" style="padding: 0.65rem 2.8rem 0.65rem 1.25rem; font-size: 1rem; font-weight: 800; width: fit-content; width: -moz-fit-content; min-width: max-content; cursor: pointer; border-radius: 16px;">
-            <option value="all" class="opt-closed" {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}>
-                🏆 전체 회차 종합 보기
-            </option>
-            {% for c in contests %}
-                {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                {% set c_title = c.THEME_NM or c.title %}
-                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or ('진행중' if (c.CONTEST_STAT == 'G001C001') else '종료') %}
-                {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
-                <option value="{{ c_id }}" class="{{ 'opt-in-progress' if is_in_prog else 'opt-closed' }}" {{ 'selected' if c_id == (selected_contest_id|string) }}>
-                    제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm }})
-                </option>
-            {% endfor %}
-        </select>
+        <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 385px;">
+            <div class="custom-contest-trigger">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
+                    <span class="selected-text" style="font-weight: 800;">
+                        {% if selected_contest_id == 'all' or not selected_contest_id %}
+                            🏆 전체 회차 종합 보기
+                        {% else %}
+                            {% set sel_c = (contests | selectattr('CONTEST_ROUND', 'equalto', selected_contest_id|int) | first) or (contests | selectattr('contest_id', 'equalto', selected_contest_id|int) | first) %}
+                            제{{ selected_contest_id }}회 {{ sel_c.THEME_NM or sel_c.title if sel_c else '' }}
+                        {% endif %}
+                    </span>
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </div>
+            <div class="custom-contest-options">
+                <div class="custom-contest-option opt-closed {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}" data-value="all" data-url="?user_id={{ user.user_id }}&contest_id=all">
+                    <span class="option-text">🏆 전체 회차 종합 보기</span>
+                </div>
+                {% for c in contests %}
+                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                    {% set c_title = c.THEME_NM or c.title %}
+                    {% set is_sel = (c_id == (selected_contest_id|string)) %}
+                    <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
+                        <span class="option-text">제{{ c_id }}회 {{ c_title }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <!-- 활동 통계 4종 카드 (Stats Grid) -->
