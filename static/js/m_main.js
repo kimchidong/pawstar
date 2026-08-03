@@ -274,7 +274,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
-                const prefix = (postData.is_co_rank ? '공동 ' : '') + catPrefix;
+                const prefix = catPrefix + (postData.is_co_rank ? '공동 ' : '');
                 const rankTitle = `${prefix}${postData.rank_candidate}위 후보`;
                 let bgStyle = '';
                 let iconHtml = '';

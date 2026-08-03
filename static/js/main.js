@@ -798,7 +798,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 const isFamily = (currentPetType && currentPetType !== 'all');
                 const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
                 const iconClass = isFamily ? petIconClass : 'fa-solid fa-medal';
-                const prefix = (post.is_co_rank ? '공동 ' : '') + catPrefix;
+                const prefix = catPrefix + (post.is_co_rank ? '공동 ' : '');
                 const rankTitle = `${prefix}${post.rank_candidate}위 후보`;
                 if (isFamily) {
                     badgeEl.innerHTML = `<div class="winner-title-badge family-badge" style="position: relative; top: 0; left: 0; right: auto; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; font-weight: 800;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>${rankTitle}</span></div>`;

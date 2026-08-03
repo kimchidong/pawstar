@@ -58,7 +58,7 @@
                 {% elif p.rank_candidate and not is_closed %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
-                    {% set rank_prefix = ('공동 ' if p.is_co_rank else '') ~ category_prefix %}
+                    {% set rank_prefix = category_prefix ~ ('공동 ' if p.is_co_rank else '') %}
                     <div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; top: 0.4rem; left: 0.4rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
                 <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
