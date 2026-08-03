@@ -175,11 +175,23 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         else if (kindNm.includes('말') || kindNm.includes('큰동물')) petIconClass = 'fa-solid fa-horse';
 
         if (mBadgeEl) {
-            mBadgeEl.style.justifyContent = 'flex-end';
-            mBadgeEl.style.right = '0.5rem';
-            mBadgeEl.style.left = 'auto';
+            mBadgeEl.style.justifyContent = 'flex-start';
+            mBadgeEl.style.left = '0.5rem';
+            mBadgeEl.style.right = 'auto';
 
-            let html = '<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; flex-wrap: wrap;">';
+            let html = '<div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.35rem; flex-wrap: wrap;">';
+
+            // 1. 실물 메달 / 배찌 이미지 나란히 배치
+            sortedAwards.forEach(aw => {
+                const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
+                const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
+                if (badgeImgSrc) {
+                    html += `<img src="${badgeImgSrc}" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35)); flex-shrink: 0;" alt="${awardNmStr}">`;
+                }
+            });
+
+            // 2. 텍스트 수상 배지 나란히 배치
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
