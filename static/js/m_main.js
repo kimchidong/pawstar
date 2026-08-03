@@ -181,7 +181,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    leftHtml += `<img src="${badgeImgSrc}" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35)); flex-shrink: 0;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect" style="width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
                 }
             });
             mMedalsLeftEl.innerHTML = leftHtml;

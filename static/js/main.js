@@ -676,7 +676,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    leftHtml += `<img src="${badgeImgSrc}" style="width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); flex-shrink: 0;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect" style="width: 46px; height: 46px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
                 }
             });
             medalsLeftEl.innerHTML = leftHtml;
