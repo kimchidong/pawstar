@@ -18,7 +18,7 @@
         {% set c_title = c.THEME_NM or c.title %}
         {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
         <a href="/m/hall-of-fame?contest_id={{ c_id }}" class="m-chip {{ 'active' if c_id == cur_id }}">
-            제{{ c_id }}회 {{ c_title }}
+            <span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}
         </a>
     {% endfor %}
 </div>

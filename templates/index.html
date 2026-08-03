@@ -73,7 +73,7 @@
                     {% else %}
                         <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
                     {% endif %}
-                    <span class="selected-text" style="font-weight: 800;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회 {{ current_contest.THEME_NM or current_contest.title }}</span>
+                    <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</span>
                 </span>
                 <i class="fa-solid fa-chevron-down arrow-icon"></i>
             </div>
@@ -90,7 +90,7 @@
                             {% else %}
                                 <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
                             {% endif %}
-                            <span class="option-text">제{{ c_id }}회 {{ c.THEME_NM or c.title }}</span>
+                            <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
                         </div>
                     {% endif %}
                 {% endfor %}

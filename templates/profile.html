@@ -53,7 +53,7 @@
                             🏆 전체 회차 종합 보기
                         {% else %}
                             {% set sel_c = (contests | selectattr('CONTEST_ROUND', 'equalto', selected_contest_id|int) | first) or (contests | selectattr('contest_id', 'equalto', selected_contest_id|int) | first) %}
-                            제{{ selected_contest_id }}회 {{ sel_c.THEME_NM or sel_c.title if sel_c else '' }}
+                            <span class="round-badge-text">제{{ selected_contest_id }}회</span> {{ sel_c.THEME_NM or sel_c.title if sel_c else '' }}
                         {% endif %}
                     </span>
                 </span>
@@ -68,7 +68,7 @@
                     {% set c_title = c.THEME_NM or c.title %}
                     {% set is_sel = (c_id == (selected_contest_id|string)) %}
                     <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
-                        <span class="option-text">제{{ c_id }}회 {{ c_title }}</span>
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
                     </div>
                 {% endfor %}
             </div>

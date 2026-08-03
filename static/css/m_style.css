@@ -616,3 +616,16 @@ body.m-body {
     transform: none !important;
 }
 
+/* 🏷️ 모바일 회차 표시 (제X회) 전용 포인트 글자색 스타일 */
+.round-badge-text {
+    color: #4f46e5;
+    font-weight: 900;
+    margin-right: 0.2rem;
+    display: inline-block;
+}
+
+.m-chip.active .round-badge-text {
+    color: #fde047;
+}
+
+
