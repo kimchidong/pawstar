@@ -1344,7 +1344,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
             resolvedIcon = 'fa-solid fa-paw';
         }
 
-        const iconHtml = `<span class="pet-emoji-icon" style="margin-right: 0.45rem; display: inline-flex; align-items: center; justify-content: center;"><i class="${resolvedIcon}" style="color: #c084fc; font-size: 1.15em; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.85));"></i></span>`;
+        const iconHtml = `<span class="pet-emoji-icon" style="margin-right: 0.45rem; display: inline-flex; align-items: center; justify-content: center;"><i class="${resolvedIcon}" style="color: #c084fc; font-size: 1.15em; filter: none !important;"></i></span>`;
         const rankMatch = rawTitle.match(/(\d+위)/);
         if (rankMatch) {
             const rankStr = rankMatch[1];

@@ -1669,7 +1669,7 @@ option.opt-closed {
 .m-card-badge .pet-emoji-icon i {
     color: inherit !important;
     font-size: 0.9em;
-    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.7)) !important;
+    filter: none !important;
 }
 
 /* 공동 수상 태그 (co-winner-tag) 우아한 통합 스타일 */
