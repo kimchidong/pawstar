@@ -1307,12 +1307,24 @@ window.openGoogleLoginModal = openGoogleLoginModal;
 })();
 
 // 🏆 메달 / 배지 중앙 확대 라이트박스 팝업 컨트롤러 (Bulletproof Body Lightbox)
-function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
+function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = '') {
     if (!imgSrc) return;
 
     // 메달/배지가 확대되어 표시된 경우 문구 및 글자 색상 분리 적용
     let displayHtml = '';
     let rawTitle = title || '수상 메달 / 배지';
+
+    const getIconClassFromKind = (kindNm) => {
+        if (!kindNm) return 'fa-solid fa-paw';
+        if (kindNm.includes('강아지') || kindNm.includes('개')) return 'fa-solid fa-dog';
+        if (kindNm.includes('고양이')) return 'fa-solid fa-cat';
+        if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치')) return 'fa-solid fa-otter';
+        if (kindNm.includes('거북이') || kindNm.includes('파충류') || kindNm.includes('도마뱀')) return 'fa-solid fa-frog';
+        if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) return 'fa-solid fa-fish';
+        if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) return 'fa-solid fa-crow';
+        if (kindNm.includes('말') || kindNm.includes('큰동물')) return 'fa-solid fa-horse';
+        return 'fa-solid fa-paw';
+    };
 
     if (rawTitle.includes('슈퍼스타')) {
         displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 1위</span><span style="color: #fbbf24; font-weight: 900; text-shadow: 0 0 12px rgba(251, 191, 36, 0.85);">슈퍼스타</span>';
@@ -1321,6 +1333,18 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
     } else if (rawTitle.includes('브라이트스타')) {
         displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 3위</span><span style="color: #fb923c; font-weight: 900; text-shadow: 0 0 12px rgba(251, 146, 60, 0.85);">브라이트스타</span>';
     } else if (rawTitle.includes('패밀리스타')) {
+        let resolvedIcon = petIcon;
+        if (!resolvedIcon) {
+            const curPost = window.currentDetailPost || window.currentMobileDetailPost;
+            if (curPost) {
+                resolvedIcon = getIconClassFromKind(curPost.KIND_NM || curPost.pet_type);
+            }
+        }
+        if (!resolvedIcon || !resolvedIcon.includes('fa-')) {
+            resolvedIcon = 'fa-solid fa-paw';
+        }
+
+        const iconHtml = `<span class="pet-emoji-icon" style="margin-right: 0.45rem; display: inline-flex; align-items: center; justify-content: center;"><i class="${resolvedIcon}" style="color: #c084fc; font-size: 1.15em; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.85));"></i></span>`;
         const rankMatch = rawTitle.match(/(\d+위)/);
         if (rankMatch) {
             const rankStr = rankMatch[1];
@@ -1329,9 +1353,9 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
             else if (rankStr === '2위') rankColor = '#cbd5e1';
             else if (rankStr === '3위') rankColor = '#fed7aa';
 
-            displayHtml = `<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85); margin-right: 0.35rem;">패밀리스타</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
+            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85); margin-right: 0.35rem;">패밀리스타</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
         } else {
-            displayHtml = `<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85);">패밀리스타</span>`;
+            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85);">패밀리스타</span>`;
         }
     } else if (rawTitle.includes('루키스타')) {
         const rankMatch = rawTitle.match(/(\d+위)/);
@@ -1359,7 +1383,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
             <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; transform: scale(0.75); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="event.stopPropagation()">
                 <button type="button" class="zoom-close-btn" style="position: absolute; top: -2.8rem; right: -0.8rem; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: #ffffff; width: 44px; height: 44px; border-radius: 50%; font-size: 2rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); box-shadow: 0 4px 14px rgba(0,0,0,0.6);">&times;</button>
                 <img class="zoom-img hall-medal-effect" src="" alt="확대 메달/배지" style="width: 310px; height: 310px; max-width: 80vw; max-height: 55vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(255,255,255,1)) drop-shadow(0 0 75px rgba(254,240,138,1)) brightness(1.25);">
-                <div class="zoom-title" style="color: #ffffff; font-size: 1.25rem; font-weight: 800; text-align: center; background: #192131; padding: 0.55rem 1.7rem; border-radius: 30px; border: 1.5px solid #fde68a; box-shadow: 0 6px 20px rgba(0,0,0,0.6); letter-spacing: -0.3px;"></div>
+                <div class="zoom-title" style="color: #ffffff; font-size: 1.25rem; font-weight: 800; text-align: center; background: #192131; padding: 0.55rem 1.7rem; border-radius: 30px; border: 1.5px solid #fde68a; box-shadow: 0 6px 20px rgba(0,0,0,0.6); letter-spacing: -0.3px; display: inline-flex; align-items: center; justify-content: center;"></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -1403,11 +1427,12 @@ document.addEventListener('click', function(e) {
             imgSrc = target.src;
         }
         let title = target.getAttribute('data-badge-title') || target.alt || target.textContent.trim();
+        let petIcon = target.getAttribute('data-pet-icon') || target.querySelector('.pet-emoji-icon i, i')?.className;
 
         if (imgSrc) {
             e.stopPropagation();
             e.preventDefault();
-            openBadgeZoomModal(imgSrc, title);
+            openBadgeZoomModal(imgSrc, title, petIcon);
         }
     }
 }, true);
