@@ -1263,6 +1263,16 @@ window.openGoogleLoginModal = openGoogleLoginModal;
 function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
     if (!imgSrc) return;
 
+    // 메달/배지가 확대되어 표시된 경우에만 문구 변경 (띄어쓰기 적용)
+    let displayTitle = title || '수상 메달 / 배지';
+    if (displayTitle.includes('슈퍼스타')) {
+        displayTitle = '전체 1위 슈퍼스타';
+    } else if (displayTitle.includes('라이징스타')) {
+        displayTitle = '전체 2위 라이징스타';
+    } else if (displayTitle.includes('브라이트스타')) {
+        displayTitle = '전체 3위 브라이트스타';
+    }
+
     let modal = document.getElementById('globalBadgeZoomModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -1285,7 +1295,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
     const titleEl = modal.querySelector('.zoom-title');
 
     if (img) img.src = imgSrc;
-    if (titleEl) titleEl.textContent = title || '수상 메달 / 배지';
+    if (titleEl) titleEl.textContent = displayTitle;
 
     modal.style.display = 'flex';
     requestAnimationFrame(() => {
