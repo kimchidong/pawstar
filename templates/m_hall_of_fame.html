@@ -38,7 +38,9 @@
                 {% elif part == 'G002P001' and rk == 3 %}
                     <div class="winner-title-badge"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
                 {% else %}
-                    <div class="winner-title-badge family-star-badge"><i class="fa-solid fa-paw"></i> <span>패밀리스타</span></div>
+                    {% set w_kind = w.KIND_NM or w.pet_type or '' %}
+                    {% set w_icon = 'fa-solid fa-dog' if ('강아지' in w_kind or '개' in w_kind) else ('fa-solid fa-cat' if '고양이' in w_kind else ('fa-solid fa-otter' if ('햄스터' in w_kind or '소동물' in w_kind or '토끼' in w_kind or '고슴도치' in w_kind) else ('fa-solid fa-frog' if ('거북이' in w_kind or '파충류' in w_kind or '도마뱀' in w_kind) else ('fa-solid fa-fish' if ('어류' in w_kind or '관상어' in w_kind or '물고기' in w_kind) else ('fa-solid fa-crow' if ('새' in w_kind or '앵무새' in w_kind or '조류' in w_kind) else ('fa-solid fa-horse' if ('말' in w_kind or '큰동물' in w_kind) else 'fa-solid fa-paw')))))) %}
+                    <div class="winner-title-badge family-star-badge"><i class="{{ w_icon }}"></i> <span>패밀리스타</span></div>
                 {% endif %}
 
                 <!-- 이미지 및 좌측 상단 메달 뱃지 -->
