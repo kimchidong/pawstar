@@ -189,9 +189,20 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const awRank = aw.ranking || aw.RANKING;
+                let displayTitle = aw.award_nm || aw.AWARD_NM || '';
+
+                if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) displayTitle = '슈퍼스타';
+                else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) displayTitle = '라이징스타';
+                else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) displayTitle = '브라이트스타';
+                else if (awardCdStr.includes('P002A901')) displayTitle = '패밀리스타 1위';
+                else if (awardCdStr.includes('P002A902')) displayTitle = '패밀리스타 2위';
+                else if (awardCdStr.includes('P002A903')) displayTitle = '패밀리스타 3위';
+                else if (awRank) displayTitle = `패밀리스타 ${awRank}위`;
+
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect badge-zoomable-img" data-badge-src="${badgeImgSrc}" data-badge-title="${awardNmStr}" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect badge-zoomable-img" data-badge-src="${badgeImgSrc}" data-badge-title="${displayTitle}" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${displayTitle}">`;
                 }
             });
             mMedalsLeftEl.innerHTML = leftHtml;
@@ -210,14 +221,14 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">👑 슈퍼스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');">👑 슈퍼스타</div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">🪄 라이징스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');">🪄 라이징스타</div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">⭐ 브라이트스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');">⭐ 브라이트스타</div>`;
                 } else {
-                    const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
+                    const titleText = awRank ? `패밀리스타 ${awRank}위` : '패밀리스타';
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${titleText}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> ${titleText}</div>`;
                 }
             });
             rightHtml += '</div>';
