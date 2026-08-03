@@ -631,41 +631,60 @@ option.opt-closed {
 .search-box {
     position: relative;
     height: 51.05px;
-}
-
-.search-box form {
-    height: 100%;
-    display: flex;
-    align-items: center;
+    width: 165px;
 }
 
 .search-box input {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    color: var(--text-primary);
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #1e293b;
     height: 51.05px;
     box-sizing: border-box;
-    padding: 0 1rem 0 2.2rem;
-    border-radius: var(--radius-sm);
+    padding: 0 1rem;
+    border-radius: 12px;
     font-size: 0.9rem;
-    font-weight: 600;
-    width: 220px;
-    transition: var(--transition);
+    font-weight: 700;
+    width: 165px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-box input:focus {
-    width: 280px;
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    width: 165px;
+    border-color: #6366f1;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
     outline: none;
 }
 
-.search-box i {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
+/* 독립된 검색 제출 아이콘 버튼 (빨간 표시 위치) */
+.search-submit-btn {
+    width: 51.05px;
+    height: 51.05px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    color: #475569;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+}
+
+.search-submit-btn:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    transform: translateY(-1px);
+}
+
+.search-submit-btn:active {
+    transform: translateY(0);
 }
 
 /* Post Cards Grid (Clean Bright White Cards) */

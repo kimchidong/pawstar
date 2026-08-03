@@ -126,13 +126,17 @@
         </div>
 
         <!-- 검색창 (동물종류 콤보 바로 옆에 나란히 배치) -->
-        <div class="search-box">
-            <form method="GET" action="/">
+        <div class="search-container" style="display: flex; align-items: center; gap: 0.45rem;">
+            <form method="GET" action="/" style="display: flex; align-items: center; gap: 0.45rem; margin: 0;">
                 <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
                 <input type="hidden" name="sort" value="{{ sort_type }}">
                 <input type="hidden" name="pet_type" value="{{ pet_type }}">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="q" value="{{ search_q }}" placeholder="아이 이름 또는 제목 검색...">
+                <div class="search-box">
+                    <input type="text" name="q" value="{{ search_q }}" placeholder="검색어 입력...">
+                </div>
+                <button type="submit" class="search-submit-btn" title="검색">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
             </form>
         </div>
     </div>
