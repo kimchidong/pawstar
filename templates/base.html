@@ -135,8 +135,8 @@
             <div class="detail-modal-body">
                 <div class="detail-media-container" style="position: relative;">
                     <img id="detailImg" src="" alt="pet image">
-                    <div id="detailMedalsLeft" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10; display: flex; align-items: center; gap: 0.4rem; pointer-events: none;"></div>
-                    <div id="detailRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.75rem; right: 0.75rem; left: auto; z-index: 10; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; pointer-events: none;"></div>
+                    <div id="detailMedalsLeft" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; pointer-events: auto;"></div>
+                    <div id="detailRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.75rem; right: 0.75rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; pointer-events: auto;"></div>
                 </div>
                 <div class="detail-info-container">
                     <div class="author-info" style="margin-bottom: 1rem;">
@@ -339,6 +339,13 @@
             });
         }
     });
-    </script>
+    <!-- 메달 / 배지 큰 이미지 라이트박스 팝업 모달 -->
+    <div id="badgeZoomModal" style="position: fixed; inset: 0; z-index: 999999; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;" onclick="closeBadgeZoomModal()">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeBadgeZoomModal()" style="position: absolute; top: -2.8rem; right: -1rem; background: none; border: none; color: #ffffff; font-size: 2.5rem; cursor: pointer; text-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 10;">&times;</button>
+            <img id="badgeZoomImg" src="" alt="확대 메달/배지" class="hall-medal-effect" style="width: 280px; height: 280px; max-width: 80vw; max-height: 60vh; object-fit: contain; filter: drop-shadow(0 0 30px rgba(255,255,255,0.95)) drop-shadow(0 0 60px rgba(254,240,138,0.95)) brightness(1.2);">
+            <div id="badgeZoomTitle" style="color: #ffffff; font-size: 1.35rem; font-weight: 900; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.8); background: rgba(15, 23, 42, 0.85); padding: 0.5rem 1.6rem; border-radius: 30px; border: 1.5px solid rgba(253, 230, 138, 0.7); box-shadow: var(--shadow-soft);"></div>
+        </div>
+    </div>
 </body>
 </html>

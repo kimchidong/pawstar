@@ -652,8 +652,18 @@ function openDetailModal(post, isHallOfFame = false) {
 
     if (medalsLeftEl) medalsLeftEl.innerHTML = '';
 
-    if (post.awards && post.awards.length > 0) {
-        const sortedAwards = [...post.awards].sort((a, b) => {
+    let awardsData = (post.awards && post.awards.length > 0) ? post.awards : [];
+    if (awardsData.length === 0 && (post.award_cd || post.AWARD_CD)) {
+        const cd = post.award_cd || post.AWARD_CD;
+        const nm = post.award_nm || post.AWARD_NM || '수상 메달';
+        const part = post.award_part || post.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
+        const img = post.badge_img || post.badge_image_path || post.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
+        const rk = post.ranking || post.RANKING || post.rank || post.rank_candidate;
+        awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+    }
+
+    if (awardsData.length > 0) {
+        const sortedAwards = [...awardsData].sort((a, b) => {
             const partA = a.award_part || a.AWARD_PART || '';
             const partB = b.award_part || b.AWARD_PART || '';
             return partA.localeCompare(partB);
@@ -676,7 +686,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect" style="width: 46px; height: 46px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect badge-zoomable-img" data-badge-src="${badgeImgSrc}" data-badge-title="${awardNmStr}" style="width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
                 }
             });
             medalsLeftEl.innerHTML = leftHtml;
@@ -691,17 +701,18 @@ function openDetailModal(post, isHallOfFame = false) {
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    rightHtml += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    rightHtml += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    rightHtml += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    rightHtml += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>패밀리스타${rankSuffix}</span></div>`;
+                    rightHtml += `<div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> <span>패밀리스타${rankSuffix}</span></div>`;
                 }
             });
             rightHtml += '</div>';
@@ -1236,3 +1247,78 @@ window.openGoogleLoginModal = openGoogleLoginModal;
         }
     }, 10000);
 })();
+
+// 🏆 메달 / 배지 중앙 확대 라이트박스 팝업 컨트롤러 (Bulletproof Body Lightbox)
+function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
+    if (!imgSrc) return;
+
+    let modal = document.getElementById('globalBadgeZoomModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'globalBadgeZoomModal';
+        modal.style.cssText = 'position: fixed; inset: 0; z-index: 99999999; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; cursor: pointer;';
+        modal.innerHTML = `
+            <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; transform: scale(0.75); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="event.stopPropagation()">
+                <button type="button" class="zoom-close-btn" style="position: absolute; top: -2.8rem; right: -0.8rem; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: #ffffff; width: 44px; height: 44px; border-radius: 50%; font-size: 2rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); box-shadow: 0 4px 14px rgba(0,0,0,0.6);">&times;</button>
+                <img class="zoom-img hall-medal-effect" src="" alt="확대 메달/배지" style="width: 300px; height: 300px; max-width: 78vw; max-height: 58vh; object-fit: contain; filter: drop-shadow(0 0 35px rgba(255,255,255,1)) drop-shadow(0 0 70px rgba(254,240,138,1)) brightness(1.25);">
+                <div class="zoom-title" style="color: #ffffff; font-size: 1.35rem; font-weight: 900; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.9); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); padding: 0.65rem 1.8rem; border-radius: 30px; border: 1.5px solid rgba(253, 230, 138, 0.85); box-shadow: 0 10px 25px rgba(0,0,0,0.5);"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', closeBadgeZoomModal);
+        const closeBtn = modal.querySelector('.zoom-close-btn');
+        if (closeBtn) closeBtn.addEventListener('click', closeBadgeZoomModal);
+    }
+
+    const img = modal.querySelector('.zoom-img');
+    const titleEl = modal.querySelector('.zoom-title');
+
+    if (img) img.src = imgSrc;
+    if (titleEl) titleEl.textContent = title || '수상 메달 / 배지';
+
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        const inner = modal.firstElementChild;
+        if (inner) inner.style.transform = 'scale(1)';
+    });
+}
+
+function closeBadgeZoomModal() {
+    const modal = document.getElementById('globalBadgeZoomModal');
+    if (modal && modal.style.display !== 'none') {
+        modal.style.opacity = '0';
+        const inner = modal.firstElementChild;
+        if (inner) inner.style.transform = 'scale(0.75)';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 250);
+    }
+}
+
+// 전역 캡처링 단계 이벤트 위임: 메달/배지 및 배지 요소 클릭 100% 보장
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.badge-zoomable-img, #detailMedalsLeft img, #mDetailMedalsLeft img, .winner-title-badge, .m-card-badge');
+    if (target) {
+        let imgSrc = target.getAttribute('data-badge-src') || target.querySelector('img')?.src;
+        if (!imgSrc && target.tagName === 'IMG') {
+            imgSrc = target.src;
+        }
+        let title = target.getAttribute('data-badge-title') || target.alt || target.textContent.trim();
+
+        if (imgSrc) {
+            e.stopPropagation();
+            e.preventDefault();
+            openBadgeZoomModal(imgSrc, title);
+        }
+    }
+}, true);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeBadgeZoomModal();
+    }
+});
+
+window.openBadgeZoomModal = openBadgeZoomModal;
+window.closeBadgeZoomModal = closeBadgeZoomModal;

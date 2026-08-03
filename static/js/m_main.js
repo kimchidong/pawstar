@@ -157,8 +157,18 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     if (mMedalsLeftEl) mMedalsLeftEl.innerHTML = '';
 
-    if (postData.awards && postData.awards.length > 0) {
-        const sortedAwards = [...postData.awards].sort((a, b) => {
+    let awardsData = (postData.awards && postData.awards.length > 0) ? postData.awards : [];
+    if (awardsData.length === 0 && (postData.award_cd || postData.AWARD_CD)) {
+        const cd = postData.award_cd || postData.AWARD_CD;
+        const nm = postData.award_nm || postData.AWARD_NM || '수상 메달';
+        const part = postData.award_part || postData.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
+        const img = postData.badge_img || postData.badge_image_path || postData.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
+        const rk = postData.ranking || postData.RANKING || postData.rank || postData.rank_candidate;
+        awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+    }
+
+    if (awardsData.length > 0) {
+        const sortedAwards = [...awardsData].sort((a, b) => {
             const partA = a.award_part || a.AWARD_PART || '';
             const partB = b.award_part || b.AWARD_PART || '';
             return partA.localeCompare(partB);
@@ -181,7 +191,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
                 const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 if (badgeImgSrc) {
-                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect" style="width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
+                    leftHtml += `<img src="${badgeImgSrc}" class="hall-medal-effect badge-zoomable-img" data-badge-src="${badgeImgSrc}" data-badge-title="${awardNmStr}" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; pointer-events: auto; cursor: pointer;" alt="${awardNmStr}">`;
                 }
             });
             mMedalsLeftEl.innerHTML = leftHtml;
@@ -196,17 +206,18 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             sortedAwards.forEach(aw => {
                 const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
                 const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const badgeImgSrc = aw.badge_img || aw.badge_image_path || aw.BADGE_IMAGE_PATH || (awardCdStr ? `/static/image/badge/${awardCdStr}.png` : '');
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">👑 슈퍼스타</div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">🪄 라이징스타</div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');">⭐ 브라이트스타</div>`;
                 } else {
                     const rankSuffix = awRank ? ` ${awRank}위` : '';
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${awardNmStr}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> 패밀리스타${rankSuffix}</div>`;
                 }
             });
             rightHtml += '</div>';
@@ -605,3 +616,6 @@ async function deleteMobileCurrentPost() {
 window.openMobileDetailModal = openMobileDetailModal;
 window.closeMobileDetailModal = closeMobileDetailModal;
 window.deleteMobileCurrentPost = deleteMobileCurrentPost;
+if (typeof window.openBadgeZoomModal === 'function') {
+    window.openBadgeZoomModal = window.openBadgeZoomModal;
+}
