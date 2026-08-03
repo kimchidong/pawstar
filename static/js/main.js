@@ -1273,6 +1273,32 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지') {
         displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 2위</span><span style="color: #38bdf8; font-weight: 900; text-shadow: 0 0 12px rgba(56, 189, 248, 0.85);">라이징스타</span>';
     } else if (rawTitle.includes('브라이트스타')) {
         displayHtml = '<span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 3위</span><span style="color: #fb923c; font-weight: 900; text-shadow: 0 0 12px rgba(251, 146, 60, 0.85);">브라이트스타</span>';
+    } else if (rawTitle.includes('패밀리스타')) {
+        const rankMatch = rawTitle.match(/(\d+위)/);
+        if (rankMatch) {
+            const rankStr = rankMatch[1];
+            let rankColor = '#e2e8f0';
+            if (rankStr === '1위') rankColor = '#fef08a';
+            else if (rankStr === '2위') rankColor = '#cbd5e1';
+            else if (rankStr === '3위') rankColor = '#fed7aa';
+
+            displayHtml = `<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85); margin-right: 0.35rem;">패밀리스타</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
+        } else {
+            displayHtml = `<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85);">패밀리스타</span>`;
+        }
+    } else if (rawTitle.includes('루키스타')) {
+        const rankMatch = rawTitle.match(/(\d+위)/);
+        if (rankMatch) {
+            const rankStr = rankMatch[1];
+            let rankColor = '#e2e8f0';
+            if (rankStr === '1위') rankColor = '#fef08a';
+            else if (rankStr === '2위') rankColor = '#cbd5e1';
+            else if (rankStr === '3위') rankColor = '#fed7aa';
+
+            displayHtml = `<span style="color: #34d399; font-weight: 900; text-shadow: 0 0 12px rgba(52, 211, 153, 0.85); margin-right: 0.35rem;">루키스타</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
+        } else {
+            displayHtml = `<span style="color: #34d399; font-weight: 900; text-shadow: 0 0 12px rgba(52, 211, 153, 0.85);">루키스타</span>`;
+        }
     } else {
         displayHtml = `<span style="color: #ffffff; font-weight: 800;">${rawTitle}</span>`;
     }
