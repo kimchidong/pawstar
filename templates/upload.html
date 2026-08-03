@@ -44,12 +44,38 @@
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐾 동물 종류
                             </label>
-                            <select name="pet_type" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 700; background: var(--bg-primary);">
+                            <!-- 숨겨진 정식 select (폼 전송 & 라이브 프리뷰 100% 연동) -->
+                            <select name="pet_type" id="hiddenUploadPetType" required style="display: none;">
                                 <option value="" selected>선택</option>
                                 {% for k in pet_kinds %}
-                                    <option value="{{ k.KIND_CD }}">{{ k.DISPLAY_NM or k.KIND_NM }}</option>
+                                    {% set k_nm = k.KIND_NM %}
+                                    {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
+                                    {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
+                                    <option value="{{ opt_text }}">{{ opt_text }}</option>
                                 {% endfor %}
                             </select>
+
+                            <!-- 검색 블럭과 100% 동일한 단색 FontAwesome 아이콘 커스텀 셀렉트 드롭다운 -->
+                            <div class="custom-pet-dropdown" id="uploadPetTypeDropdown" style="width: 100%; height: 48px;">
+                                <div class="custom-pet-trigger" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary);">
+                                    <span style="display: inline-flex; align-items: center; gap: 0.6rem;">
+                                        <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon"></i>
+                                        <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted);">동물 종류 선택</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                                </div>
+                                <div class="custom-pet-options" style="top: calc(100% + 4px); z-index: 1000; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                                    {% for k in pet_kinds %}
+                                        {% set k_nm = k.KIND_NM %}
+                                        {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
+                                        {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
+                                        {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
+                                        <div class="custom-pet-option" data-value="{{ opt_text }}" data-icon="{{ k_icon }}" data-text="{{ k_clean }}" style="cursor: pointer; padding: 0.65rem 0.9rem;">
+                                            <i class="{{ k_icon }}"></i> <span>{{ k_clean }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -331,6 +357,58 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectPetType) selectPetType.addEventListener('change', updatePreview);
     if (inputTitle) inputTitle.addEventListener('input', updatePreview);
     if (textareaContent) textareaContent.addEventListener('input', updatePreview);
+
+    // 커스텀 동물 종류 드롭다운 (검색 블럭과 100% 동일한 고급 UI)
+    const uploadDropdown = document.getElementById('uploadPetTypeDropdown');
+    if (uploadDropdown) {
+        const trigger = uploadDropdown.querySelector('.custom-pet-trigger');
+        const options = uploadDropdown.querySelectorAll('.custom-pet-option');
+        const hiddenSelect = document.getElementById('hiddenUploadPetType');
+        const triggerIcon = document.getElementById('uploadTriggerIcon');
+        const triggerText = document.getElementById('uploadTriggerText');
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            uploadDropdown.classList.toggle('open');
+        });
+
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = opt.getAttribute('data-value');
+                const iconClass = opt.getAttribute('data-icon');
+                const text = opt.getAttribute('data-text');
+
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+
+                if (triggerIcon) triggerIcon.className = `pet-icon ${iconClass}`;
+                if (triggerText) {
+                    triggerText.textContent = text;
+                    triggerText.style.color = 'var(--text-primary)';
+                }
+
+                if (hiddenSelect) {
+                    hiddenSelect.value = val;
+                    for (let i = 0; i < hiddenSelect.options.length; i++) {
+                        if (hiddenSelect.options[i].value === val) {
+                            hiddenSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    updatePreview();
+                }
+
+                uploadDropdown.classList.remove('open');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!uploadDropdown.contains(e.target)) {
+                uploadDropdown.classList.remove('open');
+            }
+        });
+    }
 
     let currentTempFilename = '';
 
