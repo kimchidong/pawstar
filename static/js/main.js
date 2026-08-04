@@ -1090,9 +1090,93 @@ function deleteDetailComment(cmtUserId) {
         showToast('댓글이 삭제되었습니다.', 'info');
         loadComments(window.currentDetailPostId);
         
-        // 점수 및 통계 UI 업데이트
-        if (data.event_res) {
-            updatePostStatsUI(window.currentDetailPostId, data.event_res);
+        // 차감된 수치 및 점수 UI 실시간 반영
+        const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
+        const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
+        const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+        const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
+
+        const postId = window.currentDetailPostId;
+        
+        window.currentDetailPostIsCommented = false;
+        if (window.currentDetailPost) {
+            window.currentDetailPost.is_commented = false;
+            if (window.currentDetailPost.actions) window.currentDetailPost.actions.is_commented = false;
+        }
+
+        const btnComment = document.getElementById('detailBtnComment');
+        if (btnComment) {
+            btnComment.classList.remove('active');
+            const icon = btnComment.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-comment';
+        }
+
+        if (postId) {
+            if (window.postsDataStore && window.postsDataStore[postId]) {
+                const storeItem = window.postsDataStore[postId];
+                if (finalComment !== undefined) storeItem.comment_count = finalComment;
+                if (finalComment !== undefined) storeItem.CMT_CNT = finalComment;
+                if (finalScore !== undefined) {
+                    storeItem.score = finalScore;
+                    storeItem.SCORE = finalScore;
+                }
+                storeItem.is_commented = false;
+                if (storeItem.actions) storeItem.actions.is_commented = false;
+            }
+
+            const commentCountEl = document.getElementById('detailCommentCount');
+            if (commentCountEl && finalComment !== undefined) {
+                commentCountEl.textContent = Number(finalComment || 0).toLocaleString();
+            }
+
+            const viewCountEl = document.getElementById('detailViewCount');
+            if (viewCountEl && finalView !== undefined) {
+                viewCountEl.textContent = Number(finalView || 0).toLocaleString();
+            }
+
+            const likeCountEl = document.getElementById('detailLikeCount');
+            if (likeCountEl && finalLike !== undefined) {
+                likeCountEl.textContent = Number(finalLike || 0).toLocaleString();
+            }
+
+            const scoreNumEl = document.getElementById('detailScoreNum');
+            if (scoreNumEl && finalScore !== undefined) {
+                scoreNumEl.textContent = finalScore.toLocaleString();
+            }
+
+            const cleanId = String(postId);
+            const rawEntId = cleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`post-card-${cleanId}`) || 
+                         document.getElementById(`post-card-${rawEntId}`) ||
+                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+                         
+            if (card) {
+                const btnCardComment = card.querySelector('.btn-comment');
+                if (btnCardComment) {
+                    btnCardComment.classList.remove('active');
+                    const icon = btnCardComment.querySelector('i');
+                    if (icon) icon.className = 'fa-regular fa-comment';
+                }
+
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = finalComment;
+                }
+                const cardScore = card.querySelector('.score-num');
+                if (cardScore && finalScore !== undefined) {
+                    cardScore.textContent = finalScore.toLocaleString();
+                }
+                const cardView = card.querySelector('.view-count');
+                if (cardView && finalView !== undefined) {
+                    cardView.textContent = finalView;
+                }
+                const cardLike = card.querySelector('.like-count');
+                if (cardLike && finalLike !== undefined) {
+                    cardLike.textContent = finalLike;
+                }
+            }
         }
     })
     .catch(err => {

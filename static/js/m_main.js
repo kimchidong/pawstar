@@ -574,9 +574,81 @@ function deleteMobileDetailComment(cmtUserId) {
         showMobileToast('댓글이 삭제되었습니다.', 'info');
         loadMobileComments(window.currentMobileDetailPostId);
         
-        // 통계 UI 업데이트
-        if (data.event_res) {
-            updateMobilePostStatsUI(window.currentMobileDetailPostId, data.event_res);
+        // 차감된 수치 및 점수 UI 실시간 반영
+        const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
+        const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
+        const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+        const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
+
+        const mPostId = window.currentMobileDetailPostId;
+        
+        window.currentMobileDetailPostIsCommented = false;
+        if (window.currentMobileDetailPost) {
+            window.currentMobileDetailPost.is_commented = false;
+            if (window.currentMobileDetailPost.actions) window.currentMobileDetailPost.actions.is_commented = false;
+        }
+
+        const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
+        if (mBtnCommentPopup) {
+            mBtnCommentPopup.classList.remove('active');
+            const icon = mBtnCommentPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-comment';
+        }
+
+        if (mPostId) {
+            const mScoreEl = document.getElementById('mDetailScoreNum');
+            if (mScoreEl && finalScore !== undefined) {
+                mScoreEl.textContent = finalScore.toLocaleString();
+            }
+
+            const mCommentEl = document.getElementById('mDetailCommentCount');
+            if (mCommentEl && finalComment !== undefined) {
+                mCommentEl.textContent = Number(finalComment || 0).toLocaleString();
+            }
+
+            const mViewEl = document.getElementById('mDetailViewCount');
+            if (mViewEl && finalView !== undefined) {
+                mViewEl.textContent = Number(finalView || 0).toLocaleString();
+            }
+
+            const mLikeEl = document.getElementById('mDetailLikeCount');
+            if (mLikeEl && finalLike !== undefined) {
+                mLikeEl.textContent = Number(finalLike || 0).toLocaleString();
+            }
+
+            const cleanId = String(mPostId);
+            const rawEntId = cleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`m-post-card-${cleanId}`) || 
+                         document.getElementById(`m-post-card-${rawEntId}`) ||
+                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+                         
+            if (card) {
+                const btnCardComment = card.querySelector('.m-btn-comment') || card.querySelector('.btn-comment');
+                if (btnCardComment) {
+                    btnCardComment.classList.remove('active');
+                    const icon = btnCardComment.querySelector('i');
+                    if (icon) icon.className = 'fa-regular fa-comment';
+                }
+
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = finalComment;
+                }
+                const cardScore = card.querySelector('.score-num');
+                if (cardScore && finalScore !== undefined) {
+                    cardScore.textContent = finalScore.toLocaleString();
+                }
+                const cardView = card.querySelector('.view-count');
+                if (cardView && finalView !== undefined) {
+                    cardView.textContent = finalView;
+                }
+                const cardLike = card.querySelector('.like-count');
+                if (cardLike && finalLike !== undefined) {
+                    cardLike.textContent = finalLike;
+                }
+            }
         }
     })
     .catch(err => {
