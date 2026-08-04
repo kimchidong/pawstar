@@ -596,11 +596,17 @@ option.opt-closed {
     gap: 0.4rem;
     height: 51.05px;
     box-sizing: border-box;
-    background: var(--bg-primary);
+    background: #ffffff;
     padding: 0.3rem;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    border: 1.5px solid #cbd5e1;
     flex: 0 0 auto;
+    transition: border-color 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tab-sort-group:hover {
+    border-color: #6366f1;
 }
 
 .sort-btn {
@@ -612,21 +618,25 @@ option.opt-closed {
     border-radius: 8px;
     font-size: 0.88rem;
     font-weight: 700;
-    transition: var(--transition);
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
 }
 
-.sort-btn:hover {
+.sort-btn:hover:not(.active) {
     color: var(--accent-purple);
+    border-color: #6366f1;
 }
 
 .sort-btn.active {
     background: var(--gradient-brand);
     color: white !important;
+    border-color: transparent;
     box-shadow: 0 3px 12px rgba(124, 58, 237, 0.3);
 }
+
 
 .search-box {
     position: relative;
