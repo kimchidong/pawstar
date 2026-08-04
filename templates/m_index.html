@@ -6,7 +6,7 @@
 <div class="m-hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(79, 70, 229, 0.6) 100%), url('{{ current_contest.BANNER_IMG_FILE_PATH or current_contest.banner_img }}') center center / cover no-repeat;">
     {% set is_closed = (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str == '종료됨') if current_contest else False %}
     {% if is_closed %}
-        <div class="m-hero-badge closed"><span>{{ current_contest.contest_year_month or '해당 년월 콘테스트' }}</span> | 종료됨</div>
+        <div class="m-hero-badge closed"><span>{{ current_contest.contest_year_month or '해당 년월 콘테스트' }}</span> | {{ current_contest.d_day_str or '종료' }}</div>
     {% else %}
         <div class="m-hero-badge">{{ current_contest.d_day_str if current_contest else 'D-DAY' }} | {{ current_contest.CONTEST_STAT_NM or current_contest.status if current_contest else '진행중' }}</div>
     {% endif %}

@@ -43,8 +43,8 @@ class PawStarService:
         end_dt = contest.get('ED_DT') or contest.get('end_date')
 
         # 상태코드가 종료(G001C002)이거나 상태명이 종료/마감인 경우
-        if stat == 'G001C002' or stat_nm in ['종료', '마감', 'CLOSED', '종료됨']:
-            contest['d_day_str'] = "종료됨"
+        if stat == 'G001C002' or stat_nm in ['종료', '마감', 'CLOSED', '종료됨', '콘테스트 마감']:
+            contest['d_day_str'] = "종료"
             contest['is_closed'] = True
             return contest
 
@@ -63,13 +63,13 @@ class PawStarService:
 
         # 종료일시가 현재 시점보다 지난 경우 자동 종료 처리
         if isinstance(end_dt, datetime) and end_dt < now:
-            contest['d_day_str'] = "종료됨"
+            contest['d_day_str'] = "종료"
             contest['is_closed'] = True
             return contest
 
         diff_days = (end_dt.date() - now.date()).days
         if diff_days < 0:
-            contest['d_day_str'] = "종료됨"
+            contest['d_day_str'] = "종료"
             contest['is_closed'] = True
         elif diff_days == 0:
             contest['d_day_str'] = "D-DAY Today"
