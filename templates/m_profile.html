@@ -133,32 +133,6 @@
                 {% set c_id = a.CONTEST_ROUND or a.contest_id %}
                 {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
-                {% if 'P001A101' in a_cd or '슈퍼' in a_nm %}
-                    {% set badge_bg = '#fffbeb' %}
-                    {% set badge_color = '#b45309' %}
-                    {% set badge_border = '#fde047' %}
-                    {% set badge_icon = 'fa-solid fa-crown' %}
-                    {% set icon_color = '#d97706' %}
-                {% elif 'P001A102' in a_cd or '라이징' in a_nm %}
-                    {% set badge_bg = '#f8fafc' %}
-                    {% set badge_color = '#334155' %}
-                    {% set badge_border = '#cbd5e1' %}
-                    {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
-                    {% set icon_color = '#475569' %}
-                {% elif 'P001A103' in a_cd or '브라이트' in a_nm %}
-                    {% set badge_bg = '#fff7ed' %}
-                    {% set badge_color = '#c2410c' %}
-                    {% set badge_border = '#fed7aa' %}
-                    {% set badge_icon = 'fa-solid fa-star' %}
-                    {% set icon_color = '#ea580c' %}
-                {% else %}
-                    {% set badge_bg = '#f3e8ff' %}
-                    {% set badge_color = '#6b21a8' %}
-                    {% set badge_border = '#d8b4fe' %}
-                    {% set badge_icon = 'fa-solid fa-award' %}
-                    {% set icon_color = '#7c3aed' %}
-                {% endif %}
-
                 <div class="trophy-row-item" onclick="openMobileDetailModal({{ a | tojson | forceescape }}, true)" style="padding: 0.9rem 0; border-bottom: {% if loop.last %}none{% else %}1px solid #f1f5f9{% endif %}; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; cursor: pointer;">
                     <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1;">
                         <img src="{{ p_img }}" alt="수상작" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;">
@@ -171,9 +145,48 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display: inline-flex; align-items: center; gap: 0.3rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1px solid {{ badge_border }}; padding: 0.3rem 0.65rem; border-radius: 16px; font-weight: 800; font-size: 0.76rem; flex-shrink: 0;">
-                        <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.8rem;"></i>
-                        <span>{{ a_nm }}</span>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
+                        {% for b in (a.awards or [a]) %}
+                            {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
+                            {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
+                            {% set b_kind = (b.KIND_CD or a.KIND_CD or '')|string %}
+
+                            {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
+                                {% set badge_bg = '#fffbeb' %}
+                                {% set badge_color = '#b45309' %}
+                                {% set badge_border = '#fde047' %}
+                                {% set badge_icon = 'fa-solid fa-crown' %}
+                                {% set icon_color = '#d97706' %}
+                            {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
+                                {% set badge_bg = '#f8fafc' %}
+                                {% set badge_color = '#334155' %}
+                                {% set badge_border = '#cbd5e1' %}
+                                {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
+                                {% set icon_color = '#475569' %}
+                            {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
+                                {% set badge_bg = '#fff7ed' %}
+                                {% set badge_color = '#c2410c' %}
+                                {% set badge_border = '#fed7aa' %}
+                                {% set badge_icon = 'fa-solid fa-star' %}
+                                {% set icon_color = '#ea580c' %}
+                            {% else %}
+                                {% set badge_bg = '#f3e8ff' %}
+                                {% set badge_color = '#6b21a8' %}
+                                {% set badge_border = '#d8b4fe' %}
+                                {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or 'cat' in b_kind.lower() %}
+                                    {% set badge_icon = 'fa-solid fa-cat' %}
+                                {% else %}
+                                    {% set badge_icon = 'fa-solid fa-dog' %}
+                                {% endif %}
+                                {% set icon_color = '#7c3aed' %}
+                            {% endif %}
+
+                            <div style="display: inline-flex; align-items: center; gap: 0.3rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1px solid {{ badge_border }}; padding: 0.3rem 0.65rem; border-radius: 16px; font-weight: 800; font-size: 0.76rem; flex-shrink: 0;">
+                                <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.8rem;"></i>
+                                <span>{{ b_nm }}</span>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% else %}

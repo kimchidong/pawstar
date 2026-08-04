@@ -512,11 +512,12 @@ class PawStarService:
 
                 award_query = """
                     SELECT 
-                        ca.CONTEST_ROUND, ca.AWARD_CD, ca.AWARD_PART, ca.RANKING,
+                        ca.CONTEST_ROUND, ca.AWARD_CD, ca.AWARD_PART, ca.RANKING, ca.KIND_CD,
                         a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
                         ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img,
                         r.TITLE AS post_title, r.PHT_FILE_PATH1 AS image_path, t.THEME_NM AS theme_title,
-                        r.ROUND_NO, r.ENT_USER_ID, r.CONTS, r.SCORE, r.VW_CNT, r.LIKE_CNT, r.CMT_CNT
+                        r.ROUND_NO, r.ENT_USER_ID, r.CONTS, r.SCORE, r.VW_CNT, r.LIKE_CNT, r.CMT_CNT,
+                        r.KIND_CD AS round_kind_cd
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
@@ -531,7 +532,43 @@ class PawStarService:
 
                 award_query += " ORDER BY ca.CONTEST_ROUND DESC, ca.RANKING ASC"
                 cur.execute(award_query, tuple(award_params))
-                my_awards = cur.fetchall()
+                raw_awards = cur.fetchall()
+
+                # 동일 회차 및 출전작 단위 그룹핑 (한 로우에 복수 수상 뱃지 세트 구성)
+                grouped_awards = {}
+                for a in raw_awards:
+                    key = (a['CONTEST_ROUND'], a.get('ROUND_NO'), a.get('post_title'))
+                    if key not in grouped_awards:
+                        grouped_awards[key] = {
+                            'CONTEST_ROUND': a['CONTEST_ROUND'],
+                            'contest_id': a['CONTEST_ROUND'],
+                            'ROUND_NO': a.get('ROUND_NO'),
+                            'post_title': a.get('post_title'),
+                            'image_path': a.get('image_path'),
+                            'theme_title': a.get('theme_title'),
+                            'ENT_USER_ID': a.get('ENT_USER_ID'),
+                            'CONTS': a.get('CONTS'),
+                            'SCORE': a.get('SCORE'),
+                            'VW_CNT': a.get('VW_CNT'),
+                            'LIKE_CNT': a.get('LIKE_CNT'),
+                            'CMT_CNT': a.get('CMT_CNT'),
+                            'awards': []
+                        }
+                    
+                    award_item = {
+                        'AWARD_CD': a.get('AWARD_CD'),
+                        'AWARD_PART': a.get('AWARD_PART'),
+                        'AWARD_NM': a.get('AWARD_NM') or a.get('prize_name'),
+                        'RANKING': a.get('RANKING'),
+                        'KIND_CD': a.get('KIND_CD') or a.get('round_kind_cd'),
+                        'prize_name': a.get('prize_name'),
+                        'badge_img': a.get('badge_img')
+                    }
+                    grouped_awards[key]['awards'].append(award_item)
+
+                my_awards = list(grouped_awards.values())
+                # 가장 최근 회차 순으로 정렬 (CONTEST_ROUND 내림차순)
+                my_awards.sort(key=lambda x: int(x.get('CONTEST_ROUND') or 0), reverse=True)
 
                 conn.close()
                 return {
