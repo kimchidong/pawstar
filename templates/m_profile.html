@@ -135,8 +135,8 @@
 
                 <div class="trophy-row-item" onclick="openMobileDetailModal({{ a | tojson | forceescape }}, true)" style="padding: 1rem 0.2rem; border-bottom: {% if loop.last %}none{% else %}1px solid #f3e8ff{% endif %}; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; cursor: pointer;">
                     
-                    <!-- 1. 모바일 맨 좌측: 실물 3D 메달 & 배지 고정 너비 컬럼 (1개든 2개든 동일 가로 사이즈 width: 76px) -->
-                    <div style="display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; width: 76px; justify-content: flex-start;">
+                    <!-- 1. 모바일 맨 좌측: 실물 3D 메달 & 배지 고정 너비 컬럼 (1개든 2개든 동일 가로 사이즈 width: 76px, 가운데 정렬) -->
+                    <div style="display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; width: 76px; justify-content: center;">
                         {% for b in (a.awards or [a]) %}
                             {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                             {% set b_img_src = b.badge_img or b.BADGE_IMG_PATH_FILE or ('/static/image/badge/' ~ b_cd ~ '.png') %}
