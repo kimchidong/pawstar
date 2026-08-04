@@ -535,10 +535,6 @@ class PawStarService:
                     WHERE ca.ENT_USER_ID = %s
                 """
                 award_params = [user_id]
-                if contest_id and str(contest_id) != 'all':
-                    award_query += " AND ca.CONTEST_ROUND = %s"
-                    award_params.append(contest_id)
-
                 award_query += " ORDER BY ca.CONTEST_ROUND DESC, ca.RANKING ASC"
                 cur.execute(award_query, tuple(award_params))
                 raw_awards = cur.fetchall()
