@@ -221,7 +221,7 @@
 
     <!-- 역대 수상 기록 (CONTEST_WINNER) -->
     <h3 style="font-size: 1.4rem; font-weight: 800; margin: 3rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> 나의 역대 콘테스트 수상 트로피 ({{ my_awards|length }})
+        <i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> 나의 역대 콘테스트 수상 트로피 ({{ stats.award_count if stats and stats.award_count is not none else (my_awards | map(attribute='awards') | map('length') | sum) }})
     </h3>
     
     <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 0.75rem 1.5rem; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04);">

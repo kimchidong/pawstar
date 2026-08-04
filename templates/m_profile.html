@@ -124,7 +124,7 @@
     <!-- 모바일 역대 수상 트로피 -->
     <div style="margin: 2rem 0 1rem 0;">
         <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
-            🏆 나의 역대 콘테스트 수상 트로피 ({{ my_awards|length }})
+            🏆 나의 역대 콘테스트 수상 트로피 ({{ stats.award_count if stats and stats.award_count is not none else (my_awards | map(attribute='awards') | map('length') | sum) }})
         </h3>
         <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 0.5rem 1rem;">
             {% for a in my_awards %}

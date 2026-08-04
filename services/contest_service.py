@@ -515,12 +515,21 @@ class PawStarService:
                         ca.CONTEST_ROUND, ca.AWARD_CD, ca.AWARD_PART, ca.RANKING, ca.KIND_CD,
                         a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
                         ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img,
-                        r.TITLE AS post_title, r.PHT_FILE_PATH1 AS image_path, t.THEME_NM AS theme_title,
-                        r.ROUND_NO, r.ENT_USER_ID, r.CONTS, r.SCORE, r.VW_CNT, r.LIKE_CNT, r.CMT_CNT,
-                        r.KIND_CD AS round_kind_cd
+                        r.TITLE AS post_title, r.TITLE AS title, r.PHT_FILE_PATH1 AS image_path, t.THEME_NM AS theme_title,
+                        r.ROUND_NO, r.ENT_USER_ID, r.ENT_USER_ID AS user_id, r.CONTS AS content, r.CONTS, r.SCORE,
+                        r.VW_CNT AS view_count, r.LIKE_CNT AS like_count, r.CMT_CNT AS comment_count,
+                        r.VW_CNT, r.LIKE_CNT, r.CMT_CNT,
+                        r.PET_NM AS pet_name, r.PET_NM,
+                        k.KIND_NM AS pet_type, k.KIND_NM,
+                        u.NK_NM AS user_nickname, u.NK_NM,
+                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
+                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
+                        CONCAT(ca.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
                     LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                    LEFT JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
                     LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     WHERE ca.ENT_USER_ID = %s
@@ -538,20 +547,37 @@ class PawStarService:
                 grouped_awards = {}
                 for a in raw_awards:
                     key = (a['CONTEST_ROUND'], a.get('ROUND_NO'), a.get('post_title'))
+                    k_fmt = self.format_pet_kind(a.get('KIND_NM') or a.get('pet_type'))
                     if key not in grouped_awards:
                         grouped_awards[key] = {
                             'CONTEST_ROUND': a['CONTEST_ROUND'],
                             'contest_id': a['CONTEST_ROUND'],
                             'ROUND_NO': a.get('ROUND_NO'),
+                            'post_id': a.get('post_id'),
                             'post_title': a.get('post_title'),
+                            'title': a.get('title') or a.get('post_title'),
                             'image_path': a.get('image_path'),
                             'theme_title': a.get('theme_title'),
                             'ENT_USER_ID': a.get('ENT_USER_ID'),
-                            'CONTS': a.get('CONTS'),
-                            'SCORE': a.get('SCORE'),
-                            'VW_CNT': a.get('VW_CNT'),
-                            'LIKE_CNT': a.get('LIKE_CNT'),
-                            'CMT_CNT': a.get('CMT_CNT'),
+                            'user_id': a.get('user_id') or a.get('ENT_USER_ID'),
+                            'user_nickname': a.get('user_nickname') or user_info.get('NK_NM', user_id),
+                            'NK_NM': a.get('NK_NM') or user_info.get('NK_NM', user_id),
+                            'user_profile': a.get('user_profile') or user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
+                            'PROFILE_URL': a.get('PROFILE_URL') or user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
+                            'pet_name': a.get('pet_name') or '반려동물',
+                            'PET_NM': a.get('PET_NM') or '반려동물',
+                            'pet_type': k_fmt,
+                            'KIND_NM': k_fmt,
+                            'content': a.get('content') or a.get('CONTS') or '',
+                            'CONTS': a.get('CONTS') or '',
+                            'SCORE': a.get('SCORE') or 0,
+                            'score': a.get('SCORE') or 0,
+                            'view_count': a.get('view_count') or 0,
+                            'VW_CNT': a.get('VW_CNT') or 0,
+                            'like_count': a.get('like_count') or 0,
+                            'LIKE_CNT': a.get('LIKE_CNT') or 0,
+                            'comment_count': a.get('comment_count') or 0,
+                            'CMT_CNT': a.get('CMT_CNT') or 0,
                             'awards': []
                         }
                     
@@ -584,7 +610,7 @@ class PawStarService:
                         'my_post_count': my_post_count,
                         'total_score': total_score,
                         'total_likes': total_likes,
-                        'award_count': len(my_awards)
+                        'award_count': len(raw_awards)
                     },
                     'my_posts': my_posts,
                     'my_awards': my_awards
