@@ -342,11 +342,11 @@ async function triggerEvent(postId, eventType) {
         // 팝업 모달 내부 수치도 동시 실시간 갱신
         const detailViewCountEl = document.getElementById('detailViewCount');
         if (detailViewCountEl && data.view_count !== undefined) {
-            detailViewCountEl.textContent = data.view_count;
+            detailViewCountEl.textContent = Number(data.view_count || 0).toLocaleString();
         }
         const mDetailViewCountEl = document.getElementById('mDetailViewCount');
         if (mDetailViewCountEl && data.view_count !== undefined) {
-            mDetailViewCountEl.textContent = data.view_count;
+            mDetailViewCountEl.textContent = Number(data.view_count || 0).toLocaleString();
         }
 
         const detailScoreNumEl = document.getElementById('detailScoreNum');
@@ -362,9 +362,9 @@ async function triggerEvent(postId, eventType) {
             detailScore.textContent = modalScoreVal.toLocaleString();
         }
         const dView = document.getElementById('detailViewCount');
-        if (dView && data && data.view_count !== undefined) dView.textContent = data.view_count;
+        if (dView && data && data.view_count !== undefined) dView.textContent = Number(data.view_count || 0).toLocaleString();
         const dLike = document.getElementById('detailLikeCount');
-        if (dLike && data && data.like_count !== undefined) dLike.textContent = data.like_count;
+        if (dLike && data && data.like_count !== undefined) dLike.textContent = Number(data.like_count || 0).toLocaleString();
         if (data && data.is_liked !== undefined) {
             const detailBtnLike = document.getElementById('detailBtnLike');
             const detailHeartIcon = document.getElementById('detailHeartIcon');
@@ -648,17 +648,21 @@ function openDetailModal(post, isHallOfFame = false) {
     const createdAtEl = document.getElementById('detailCreatedAt');
     if (createdAtEl) createdAtEl.textContent = post.created_at || '2026-07-28 00:00:00';
 
+    const viewCountVal = post.view_count !== undefined ? post.view_count : (post.VW_CNT !== undefined ? post.VW_CNT : 0);
+    const likeCountVal = post.like_count !== undefined ? post.like_count : (post.LIKE_CNT !== undefined ? post.LIKE_CNT : 0);
+    const commentCountVal = post.comment_count !== undefined ? post.comment_count : (post.CMT_CNT !== undefined ? post.CMT_CNT : 0);
+
     const viewCountEl = document.getElementById('detailViewCount');
-    if (viewCountEl) viewCountEl.textContent = (post.view_count !== undefined ? post.view_count : (post.VW_CNT !== undefined ? post.VW_CNT : 0));
+    if (viewCountEl) viewCountEl.textContent = Number(viewCountVal || 0).toLocaleString();
 
     const likeCountEl = document.getElementById('detailLikeCount');
-    if (likeCountEl) likeCountEl.textContent = (post.like_count !== undefined ? post.like_count : (post.LIKE_CNT !== undefined ? post.LIKE_CNT : 0));
+    if (likeCountEl) likeCountEl.textContent = Number(likeCountVal || 0).toLocaleString();
 
     const commentCountEl = document.getElementById('detailCommentCount');
-    if (commentCountEl) commentCountEl.textContent = (post.comment_count !== undefined ? post.comment_count : (post.CMT_CNT !== undefined ? post.CMT_CNT : 0));
+    if (commentCountEl) commentCountEl.textContent = Number(commentCountVal || 0).toLocaleString();
 
     const shareCountEl = document.getElementById('detailShareCount');
-    if (shareCountEl) shareCountEl.textContent = post.share_count || 0;
+    if (shareCountEl) shareCountEl.textContent = Number(post.share_count || 0).toLocaleString();
 
     const isCommented = (post.actions && post.actions.is_commented) || post.is_commented || false;
     window.currentDetailPost = post;
@@ -1113,17 +1117,17 @@ function submitDetailComment() {
 
             const commentCountEl = document.getElementById('detailCommentCount');
             if (commentCountEl && finalComment !== undefined) {
-                commentCountEl.textContent = finalComment;
+                commentCountEl.textContent = Number(finalComment || 0).toLocaleString();
             }
 
             const viewCountEl = document.getElementById('detailViewCount');
             if (viewCountEl && finalView !== undefined) {
-                viewCountEl.textContent = finalView;
+                viewCountEl.textContent = Number(finalView || 0).toLocaleString();
             }
 
             const likeCountEl = document.getElementById('detailLikeCount');
             if (likeCountEl && finalLike !== undefined) {
-                likeCountEl.textContent = finalLike;
+                likeCountEl.textContent = Number(finalLike || 0).toLocaleString();
             }
 
             const scoreNumEl = document.getElementById('detailScoreNum');

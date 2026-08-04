@@ -335,6 +335,8 @@ def auth_google_callback():
         saved_next_url = session.get('next_url') or '/'
         session.clear()
         session['user_id'] = user_info['user_id']
+        session['user'] = user_info
+        session['profile_img'] = user_info['profile_img']
         session['access_token'] = access_token
         session['is_logged_in'] = True
         session['last_activity'] = datetime.datetime.now().timestamp()
@@ -364,6 +366,8 @@ def api_auth_google():
 
     session.clear()
     session['user_id'] = user_info['user_id']
+    session['user'] = user_info
+    session['profile_img'] = user_info['profile_img']
     session['is_logged_in'] = True
     session['last_activity'] = datetime.datetime.now().timestamp()
     session.pop('logged_out', None)

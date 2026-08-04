@@ -231,20 +231,48 @@ class PawStarService:
     def get_contest(self, contest_id=None):
         return self.get_current_contest(contest_id)
 
+    def is_user_exists(self, user_id):
+        if not user_id:
+            return False
+        conn = self.get_db_connection()
+        if not conn:
+            return False
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM pst_user WHERE USER_ID = %s", (user_id,))
+                result = cur.fetchone()
+                conn.close()
+                return bool(result)
+        except Exception as e:
+            print("is_user_exists error:", e)
+            return False
+
     def register_user(self, user_id, nickname, password="", profile_img="", **kwargs):
         conn = self.get_db_connection()
         if not conn:
             return None
         try:
+            profile_url = profile_img or '/static/image/profile/default_profile.png'
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                     VALUES (%s, %s, %s, 1, NOW(), NOW())
-                    ON DUPLICATE KEY UPDATE NK_NM=VALUES(NK_NM), PROFILE_URL=VALUES(PROFILE_URL), LGN_CNT=LGN_CNT+1, LGN_DT=NOW()
-                """, (user_id, nickname, profile_img or '/static/image/profile/default_profile.png'))
+                    ON DUPLICATE KEY UPDATE 
+                        NK_NM = VALUES(NK_NM),
+                        PROFILE_URL = IF(VALUES(PROFILE_URL) != '' AND VALUES(PROFILE_URL) != '/static/image/profile/default_profile.png', VALUES(PROFILE_URL), PROFILE_URL),
+                        LGN_CNT = LGN_CNT + 1, 
+                        LGN_DT = NOW()
+                """, (user_id, nickname, profile_url))
                 conn.commit()
+
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                user = cur.fetchone()
                 conn.close()
-                return {'USER_ID': user_id, 'NK_NM': nickname, 'PROFILE_URL': profile_img, 'user_id': user_id, 'nickname': nickname, 'profile_img': profile_img}
+
+                final_nk = user.get('NK_NM', nickname) if user else nickname
+                final_img = user.get('PROFILE_URL', profile_url) if user else profile_url
+
+                return {'USER_ID': user_id, 'NK_NM': final_nk, 'PROFILE_URL': final_img, 'user_id': user_id, 'nickname': final_nk, 'profile_img': final_img}
         except Exception as e:
             print("register_user error:", e)
             return None
@@ -274,7 +302,6 @@ class PawStarService:
                     cur.execute("""
                         INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                         VALUES (%s, %s, %s, 1, NOW(), NOW())
-                        ON DUPLICATE KEY UPDATE LGN_CNT = LGN_CNT + 1, LGN_DT = NOW()
                     """, (user_id, nickname, profile_img))
                     conn.commit()
                     user_info = {
@@ -286,15 +313,30 @@ class PawStarService:
                         'profile_img': profile_img
                     }
                 else:
-                    cur.execute("UPDATE pst_user SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() WHERE USER_ID = %s", (user_id,))
+                    # 로그인 성공 시 전달받은 최신 프로필 이미지가 유효하면 DB 및 반환 객체에 최신 프로필 이미지 항상 갱신 저장
+                    if picture and picture.strip() and picture != '/static/image/profile/default_profile.png':
+                        cur.execute("""
+                            UPDATE pst_user 
+                            SET PROFILE_URL = %s, LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() 
+                            WHERE USER_ID = %s
+                        """, (picture.strip(), user_id))
+                        latest_img = picture.strip()
+                    else:
+                        cur.execute("""
+                            UPDATE pst_user 
+                            SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() 
+                            WHERE USER_ID = %s
+                        """, (user_id,))
+                        latest_img = user.get('PROFILE_URL') or profile_img
+
                     conn.commit()
                     user_info = {
                         'USER_ID': user['USER_ID'],
                         'NK_NM': user.get('NK_NM', nickname),
-                        'PROFILE_URL': user.get('PROFILE_URL', profile_img),
+                        'PROFILE_URL': latest_img,
                         'user_id': user['USER_ID'],
                         'nickname': user.get('NK_NM', nickname),
-                        'profile_img': user.get('PROFILE_URL', profile_img)
+                        'profile_img': latest_img
                     }
 
                 conn.close()

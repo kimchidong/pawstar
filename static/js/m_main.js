@@ -608,7 +608,7 @@ function submitMobileDetailComment() {
 
                 const cardComment = card.querySelector('.comment-count');
                 if (cardComment && finalComment !== undefined) {
-                    cardComment.textContent = finalComment;
+                    cardComment.textContent = Number(finalComment || 0).toLocaleString();
                 }
                 const cardScore = card.querySelector('.m-card-score, .score-num');
                 if (cardScore && finalScore) {
