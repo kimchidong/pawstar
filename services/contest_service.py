@@ -20,6 +20,22 @@ class PawStarService:
     def _attach_d_day(self, contest):
         if not contest:
             return contest
+
+        st_dt = contest.get('ST_DT') or contest.get('start_date') or contest.get('ED_DT') or contest.get('end_date')
+        if st_dt:
+            if isinstance(st_dt, str):
+                try:
+                    st_dt_obj = datetime.strptime(st_dt[:10], "%Y-%m-%d")
+                    contest['contest_year_month'] = f"{st_dt_obj.year}년 {st_dt_obj.month}월 콘테스트"
+                except Exception:
+                    contest['contest_year_month'] = "해당 년월 콘테스트"
+            elif hasattr(st_dt, 'year'):
+                contest['contest_year_month'] = f"{st_dt.year}년 {st_dt.month}월 콘테스트"
+            else:
+                contest['contest_year_month'] = "해당 년월 콘테스트"
+        else:
+            contest['contest_year_month'] = "해당 년월 콘테스트"
+
         end_dt = contest.get('ED_DT') or contest.get('end_date')
         if not end_dt:
             contest['d_day_str'] = "상시 진행"

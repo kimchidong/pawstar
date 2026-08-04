@@ -11,7 +11,7 @@
             {% set is_closed = (current_contest.CONTEST_STAT == 'G001C002' or current_contest.status == '종료' or current_contest.CONTEST_STAT_NM == '종료' or current_contest.d_day_str == '종료됨') %}
             {% if is_closed %}
                 <div class="contest-badge-closed">
-                    <span>회차 마감</span>
+                    <span>{{ current_contest.contest_year_month or '해당 년월 콘테스트' }}</span>
                 </div>
             {% else %}
                 <div class="contest-badge-live">
