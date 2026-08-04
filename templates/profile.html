@@ -27,9 +27,7 @@
                 </div>
             </div>
 
-            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;" id="currentBio">
-                {{ user.bio or '반려동물과 함께하는 따뜻하고 행복한 일상 이야기 🐾' }}
-            </p>
+
 
             <div style="display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
                 {% if user.email %}
@@ -263,15 +261,6 @@
                 <label>집사 닉네임</label>
                 <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required>
             </div>
-            <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                    <label style="margin-bottom: 0;">한줄 소개</label>
-                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">
-                        <strong id="bioByteCount" style="color: var(--accent-purple); font-weight: 700;">0</strong> / <span id="bioMaxBytes">200</span> Bytes
-                    </span>
-                </div>
-                <textarea id="editBio" class="form-control" rows="3" placeholder="우리 아이 소개 및 자기소개">{{ user.bio }}</textarea>
-            </div>
             <button type="submit" class="btn-save-profile" id="btnSaveProfile">
                 <i class="fa-solid fa-check"></i> 수정사항 저장하기
             </button>
@@ -350,45 +339,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // editBio 실시간 바이트 계산 및 제한 로직
-    const bioInput = document.getElementById('editBio');
-    const bioByteCount = document.getElementById('bioByteCount');
-    const MAX_BIO_BYTES = 200;
-
-    function getByteLength(str) {
-        return new TextEncoder().encode(str).length;
-    }
-
-    function updateBioByteCount() {
-        if (!bioInput || !bioByteCount) return;
-        let text = bioInput.value;
-        let bytes = getByteLength(text);
-
-        if (bytes > MAX_BIO_BYTES) {
-            while (getByteLength(text) > MAX_BIO_BYTES) {
-                text = text.slice(0, -1);
-            }
-            bioInput.value = text;
-            bytes = getByteLength(text);
-        }
-
-        bioByteCount.textContent = bytes;
-    }
-
-    if (bioInput) {
-        bioInput.addEventListener('input', updateBioByteCount);
-        if (btnOpen) {
-            btnOpen.addEventListener('click', updateBioByteCount);
-        }
-        updateBioByteCount();
-    }
-
     // 프로필 정보 수정 폼 제출
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const nickname = document.getElementById('editNickname').value.trim();
-            const bio = document.getElementById('editBio').value.trim();
             const profile_img = profileImgInput.value;
 
             fetch('/api/profile/update', {
@@ -399,7 +354,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     user_id: '{{ user.user_id }}',
                     nickname: nickname,
-                    bio: bio,
                     profile_img: profile_img
                 })
             })

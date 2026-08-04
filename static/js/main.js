@@ -152,8 +152,7 @@ function initEventHandlers() {
             const updateData = {
                 user_id: 'user1',
                 nickname: document.getElementById('editNickname').value,
-                profile_img: document.getElementById('editProfileImg').value,
-                bio: document.getElementById('editBio').value
+                profile_img: document.getElementById('editProfileImg').value
             };
 
             try {
@@ -170,8 +169,6 @@ function initEventHandlers() {
                     // DOM 실시간 갱신
                     const currentNickname = document.getElementById('currentNickname');
                     if (currentNickname) currentNickname.textContent = res.data.nickname;
-                    const currentBio = document.getElementById('currentBio');
-                    if (currentBio) currentBio.textContent = res.data.bio;
                     const currentProfileImg = document.getElementById('currentProfileImg');
                     if (currentProfileImg) currentProfileImg.src = res.data.profile_img;
                 } else {

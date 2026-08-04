@@ -46,13 +46,13 @@ def seed_database():
         # 3. Users (USER_ID를 복호화 불가능한 단방향 SHA-256 해시로 저장)
         DEFAULT_AVATAR = '/static/image/profile/default_profile.png'
         users_data = [
-            (hash_id('user1'), '뽀삐아빠', DEFAULT_AVATAR, '골든리트리버 뽀삐와 함께 살고 있습니다 🦮', 'USER', '2026-07-30 22:00:00', 5),
-            (hash_id('user2'), '냥냥 집사', DEFAULT_AVATAR, '귀여운 아비시니안 나비의 일상 🐈', 'USER', '2026-07-30 21:00:00', 3),
-            (hash_id('user3'), '햄찌마스터', DEFAULT_AVATAR, '볼빵빵 햄찌 모찌 🐹', 'USER', '2026-07-30 20:00:00', 2),
-            (hash_id('user4'), '앵두네', DEFAULT_AVATAR, '노래하는 모란앵무 앵두 🦜', 'USER', '2026-07-30 19:00:00', 1)
+            (hash_id('user1'), '몽실이 아빠', DEFAULT_AVATAR, 'USER', '2026-07-30 22:00:00', 5),
+            (hash_id('user2'), '냥냥 집사', DEFAULT_AVATAR, 'USER', '2026-07-30 21:00:00', 3),
+            (hash_id('user3'), '햄찌마스터', DEFAULT_AVATAR, 'USER', '2026-07-30 20:00:00', 2),
+            (hash_id('user4'), '앵두네', DEFAULT_AVATAR, 'USER', '2026-07-30 19:00:00', 1)
         ]
-        sql_user = """INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, BIO, ROLE, LAST_LOGIN_AT, LOGIN_COUNT)
-                      VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+        sql_user = """INSERT INTO USERS (USER_ID, NICKNAME, PROFILE_IMG, ROLE, LAST_LOGIN_AT, LOGIN_COUNT)
+                      VALUES (%s, %s, %s, %s, %s, %s)"""
         cur.executemany(sql_user, users_data)
 
         # 4. Contests (7월부터 제1회 시작)

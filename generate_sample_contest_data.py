@@ -73,8 +73,8 @@ def run_seed():
                 ('user_gureum', '구름아빠', '/static/image/profile/default_profile.png', '솜사탕 비숑 구름이 ☁️')
             ]
 
-            cur.execute("DELETE FROM pst_user WHERE USER_ID LIKE 'user_%';")
-            for u_id, nk, p_img, bio in users_list:
+            for u_item in users_list:
+                u_id, nk, p_img = u_item[0], u_item[1], u_item[2]
                 cur.execute("""
                     INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                     VALUES (%s, %s, %s, 1, NOW(), NOW())

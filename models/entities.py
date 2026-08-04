@@ -92,10 +92,9 @@ class ContestWinner:
         self.awarded_at = datetime.now()
 
 class User:
-    def __init__(self, user_id, nickname, profile_img, bio=''):
+    def __init__(self, user_id, nickname, profile_img, **kwargs):
         self.user_id = user_id
         self.nickname = nickname
         self.profile_img = profile_img
-        self.bio = bio
         self.badges = [] # 확장성: 보유 배지 목록
         self.awards = [] # 확장성: 프로필 수상 이력

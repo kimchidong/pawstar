@@ -174,7 +174,6 @@ def api_auth_register():
     nickname = data.get('nickname', '').strip()
     password = data.get('password', '').strip()
     profile_img = data.get('profile_img', '').strip()
-    bio = data.get('bio', '').strip()
 
     if not user_id or not nickname or not password:
         return jsonify({'success': False, 'message': '아이디, 닉네임, 사용자인증번호(비밀번호)는 필수 입력 사항입니다.'}), 400
@@ -186,7 +185,7 @@ def api_auth_register():
     if profile_img:
         profile_img = finalize_temp_profile_image(profile_img)
 
-    new_user = service.register_user(user_id, nickname, password, profile_img, bio)
+    new_user = service.register_user(user_id, nickname, password, profile_img)
 
     session.clear()
     session['user_id'] = user_id
@@ -202,7 +201,6 @@ def api_auth_setup_profile():
     nickname = data.get('nickname', '').strip()
     password = data.get('password', '').strip()
     profile_img = data.get('profile_img', '').strip()
-    bio = data.get('bio', '').strip()
 
     if not nickname:
         return jsonify({'success': False, 'message': '집사 닉네임을 입력해주세요.'}), 400
@@ -215,7 +213,8 @@ def api_auth_setup_profile():
     if profile_img:
         profile_img = finalize_temp_profile_image(profile_img)
 
-    new_user = service.register_user(auto_uuid, nickname, password, profile_img, bio)
+    new_user = service.register_user(auto_uuid, nickname, password, profile_img)
+
 
     session.clear()
     session['user_id'] = auto_uuid
@@ -750,10 +749,10 @@ def api_profile_update():
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
     data = request.json or {}
     nickname = data.get('nickname')
-    bio = data.get('bio')
     profile_img = data.get('profile_img')
-    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, bio=bio, profile_img=profile_img)
+    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, profile_img=profile_img)
     return jsonify({'success': True, 'message': '프로필 정보가 수정되었습니다.', 'data': updated_user})
+
 
 
 # 5. 배치 & 관리자 (회차 종료 및 수상자 선정 배치 시뮬레이션)

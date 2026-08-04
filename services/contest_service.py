@@ -231,20 +231,7 @@ class PawStarService:
     def get_contest(self, contest_id=None):
         return self.get_current_contest(contest_id)
 
-    def is_user_exists(self, user_id):
-        conn = self.get_db_connection()
-        if not conn:
-            return False
-        try:
-            with conn.cursor() as cur:
-                cur.execute("SELECT 1 FROM pst_user WHERE USER_ID = %s", (user_id,))
-                res = bool(cur.fetchone())
-                conn.close()
-                return res
-        except Exception:
-            return False
-
-    def register_user(self, user_id, nickname, password="", profile_img="", bio=""):
+    def register_user(self, user_id, nickname, password="", profile_img="", **kwargs):
         conn = self.get_db_connection()
         if not conn:
             return None
@@ -323,7 +310,7 @@ class PawStarService:
                 'profile_img': profile_img
             }
 
-    def update_user_profile(self, user_id, nickname, bio="", profile_img="", **kwargs):
+    def update_user_profile(self, user_id, nickname, profile_img="", **kwargs):
         conn = self.get_db_connection()
         if not conn:
             return {
@@ -411,6 +398,10 @@ class PawStarService:
 
                 if not user_info:
                     user_info = {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}
+
+                user_info['user_id'] = user_info.get('USER_ID', user_id)
+                user_info['nickname'] = user_info.get('NK_NM', user_id)
+                user_info['profile_img'] = user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png')
 
                 query = """
                     SELECT 
