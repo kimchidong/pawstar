@@ -1747,12 +1747,12 @@ option.opt-closed {
 }
 
 .avatar-ring {
-    width: 105px;
-    height: 105px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    padding: 3.5px;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.22);
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1764,7 +1764,8 @@ option.opt-closed {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
 }
 
