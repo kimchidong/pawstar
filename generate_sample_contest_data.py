@@ -302,12 +302,55 @@ def run_seed():
                             cur.execute("""
                                 UPDATE pst_contest_round SET KIND_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                             """, (rk, c_round, k_winner['ROUND_NO']))
+            # 8. 사용자 google_111293809055278216802 실수상 데이터 5개 보장
+            target_user = 'google_111293809055278216802'
+            cur.execute("""
+                INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                VALUES (%s, '별별22', '/static/image/profile/default_profile.png', 1, NOW(), NOW())
+                ON DUPLICATE KEY UPDATE LGN_CNT = LGN_CNT + 1, LGN_DT = NOW()
+            """, (target_user,))
+
+            # 각 회차별 출전 게시물 보장
+            posts_info = [
+                (1, '사랑스러운 몽실이의 인생 컷 🐶', '/static/sample_image/sample_01.jpg', 1520, 840, 92, 12500),
+                (2, '무더위를 싹 씻어줄 시원한 몽실이 🌊', '/static/sample_image/sample_02.jpg', 1100, 530, 48, 8400),
+                (3, '사랑스럽고 행복한 울 집 반려동물 일상 🐾', '/static/sample_image/sample_03.jpg', 2100, 1120, 130, 16800)
+            ]
+
+            user_round_no = {}
+            for c_round, title, img_path, vw, lk, cmt, score in posts_info:
+                cur.execute("SELECT ROUND_NO FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s LIMIT 1", (c_round, target_user))
+                row = cur.fetchone()
+                if row:
+                    r_no = row['ROUND_NO']
+                else:
+                    cur.execute("SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_no FROM pst_contest_round WHERE CONTEST_ROUND = %s", (c_round,))
+                    r_no = cur.fetchone()['next_no']
+                    cur.execute("""
+                        INSERT INTO pst_contest_round (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, ENT_DT)
+                        VALUES (%s, %s, %s, 'K001', '몽실이', %s, '우리 소중한 아이의 활기찬 일상입니다.', %s, '', %s, %s, %s, %s, NOW())
+                    """, (c_round, r_no, target_user, title, img_path, vw, lk, cmt, score))
+                user_round_no[c_round] = r_no
+
+            # 5개 수상 실데이터 보장 (pst_contest_award)
+            cur.execute("DELETE FROM pst_contest_award WHERE ENT_USER_ID = %s", (target_user,))
+            awards_to_insert = [
+                (1, 'G002P001', 'P001A101', user_round_no[1], 'K001', 1520, 840, 92, 12500, 1), # 1) 제1회 전체1위(슈퍼스타)
+                (1, 'G002P002', 'P002A901', user_round_no[1], 'K001', 1520, 840, 92, 12500, 1), # 2) 제1회 패밀리1위
+                (2, 'G002P002', 'P002A902', user_round_no[2], 'K001', 1100, 530, 48, 8400, 2),  # 3) 제2회 패밀리2위
+                (3, 'G002P001', 'P001A101', user_round_no[3], 'K001', 2100, 1120, 130, 16800, 1),# 4) 제3회 전체1위(슈퍼스타)
+                (3, 'G002P002', 'P002A901', user_round_no[3], 'K001', 2100, 1120, 130, 16800, 1) # 5) 제3회 패밀리1위
+            ]
+
+            for c_round, part, award_cd, r_no, kind, vw, lk, cmt, score, rk in awards_to_insert:
+                cur.execute("""
+                    INSERT INTO pst_contest_award (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (c_round, part, award_cd, r_no, target_user, kind, vw, lk, cmt, score, rk))
 
             conn.commit()
             print("\n" + "=" * 65)
-            print(f"🎉 성공적으로 지난 회차 2개 및 진행 중 회차 1개의 모든 데이터 시딩이 완수되었습니다!")
-            print(f"   - 생성된 포스트 총 {total_posts_created}개")
-            print(f"   - 사용된 이미지: {len(image_files)}개 (/static/sample_image/sample_01.jpg ~ sample_20.jpg)")
+            print(f"🎉 성공적으로 {target_user} 계정에 5개 실수상 데이터 저장 완료!")
             print("=" * 65)
 
     except Exception as e:

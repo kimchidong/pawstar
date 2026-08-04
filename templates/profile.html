@@ -265,10 +265,9 @@
                     
                     <div style="min-width: 0; flex: 1;">
                         <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.3rem;">
-                            <span style="font-weight: 800; color: #d97706; font-size: 1rem; letter-spacing: -0.01em;">제{{ c_id }}회 콘테스트</span>
-                            {% if a.theme_title %}
-                                <span style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">- {{ a.theme_title }}</span>
-                            {% endif %}
+                            <span style="font-weight: 800; color: #d97706; font-size: 1.05rem; letter-spacing: -0.01em;">
+                                제{{ c_id }}회 {% if a.theme_title %}{{ a.theme_title }}{% else %}콘테스트{% endif %}
+                            </span>
                         </div>
                         <div style="font-size: 0.88rem; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             수상작: <strong style="color: #1e293b; font-weight: 700;">{{ a.post_title or '자랑스러운 반려동물 출전작' }}</strong>

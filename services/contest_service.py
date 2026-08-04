@@ -512,10 +512,16 @@ class PawStarService:
 
                 award_query = """
                     SELECT 
-                        ca.CONTEST_ROUND, ca.AWARD_CD, a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
-                        ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img
+                        ca.CONTEST_ROUND, ca.AWARD_CD, ca.AWARD_PART, ca.RANKING,
+                        a.AWARD_NM, a.BADGE_IMG_PATH_FILE,
+                        ca.CONTEST_ROUND AS contest_id, a.AWARD_NM AS prize_name, a.BADGE_IMG_PATH_FILE AS badge_img,
+                        r.TITLE AS post_title, r.PHT_FILE_PATH1 AS image_path, t.THEME_NM AS theme_title,
+                        r.ROUND_NO, r.ENT_USER_ID, r.CONTS, r.SCORE, r.VW_CNT, r.LIKE_CNT, r.CMT_CNT
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                    LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                    LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     WHERE ca.ENT_USER_ID = %s
                 """
                 award_params = [user_id]
@@ -523,6 +529,7 @@ class PawStarService:
                     award_query += " AND ca.CONTEST_ROUND = %s"
                     award_params.append(contest_id)
 
+                award_query += " ORDER BY ca.CONTEST_ROUND DESC, ca.RANKING ASC"
                 cur.execute(award_query, tuple(award_params))
                 my_awards = cur.fetchall()
 
