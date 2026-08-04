@@ -36,9 +36,21 @@ class PawStarService:
         else:
             contest['contest_year_month'] = "해당 년월 콘테스트"
 
+        stat = str(contest.get('CONTEST_STAT') or contest.get('contest_stat') or '').strip()
+        stat_nm = str(contest.get('CONTEST_STAT_NM') or contest.get('status') or '').strip()
+        
+        now = datetime.now()
         end_dt = contest.get('ED_DT') or contest.get('end_date')
+
+        # 상태코드가 종료(G001C002)이거나 상태명이 종료/마감인 경우
+        if stat == 'G001C002' or stat_nm in ['종료', '마감', 'CLOSED', '종료됨']:
+            contest['d_day_str'] = "종료됨"
+            contest['is_closed'] = True
+            return contest
+
         if not end_dt:
             contest['d_day_str'] = "상시 진행"
+            contest['is_closed'] = False
             return contest
 
         if isinstance(end_dt, str):
@@ -46,16 +58,25 @@ class PawStarService:
                 end_dt = datetime.strptime(end_dt[:10], "%Y-%m-%d")
             except Exception:
                 contest['d_day_str'] = "상시 진행"
+                contest['is_closed'] = False
                 return contest
 
-        now = datetime.now()
-        diff_days = (end_dt - now).days
+        # 종료일시가 현재 시점보다 지난 경우 자동 종료 처리
+        if isinstance(end_dt, datetime) and end_dt < now:
+            contest['d_day_str'] = "종료됨"
+            contest['is_closed'] = True
+            return contest
+
+        diff_days = (end_dt.date() - now.date()).days
         if diff_days < 0:
             contest['d_day_str'] = "종료됨"
+            contest['is_closed'] = True
         elif diff_days == 0:
             contest['d_day_str'] = "D-DAY Today"
+            contest['is_closed'] = False
         else:
             contest['d_day_str'] = f"D-{diff_days}"
+            contest['is_closed'] = False
         return contest
 
     def get_user_contest_entry_count(self, contest_id, base_user_id):
