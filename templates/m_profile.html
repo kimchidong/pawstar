@@ -162,52 +162,75 @@
                         </div>
                     </div>
                     
-                    <!-- 3. 우측: 텍스트 뱃지 칩 세트 (이전 스타일 원복) -->
-                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
-                        {% for b in (a.awards or [a]) %}
-                            {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
-                            {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
-                            {% set b_kind = (b.KIND_CD or a.KIND_CD or '')|string %}
-
-                            {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
-                                {% set badge_bg = 'linear-gradient(135deg, #fffbeb 0%, #fef08a 100%)' %}
-                                {% set badge_color = '#854d0e' %}
-                                {% set badge_border = '#facc15' %}
-                                {% set badge_shadow = '0 3px 10px rgba(245, 158, 11, 0.2)' %}
-                                {% set badge_icon = 'fa-solid fa-crown' %}
-                                {% set icon_color = '#b45309' %}
-                            {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
-                                {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
-                                {% set badge_color = '#334155' %}
-                                {% set badge_border = '#cbd5e1' %}
-                                {% set badge_shadow = '0 3px 8px rgba(100, 116, 139, 0.12)' %}
-                                {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
-                                {% set icon_color = '#475569' %}
-                            {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
-                                {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
-                                {% set badge_color = '#c2410c' %}
-                                {% set badge_border = '#fdba74' %}
-                                {% set badge_shadow = '0 3px 8px rgba(234, 88, 12, 0.15)' %}
-                                {% set badge_icon = 'fa-solid fa-star' %}
-                                {% set icon_color = '#ea580c' %}
-                            {% else %}
-                                {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
-                                {% set badge_color = '#6b21a8' %}
-                                {% set badge_border = '#d8b4fe' %}
-                                {% set badge_shadow = '0 3px 10px rgba(124, 58, 237, 0.15)' %}
-                                {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or 'cat' in b_kind.lower() %}
-                                    {% set badge_icon = 'fa-solid fa-cat' %}
-                                {% else %}
-                                    {% set badge_icon = 'fa-solid fa-dog' %}
-                                {% endif %}
-                                {% set icon_color = '#7c3aed' %}
-                            {% endif %}
-
-                            <div style="display: inline-flex; align-items: center; gap: 0.3rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.32rem 0.65rem; border-radius: 18px; font-weight: 900; font-size: 0.76rem; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">
-                                <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.8rem;"></i>
-                                <span>{{ b_nm }}</span>
+                    <!-- 3. 우측: 평가 3요소 뱃지 + 텍스트 수상 뱃지 칩 세트 -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
+                        <!-- 모바일 평가 3요소 및 총점 2단 지표 -->
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;">
+                            <!-- 윗줄: 총점 -->
+                            <span style="font-size: 0.72rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.15rem 0.5rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.2rem;">
+                                ⭐ {{ "{:,}".format(a.score or 0) }}점
+                            </span>
+                            <!-- 아랫줄: 평가 3요소 (좋아요, 조회, 댓글) -->
+                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                <span style="font-size: 0.68rem; font-weight: 700; color: #e11d48; background: #fff1f2; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
+                                    ❤️ {{ "{:,}".format(a.like_count or 0) }}
+                                </span>
+                                <span style="font-size: 0.68rem; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
+                                    👁️ {{ "{:,}".format(a.view_count or 0) }}
+                                </span>
+                                <span style="font-size: 0.68rem; font-weight: 700; color: #059669; background: #ecfdf5; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
+                                    💬 {{ "{:,}".format(a.comment_count or 0) }}
+                                </span>
                             </div>
-                        {% endfor %}
+                        </div>
+
+                        <!-- 수상 뱃지 세트 (가로 1줄 나란히 정렬) -->
+                        <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: nowrap;">
+                            {% for b in (a.awards or [a]) %}
+                                {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
+                                {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
+                                {% set b_kind = (b.KIND_CD or a.KIND_CD or '')|string %}
+
+                                {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
+                                    {% set badge_bg = 'linear-gradient(135deg, #fffbeb 0%, #fef08a 100%)' %}
+                                    {% set badge_color = '#854d0e' %}
+                                    {% set badge_border = '#facc15' %}
+                                    {% set badge_shadow = '0 3px 10px rgba(245, 158, 11, 0.2)' %}
+                                    {% set badge_icon = 'fa-solid fa-crown' %}
+                                    {% set icon_color = '#b45309' %}
+                                {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
+                                    {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
+                                    {% set badge_color = '#334155' %}
+                                    {% set badge_border = '#cbd5e1' %}
+                                    {% set badge_shadow = '0 3px 8px rgba(100, 116, 139, 0.12)' %}
+                                    {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
+                                    {% set icon_color = '#475569' %}
+                                {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
+                                    {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
+                                    {% set badge_color = '#c2410c' %}
+                                    {% set badge_border = '#fdba74' %}
+                                    {% set badge_shadow = '0 3px 8px rgba(234, 88, 12, 0.15)' %}
+                                    {% set badge_icon = 'fa-solid fa-star' %}
+                                    {% set icon_color = '#ea580c' %}
+                                {% else %}
+                                    {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
+                                    {% set badge_color = '#6b21a8' %}
+                                    {% set badge_border = '#d8b4fe' %}
+                                    {% set badge_shadow = '0 3px 10px rgba(124, 58, 237, 0.15)' %}
+                                    {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or 'cat' in b_kind.lower() %}
+                                        {% set badge_icon = 'fa-solid fa-cat' %}
+                                    {% else %}
+                                        {% set badge_icon = 'fa-solid fa-dog' %}
+                                    {% endif %}
+                                    {% set icon_color = '#7c3aed' %}
+                                {% endif %}
+
+                                <div style="display: inline-flex; align-items: center; gap: 0.3rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.32rem 0.65rem; border-radius: 18px; font-weight: 900; font-size: 0.76rem; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">
+                                    <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.8rem;"></i>
+                                    <span>{{ b_nm }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             {% else %}
