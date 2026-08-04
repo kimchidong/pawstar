@@ -581,6 +581,10 @@ class PawStarService:
                             'awards': []
                         }
                     
+                    b_img = a.get('badge_img') or a.get('BADGE_IMG_PATH_FILE') or ''
+                    if not b_img and a.get('AWARD_CD'):
+                        b_img = f"/static/image/badge/{a.get('AWARD_CD')}.png"
+                    
                     award_item = {
                         'AWARD_CD': a.get('AWARD_CD'),
                         'AWARD_PART': a.get('AWARD_PART'),
@@ -588,7 +592,8 @@ class PawStarService:
                         'RANKING': a.get('RANKING'),
                         'KIND_CD': a.get('KIND_CD') or a.get('round_kind_cd'),
                         'prize_name': a.get('prize_name'),
-                        'badge_img': a.get('badge_img')
+                        'badge_img': b_img,
+                        'BADGE_IMG_PATH_FILE': b_img
                     }
                     grouped_awards[key]['awards'].append(award_item)
 

@@ -224,59 +224,77 @@
         <i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> 나의 역대 콘테스트 수상 트로피 ({{ stats.award_count if stats and stats.award_count is not none else (my_awards | map(attribute='awards') | map('length') | sum) }})
     </h3>
     
-    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 0.75rem 1.5rem; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04);">
+    <div style="background: linear-gradient(180deg, #ffffff 0%, #faf5ff 100%); border: 1.5px solid #e9d5ff; border-radius: 24px; padding: 0.85rem 1.75rem; box-shadow: 0 12px 35px -8px rgba(124, 58, 237, 0.08);">
         {% for a in my_awards %}
             {% set a_cd = (a.AWARD_CD or a.award_cd or '')|string %}
             {% set a_nm = a.AWARD_NM or a.prize_name or '수상작' %}
             {% set c_id = a.CONTEST_ROUND or a.contest_id %}
             {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
-            <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="padding: 1.15rem 0.5rem; border-bottom: {% if loop.last %}none{% else %}1px solid #f1f5f9{% endif %}; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; cursor: pointer; transition: all 0.2s ease; border-radius: 12px;">
-                <div style="display: flex; align-items: center; gap: 1.1rem; min-width: 0; flex: 1;">
-                    <!-- 수상작 썸네일 -->
-                    <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 54px; height: 54px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="padding: 1.2rem 0.6rem; border-bottom: {% if loop.last %}none{% else %}1px solid #f3e8ff{% endif %}; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 16px; margin: 0.2rem 0;">
+                
+                <!-- 1. 맨 좌측: 실물 3D 메달 & 배지 고정 너비 컬럼 (1개든 2개든 동일 가로 사이즈 width: 92px) -->
+                <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; width: 92px; justify-content: flex-start;">
+                    {% for b in (a.awards or [a]) %}
+                        {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
+                        {% set b_img_src = b.badge_img or b.BADGE_IMG_PATH_FILE or ('/static/image/badge/' ~ b_cd ~ '.png') %}
+                        <img src="{{ b_img_src }}" alt="메달/배지" style="width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(124, 58, 237, 0.22));">
+                    {% endfor %}
+                </div>
+
+                <!-- 2. 중앙: 출전작 썸네일 + 회차/테마 뱃지 + 수상작 제목 -->
+                <div style="display: flex; align-items: center; gap: 1.2rem; min-width: 0; flex: 1;">
+                    <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15); flex-shrink: 0;">
                     
                     <div style="min-width: 0; flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.3rem;">
-                            <span style="font-weight: 800; color: #d97706; font-size: 1.05rem; letter-spacing: -0.01em;">
-                                제{{ c_id }}회 {% if a.theme_title %}{{ a.theme_title }}{% else %}콘테스트{% endif %}
+                        <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                            <span style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-weight: 900; font-size: 0.78rem; padding: 0.22rem 0.65rem; border-radius: 10px; box-shadow: 0 3px 8px rgba(124, 58, 237, 0.25); letter-spacing: -0.02em;">
+                                제{{ c_id }}회
+                            </span>
+                            <span style="font-weight: 900; color: #0f172a; font-size: 1.08rem; letter-spacing: -0.02em;">
+                                {% if a.theme_title %}{{ a.theme_title }}{% else %}콘테스트{% endif %}
                             </span>
                         </div>
-                        <div style="font-size: 0.88rem; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            수상작: <strong style="color: #1e293b; font-weight: 700;">{{ a.post_title or '자랑스러운 반려동물 출전작' }}</strong>
+                        <div style="font-size: 0.88rem; color: #64748b; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span style="color: #8b5cf6; font-weight: 800; font-size: 0.78rem; background: #f3e8ff; padding: 0.12rem 0.45rem; border-radius: 6px; border: 1px solid #e9d5ff;">수상작</span>
+                            <strong style="color: #334155; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ a.post_title or '자랑스러운 반려동물 출전작' }}</strong>
                         </div>
                     </div>
                 </div>
 
-                <!-- 우측 트로피 뱃지 칩 (다중 수상 시 한 행에 여러 뱃지 연속 표시) -->
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
+                <!-- 3. 우측: 3D 엠보싱 텍스트 뱃지 칩 세트 (이전 스타일 원복) -->
+                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
                     {% for b in (a.awards or [a]) %}
                         {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                         {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
                         {% set b_kind = (b.KIND_CD or a.KIND_CD or '')|string %}
 
                         {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
-                            {% set badge_bg = '#fffbeb' %}
-                            {% set badge_color = '#b45309' %}
-                            {% set badge_border = '#fde047' %}
+                            {% set badge_bg = 'linear-gradient(135deg, #fffbeb 0%, #fef08a 100%)' %}
+                            {% set badge_color = '#854d0e' %}
+                            {% set badge_border = '#facc15' %}
+                            {% set badge_shadow = '0 4px 14px rgba(245, 158, 11, 0.22)' %}
                             {% set badge_icon = 'fa-solid fa-crown' %}
-                            {% set icon_color = '#d97706' %}
+                            {% set icon_color = '#b45309' %}
                         {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
-                            {% set badge_bg = '#f8fafc' %}
+                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
                             {% set badge_color = '#334155' %}
                             {% set badge_border = '#cbd5e1' %}
+                            {% set badge_shadow = '0 4px 12px rgba(100, 116, 139, 0.15)' %}
                             {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
                             {% set icon_color = '#475569' %}
                         {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
-                            {% set badge_bg = '#fff7ed' %}
+                            {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
                             {% set badge_color = '#c2410c' %}
-                            {% set badge_border = '#fed7aa' %}
+                            {% set badge_border = '#fdba74' %}
+                            {% set badge_shadow = '0 4px 12px rgba(234, 88, 12, 0.18)' %}
                             {% set badge_icon = 'fa-solid fa-star' %}
                             {% set icon_color = '#ea580c' %}
                         {% else %}
-                            {% set badge_bg = '#f3e8ff' %}
+                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
                             {% set badge_color = '#6b21a8' %}
                             {% set badge_border = '#d8b4fe' %}
+                            {% set badge_shadow = '0 4px 14px rgba(124, 58, 237, 0.18)' %}
                             {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or 'cat' in b_kind.lower() %}
                                 {% set badge_icon = 'fa-solid fa-cat' %}
                             {% else %}
@@ -285,7 +303,7 @@
                             {% set icon_color = '#7c3aed' %}
                         {% endif %}
 
-                        <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 800; font-size: 0.88rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                        <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.48rem 1rem; border-radius: 22px; font-weight: 900; font-size: 0.88rem; box-shadow: {{ badge_shadow }}; letter-spacing: -0.01em;">
                             <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.95rem;"></i>
                             <span>{{ b_nm }}</span>
                         </div>
@@ -293,8 +311,8 @@
                 </div>
             </div>
         {% else %}
-            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-                <i class="fa-solid fa-award" style="font-size: 2.8rem; margin-bottom: 0.85rem; color: #cbd5e1;"></i>
+            <div style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-award" style="font-size: 3rem; margin-bottom: 0.85rem; color: #cbd5e1;"></i>
                 <p style="font-weight: 700; color: #64748b; margin: 0;">아직 수상 기록이 없습니다. 매월 열리는 콘테스트에 우리 아이를 출전시켜 보세요!</p>
             </div>
         {% endfor %}
