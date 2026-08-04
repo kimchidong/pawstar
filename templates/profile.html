@@ -3,21 +3,31 @@
 {% block content %}
 
 <div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
-    <!-- Profile Card Header (plamodelshop 방식 동일 구조) -->
+    <!-- Profile Card Header (고급스러운 밸런스 재설계) -->
     <div class="profile-card">
-        <img src="{{ user.profile_img }}" class="profile-avatar" id="currentProfileImg" alt="user profile">
-        <div style="flex: 1; min-width: 0; word-break: break-word;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <h2 style="font-size: 1.8rem; font-weight: 800;" id="currentNickname">{{ user.nickname }}</h2>
+        <div class="profile-avatar-container">
+            <div class="avatar-ring">
+                <img src="{{ user.profile_img }}" class="profile-avatar" id="currentProfileImg" alt="user profile">
+            </div>
+        </div>
+        
+        <div class="profile-info-body">
+            <div class="profile-header-row">
+                <div class="profile-user-identity">
+                    <h2 class="profile-user-nickname" id="currentNickname">{{ user.nickname }}</h2>
+                    <span class="user-role-chip"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
+                    {% if user.email %}
+                        <span class="user-google-chip"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
+                    {% endif %}
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                
+                <div class="profile-action-btns">
                     <!-- 프로필 정보 수정 버튼 -->
                     <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
                         <i class="fa-solid fa-pen-to-square"></i> 프로필 정보 수정
                     </button>
                     <!-- 로그아웃 버튼 -->
-                    <a href="/logout" class="btn-logout-profile" id="btnLogoutProfile" title="로그아웃 (브라우저 닫기/30분 미이용시 자동로그아웃)">
+                    <a href="/logout" class="btn-logout-profile" id="btnLogoutProfile" title="로그아웃">
                         <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
                     </a>
                     <!-- 회원 탈퇴 버튼 -->
@@ -27,17 +37,21 @@
                 </div>
             </div>
 
-
-
-            <div style="display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
-                {% if user.email %}
-                    <span style="background: #f1f5f9; color: #334155; padding: 0.25rem 0.75rem; border-radius: 16px; font-weight: 700; font-size: 0.82rem; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 연동 계정: {{ user.email }}
-                    </span>
-                {% endif %}
+            <!-- 미니 활동 요약 뱃지 라인 -->
+            <div class="profile-mini-stats">
+                <div class="mini-stat-badge stat-posts">
+                    <i class="fa-solid fa-paw"></i> <span>출전작</span> <strong>{{ "{:,}".format(stats.my_post_count) }}개</strong>
+                </div>
+                <div class="mini-stat-badge stat-score">
+                    <i class="fa-solid fa-star"></i> <span>누적 점수</span> <strong>{{ "{:,}".format(stats.total_score) }}점</strong>
+                </div>
+                <div class="mini-stat-badge stat-likes">
+                    <i class="fa-solid fa-heart"></i> <span>받은 좋아요</span> <strong>{{ "{:,}".format(stats.total_likes) }}개</strong>
+                </div>
+                <div class="mini-stat-badge stat-awards">
+                    <i class="fa-solid fa-trophy"></i> <span>수상 내역</span> <strong>{{ stats.award_count }}개</strong>
+                </div>
             </div>
-
-
         </div>
     </div>
 
