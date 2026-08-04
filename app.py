@@ -930,7 +930,8 @@ def get_comments(post_id):
                 contest_id = int(parts[0])
                 ent_user_id = parts[1]
 
-        post_detail = service.get_post_detail(contest_id, ent_user_id)
+        user_id = session.get('user_id')
+        post_detail = service.get_post_detail(contest_id, ent_user_id, user_id)
         comments = post_detail.get('comments', []) if post_detail else []
         return jsonify({'success': True, 'comments': comments})
     except Exception as e:
@@ -993,6 +994,61 @@ def add_comment_api(post_id):
     except Exception as e:
         print("댓글 등록 오류:", e)
         return jsonify({'success': False, 'message': f'댓글 등록 중 오류: {str(e)}'}), 500
+
+@app.route('/api/comments/<path:post_id>/delete', methods=['POST', 'DELETE'])
+def delete_comment_api(post_id):
+    """ 한줄 댓글 삭제 """
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'message': '로그인이 필요합니다.', 'require_login': True}), 401
+
+        data = request.get_json() or {}
+        target_cmt_user_id = data.get('cmt_user_id') or user_id
+
+        contest_id = 1
+        ent_user_id = str(post_id)
+        if '_' in str(post_id):
+            parts = str(post_id).split('_', 1)
+            if parts[0].isdigit():
+                contest_id = int(parts[0])
+                ent_user_id = parts[1]
+
+        res = service.delete_comment(contest_id, ent_user_id, target_cmt_user_id)
+        if not res.get('success'):
+            return jsonify({'success': False, 'message': res.get('message', '댓글 삭제 중 오류가 발생했습니다.')}), 400
+
+        post_detail = service.get_post_detail(contest_id, ent_user_id, user_id)
+        comments = post_detail.get('comments', []) if post_detail else []
+
+        vw_cnt = res.get('view_count', post_detail.get('VW_CNT', 0) if post_detail else 0)
+        like_cnt = res.get('like_count', post_detail.get('LIKE_CNT', 0) if post_detail else 0)
+        cmt_cnt = res.get('comment_count', post_detail.get('CMT_CNT', 0) if post_detail else 0)
+        final_score = res.get('score', post_detail.get('SCORE', 0) if post_detail else 0)
+
+        event_res = {
+            'view_count': vw_cnt,
+            'like_count': like_cnt,
+            'comment_count': cmt_cnt,
+            'score': final_score,
+            'new_score': final_score
+        }
+
+        return jsonify({
+            'success': True,
+            'message': '댓글이 삭제되었습니다.',
+            'comments': comments,
+            'view_count': vw_cnt,
+            'like_count': like_cnt,
+            'comment_count': cmt_cnt,
+            'score': final_score,
+            'new_score': final_score,
+            'stats': event_res,
+            'event_res': event_res
+        })
+    except Exception as e:
+        print("댓글 삭제 오류:", e)
+        return jsonify({'success': False, 'message': f'댓글 삭제 중 오류: {str(e)}'}), 500
 
 from PIL import Image
 

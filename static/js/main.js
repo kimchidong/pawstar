@@ -1036,20 +1036,69 @@ function renderDetailComments(comments) {
         return;
     }
     
-    listEl.innerHTML = comments.map(c => `
-        <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 800; color: var(--text-primary);">
-                    <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
-                    <span>${escapeHtml(c.user_nickname || '집사')}</span>
+    const rawCurrentId = String(window.CURRENT_USER_ID || '');
+    const currentUserId = rawCurrentId.split('_post_')[0];
+    const currentNickname = window.CURRENT_USER_NICKNAME;
+
+    listEl.innerHTML = comments.map(c => {
+        const rawCUserId = String(c.user_id || c.USER_ID || c.CMT_USER_ID || '');
+        const cUserId = rawCUserId.split('_post_')[0];
+        const cNickname = c.user_nickname || c.NK_NM;
+        const isMine = c.is_mine === true || (currentUserId && cUserId && cUserId === currentUserId) || (currentNickname && cNickname && cNickname === currentNickname);
+
+        const deleteBtnHtml = isMine ? `
+            <button onclick="deleteDetailComment('${c.CMT_USER_ID || c.user_id || c.USER_ID}')" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; font-size: 0.72rem; cursor: pointer; padding: 0.15rem 0.45rem; border-radius: 6px; font-weight: 700; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.25rem;" title="댓글 삭제">
+                <i class="fa-solid fa-trash-can" style="font-size: 0.68rem;"></i> 삭제
+            </button>
+        ` : '';
+
+        return `
+            <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.2rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem; font-weight: 800; color: var(--text-primary);">
+                        <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
+                        <span>${escapeHtml(c.user_nickname || '집사')}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at || ''}</span>
+                        ${deleteBtnHtml}
+                    </div>
                 </div>
-                <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at || ''}</span>
+                <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.4rem;">
+                    ${escapeHtml(c.content)}
+                </div>
             </div>
-            <div style="color: var(--text-secondary); font-weight: 500; word-break: break-all; padding-left: 1.4rem;">
-                ${escapeHtml(c.content)}
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+function deleteDetailComment(cmtUserId) {
+    if (!window.currentDetailPostId) return;
+    if (!confirm('작성하신 댓글을 삭제하시겠습니까?')) return;
+
+    fetch(`/api/comments/${window.currentDetailPostId}/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cmt_user_id: cmtUserId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            showToast(data.message || '댓글 삭제 실패', 'warning');
+            return;
+        }
+        showToast('댓글이 삭제되었습니다.', 'info');
+        loadComments(window.currentDetailPostId);
+        
+        // 점수 및 통계 UI 업데이트
+        if (data.event_res) {
+            updatePostStatsUI(window.currentDetailPostId, data.event_res);
+        }
+    })
+    .catch(err => {
+        console.error('댓글 삭제 오류:', err);
+        showToast('댓글 삭제 중 오류가 발생했습니다.', 'error');
+    });
 }
 
 function submitDetailComment() {

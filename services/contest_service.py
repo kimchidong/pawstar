@@ -1147,6 +1147,10 @@ class PawStarService:
                     ORDER BY c.CMD_DT ASC
                 """, (contest_id, round_no))
                 comments = cur.fetchall()
+                if comments:
+                    for c in comments:
+                        c_uid = str(c.get('USER_ID') or c.get('user_id') or '')
+                        c['is_mine'] = bool(current_user_id and c_uid == str(current_user_id))
 
                 is_liked = False
                 is_commented = False
@@ -1465,6 +1469,50 @@ class PawStarService:
             err_str = str(e)
             if "1062" in err_str or "Duplicate entry" in err_str:
                 return {'success': False, 'message': '한 게시물에 한 회원은 단 한번만 댓글 등록 가능합니다.'}
+            return {'success': False, 'message': str(e)}
+
+    def delete_comment(self, contest_id, target_id, cmt_user_id):
+        if self.is_contest_closed(contest_id):
+            return {'success': False, 'is_ended': True, 'message': '마감(종료)된 콘테스트 회차에서는 댓글을 삭제할 수 없습니다.'}
+
+        conn = self.get_db_connection()
+        if not conn:
+            return {'success': False, 'message': 'DB 연결 실패'}
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT ROUND_NO FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
+                    ORDER BY ENT_DT DESC LIMIT 1
+                """, (contest_id, target_id, target_id))
+                r_info = cur.fetchone()
+                if not r_info:
+                    conn.close()
+                    return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
+                round_no = r_info['ROUND_NO']
+
+                # 댓글 삭제
+                cur.execute("""
+                    DELETE FROM pst_contest_cmt
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND CMT_USER_ID = %s
+                """, (contest_id, round_no, cmt_user_id))
+
+                # 3요소 재조회 및 동기화
+                stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
+                conn.commit()
+                conn.close()
+
+                return {
+                    'success': True,
+                    'stats': stats,
+                    'view_count': stats['view_count'],
+                    'like_count': stats['like_count'],
+                    'comment_count': stats['comment_count'],
+                    'score': stats['score']
+                }
+        except Exception as e:
+            print("delete_comment error:", e)
             return {'success': False, 'message': str(e)}
 
     def get_hall_of_fame(self, contest_id=None):
