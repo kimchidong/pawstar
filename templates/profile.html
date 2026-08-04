@@ -224,22 +224,68 @@
         <i class="fa-solid fa-trophy" style="color: var(--accent-gold);"></i> 나의 역대 콘테스트 수상 트로피 ({{ my_awards|length }})
     </h3>
     
-    <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft);">
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 0.75rem 1.5rem; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04);">
         {% for a in my_awards %}
-            <div style="padding: 1rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                <div>
-                    <span style="font-weight: 800; color: var(--accent-gold); font-size: 1.05rem;">제{{ a.contest_id }}회 콘테스트</span> - 
-                    <span style="font-weight: 800; color: var(--text-primary);">{{ a.award_type }}</span>
-                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.3rem;">수상작: <strong>{{ a.post_title }}</strong></div>
+            {% set a_cd = (a.AWARD_CD or a.award_cd or '')|string %}
+            {% set a_nm = a.AWARD_NM or a.prize_name or '수상작' %}
+            {% set c_id = a.CONTEST_ROUND or a.contest_id %}
+            {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
+
+            <!-- 수상 구분별 뱃지 스타일 정의 -->
+            {% if 'P001A101' in a_cd or '슈퍼' in a_nm %}
+                {% set badge_bg = '#fffbeb' %}
+                {% set badge_color = '#b45309' %}
+                {% set badge_border = '#fde047' %}
+                {% set badge_icon = 'fa-solid fa-crown' %}
+                {% set icon_color = '#d97706' %}
+            {% elif 'P001A102' in a_cd or '라이징' in a_nm %}
+                {% set badge_bg = '#f8fafc' %}
+                {% set badge_color = '#334155' %}
+                {% set badge_border = '#cbd5e1' %}
+                {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
+                {% set icon_color = '#475569' %}
+            {% elif 'P001A103' in a_cd or '브라이트' in a_nm %}
+                {% set badge_bg = '#fff7ed' %}
+                {% set badge_color = '#c2410c' %}
+                {% set badge_border = '#fed7aa' %}
+                {% set badge_icon = 'fa-solid fa-star' %}
+                {% set icon_color = '#ea580c' %}
+            {% else %}
+                {% set badge_bg = '#f3e8ff' %}
+                {% set badge_color = '#6b21a8' %}
+                {% set badge_border = '#d8b4fe' %}
+                {% set badge_icon = 'fa-solid fa-award' %}
+                {% set icon_color = '#7c3aed' %}
+            {% endif %}
+
+            <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="padding: 1.15rem 0.5rem; border-bottom: {% if loop.last %}none{% else %}1px solid #f1f5f9{% endif %}; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; cursor: pointer; transition: all 0.2s ease; border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 1.1rem; min-width: 0; flex: 1;">
+                    <!-- 수상작 썸네일 -->
+                    <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 54px; height: 54px; border-radius: 12px; object-fit: cover; border: 1.5px solid #e2e8f0; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.3rem;">
+                            <span style="font-weight: 800; color: #d97706; font-size: 1rem; letter-spacing: -0.01em;">제{{ c_id }}회 콘테스트</span>
+                            {% if a.theme_title %}
+                                <span style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">- {{ a.theme_title }}</span>
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 0.88rem; color: #64748b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            수상작: <strong style="color: #1e293b; font-weight: 700;">{{ a.post_title or '자랑스러운 반려동물 출전작' }}</strong>
+                        </div>
+                    </div>
                 </div>
-                <div style="font-size: 0.95rem; color: var(--accent-purple); font-weight: 800; background: var(--bg-primary); padding: 0.4rem 0.85rem; border-radius: 20px; border: 1px solid var(--border-light);">
-                    🏆 {{ a.prize_name }}
+
+                <!-- 우측 트로피 뱃지 칩 -->
+                <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.45rem 1rem; border-radius: 20px; font-weight: 800; font-size: 0.88rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-shrink: 0;">
+                    <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.95rem;"></i>
+                    <span>{{ a_nm }}</span>
                 </div>
             </div>
         {% else %}
-            <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
-                <i class="fa-solid fa-award" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--border-light);"></i>
-                <p>아직 수상 기록이 없습니다. 매월 열리는 콘테스트에 우리 아이를 출전시켜 보세요!</p>
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-award" style="font-size: 2.8rem; margin-bottom: 0.85rem; color: #cbd5e1;"></i>
+                <p style="font-weight: 700; color: #64748b; margin: 0;">아직 수상 기록이 없습니다. 매월 열리는 콘테스트에 우리 아이를 출전시켜 보세요!</p>
             </div>
         {% endfor %}
     </div>
