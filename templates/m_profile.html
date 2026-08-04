@@ -103,9 +103,23 @@
                         </div>
                     </div>
                     <div class="m-card-title" style="margin-top: 0.35rem; font-weight: 800;">{{ p.TITLE or p.title }}</div>
-                    <div class="m-card-footer" style="margin-top: 0.35rem; font-size: 0.75rem; color: var(--text-muted);">
+                    <div class="m-card-footer" style="margin-top: 0.35rem; font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;">
                         <span>{{ p.ENT_DT or p.created_at }}</span>
-                        <span>❤️ {{ p.LIKE_CNT or p.like_count or 0 }}</span>
+                    </div>
+                    <!-- 모바일 3요소 라운드 박스 (조회, 좋아요, 댓글) -->
+                    <div class="m-card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; margin-top: 0.5rem; text-align: center;">
+                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #0284c7; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-eye" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format(p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0)) }}</span>
+                        </div>
+                        <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-heart" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format(p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0)) }}</span>
+                        </div>
+                        <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-comment" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format(p.CMT_CNT if p.CMT_CNT is not none else (p.comment_count or 0)) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

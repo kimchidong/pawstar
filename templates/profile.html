@@ -173,12 +173,28 @@
                     <p class="post-desc">{{ p.CONTS or p.content }}</p>
 
                     <!-- 등록 일시 (시분초) 및 총 점수 -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.65rem;">
                         <span style="font-size: 0.78rem; color: var(--text-muted);">
                             {{ p.ENT_DT or p.created_at }}
                         </span>
                         <div class="card-total-score">
                             <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.SCORE or p.score or 0) }}</span> 점
+                        </div>
+                    </div>
+
+                    <!-- 이미지 캡처 스타일 3요소 박스 (조회, 좋아요, 댓글) -->
+                    <div class="card-actions" onclick="event.stopPropagation();" style="margin-top: 0.4rem;">
+                        <div class="action-btn btn-view" title="조회수">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count">{{ "{:,}".format(p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0)) }}</span>
+                        </div>
+                        <div class="action-btn btn-like" title="좋아요 수">
+                            <i class="fa-regular fa-heart"></i>
+                            <span class="like-count">{{ "{:,}".format(p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0)) }}</span>
+                        </div>
+                        <div class="action-btn btn-comment" title="댓글 수">
+                            <i class="fa-regular fa-comment"></i>
+                            <span class="comment-count">{{ "{:,}".format(p.CMT_CNT if p.CMT_CNT is not none else (p.comment_count or 0)) }}</span>
                         </div>
                     </div>
                 </div>
