@@ -278,15 +278,15 @@
                     </div>
                 </div>
 
-                <!-- 3. 평가 3요소 & 총점 독립 전용 컬럼 (위: 총점, 아래: 3요소 / 세로줄 완벽 고정 정렬 width: 275px) -->
-                <div style="width: 275px; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+                <!-- 3. 평가 3요소 & 총점 독립 전용 컬럼 (위: 총점, 아래: 3요소 / 가운데 정렬 width: 275px) -->
+                <div style="width: 275px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem;">
                     <!-- 윗줄: 총점 -->
                     <span style="font-size: 0.78rem; font-weight: 900; color: #d97706; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.22rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.3rem; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);">
                         <i class="fa-solid fa-star" style="font-size: 0.75rem;"></i> {{ "{:,}".format(a.score or 0) }}점
                     </span>
 
-                    <!-- 아랫줄: 평가 3요소 (좋아요, 조회, 댓글) -->
-                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <!-- 아랫줄: 평가 3요소 (좋아요, 조회, 댓글 - 가운데 정렬) -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
                         <span style="font-size: 0.74rem; font-weight: 700; color: #e11d48; background: #fff1f2; border: 1px solid #ffe4e6; padding: 0.2rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
                             <i class="fa-solid fa-heart" style="font-size: 0.7rem;"></i> 좋아요 {{ "{:,}".format(a.like_count or 0) }}
                         </span>
