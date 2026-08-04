@@ -1942,6 +1942,12 @@ option.opt-closed {
     outline: none;
 }
 .form-control:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
+#detailCommentInput:focus,
+#mDetailCommentInput:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 1px solid var(--accent-purple) !important;
+}
 
 /* Animations & Toast */
 @keyframes pulse {
