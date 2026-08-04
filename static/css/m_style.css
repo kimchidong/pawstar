@@ -527,7 +527,18 @@ body.m-body {
     font-weight: 400;
     outline: none;
     background: var(--bg-primary);
+    transition: border-color 0.2s ease;
 }
+
+.m-form-control:hover {
+    border-color: #6366f1;
+}
+
+.m-form-control:focus {
+    border-color: #4f46e5;
+}
+
+
 
 .m-btn-submit {
     width: 100%;
