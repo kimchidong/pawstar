@@ -145,18 +145,6 @@
         <h3 style="font-size: 1.4rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fa-solid fa-paw" style="color: var(--accent-purple);"></i> 내 펫 출전 게시물 ({{ my_posts|length }})
         </h3>
-
-        <!-- 회차 선택 콤보박스 -->
-        {% if my_posts %}
-        <div>
-            <select id="myPostContestSelect" class="select-custom" style="padding: 0.4rem 0.85rem; font-size: 0.88rem; border-radius: 12px; border: 1.5px solid var(--border-light); background: #ffffff; font-weight: 700; color: var(--text-primary); cursor: pointer; min-width: 170px;" onchange="filterMyPostsByRound(this.value)">
-                <option value="all">전체 회차 ({{ my_posts|length }}개)</option>
-                {% for r_id, count in round_map.items()|sort %}
-                    <option value="{{ r_id }}">제{{ r_id }}회 콘테스트 ({{ count }}개)</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
     </div>
 
     <div class="posts-grid" id="myPostsGrid">

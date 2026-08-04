@@ -80,16 +80,6 @@
             🐾 내 펫 출전작 ({{ my_posts|length }})
         </h3>
 
-        {% if my_posts %}
-        <div style="display: flex; align-items: center; gap: 0.35rem;">
-            <select id="mMyPostContestSelect" class="m-select-custom" style="padding: 0.3rem 0.6rem; font-size: 0.78rem; border-radius: 10px; border: 1px solid var(--border-light); background: #ffffff; font-weight: 700; color: var(--text-primary);" onchange="filterMobileMyPostsByRound(this.value)">
-                <option value="all">전체 회차 ({{ my_posts|length }}개)</option>
-                {% for r_id, count in round_map.items()|sort %}
-                    <option value="{{ r_id }}">제{{ r_id }}회 콘테스트 ({{ count }}개)</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
     </div>
 
     <div class="m-feed-grid" style="padding: 0;">
