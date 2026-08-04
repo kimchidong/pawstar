@@ -184,13 +184,13 @@
                             <span style="font-size: 0.72rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.15rem 0.5rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.2rem;">
                                 ⭐ {{ "{:,}".format(a.score or 0) }}점
                             </span>
-                            <!-- 아랫줄: 평가 3요소 (좋아요, 조회, 댓글) -->
+                            <!-- 아랫줄: 평가 3요소 (조회수, 좋아요, 댓글 순) -->
                             <div style="display: flex; align-items: center; gap: 0.25rem;">
-                                <span style="font-size: 0.68rem; font-weight: 700; color: #e11d48; background: #fff1f2; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
-                                    ❤️ {{ "{:,}".format(a.like_count or 0) }}
-                                </span>
                                 <span style="font-size: 0.68rem; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
                                     👁️ {{ "{:,}".format(a.view_count or 0) }}
+                                </span>
+                                <span style="font-size: 0.68rem; font-weight: 700; color: #e11d48; background: #fff1f2; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
+                                    ❤️ {{ "{:,}".format(a.like_count or 0) }}
                                 </span>
                                 <span style="font-size: 0.68rem; font-weight: 700; color: #059669; background: #ecfdf5; padding: 0.12rem 0.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.18rem;">
                                     💬 {{ "{:,}".format(a.comment_count or 0) }}

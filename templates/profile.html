@@ -285,13 +285,13 @@
                         <i class="fa-solid fa-star" style="font-size: 0.75rem;"></i> {{ "{:,}".format(a.score or 0) }}점
                     </span>
 
-                    <!-- 아랫줄: 평가 3요소 (좋아요, 조회, 댓글 - 가운데 정렬) -->
+                    <!-- 아랫줄: 평가 3요소 (조회수, 좋아요, 댓글 순 - 가운데 정렬) -->
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
-                        <span style="font-size: 0.74rem; font-weight: 700; color: #e11d48; background: #fff1f2; border: 1px solid #ffe4e6; padding: 0.2rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
-                            <i class="fa-solid fa-heart" style="font-size: 0.7rem;"></i> 좋아요 {{ "{:,}".format(a.like_count or 0) }}
-                        </span>
                         <span style="font-size: 0.74rem; font-weight: 700; color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; padding: 0.2rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
                             <i class="fa-solid fa-eye" style="font-size: 0.7rem;"></i> 조회 {{ "{:,}".format(a.view_count or 0) }}
+                        </span>
+                        <span style="font-size: 0.74rem; font-weight: 700; color: #e11d48; background: #fff1f2; border: 1px solid #ffe4e6; padding: 0.2rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
+                            <i class="fa-solid fa-heart" style="font-size: 0.7rem;"></i> 좋아요 {{ "{:,}".format(a.like_count or 0) }}
                         </span>
                         <span style="font-size: 0.74rem; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 0.2rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
                             <i class="fa-solid fa-comment" style="font-size: 0.7rem;"></i> 댓글 {{ "{:,}".format(a.comment_count or 0) }}
