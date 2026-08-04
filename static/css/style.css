@@ -2227,18 +2227,22 @@ option.opt-closed {
 .btn-edit-profile {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.35rem;
+    height: 40px;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
     border-radius: 24px;
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);
     color: #ffffff;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 800;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     outline: none;
+    line-height: 1;
 }
 
 .btn-edit-profile:hover {
@@ -2247,12 +2251,8 @@ option.opt-closed {
 }
 
 .btn-edit-profile i {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     transition: transform 0.3s ease;
-}
-
-.btn-edit-profile:hover i {
-    /* 오버 회전 효과 제거 */
 }
 
 /* Save Profile Button Styling */
@@ -2289,8 +2289,11 @@ option.opt-closed {
 .btn-logout-profile {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
-    padding: 0.6rem 1.1rem;
+    height: 40px;
+    padding: 0 1.1rem;
+    box-sizing: border-box;
     border-radius: 24px;
     background: #f1f5f9;
     border: 1px solid var(--border-light);
@@ -2299,6 +2302,7 @@ option.opt-closed {
     font-weight: 700;
     text-decoration: none;
     transition: all 0.2s ease;
+    line-height: 1;
 }
 
 .btn-logout-profile:hover {
@@ -2307,6 +2311,35 @@ option.opt-closed {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
+
+/* Withdraw Profile Button Styling */
+.btn-withdraw-profile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    height: 40px;
+    padding: 0 1.1rem;
+    box-sizing: border-box;
+    border-radius: 24px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #ef4444;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    outline: none;
+}
+
+.btn-withdraw-profile:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
 
 /* Modal Overscroll Contain */
 .modal-backdrop, .detail-modal-content, .detail-info-container, .m-modal-backdrop, .m-modal-sheet {
