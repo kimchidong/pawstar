@@ -1295,8 +1295,30 @@ option.opt-closed {
 .action-btn.btn-view:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
 .action-btn.btn-comment:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
 .action-btn.btn-score:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
-.action-btn.btn-share { background: #ecfdf5; border-color: #a7f3d0; color: #059669; }
+.action-btn.btn-share { background: var(--bg-primary); border: 1.5px solid var(--border-light); color: var(--text-secondary); }
 .action-btn.btn-share:hover { color: #10b981; border-color: #34d399; }
+
+/* 상단 둥근 공유 아이콘 버튼 기본(비활성) & active(활성) 스타일 */
+.btn-share-action {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-share-action:hover, .btn-share-action.active {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: #10b981 !important;
+}
 
 /* 회차 목록 피드 카드 3요소 정보상자 마우스 오버 효과 & 손가락 커서 제거 */
 .post-card .action-btn,
