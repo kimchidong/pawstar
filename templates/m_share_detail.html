@@ -8,7 +8,7 @@
     <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); border-radius: 16px; padding: 1.2rem 1rem; color: #ffffff; text-align: center; box-shadow: 0 6px 18px rgba(168, 85, 247, 0.25); margin-bottom: 1.2rem;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
             <div style="display: inline-flex; align-items: center; gap: 0.3rem; background: rgba(255,255,255,0.22); padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.78rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.35);">
-                🏆 제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회 콘테스트
+                🏆 <span style="color: #fef08a; font-weight: 900;">제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회</span> {{ post.contest_title or '콘테스트' }}
             </div>
 
             {% if post.is_closed or post.closed or post.STATUS_CD == 'G001C002' %}

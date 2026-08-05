@@ -1217,6 +1217,8 @@ class PawStarService:
                         r.CMT_CNT,
                         r.SCORE,
                         r.ENT_DT AS ENT_DT,
+                        -- 콘테스트명
+                        COALESCE(t.THEME_NM, CONCAT('제', r.CONTEST_ROUND, '회 콘테스트')) AS contest_title,
                         -- 호환용
                         r.CONTEST_ROUND AS contest_id,
                         r.ROUND_NO AS round_no,
@@ -1245,6 +1247,8 @@ class PawStarService:
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                    LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
                     WHERE r.CONTEST_ROUND = %s AND (r.ROUND_NO = %s OR r.ENT_USER_ID = %s)
                     ORDER BY r.ENT_DT DESC
                     LIMIT 1

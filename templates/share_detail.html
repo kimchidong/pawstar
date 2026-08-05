@@ -8,7 +8,7 @@
     <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); border-radius: 20px; padding: 1.8rem 2rem; color: #ffffff; text-align: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25); margin-bottom: 2rem;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
             <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.22); backdrop-filter: blur(10px); padding: 0.35rem 0.95rem; border-radius: 20px; font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.35); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <i class="fa-solid fa-trophy" style="color: #fef08a;"></i> 제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회 콘테스트
+                <i class="fa-solid fa-trophy" style="color: #fef08a;"></i> <span style="color: #fef08a; font-weight: 900;">제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회</span> {{ post.contest_title or '콘테스트' }}
             </div>
 
             {% if post.is_closed or post.closed or post.STATUS_CD == 'G001C002' %}
