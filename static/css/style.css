@@ -1295,8 +1295,8 @@ option.opt-closed {
 .action-btn.btn-view:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
 .action-btn.btn-comment:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
 .action-btn.btn-score:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
-.action-btn.btn-share { background: #f5f3ff; border-color: #ddd6fe; color: #7c3aed; }
-.action-btn.btn-share:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
+.action-btn.btn-share { background: #ecfdf5; border-color: #a7f3d0; color: #059669; }
+.action-btn.btn-share:hover { color: #10b981; border-color: #34d399; }
 
 /* 회차 목록 피드 카드 3요소 정보상자 마우스 오버 효과 & 손가락 커서 제거 */
 .post-card .action-btn,
@@ -1344,6 +1344,17 @@ option.opt-closed {
 .action-btn.btn-view.active i, #detailBtnView.active i,
 .action-btn.btn-view.active span, #detailBtnView.active span {
     color: #0284c7 !important;
+}
+
+/* 공유(Share) active 상태 스타일 (민트/에메랄드 하이라이트) */
+.action-btn.btn-share.active, #detailBtnShare.active {
+    background: #ecfdf5 !important;
+    border-color: #34d399 !important;
+    color: #059669 !important;
+}
+.action-btn.btn-share.active i, #detailBtnShare.active i,
+.action-btn.btn-share.active span, #detailBtnShare.active span {
+    color: #059669 !important;
 }
 
 .action-btn .score-plus {
