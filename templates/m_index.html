@@ -19,7 +19,7 @@
 
 <!-- 필터 스크롤바 -->
 <div class="m-filter-scroll">
-    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-layer-group"></i> 전체보기</a>
+    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
     {% for k in pet_kinds %}
         {% set k_nm = k.KIND_NM %}
         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}

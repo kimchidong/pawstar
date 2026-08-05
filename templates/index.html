@@ -110,7 +110,7 @@
 
         <!-- 동물 종류 콤보 박스 (단색 FontAwesome 아이콘 적용 커스텀 셀렉트 드롭다운) -->
         {% set sel_kind = pet_type or '' %}
-        {% set sel_icon = 'fa-solid fa-layer-group' if (pet_type == 'all' or not pet_type) else ('fa-solid fa-dog' if ('강아지' in sel_kind or '개' in sel_kind) else ('fa-solid fa-cat' if '고양이' in sel_kind else ('fa-solid fa-otter' if ('햄스터' in sel_kind or '소동물' in sel_kind or '토끼' in sel_kind or '고슴도치' in sel_kind) else ('fa-solid fa-frog' if ('거북이' in sel_kind or '파충류' in sel_kind or '도마뱀' in sel_kind) else ('fa-solid fa-fish' if ('어류' in sel_kind or '관상어' in sel_kind or '물고기' in sel_kind) else ('fa-solid fa-crow' if ('새' in sel_kind or '앵무새' in sel_kind or '조류' in sel_kind) else ('fa-solid fa-horse' if ('말' in sel_kind or '큰동물' in sel_kind) else 'fa-solid fa-layer-group'))))))) %}
+        {% set sel_icon = 'fa-solid fa-grip' if (pet_type == 'all' or not pet_type) else ('fa-solid fa-dog' if ('강아지' in sel_kind or '개' in sel_kind) else ('fa-solid fa-cat' if '고양이' in sel_kind else ('fa-solid fa-otter' if ('햄스터' in sel_kind or '소동물' in sel_kind or '토끼' in sel_kind or '고슴도치' in sel_kind) else ('fa-solid fa-frog' if ('거북이' in sel_kind or '파충류' in sel_kind or '도마뱀' in sel_kind) else ('fa-solid fa-fish' if ('어류' in sel_kind or '관상어' in sel_kind or '물고기' in sel_kind) else ('fa-solid fa-crow' if ('새' in sel_kind or '앵무새' in sel_kind or '조류' in sel_kind) else ('fa-solid fa-horse' if ('말' in sel_kind or '큰동물' in sel_kind) else 'fa-solid fa-grip'))))))) %}
         {% set sel_display = '전체 동물' if (pet_type == 'all' or not pet_type) else (sel_kind|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '')) %}
         
         <div class="custom-pet-dropdown" id="customPetTypeDropdown">
@@ -123,12 +123,12 @@
             </div>
             <div class="custom-pet-options">
                 <div class="custom-pet-option {{ 'selected' if pet_type == 'all' or not pet_type }}" data-value="all">
-                    <i class="fa-solid fa-layer-group"></i> <span>전체 동물</span>
+                    <i class="fa-solid fa-grip"></i> <span>전체 동물</span>
                 </div>
                 {% for k in pet_kinds %}
                     {% set k_nm = k.KIND_NM %}
                     {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
-                    {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-layer-group')))))) %}
+                    {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-grip')))))) %}
                     <div class="custom-pet-option {{ 'selected' if (pet_type == k_nm or pet_type == k.KIND_CD or (pet_type and pet_type in k_nm)) }}" data-value="{{ k_nm }}">
                         <i class="{{ k_icon }}"></i> <span>{{ k_clean }}</span>
                     </div>
