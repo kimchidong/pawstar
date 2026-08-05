@@ -106,21 +106,28 @@
                     <div class="m-card-footer" style="margin-top: 0.35rem; font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;">
                         <span>{{ p.ENT_DT or p.created_at }}</span>
                     </div>
-                    <!-- 모바일 3요소 라운드 박스 (조회, 좋아요, 댓글) -->
-                    <div class="m-card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; margin-top: 0.5rem; text-align: center;">
-                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #0284c7; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-eye" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format(p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0)) }}</span>
+                    <!-- 모바일 4요소 라운드 박스 (조회, 좋아요, 댓글, 공유) 및 전용 공유버튼 -->
+                    <div class="m-card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; margin-top: 0.5rem; text-align: center;">
+                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #0284c7; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-eye" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format((p.VW_CNT or p.view_count or 0)|int) }}</span>
                         </div>
-                        <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-heart" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format(p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0)) }}</span>
+                        <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-heart" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format((p.LIKE_CNT or p.like_count or 0)|int) }}</span>
                         </div>
-                        <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 10px; padding: 0.25rem 0.2rem; font-size: 0.72rem; font-weight: 800; color: #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-comment" style="font-size: 0.75rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format(p.CMT_CNT if p.CMT_CNT is not none else (p.comment_count or 0)) }}</span>
+                        <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-regular fa-comment" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
+                        </div>
+                        <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #6d28d9; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-share-nodes" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
+                            <span>{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
                         </div>
                     </div>
+                    <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="width: 100%; margin-top: 0.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2);" title="전용 공유주소 복사 (회원가입 시 +1점)">
+                        <i class="fa-solid fa-link"></i> 전용 공유주소 복사 (+1점)
+                    </button>
                 </div>
             </div>
         {% else %}
@@ -176,9 +183,9 @@
                         </div>
                     </div>
                     
-                    <!-- 3. 우측: 평가 3요소 뱃지 + 텍스트 수상 뱃지 칩 세트 -->
+                    <!-- 3. 우측: 평가 4요소 뱃지 + 텍스트 수상 뱃지 칩 세트 -->
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0;">
-                        <!-- 모바일 평가 3요소 및 총점 가로 1줄 나란히 배치 -->
+                        <!-- 모바일 평가 4요소 및 총점 가로 1줄 나란히 배치 -->
                         <div style="display: flex; align-items: center; justify-content: center; gap: 0.22rem; flex-wrap: wrap;">
                             <span style="font-size: 0.68rem; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 0.12rem 0.38rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.15rem;">
                                 👁️ {{ "{:,}".format(a.view_count or 0) }}
@@ -188,6 +195,9 @@
                             </span>
                             <span style="font-size: 0.68rem; font-weight: 700; color: #059669; background: #ecfdf5; padding: 0.12rem 0.38rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.15rem;">
                                 💬 {{ "{:,}".format(a.comment_count or 0) }}
+                            </span>
+                            <span style="font-size: 0.68rem; font-weight: 700; color: #7c3aed; background: #f5f3ff; padding: 0.12rem 0.38rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.15rem;">
+                                🔗 {{ "{:,}".format(a.share_count or 0) }}
                             </span>
                             <span style="font-size: 0.7rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.12rem 0.42rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.15rem;">
                                 ⭐ {{ "{:,}".format(a.score or 0) }}점

@@ -57,8 +57,8 @@ class Post:
         self.comment_count += comment_delta
         self.share_count += share_delta
         
-        # 이벤트 발생 시 score 계산: 조회+1, 좋아요+5, 댓글+10, 
-        delta_score = (view_delta * 1) + (like_delta * 5) + (comment_delta * 10) 
+        # 이벤트 발생 시 score 계산: 조회+1, 좋아요+5, 댓글+10, 공유+1
+        delta_score = (view_delta * 1) + (like_delta * 5) + (comment_delta * 10) + (share_delta * 1)
         self.score += delta_score
         return delta_score
 
@@ -78,8 +78,8 @@ class PostDailyStat:
         self.share_count += share
 
     def calculate_trending_score(self):
-        # 최근 급상승 점수 : 조회x1, 좋아요x5, 댓글x10, 공유x20
-        return (self.view_count * 1) + (self.like_count * 5) + (self.comment_count * 10) + (self.share_count * 20)
+        # 최근 급상승 점수 : 조회x1, 좋아요x5, 댓글x10, 공유x1
+        return (self.view_count * 1) + (self.like_count * 5) + (self.comment_count * 10) + (self.share_count * 1)
 
 class ContestWinner:
     def __init__(self, winner_id, contest_id, post_id, user_id, award_type, prize_name=''):

@@ -87,8 +87,13 @@
                         <div id="mDetailPetTag" style="font-size: 0.75rem; color: var(--accent-pink); font-weight: 700;">강아지</div>
                     </div>
                 </div>
-                <div style="background: #fffbeb; border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;">
-                    ⭐ <span id="mDetailScoreNum">0</span> 점
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;">
+                        ⭐ <span id="mDetailScoreNum">0</span> 점
+                    </div>
+                    <button type="button" onclick="handleShareClick();" title="전용 공유주소 복사 (+1점)" style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); color: #8b5cf6; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
                 </div>
             </div>
             <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;"></p>

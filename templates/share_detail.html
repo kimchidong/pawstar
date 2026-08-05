@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 2.5rem auto; padding: 0 1rem;">
+
+    <!-- 1. 상단 웰컴 히어로 배너 -->
+    <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); border-radius: 20px; padding: 1.8rem 2rem; color: #ffffff; text-align: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25); margin-bottom: 2rem;">
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.8rem; border: 1px solid rgba(255,255,255,0.3);">
+            <i class="fa-solid fa-gift"></i> 전용 공유 추천 링크 유입
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
+            자랑스러운 반려동물의 출전작에 응원해 보세요!
+        </h2>
+        <p style="font-size: 0.95rem; opacity: 0.95; font-weight: 500; margin: 0;">
+            이 링크를 통해 회원가입 하시면 해당 게시물에 <strong style="color: #fef08a; font-size: 1.05rem;">공유 점수 +1점</strong>이 즉시 선물로 적립됩니다! 🐾
+        </p>
+    </div>
+
+    <!-- 2. 단독 게시물 카드 -->
+    {% if post %}
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); transition: all 0.3s ease;">
+        <!-- 상단 헤더: 작성자 및 공유번호 -->
+        <div style="padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <img src="{{ post.user_profile or post.PROFILE_URL or '/static/image/profile/default_profile.png' }}" alt="프로필" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0;">
+                <div>
+                    <div style="font-size: 1rem; font-weight: 800; color: #1e293b;">{{ post.user_nickname or post.NK_NM or '집사' }}</div>
+                    <div style="font-size: 0.8rem; color: #e11d48; font-weight: 700;">
+                        🐾 {{ post.pet_type or post.KIND_NM or '반려동물' }} {% if post.pet_name or post.PET_NM %}· {{ post.pet_name or post.PET_NM }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
+                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 0.25rem 0.65rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                    <i class="fa-solid fa-hashtag"></i> 공유번호: {{ post.share_sn or post.SHARE_SN or 'S-UUID' }}
+                </span>
+                <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">{{ post.created_at or post.ENT_DT }}</span>
+            </div>
+        </div>
+
+        <!-- 미디어 영역 (사진/동영상) -->
+        <div style="width: 100%; max-height: 520px; background: #0f172a; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img src="{{ post.image_path or post.PHT_FILE_PATH1 or '/static/image/paw/default_pet.jpg' }}" alt="{{ post.title }}" style="width: 100%; height: 100%; object-fit: contain; max-height: 520px;" onerror="this.src='/static/image/paw/default_pet.jpg';">
+        </div>
+
+        <!-- 본문 정보 -->
+        <div style="padding: 1.8rem 1.8rem 1.2rem 1.8rem;">
+            <h1 style="font-size: 1.35rem; font-weight: 900; color: #0f172a; margin-bottom: 0.8rem; line-height: 1.4;">
+                {{ post.title }}
+            </h1>
+            <p style="font-size: 0.98rem; color: #334155; line-height: 1.65; white-space: pre-line; margin-bottom: 1.5rem;">
+                {{ post.content }}
+            </p>
+
+            <!-- 4요소 실시간 현황 및 총점 상자 -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <div class="action-btn btn-view" style="padding: 0.4rem 0.7rem; cursor: default; background: #ffffff; border: 1px solid #bae6fd; color: #0284c7; border-radius: 10px;">
+                        <i class="fa-regular fa-eye"></i> <span style="font-weight: 800;">{{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-like" style="padding: 0.4rem 0.7rem; cursor: default; background: #ffffff; border: 1px solid #fecdd3; color: #e11d48; border-radius: 10px;">
+                        <i class="fa-regular fa-heart"></i> <span style="font-weight: 800;">{{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-comment" style="padding: 0.4rem 0.7rem; cursor: default; background: #ffffff; border: 1px solid #e9d5ff; color: #7c3aed; border-radius: 10px;">
+                        <i class="fa-regular fa-comment"></i> <span style="font-weight: 800;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-share" style="padding: 0.4rem 0.7rem; cursor: default; background: #ffffff; border: 1px solid #ddd6fe; color: #6d28d9; border-radius: 10px;">
+                        <i class="fa-solid fa-share-nodes"></i> <span style="font-weight: 800;">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.45rem 1rem; border-radius: 14px; color: #d97706; font-size: 1.05rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);">
+                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span style="font-size: 1.2rem;">{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
+                </div>
+            </div>
+
+            <!-- 대형 콜투액션(CTA) 버튼 그룹 -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% if not is_logged_in %}
+                <button type="button" onclick="document.getElementById('btnOpenAuthModal')?.click();" style="width: 100%; padding: 1.05rem; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); transition: transform 0.2s ease;">
+                    <i class="fa-solid fa-user-plus" style="font-size: 1.2rem;"></i> 회원가입하고 응원하기 (+1점 자동적립)
+                </button>
+                {% endif %}
+
+                <div style="display: flex; gap: 0.6rem;">
+                    <a href="/" style="flex: 1; padding: 0.85rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 0.95rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
+                    </a>
+                    <button type="button" onclick="copyPostShareUrl('{{ post.CONTEST_ROUND or post.contest_id }}', '{{ post.ROUND_NO or post.round_no }}', '{{ post.SHARE_SN or post.share_sn }}');" style="padding: 0.85rem 1.2rem; border-radius: 14px; background: #e0e7ff; border: 1px solid #c7d2fe; color: #4338ca; font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-link"></i> 공유링크 복사
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem; background: #ffffff; border-radius: 20px; color: #64748b;">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; color: #f43f5e; margin-bottom: 1rem;"></i>
+        <p style="font-size: 1.1rem; font-weight: 700;">해당 공유 게시물을 찾을 수 없습니다.</p>
+        <a href="/" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--gradient-brand); color: #fff; border-radius: 12px; font-weight: 800; text-decoration: none;">메인 피드로 이동</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

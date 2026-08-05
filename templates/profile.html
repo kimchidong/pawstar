@@ -180,20 +180,29 @@
                         </div>
                     </div>
 
-                    <!-- 이미지 캡처 스타일 3요소 박스 (조회, 좋아요, 댓글) -->
-                    <div class="card-actions" onclick="event.stopPropagation();" style="margin-top: 0.4rem;">
-                        <div class="action-btn btn-view" title="조회수">
-                            <i class="fa-regular fa-eye"></i>
-                            <span class="view-count">{{ "{:,}".format(p.VW_CNT if p.VW_CNT is not none else (p.view_count or 0)) }}</span>
+                    <!-- 이미지 캡처 스타일 4요소 박스 (조회, 좋아요, 댓글, 공유) & 전용 공유링크 복사 -->
+                    <div class="card-actions" onclick="event.stopPropagation();" style="margin-top: 0.4rem; display: flex; align-items: center; justify-content: space-between; gap: 0.3rem;">
+                        <div style="display: flex; align-items: center; gap: 0.3rem;">
+                            <div class="action-btn btn-view" title="조회수">
+                                <i class="fa-regular fa-eye"></i>
+                                <span class="view-count">{{ "{:,}".format((p.VW_CNT or p.view_count or 0)|int) }}</span>
+                            </div>
+                            <div class="action-btn btn-like" title="좋아요 수">
+                                <i class="fa-regular fa-heart"></i>
+                                <span class="like-count">{{ "{:,}".format((p.LIKE_CNT or p.like_count or 0)|int) }}</span>
+                            </div>
+                            <div class="action-btn btn-comment" title="댓글 수">
+                                <i class="fa-regular fa-comment"></i>
+                                <span class="comment-count">{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
+                            </div>
+                            <div class="action-btn btn-share" title="공유 가입 수" style="color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <span class="share-count">{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
+                            </div>
                         </div>
-                        <div class="action-btn btn-like" title="좋아요 수">
-                            <i class="fa-regular fa-heart"></i>
-                            <span class="like-count">{{ "{:,}".format(p.LIKE_CNT if p.LIKE_CNT is not none else (p.like_count or 0)) }}</span>
-                        </div>
-                        <div class="action-btn btn-comment" title="댓글 수">
-                            <i class="fa-regular fa-comment"></i>
-                            <span class="comment-count">{{ "{:,}".format(p.CMT_CNT if p.CMT_CNT is not none else (p.comment_count or 0)) }}</span>
-                        </div>
+                        <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.25rem 0.55rem; font-size: 0.72rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2); transition: all 0.2s;" title="전용 공유주소 복사 (회원가입 시 +1점)">
+                            <i class="fa-solid fa-link"></i> 전용공유
+                        </button>
                     </div>
                 </div>
             </div>
@@ -275,7 +284,7 @@
                     </div>
                 </div>
 
-                <!-- 3. 평가 3요소 & 총점 가로 1줄 나란히 정렬 전용 컬럼 (조회, 좋아요, 댓글, 총점) -->
+                <!-- 3. 평가 4요소 & 총점 가로 1줄 나란히 정렬 전용 컬럼 (조회, 좋아요, 댓글, 공유, 총점) -->
                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; flex-shrink: 0;">
                     <span style="font-size: 0.74rem; font-weight: 700; color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; padding: 0.25rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
                         <i class="fa-solid fa-eye" style="font-size: 0.7rem;"></i> 조회 {{ "{:,}".format(a.view_count or 0) }}
@@ -285,6 +294,9 @@
                     </span>
                     <span style="font-size: 0.74rem; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 0.25rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
                         <i class="fa-solid fa-comment" style="font-size: 0.7rem;"></i> 댓글 {{ "{:,}".format(a.comment_count or 0) }}
+                    </span>
+                    <span style="font-size: 0.74rem; font-weight: 700; color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 0.25rem 0.55rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <i class="fa-solid fa-share-nodes" style="font-size: 0.7rem;"></i> 공유 {{ "{:,}".format(a.share_count or 0) }}
                     </span>
                     <span style="font-size: 0.76rem; font-weight: 900; color: #d97706; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.25rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.3rem; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);">
                         <i class="fa-solid fa-star" style="font-size: 0.75rem;"></i> {{ "{:,}".format(a.score or 0) }}점

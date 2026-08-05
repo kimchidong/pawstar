@@ -4,6 +4,7 @@ Paw Star Contest Service (get_posts & get_post_detail query rewrite)
 
 from datetime import datetime, timedelta
 import pymysql
+import uuid
 from config import db_config
 
 class PawStarService:
@@ -347,7 +348,8 @@ class PawStarService:
                         'PROFILE_URL': profile_img,
                         'user_id': user_id,
                         'nickname': nickname,
-                        'profile_img': profile_img
+                        'profile_img': profile_img,
+                        'is_new_user': True
                     }
                 else:
                     # 로그인 성공 시 전달받은 최신 프로필 이미지가 유효하면 DB 및 반환 객체에 최신 프로필 이미지 항상 갱신 저장
@@ -502,6 +504,7 @@ class PawStarService:
                 query = """
                     SELECT 
                         r.CONTEST_ROUND,
+                        r.ROUND_NO,
                         r.ENT_USER_ID,
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
@@ -517,10 +520,13 @@ class PawStarService:
                         r.VW_CNT,
                         r.LIKE_CNT,
                         r.CMT_CNT,
+                        COALESCE(r.SHARE_CNT, 0) AS SHARE_CNT,
+                        r.SHARE_SN,
                         r.SCORE,
                         r.ENT_DT,
                         -- 호환 키
                         r.CONTEST_ROUND AS contest_id,
+                        r.ROUND_NO AS round_no,
                         r.ENT_USER_ID AS user_id,
                         CONCAT(r.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id,
                         u.NK_NM AS user_nickname,
@@ -533,6 +539,8 @@ class PawStarService:
                         r.VW_CNT AS view_count,
                         r.LIKE_CNT AS like_count,
                         r.CMT_CNT AS comment_count,
+                        COALESCE(r.SHARE_CNT, 0) AS share_count,
+                        r.SHARE_SN AS share_sn,
                         r.SCORE AS score
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -715,17 +723,86 @@ class PawStarService:
                 row_r = cur.fetchone()
                 next_round_no = row_r['next_round_no'] if row_r else 1
 
+                share_sn = f"S-{uuid.uuid4()}"
                 cur.execute("""
                     INSERT INTO pst_contest_round 
-                    (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2))
+                    (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, SHARE_SN, SHARE_CNT)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
+                """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2, share_sn))
                 conn.commit()
                 conn.close()
-                return {'success': True, 'ent_user_id': actual_ent_user_id, 'round_no': next_round_no}
+                return {'success': True, 'ent_user_id': actual_ent_user_id, 'round_no': next_round_no, 'share_sn': share_sn}
         except Exception as e:
             print("create_contest_entry error:", e)
             return {'success': False, 'message': str(e)}
+
+    def get_or_create_share_sn(self, contest_id, round_no):
+        """ 게시물의 공유 고유 번호(SHARE_SN: 'S-' 접두어 포함) 반환 (없을 경우 자동 생성 후 DB 저장) """
+        conn = self.get_db_connection()
+        if not conn:
+            return None
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT SHARE_SN FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                """, (contest_id, round_no))
+                row = cur.fetchone()
+                if row and row.get('SHARE_SN'):
+                    sn = row['SHARE_SN']
+                    if not sn.startswith('S-'):
+                        sn = f"S-{sn}"
+                        cur.execute("""
+                            UPDATE pst_contest_round
+                            SET SHARE_SN = %s
+                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                        """, (sn, contest_id, round_no))
+                        conn.commit()
+                    conn.close()
+                    return sn
+
+                new_sn = f"S-{uuid.uuid4()}"
+                cur.execute("""
+                    UPDATE pst_contest_round
+                    SET SHARE_SN = %s
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                """, (new_sn, contest_id, round_no))
+                conn.commit()
+                conn.close()
+                return new_sn
+        except Exception as e:
+            print("get_or_create_share_sn error:", e)
+            if conn:
+                conn.close()
+            return None
+
+    def increment_share_count_on_signup(self, contest_id, round_no, share_sn):
+        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 공유횟수 +1 및 점수 +1 반영 """
+        conn = self.get_db_connection()
+        if not conn:
+            return False
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT CONTEST_ROUND, ROUND_NO, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
+                    FROM pst_contest_round
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_SN = %s
+                """, (contest_id, round_no, share_sn))
+                row = cur.fetchone()
+                if not row:
+                    conn.close()
+                    return False
+
+                new_share_cnt = row['SHARE_CNT'] + 1
+                self.sync_and_get_post_stats(cur, contest_id, round_no, share_cnt_override=new_share_cnt)
+                conn.commit()
+                conn.close()
+                return True
+        except Exception as e:
+            print("increment_share_count_on_signup error:", e)
+            if conn:
+                conn.close()
+            return False
 
     def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path1="", file_path2="", **kwargs):
         path1 = file_path1 or media_url or "/static/image/paw/default_pet.jpg"
@@ -884,9 +961,12 @@ class PawStarService:
                     (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
+                    COALESCE(r.SHARE_CNT, 0) AS share_count,
+                    r.SHARE_SN AS share_sn,
                     ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
                      (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS score,
+                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                     COALESCE(r.SHARE_CNT, 0) * 1) AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
                 LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
@@ -1110,9 +1190,12 @@ class PawStarService:
                         (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
                         (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
+                        COALESCE(r.SHARE_CNT, 0) AS share_count,
+                        r.SHARE_SN AS share_sn,
                         ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
                          (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS score,
+                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                         COALESCE(r.SHARE_CNT, 0) * 1) AS score,
                         r.ENT_DT AS created_at
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -1201,15 +1284,15 @@ class PawStarService:
             print("get_post_detail error:", e)
             return None
 
-    def sync_and_get_post_stats(self, cur, contest_id, round_no):
+    def sync_and_get_post_stats(self, cur, contest_id, round_no, share_cnt_override=None):
         """
-        3가지 평가 요소(조회/좋아요/댓글) 이벤트 발생 시 공통 적용:
-        1. 하위 테이블(pst_contest_vw, pst_contest_like, pst_contest_cmt)에서 실제 3요소 개수 DB 재조회
-        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10)
-        3. DB pst_contest_round 테이블에 3요소 카운트 및 SCORE 반영 UPDATE
-        4. DB에서 최종 3요소 및 SCORE를 다시 SELECT하여 반환
+        4가지 평가 요소(조회/좋아요/댓글/공유) 이벤트 발생 시 공통 적용:
+        1. 하위 테이블(pst_contest_vw, pst_contest_like, pst_contest_cmt) 및 pst_contest_round(SHARE_CNT)에서 실제 4요소 개수 DB 재조회
+        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10, SHARE: 1)
+        3. DB pst_contest_round 테이블에 4요소 카운트 및 SCORE 반영 UPDATE
+        4. DB에서 최종 4요소 및 SCORE를 다시 SELECT하여 반환
         """
-        # 1. DB에서 3요소 개수 재조회
+        # 1. DB에서 4요소 개수 재조회
         cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         vw_cnt = cur.fetchone()['cnt']
 
@@ -1219,30 +1302,30 @@ class PawStarService:
         cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         cmt_cnt = cur.fetchone()['cnt']
 
-        # 2. 총 점수 계산
-        calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10)
+        if share_cnt_override is not None:
+            share_cnt = share_cnt_override
+        else:
+            cur.execute("SELECT COALESCE(SHARE_CNT, 0) AS cnt FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+            r_share = cur.fetchone()
+            share_cnt = r_share['cnt'] if r_share else 0
+
+        # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 1점)
+        calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 1)
 
         # 3. DB pst_contest_round 최신화 UPDATE
         cur.execute("""
             UPDATE pst_contest_round
-            SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SCORE = %s
+            SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
             WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-        """, (vw_cnt, like_cnt, cmt_cnt, calc_score, contest_id, round_no))
+        """, (vw_cnt, like_cnt, cmt_cnt, share_cnt, calc_score, contest_id, round_no))
 
-        # 4. DB에서 최종 3요소 및 SCORE 다시 SELECT하여 반환
-        cur.execute("""
-            SELECT VW_CNT, LIKE_CNT, CMT_CNT, SCORE 
-            FROM pst_contest_round 
-            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-        """, (contest_id, round_no))
-        row = cur.fetchone() or {'VW_CNT': vw_cnt, 'LIKE_CNT': like_cnt, 'CMT_CNT': cmt_cnt, 'SCORE': calc_score}
-        
         return {
-            'view_count': row['VW_CNT'],
-            'like_count': row['LIKE_CNT'],
-            'comment_count': row['CMT_CNT'],
-            'score': row['SCORE'],
-            'new_score': row['SCORE']
+            'view_count': vw_cnt,
+            'like_count': like_cnt,
+            'comment_count': cmt_cnt,
+            'share_count': share_cnt,
+            'score': calc_score,
+            'new_score': calc_score
         }
 
     def is_contest_closed(self, contest_id):

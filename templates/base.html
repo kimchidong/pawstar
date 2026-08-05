@@ -160,7 +160,7 @@
                         <span style="font-size: 0.82rem; color: var(--text-muted);" id="detailCreatedAt">
                             2026-07-28 00:00:00
                         </span>
-                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div style="display: flex; align-items: center; gap: 0.45rem;">
                             <div class="card-total-score">
                                 <i class="fa-solid fa-star"></i> <span id="detailScoreNum" class="score-num">0</span> 점
                             </div>
@@ -168,10 +168,14 @@
                             <button type="button" id="detailHeartLikeBtn" class="btn-heart-action" title="좋아요 누르기" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; cursor: pointer; transition: all 0.2s ease;">
                                 <i class="fa-regular fa-heart" id="detailHeartIcon"></i>
                             </button>
+                            <!-- 하트 우측 전용공유 아이콘 버튼 -->
+                            <button type="button" id="detailShareIconBtn" onclick="handleShareClick();" class="btn-share-action" title="전용 공유주소 복사 (+1점)" style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); color: #8b5cf6; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: all 0.2s ease;">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 실시간 수치 현황 표시 영역 (단순 정보용) -->
+                    <!-- 실시간 수치 현황 표시 영역 (4요소: 조회, 좋아요, 댓글, 공유가입) -->
                     <div class="card-actions detail-actions">
                         <div class="action-btn btn-view" id="detailBtnView" title="조회수">
                             <i class="fa-regular fa-eye"></i>
@@ -184,6 +188,10 @@
                         <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();">
                             <i class="fa-regular fa-comment"></i>
                             <span class="comment-count" id="detailCommentCount">0</span>
+                        </div>
+                        <div class="action-btn btn-share" id="detailBtnShare" title="공유 가입 수" onclick="handleShareClick();">
+                            <i class="fa-solid fa-share-nodes"></i>
+                            <span class="share-count" id="detailShareCount">0</span>
                         </div>
                     </div>
 

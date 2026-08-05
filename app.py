@@ -166,6 +166,19 @@ def api_auth_login():
     else:
         return jsonify({'success': False, 'message': result}), 401
 
+def process_signup_share_referral():
+    """ 공유 링크 유입 가입 시 공유 카운트 및 점수 1 증가 처리 헬퍼 """
+    share_info = session.get('share_info')
+    if share_info and isinstance(share_info, dict):
+        c_round = share_info.get('contest_round')
+        r_no = share_info.get('round_no')
+        s_sn = share_info.get('share_sn')
+        if c_round and r_no and s_sn:
+            try:
+                service.increment_share_count_on_signup(c_round, r_no, s_sn)
+            except Exception as e:
+                print("process_signup_share_referral error:", e)
+
 @app.route('/api/auth/register', methods=['POST'])
 def api_auth_register():
     """ 회원가입 및 즉시 로그인 API """
@@ -186,6 +199,9 @@ def api_auth_register():
         profile_img = finalize_temp_profile_image(profile_img)
 
     new_user = service.register_user(user_id, nickname, password, profile_img)
+
+    # 공유 유입 회원가입 시 공유 카운트 및 점수 +1 반영
+    process_signup_share_referral()
 
     session.clear()
     session['user_id'] = user_id
@@ -215,6 +231,8 @@ def api_auth_setup_profile():
 
     new_user = service.register_user(auto_uuid, nickname, password, profile_img)
 
+    # 공유 유입 회원가입 시 공유 카운트 및 점수 +1 반영
+    process_signup_share_referral()
 
     session.clear()
     session['user_id'] = auto_uuid
@@ -332,6 +350,9 @@ def auth_google_callback():
         # 3. PawStar 서비스 회원 가입/로그인 처리
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
+        if user_info and user_info.get('is_new_user'):
+            process_signup_share_referral()
+
         saved_next_url = session.get('next_url') or '/'
         session.clear()
         session['user_id'] = user_info['user_id']
@@ -393,6 +414,63 @@ def get_current_user_id():
     if session.get('user_id'):
         return session['user_id']
     return None
+
+@app.route('/share')
+@app.route('/m/share')
+def route_share():
+    """ 전용 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN) 유입 전용 랜딩 라우트 """
+    contest_round = request.args.get('contest_round') or request.args.get('contest_id')
+    round_no = request.args.get('round_no')
+    share_sn = request.args.get('share_sn')
+
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+    current_user_id = get_current_user_id()
+    is_logged_in = bool(current_user_id)
+
+    post = None
+    if contest_round and round_no:
+        if share_sn:
+            session['share_info'] = {
+                'contest_round': int(contest_round),
+                'round_no': int(round_no),
+                'share_sn': str(share_sn)
+            }
+        post = service.get_post_detail(contest_round, round_no, current_user_id)
+
+    template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
+    return render_template(
+        template_name,
+        post=post,
+        is_logged_in=is_logged_in,
+        current_user_id=current_user_id,
+        contest_round=contest_round,
+        round_no=round_no,
+        share_sn=share_sn
+    )
+
+@app.route('/api/contest/share_url', methods=['GET', 'POST'])
+def api_contest_share_url():
+    """ 게시글 전용 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN) 생성/조회 API """
+    data = request.json if (request.is_json and request.json) else request.args
+    contest_round = data.get('contest_round') or data.get('contest_id')
+    round_no = data.get('round_no')
+
+    if not contest_round or not round_no:
+        return jsonify({'success': False, 'message': 'contest_round와 round_no가 필요합니다.'}), 400
+
+    share_sn = service.get_or_create_share_sn(contest_round, round_no)
+    if not share_sn:
+        return jsonify({'success': False, 'message': '전용 공유주소 생성 실패'}), 500
+
+    base_url = request.host_url.rstrip('/')
+    share_url = f"{base_url}/share?contest_round={contest_round}&round_no={round_no}&share_sn={share_sn}"
+    return jsonify({
+        'success': True,
+        'contest_round': int(contest_round),
+        'round_no': int(round_no),
+        'share_sn': share_sn,
+        'share_url': share_url
+    })
 
 # --- PC 전용 라우트 (1280px 고정) ---
 

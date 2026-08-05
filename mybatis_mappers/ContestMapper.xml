@@ -23,6 +23,8 @@
             r.VW_CNT AS VIEW_COUNT,
             r.LIKE_CNT AS LIKE_COUNT,
             r.CMT_CNT AS COMMENT_COUNT,
+            r.SHARE_CNT AS SHARE_COUNT,
+            r.SHARE_SN,
             r.ENT_DT AS CREATED_AT
         FROM pst_contest_round r
         JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -30,7 +32,7 @@
         JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
         LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
         WHERE r.CONTEST_ROUND = #{contestId}
-        ORDER BY r.SCORE DESC, r.CMT_CNT DESC, r.LIKE_CNT DESC, r.VW_CNT DESC, r.ENT_DT DESC
+        ORDER BY r.SCORE DESC, r.SHARE_CNT DESC, r.CMT_CNT DESC, r.LIKE_CNT DESC, r.VW_CNT DESC, r.ENT_DT DESC
     </select>
 
 
@@ -72,7 +74,8 @@
             SCORE = SCORE + #{scoreDelta},
             VW_CNT = VW_CNT + #{viewDelta},
             LIKE_CNT = LIKE_CNT + #{likeDelta},
-            CMT_CNT = CMT_CNT + #{commentDelta}
+            CMT_CNT = CMT_CNT + #{commentDelta},
+            SHARE_CNT = SHARE_CNT + #{shareDelta}
         WHERE CONTEST_ROUND = #{contestId} AND ROUND_NO = #{roundNo};
     </update>
 

@@ -77,15 +77,18 @@
                     </div>
                 </div>
                 <div class="m-card-title">{{ p.title }}</div>
-                <div class="m-card-footer card-actions" onclick="event.stopPropagation();" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; align-items: center; font-size: 0.75rem;">
+                <div class="m-card-footer card-actions" onclick="event.stopPropagation();" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; align-items: center; font-size: 0.75rem;">
                     <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
-                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format(p.view_count or p.VW_CNT or 0) }}</span>
+                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
                     </div>
                     <div class="action-btn btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 수">
-                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i> <span class="like-count">{{ "{:,}".format(p.like_count or p.LIKE_CNT or 0) }}</span>
+                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i> <span class="like-count">{{ "{:,}".format((p.like_count or p.LIKE_CNT or 0)|int) }}</span>
                     </div>
                     <div class="action-btn btn-comment {% if is_logged_in and p.actions and p.actions.is_commented %}active{% endif %}" title="댓글 수">
-                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i> <span class="comment-count">{{ "{:,}".format(p.comment_count or p.CMT_CNT or 0) }}</span>
+                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i> <span class="comment-count">{{ "{:,}".format((p.comment_count or p.CMT_CNT or 0)|int) }}</span>
+                    </div>
+                    <div class="action-btn btn-share" title="공유 가입 수" style="background: #f5f3ff; border-color: #ddd6fe; color: #7c3aed;">
+                        <i class="fa-solid fa-share-nodes"></i> <span class="share-count">{{ "{:,}".format((p.share_count or p.SHARE_CNT or 0)|int) }}</span>
                     </div>
                 </div>
             </div>
