@@ -472,6 +472,7 @@ function openDetailModal(post, isHallOfFame = false) {
 
     const modal = document.getElementById('postDetailModal');
     if (!modal || !post) return;
+    modal.style.display = '';
 
     // 객체 데이터 속성 표준화
     post.post_id = post.post_id || post.POST_ID || ((post.CONTEST_ROUND || post.contest_id) && (post.ROUND_NO || post.round_no) ? `${post.CONTEST_ROUND || post.contest_id}_${post.ROUND_NO || post.round_no}` : (post.ROUND_NO || post.round_no));
@@ -978,7 +979,8 @@ if (!window.postsDataStore) {
 function closeDetailModal() {
     const modal = document.getElementById('postDetailModal');
     if (modal) {
-        modal.classList.remove('show');
+        modal.classList.remove('show', 'active');
+        modal.style.display = '';
         document.body.style.overflow = '';
     }
 }

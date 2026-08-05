@@ -68,7 +68,7 @@
     </nav>
 
     <!-- 모바일 상세보기 모달 -->
-    <div class="m-modal-backdrop" id="mDetailModal">
+    <div class="m-modal-backdrop" id="mDetailModal" onclick="if(event.target===this) closeMobileDetailModal();">
         <div class="m-modal-sheet" style="max-height: 95vh; padding: 1.25rem;">
             <div class="m-modal-header" style="margin-bottom: 0.75rem;">
                 <h3 id="mDetailTitle">게시물 상세</h3>

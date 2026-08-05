@@ -112,6 +112,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const detailModal = document.getElementById('mDetailModal');
     if (!detailModal) return;
+    detailModal.style.display = '';
 
     postData.post_id = postData.post_id || postData.POST_ID || ((postData.CONTEST_ROUND || postData.contest_id) && (postData.ROUND_NO || postData.round_no) ? `${postData.CONTEST_ROUND || postData.contest_id}_${postData.ROUND_NO || postData.round_no}` : (postData.ROUND_NO || postData.round_no));
     postData.title = postData.title || postData.TITLE || '';
@@ -472,7 +473,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 function closeMobileDetailModal() {
     const detailModal = document.getElementById('mDetailModal');
     if (detailModal) {
-        detailModal.classList.remove('active');
+        detailModal.classList.remove('active', 'show');
+        detailModal.style.display = '';
         document.body.style.overflow = '';
     }
 }
