@@ -429,13 +429,13 @@ def route_share():
 
     post = None
     if contest_round and round_no:
-        if share_sn:
+        post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
+        if post and share_sn:
             session['share_info'] = {
                 'contest_round': int(contest_round),
                 'round_no': int(round_no),
                 'share_sn': str(share_sn)
             }
-        post = service.get_post_detail(contest_round, round_no, current_user_id)
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(

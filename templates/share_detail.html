@@ -3,10 +3,24 @@
 {% block content %}
 <div style="max-width: 800px; margin: 2.5rem auto; padding: 0 1rem;">
 
+    {% if post %}
     <!-- 1. 상단 웰컴 히어로 배너 -->
     <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); border-radius: 20px; padding: 1.8rem 2rem; color: #ffffff; text-align: center; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25); margin-bottom: 2rem;">
-        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.8rem; border: 1px solid rgba(255,255,255,0.3);">
-            <i class="fa-solid fa-trophy" style="color: #fef08a;"></i> 제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회 콘테스트
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.22); backdrop-filter: blur(10px); padding: 0.35rem 0.95rem; border-radius: 20px; font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.35); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <i class="fa-solid fa-trophy" style="color: #fef08a;"></i> 제{{ post.contest_id or post.CONTEST_ROUND or contest_round or 1 }}회 콘테스트
+            </div>
+
+            {% if post.is_closed or post.closed or post.STATUS_CD == 'G001C002' %}
+            <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(148, 163, 184, 0.25); backdrop-filter: blur(10px); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.82rem; font-weight: 800; color: #e2e8f0; border: 1px solid rgba(203, 213, 225, 0.4);">
+                <i class="fa-solid fa-lock"></i> 회차 종료
+            </div>
+            {% else %}
+            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(16, 185, 129, 0.25); backdrop-filter: blur(10px); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: 0.82rem; font-weight: 800; color: #a7f3d0; border: 1px solid rgba(52, 211, 153, 0.5); box-shadow: 0 0 14px rgba(52, 211, 153, 0.35);">
+                <span style="display: inline-block; width: 8px; height: 8px; background-color: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399;"></span>
+                🔥 LIVE 진행 중
+            </div>
+            {% endif %}
         </div>
         <h2 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
             자랑스러운 반려동물의 출전작에 응원해 보세요!
@@ -17,7 +31,6 @@
     </div>
 
     <!-- 2. 단독 게시물 카드 -->
-    {% if post %}
     <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); transition: all 0.3s ease;">
         <!-- 상단 헤더: 작성자 및 공유번호 -->
         <div style="padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
@@ -111,10 +124,20 @@
         </div>
     </div>
     {% else %}
-    <div style="text-align: center; padding: 4rem; background: #ffffff; border-radius: 20px; color: #64748b;">
-        <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; color: #f43f5e; margin-bottom: 1rem;"></i>
-        <p style="font-size: 1.1rem; font-weight: 700;">해당 공유 게시물을 찾을 수 없습니다.</p>
-        <a href="/" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--gradient-brand); color: #fff; border-radius: 12px; font-weight: 800; text-decoration: none;">메인 피드로 이동</a>
+    <div style="background: #ffffff; border-radius: 24px; padding: 4rem 2rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.06); max-width: 600px; margin: 2rem auto; border: 1px solid #f1f5f9;">
+        <div style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #ef4444; font-size: 2.2rem; box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15);">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 900; color: #0f172a; margin-bottom: 0.75rem;">
+            존재하지 않는 게시물입니다
+        </h2>
+        <p style="font-size: 0.95rem; color: #64748b; margin-bottom: 2rem; line-height: 1.6;">
+            요청하신 공유 링크의 정보가 올바르지 않거나<br>
+            이미 삭제되었거나 존재하지 않는 출전작 게시물입니다.
+        </p>
+        <a href="/" style="display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: #ffffff; padding: 0.9rem 1.8rem; border-radius: 16px; font-weight: 800; font-size: 1rem; text-decoration: none; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); transition: transform 0.2s ease;">
+            <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
+        </a>
     </div>
     {% endif %}
 

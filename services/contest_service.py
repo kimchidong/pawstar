@@ -1129,6 +1129,13 @@ class PawStarService:
                     row['KIND_NM'] = k_formatted
                     row['pet_type'] = k_formatted
 
+                    is_closed_stat = self.is_contest_closed(contest_id)
+                    row['is_closed'] = is_closed_stat
+                    row['closed'] = is_closed_stat
+                    if is_closed_stat:
+                        row['CONTEST_STAT'] = 'G001C002'
+                        row['STATUS_CD'] = 'G001C002'
+
                     row['awards'] = awards_map.get(row['ROUND_NO'], [])
                     row['actions'] = {
                         'is_liked': row['ROUND_NO'] in liked_round_nos,
@@ -1160,7 +1167,7 @@ class PawStarService:
             empty_pag = {'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page}
             return {'posts': [], 'total_count': 0, 'page': 1, 'total_pages': 1, 'per_page': per_page, 'pagination': empty_pag}
 
-    def get_post_detail(self, contest_id, target_id, current_user_id=None):
+    def get_post_detail(self, contest_id, target_id, current_user_id=None, share_sn=None):
         conn = self.get_db_connection()
         if not conn:
             return None
@@ -1223,6 +1230,21 @@ class PawStarService:
                 if not post:
                     conn.close()
                     return None
+
+                # contest_round, round_no, share_sn 3개 값 엄격 100% 일치 검증
+                if share_sn is not None and str(share_sn).strip() != '':
+                    db_sn = str(post.get('SHARE_SN') or post.get('share_sn') or '').strip()
+                    target_sn = str(share_sn).strip()
+                    if db_sn != target_sn:
+                        conn.close()
+                        return None
+
+                is_closed_stat = self.is_contest_closed(contest_id)
+                post['is_closed'] = is_closed_stat
+                post['closed'] = is_closed_stat
+                if is_closed_stat:
+                    post['CONTEST_STAT'] = 'G001C002'
+                    post['STATUS_CD'] = 'G001C002'
 
                 round_no = post['ROUND_NO']
 
@@ -1358,13 +1380,17 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT CONTEST_STAT FROM pst_contest
+                    SELECT CONTEST_STAT
+                    FROM pst_contest
                     WHERE CONTEST_ROUND = %s
+                    LIMIT 1
                 """, (contest_id,))
                 r = cur.fetchone()
                 conn.close()
-                if r and r.get('CONTEST_STAT') == 'G001C002':
-                    return True
+                if r:
+                    stat = str(r.get('CONTEST_STAT') or '')
+                    if stat in ['G001C002', 'CLOSED', '마감', '종료']:
+                        return True
                 return False
         except Exception as e:
             print("is_contest_closed check error:", e)
