@@ -24,7 +24,10 @@
             <span>Paw Star</span>
         </a>
         <div class="m-header-actions">
-            <a href="/" class="m-btn-pc-switch" title="PC 버진으로 이동">
+            <a href="/m/upload" class="m-btn-pc-switch {{ 'active' if request.path == '/m/upload' }}" style="background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 700;" title="출전하기">
+                <i class="fa-solid fa-paper-plane"></i> 출전하기
+            </a>
+            <a href="/" class="m-btn-pc-switch" title="PC 버전으로 이동">
                 <i class="fa-solid fa-desktop"></i> PC버전
             </a>
         </div>
