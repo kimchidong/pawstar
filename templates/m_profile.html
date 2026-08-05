@@ -120,7 +120,7 @@
                             <i class="fa-regular fa-comment" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
                             <span>{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
                         </div>
-                        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #059669; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div class="action-btn btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #059669; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                             <i class="fa-solid fa-share-nodes" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
                             <span>{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
                         </div>

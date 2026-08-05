@@ -370,6 +370,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                         if (icon) icon.className = 'fa-regular fa-comment';
                     }
                 }
+                if (data.actions.is_shared !== undefined) {
+                    const mIsShared = !!data.actions.is_shared;
+                    const btnSharePopup = document.getElementById('mDetailBtnShare');
+                    if (btnSharePopup) btnSharePopup.classList.toggle('active', mIsShared);
+                }
             }
         })
         .catch(err => console.error(err));

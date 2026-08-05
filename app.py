@@ -166,8 +166,8 @@ def api_auth_login():
     else:
         return jsonify({'success': False, 'message': result}), 401
 
-def process_signup_share_referral():
-    """ 공유 링크 유입 가입 시 공유 카운트 및 점수 1 증가 처리 헬퍼 """
+def process_signup_share_referral(new_user_id=None):
+    """ 공유 링크 유입 가입 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 """
     share_info = session.get('share_info')
     if share_info and isinstance(share_info, dict):
         c_round = share_info.get('contest_round')
@@ -175,7 +175,7 @@ def process_signup_share_referral():
         s_sn = share_info.get('share_sn')
         if c_round and r_no and s_sn:
             try:
-                service.increment_share_count_on_signup(c_round, r_no, s_sn)
+                service.increment_share_count_on_signup(c_round, r_no, s_sn, user_id=new_user_id)
             except Exception as e:
                 print("process_signup_share_referral error:", e)
 
@@ -200,8 +200,8 @@ def api_auth_register():
 
     new_user = service.register_user(user_id, nickname, password, profile_img)
 
-    # 공유 유입 회원가입 시 공유 카운트 및 점수 +1 반영
-    process_signup_share_referral()
+    # 공유 유입 회원가입 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
+    process_signup_share_referral(new_user_id=user_id)
 
     session.clear()
     session['user_id'] = user_id
@@ -231,8 +231,8 @@ def api_auth_setup_profile():
 
     new_user = service.register_user(auto_uuid, nickname, password, profile_img)
 
-    # 공유 유입 회원가입 시 공유 카운트 및 점수 +1 반영
-    process_signup_share_referral()
+    # 공유 유입 회원가입 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
+    process_signup_share_referral(new_user_id=auto_uuid)
 
     session.clear()
     session['user_id'] = auto_uuid
@@ -351,7 +351,7 @@ def auth_google_callback():
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
         if user_info and user_info.get('is_new_user'):
-            process_signup_share_referral()
+            process_signup_share_referral(new_user_id=user_info['user_id'])
 
         saved_next_url = session.get('next_url') or '/'
         session.clear()

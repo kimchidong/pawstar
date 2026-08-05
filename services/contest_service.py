@@ -776,8 +776,8 @@ class PawStarService:
                 conn.close()
             return None
 
-    def increment_share_count_on_signup(self, contest_id, round_no, share_sn):
-        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 공유횟수 +1 및 점수 +1 반영 """
+    def increment_share_count_on_signup(self, contest_id, round_no, share_sn, user_id=None):
+        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 PST_CONTEST_SHARE 저장, 공유횟수 +1 및 점수 +1 반영 """
         conn = self.get_db_connection()
         if not conn:
             return False
@@ -792,6 +792,12 @@ class PawStarService:
                 if not row:
                     conn.close()
                     return False
+
+                if user_id:
+                    cur.execute("""
+                        INSERT IGNORE INTO pst_contest_share (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
+                        VALUES (%s, %s, %s)
+                    """, (contest_id, round_no, user_id))
 
                 new_share_cnt = row['SHARE_CNT'] + 1
                 self.sync_and_get_post_stats(cur, contest_id, round_no, share_cnt_override=new_share_cnt)
@@ -998,6 +1004,7 @@ class PawStarService:
                 liked_round_nos = set()
                 commented_round_nos = set()
                 viewed_round_nos = set()
+                shared_round_nos = set()
                 if current_user_id:
                     cur.execute("""
                         SELECT ROUND_NO FROM pst_contest_like
@@ -1019,6 +1026,13 @@ class PawStarService:
                     """, (contest_id, current_user_id))
                     viewed_rows = cur.fetchall()
                     viewed_round_nos = {r['ROUND_NO'] for r in viewed_rows}
+
+                    cur.execute("""
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_share
+                        WHERE CONTEST_ROUND = %s AND SHARE_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    shared_rows = cur.fetchall()
+                    shared_round_nos = {r['ROUND_NO'] for r in shared_rows}
 
                 # 3. 해당 회차의 모든 수상 기록 조회 (전체부문 G002P001 -> 품종부문 G002P002 순서 정렬)
                 cur.execute("""
@@ -1119,7 +1133,8 @@ class PawStarService:
                     row['actions'] = {
                         'is_liked': row['ROUND_NO'] in liked_round_nos,
                         'is_commented': row['ROUND_NO'] in commented_round_nos,
-                        'is_viewed': row['ROUND_NO'] in viewed_round_nos
+                        'is_viewed': row['ROUND_NO'] in viewed_round_nos,
+                        'is_shared': row['ROUND_NO'] in shared_round_nos
                     }
                     posts.append(row)
 
@@ -1238,6 +1253,7 @@ class PawStarService:
                 is_liked = False
                 is_commented = False
                 is_viewed = False
+                is_shared = False
                 if current_user_id:
                     cur.execute("""
                         SELECT 1 FROM pst_contest_like
@@ -1256,6 +1272,12 @@ class PawStarService:
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                     """, (contest_id, round_no, current_user_id))
                     is_viewed = bool(cur.fetchone())
+
+                    cur.execute("""
+                        SELECT 1 FROM pst_contest_share
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_USER_ID = %s
+                    """, (contest_id, round_no, current_user_id))
+                    is_shared = bool(cur.fetchone())
 
                 dt_p = post.get('ENT_DT')
                 if hasattr(dt_p, 'strftime'):
@@ -1277,7 +1299,7 @@ class PawStarService:
                     cmt_list.append(c)
 
                 post['comments'] = cmt_list
-                post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented, 'is_viewed': is_viewed}
+                post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented, 'is_viewed': is_viewed, 'is_shared': is_shared}
                 conn.close()
                 return post
         except Exception as e:

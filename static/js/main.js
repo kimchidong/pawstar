@@ -872,6 +872,13 @@ function openDetailModal(post, isHallOfFame = false) {
                     window.currentDetailPostIsCommented = !!data.actions.is_commented;
                     updatePopupCommentUI(!!data.actions.is_commented);
                 }
+                if (data.actions.is_shared !== undefined) {
+                    const isShared = !!data.actions.is_shared;
+                    const btnShare = document.getElementById('detailBtnShare');
+                    const iconShare = document.getElementById('detailShareIconBtn');
+                    if (btnShare) btnShare.classList.toggle('active', isShared);
+                    if (iconShare) iconShare.classList.toggle('active', isShared);
+                }
             }
         })
         .catch(err => {
