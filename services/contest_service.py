@@ -777,12 +777,33 @@ class PawStarService:
             return None
 
     def increment_share_count_on_signup(self, contest_id, round_no, share_sn, user_id=None):
-        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 PST_CONTEST_SHARE 저장, 공유횟수 +1 및 점수 +1 반영 """
+        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 PST_CONTEST_SHARE 저장, 공유횟수 +1 및 점수 +1 반영
+            단, 진행 중인 회차(CONTEST_STAT = 'G001C001')에 한해서만 반영. 과거(종료) 회차는 무시. """
         conn = self.get_db_connection()
         if not conn:
             return False
         try:
             with conn.cursor() as cur:
+                # 1. 해당 회차가 현재 진행 중인지 확인 (종료된 과거 회차는 반영 불가)
+                cur.execute("""
+                    SELECT c.CONTEST_STAT
+                    FROM pst_contest c
+                    WHERE c.CONTEST_ROUND = %s
+                """, (contest_id,))
+                contest_row = cur.fetchone()
+                if not contest_row:
+                    print(f"increment_share_count_on_signup: contest {contest_id} not found, skip.")
+                    conn.close()
+                    return False
+
+                contest_stat = str(contest_row.get('CONTEST_STAT') or '').strip()
+                if contest_stat != 'G001C001':
+                    # 종료된 과거 회차 → 공유 카운트/점수 반영 차단
+                    print(f"increment_share_count_on_signup: contest {contest_id} is not active (STAT={contest_stat}), skip share score.")
+                    conn.close()
+                    return False
+
+                # 2. 게시물(SHARE_SN) 존재 확인
                 cur.execute("""
                     SELECT CONTEST_ROUND, ROUND_NO, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
                     FROM pst_contest_round
@@ -793,12 +814,14 @@ class PawStarService:
                     conn.close()
                     return False
 
+                # 3. 공유 가입 이력 기록
                 if user_id:
                     cur.execute("""
                         INSERT IGNORE INTO pst_contest_share (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
                         VALUES (%s, %s, %s)
                     """, (contest_id, round_no, user_id))
 
+                # 4. 공유 카운트 및 점수 반영
                 new_share_cnt = row['SHARE_CNT'] + 1
                 self.sync_and_get_post_stats(cur, contest_id, round_no, share_cnt_override=new_share_cnt)
                 conn.commit()
