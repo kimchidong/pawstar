@@ -334,6 +334,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             if (icon) icon.className = 'fa-regular fa-heart';
         }
     }
+    
+    const mBtnSharePopup = document.getElementById('mDetailBtnShare');
+    if (mBtnSharePopup) mBtnSharePopup.classList.remove('active');
+
     if (mHeartIcon) {
         mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
         mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';

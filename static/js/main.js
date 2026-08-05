@@ -862,6 +862,15 @@ function openDetailModal(post, isHallOfFame = false) {
     // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화 및 색상 채우기
     updatePopupLikeUI(isLiked);
 
+    const updatePopupShareUI = (sharedState) => {
+        const btnShare = document.getElementById('detailBtnShare');
+        const iconShare = document.getElementById('detailShareIconBtn');
+        if (btnShare) btnShare.classList.toggle('active', !!sharedState);
+        if (iconShare) iconShare.classList.toggle('active', !!sharedState);
+    };
+
+    updatePopupShareUI(false);
+
     fetch(`/api/post/user_actions/${post.post_id}`)
         .then(res => res.json())
         .then(data => {
@@ -873,11 +882,7 @@ function openDetailModal(post, isHallOfFame = false) {
                     updatePopupCommentUI(!!data.actions.is_commented);
                 }
                 if (data.actions.is_shared !== undefined) {
-                    const isShared = !!data.actions.is_shared;
-                    const btnShare = document.getElementById('detailBtnShare');
-                    const iconShare = document.getElementById('detailShareIconBtn');
-                    if (btnShare) btnShare.classList.toggle('active', isShared);
-                    if (iconShare) iconShare.classList.toggle('active', isShared);
+                    updatePopupShareUI(!!data.actions.is_shared);
                 }
             }
         })
@@ -1375,7 +1380,6 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
 
 async function handleShareClick() {
     if (!window.currentDetailPostId) return;
-    const btnShare = document.getElementById('detailBtnShare');
     if (window.currentDetailPostData) {
         const p = window.currentDetailPostData;
         const cRound = p.contest_id || p.CONTEST_ROUND;
@@ -1385,7 +1389,6 @@ async function handleShareClick() {
     } else {
         await copyPostShareUrl();
     }
-    if (btnShare) btnShare.classList.add('active');
 }
 
 window.copyPostShareUrl = copyPostShareUrl;
