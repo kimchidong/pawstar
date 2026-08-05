@@ -44,14 +44,20 @@
                         <i class="fa-solid fa-paw"></i> 출전하기
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" style="display: flex; align-items: center; gap: 0.1rem;">
                     {% if is_logged_in %}
                         <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
                             <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
                             {{ current_user.NK_NM or current_user.nickname }}
                         </a>
+                        <a href="/logout" id="btnNavLogout" style="margin-left: 0.4rem;">
+                            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                        </a>
                     {% else %}
-                        <a href="/auth/google" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
+                        <a href="#" id="btnNavRegister" onclick="openGoogleAuthModal(); return false;">
+                            <i class="fa-solid fa-user-plus"></i> 회원가입
+                        </a>
+                        <a href="/auth/google" id="btnNavLogin" style="margin-left: 0.4rem;">
                             <i class="fa-solid fa-right-to-bracket"></i> 로그인
                         </a>
                     {% endif %}
@@ -395,6 +401,107 @@
             });
         }
     });
+    </script>
+
+    <!-- 로그인/회원가입 통합 모달 -->
+    <div class="modal-backdrop" id="authModal" onclick="if(event.target===this) closeAuthModal();" style="display:none;">
+        <div class="modal-content" style="max-width: 420px; padding: 2rem;">
+            <div class="modal-header" style="margin-bottom: 1.25rem;">
+                <h3 id="authModalTitle"><i class="fa-solid fa-key"></i> 회원 로그인</h3>
+                <button type="button" class="btn-close" onclick="closeAuthModal()">&times;</button>
+            </div>
+            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.25rem; margin-bottom: 1.25rem; border: 1px solid var(--border-light);">
+                <button type="button" id="pcTabLoginBtn" style="flex:1; padding:0.5rem; border:none; border-radius:6px; font-weight:800; font-size:0.88rem; background:var(--gradient-brand); color:#fff; cursor:pointer;">로그인</button>
+                <button type="button" id="pcTabRegisterBtn" style="flex:1; padding:0.5rem; border:none; border-radius:6px; font-weight:800; font-size:0.88rem; background:transparent; color:var(--text-secondary); cursor:pointer;">회원가입</button>
+            </div>
+            <form id="pcLoginForm">
+                <div style="margin-bottom:0.85rem;">
+                    <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:0.35rem; color:var(--text-secondary);">회원 아이디</label>
+                    <input type="text" id="pcLoginUserId" class="form-control" placeholder="아이디 입력" required style="width:100%; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:1.1rem;">
+                    <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:0.35rem; color:var(--text-secondary);">사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="pcLoginPassword" class="form-control" placeholder="비밀번호 입력 (기본: 1234)" required style="width:100%; box-sizing:border-box;">
+                </div>
+                <button type="submit" style="width:100%; padding:0.75rem; border-radius:12px; border:none; background:var(--gradient-brand); color:#fff; font-weight:900; font-size:0.95rem; cursor:pointer;">🚀 로그인 하기</button>
+            </form>
+            <form id="pcRegisterForm" style="display:none;">
+                <div style="margin-bottom:0.85rem;">
+                    <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:0.35rem; color:var(--text-secondary);">희망 아이디</label>
+                    <input type="text" id="pcRegUserId" class="form-control" placeholder="아이디 입력" required style="width:100%; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:0.85rem;">
+                    <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:0.35rem; color:var(--text-secondary);">집사 닉네임</label>
+                    <input type="text" id="pcRegNickname" class="form-control" placeholder="멋진 닉네임" required style="width:100%; box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:1.1rem;">
+                    <label style="display:block; font-size:0.82rem; font-weight:700; margin-bottom:0.35rem; color:var(--text-secondary);">사용자인증번호 (비밀번호)</label>
+                    <input type="password" id="pcRegPassword" class="form-control" placeholder="비밀번호 입력" required style="width:100%; box-sizing:border-box;">
+                </div>
+                <button type="submit" style="width:100%; padding:0.75rem; border-radius:12px; border:none; background:linear-gradient(135deg,#059669,#10b981); color:#fff; font-weight:900; font-size:0.95rem; cursor:pointer;">✨ 회원가입 시작하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function openAuthModal(tab) {
+        const modal = document.getElementById('authModal');
+        const lf = document.getElementById('pcLoginForm');
+        const rf = document.getElementById('pcRegisterForm');
+        const tl = document.getElementById('pcTabLoginBtn');
+        const tr = document.getElementById('pcTabRegisterBtn');
+        const ti = document.getElementById('authModalTitle');
+        if (!modal) return;
+        if (tab === 'register') {
+            tr.style.background = 'linear-gradient(135deg,#059669,#10b981)'; tr.style.color = '#fff';
+            tl.style.background = 'transparent'; tl.style.color = 'var(--text-secondary)';
+            rf.style.display = 'block'; lf.style.display = 'none';
+            ti.innerHTML = '<i class="fa-solid fa-user-plus"></i> 신규 회원가입';
+        } else {
+            tl.style.background = 'var(--gradient-brand)'; tl.style.color = '#fff';
+            tr.style.background = 'transparent'; tr.style.color = 'var(--text-secondary)';
+            lf.style.display = 'block'; rf.style.display = 'none';
+            ti.innerHTML = '<i class="fa-solid fa-key"></i> 회원 로그인';
+        }
+        modal.style.display = 'flex';
+    }
+    function closeAuthModal() {
+        const modal = document.getElementById('authModal');
+        if (modal) modal.style.display = 'none';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('pcTabLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
+        document.getElementById('pcTabRegisterBtn')?.addEventListener('click', () => openAuthModal('register'));
+
+        document.getElementById('pcLoginForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user_id = document.getElementById('pcLoginUserId').value.trim();
+            const password = document.getElementById('pcLoginPassword').value.trim();
+            if (!user_id || !password) return;
+            fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, password}) })
+            .then(r => r.json()).then(data => {
+                if (data.success) location.reload();
+                else if (typeof showToast==='function') showToast('❌ ' + (data.message||'로그인 실패'));
+                else alert(data.message||'로그인 실패');
+            });
+        });
+
+        document.getElementById('pcRegisterForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user_id = document.getElementById('pcRegUserId').value.trim();
+            const nickname = document.getElementById('pcRegNickname').value.trim();
+            const password = document.getElementById('pcRegPassword').value.trim();
+            if (!user_id || !nickname || !password) return;
+            fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, nickname, password}) })
+            .then(r => r.json()).then(data => {
+                if (data.success) { if(typeof showToast==='function') showToast('🎉 회원가입 성공!'); setTimeout(() => location.reload(), 800); }
+                else if (typeof showToast==='function') showToast('❌ ' + (data.message||'회원가입 실패'));
+                else alert(data.message||'회원가입 실패');
+            });
+        });
+    });
+    </script>
+
     <!-- 메달 / 배지 큰 이미지 라이트박스 팝업 모달 -->
     <div id="badgeZoomModal" style="position: fixed; inset: 0; z-index: 999999; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;" onclick="closeBadgeZoomModal()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" onclick="event.stopPropagation()">
