@@ -882,3 +882,14 @@ async function handleShareClick() {
 
 window.copyPostShareUrl = copyPostShareUrl;
 window.handleShareClick = handleShareClick;
+
+// 전역 모바일 모달 외부 배경(Backdrop) 클릭 시 팝업 닫기 이벤트 핸들러
+document.addEventListener('click', function(e) {
+    if (e.target && (e.target.classList.contains('m-modal-backdrop') || e.target.classList.contains('modal-backdrop'))) {
+        e.target.classList.remove('show', 'active');
+        e.target.style.display = 'none';
+        if (typeof closeGoogleAuthModal === 'function') {
+            closeGoogleAuthModal();
+        }
+    }
+});
