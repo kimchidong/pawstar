@@ -109,7 +109,7 @@
             <!-- 모바일 대형 버튼 그룹 -->
             <div style="display: flex; flex-direction: column; gap: 0.6rem;">
                 {% if not is_logged_in %}
-                <button type="button" onclick="const mAuthModal = document.getElementById('mAuthModal'); if(mAuthModal) mAuthModal.classList.add('active'); else if(typeof openGoogleAuthWindow === 'function') openGoogleAuthWindow(); else window.location.href = '/auth/google';" style="width: 100%; padding: 0.85rem; border-radius: 14px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 0.95rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);">
+                <button type="button" onclick="if(typeof openGoogleAuthModal === 'function'){ openGoogleAuthModal(); } else { const m = document.getElementById('mGoogleAuthModal') || document.getElementById('googleAuthModal'); if(m) { m.style.display='flex'; m.classList.add('active','show'); } else { window.location.href = '/auth/google'; } }" style="width: 100%; padding: 0.85rem; border-radius: 14px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 0.95rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);">
                     <i class="fa-solid fa-user-plus"></i> 회원가입하고 응원하기 (+10점)
                 </button>
                 {% endif %}

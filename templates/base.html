@@ -229,6 +229,21 @@
     </div>
 
     <script>
+    window.openGoogleAuthModal = function() {
+        const modal = document.getElementById('googleAuthModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            modal.classList.add('active');
+        }
+        const mModal = document.getElementById('mGoogleAuthModal');
+        if (mModal) {
+            mModal.style.display = 'flex';
+            mModal.classList.add('show');
+            mModal.classList.add('active');
+        }
+    };
+
     window.closeGoogleAuthModal = function() {
         const modal = document.getElementById('googleAuthModal');
         if (modal) {
