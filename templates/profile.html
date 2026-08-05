@@ -200,7 +200,7 @@
                                 <span class="share-count">{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
                             </div>
                         </div>
-                        <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.25rem 0.55rem; font-size: 0.72rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2); transition: all 0.2s;" title="전용 공유주소 복사 (회원가입 시 +1점)">
+                        <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.25rem 0.55rem; font-size: 0.72rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2); transition: all 0.2s;" title="전용 공유주소 복사 (회원가입 시 +10점)">
                             <i class="fa-solid fa-link"></i> 전용공유
                         </button>
                     </div>

@@ -12,7 +12,7 @@
             자랑스러운 반려동물의 출전작에 응원해 보세요!
         </h2>
         <p style="font-size: 0.95rem; opacity: 0.95; font-weight: 500; margin: 0;">
-            이 링크를 통해 회원가입 하시면 해당 게시물에 <strong style="color: #fef08a; font-size: 1.05rem;">공유 점수 +1점</strong>이 즉시 선물로 적립됩니다! 🐾
+            이 링크를 통해 회원가입 하시면 해당 게시물에 <strong style="color: #fef08a; font-size: 1.05rem;">공유 점수 +10점</strong>이 즉시 선물로 적립됩니다! 🐾
         </p>
     </div>
 
@@ -75,7 +75,7 @@
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 {% if not is_logged_in %}
                 <button type="button" onclick="if(typeof openGoogleAuthWindow === 'function'){ openGoogleAuthWindow(); } else { const modal = document.getElementById('googleAuthModal'); if(modal) modal.classList.add('show'); else window.location.href = '/auth/google'; }" style="width: 100%; padding: 1.05rem; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); transition: transform 0.2s ease;">
-                    <i class="fa-solid fa-user-plus" style="font-size: 1.2rem;"></i> 회원가입하고 응원하기 (+1점 자동적립)
+                    <i class="fa-solid fa-user-plus" style="font-size: 1.2rem;"></i> 회원가입하고 응원하기 (+10점 자동적립)
                 </button>
                 {% endif %}
 

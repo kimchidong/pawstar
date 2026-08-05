@@ -972,7 +972,7 @@ class PawStarService:
                     ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
                      (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
                      (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
-                     COALESCE(r.SHARE_CNT, 0) * 1) AS score,
+                     COALESCE(r.SHARE_CNT, 0) * 10) AS score,
                     r.ENT_DT AS created_at
                 FROM pst_contest_round r
                 LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
@@ -1210,7 +1210,7 @@ class PawStarService:
                         ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
                          (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
                          (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
-                         COALESCE(r.SHARE_CNT, 0) * 1) AS score,
+                         COALESCE(r.SHARE_CNT, 0) * 10) AS score,
                         r.ENT_DT AS created_at
                     FROM pst_contest_round r
                     JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
@@ -1331,8 +1331,8 @@ class PawStarService:
             r_share = cur.fetchone()
             share_cnt = r_share['cnt'] if r_share else 0
 
-        # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 1점)
-        calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 1)
+        # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 10점)
+        calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 10)
 
         # 3. DB pst_contest_round 최신화 UPDATE
         cur.execute("""
