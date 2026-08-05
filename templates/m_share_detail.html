@@ -47,24 +47,33 @@
             </p>
 
             <!-- 4요소 실시간 현황 및 총점 상자 -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem;">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; text-align: center;">
-                    <div style="background: #ffffff; border: 1px solid #bae6fd; color: #0284c7; border-radius: 8px; padding: 0.3rem 0.1rem; font-size: 0.7rem; font-weight: 800;">
-                        👁️ {{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.9rem; margin-bottom: 1.2rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem;">
+                    <div style="font-size: 0.8rem; font-weight: 800; color: #475569;">
+                        📊 실시간 평가 요소 현황
                     </div>
-                    <div style="background: #ffffff; border: 1px solid #fecdd3; color: #e11d48; border-radius: 8px; padding: 0.3rem 0.1rem; font-size: 0.7rem; font-weight: 800;">
-                        ❤️ {{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}
-                    </div>
-                    <div style="background: #ffffff; border: 1px solid #e9d5ff; color: #7c3aed; border-radius: 8px; padding: 0.3rem 0.1rem; font-size: 0.7rem; font-weight: 800;">
-                        💬 {{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}
-                    </div>
-                    <div style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #059669; border-radius: 8px; padding: 0.3rem 0.1rem; font-size: 0.7rem; font-weight: 800;">
-                        🔗 {{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}
+                    <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.3rem 0.7rem; border-radius: 10px; color: #d97706; font-size: 0.85rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span>{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
                     </div>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.4rem; border-radius: 10px; color: #d97706; font-size: 0.95rem; font-weight: 900; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span>{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem;">
+                    <div class="action-btn btn-view" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.5rem 0.2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default;">
+                        <i class="fa-regular fa-eye" style="font-size: 0.95rem;"></i>
+                        <span style="font-weight: 800; font-size: 0.82rem;">{{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-like" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.5rem 0.2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default;">
+                        <i class="fa-regular fa-heart" style="font-size: 0.95rem;"></i>
+                        <span style="font-weight: 800; font-size: 0.82rem;">{{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-comment" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.5rem 0.2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default;">
+                        <i class="fa-regular fa-comment" style="font-size: 0.95rem;"></i>
+                        <span style="font-weight: 800; font-size: 0.82rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
+                    </div>
+                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" style="border-radius: 12px; padding: 0.5rem 0.2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default;">
+                        <i class="fa-solid fa-share-nodes" style="font-size: 0.95rem;"></i>
+                        <span style="font-weight: 800; font-size: 0.82rem;">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
+                    </div>
                 </div>
             </div>
 
