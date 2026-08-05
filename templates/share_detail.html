@@ -50,33 +50,30 @@
             </p>
 
             <!-- 4요소 실시간 현황 및 총점 상자 -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.2rem 1.4rem; margin-bottom: 1.5rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem;">
-                    <div style="font-size: 0.9rem; font-weight: 800; color: #475569;">
-                        📊 실시간 평가 요소 현황
-                    </div>
-                    <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.4rem 0.9rem; border-radius: 14px; color: #d97706; font-size: 0.95rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);">
-                        <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span style="font-size: 1.1rem;">{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem;">
-                    <div class="action-btn btn-view" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.2rem 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem;">
+                <!-- 좌측 정렬: 평가 4요소 나란히 배치 -->
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div class="action-btn btn-view" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default; min-width: 68px;">
                         <i class="fa-regular fa-eye" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-like" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default;">
+                    <div class="action-btn btn-like" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default; min-width: 68px;">
                         <i class="fa-regular fa-heart" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-comment" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default;">
+                    <div class="action-btn btn-comment" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default; min-width: 68px;">
                         <i class="fa-regular fa-comment" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" style="border-radius: 14px; padding: 0.65rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default;">
+                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" style="border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default; min-width: 68px;">
                         <i class="fa-solid fa-share-nodes" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
                     </div>
+                </div>
+
+                <!-- 우측 정렬: 총점 뱃지 -->
+                <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.55rem 1.1rem; border-radius: 14px; color: #d97706; font-size: 1.05rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12); flex-shrink: 0;">
+                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span style="font-size: 1.2rem;">{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
                 </div>
             </div>
 
