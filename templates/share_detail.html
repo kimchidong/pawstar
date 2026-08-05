@@ -31,9 +31,6 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
-                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 0.25rem 0.65rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.3rem;">
-                    <i class="fa-solid fa-hashtag"></i> 공유번호: {{ post.share_sn or post.SHARE_SN or 'S-UUID' }}
-                </span>
                 <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">{{ post.created_at or post.ENT_DT }}</span>
             </div>
         </div>
@@ -82,14 +79,9 @@
                 </button>
                 {% endif %}
 
-                <div style="display: flex; gap: 0.6rem;">
-                    <a href="/" style="flex: 1; padding: 0.85rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 0.95rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
-                    </a>
-                    <button type="button" onclick="copyPostShareUrl('{{ post.CONTEST_ROUND or post.contest_id }}', '{{ post.ROUND_NO or post.round_no }}', '{{ post.SHARE_SN or post.share_sn }}');" style="padding: 0.85rem 1.2rem; border-radius: 14px; background: #e0e7ff; border: 1px solid #c7d2fe; color: #4338ca; font-size: 0.95rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-link"></i> 공유링크 복사
-                    </button>
-                </div>
+                <a href="/" style="width: 100%; padding: 0.95rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 1rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
+                </a>
             </div>
         </div>
     </div>

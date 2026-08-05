@@ -666,6 +666,7 @@ function openDetailModal(post, isHallOfFame = false) {
 
     const isCommented = (post.actions && post.actions.is_commented) || post.is_commented || false;
     window.currentDetailPost = post;
+    window.currentDetailPostData = post;
     window.currentDetailPostIsCommented = isCommented;
 
     btnCommentPopup = document.getElementById('detailBtnComment');
@@ -1324,10 +1325,28 @@ function submitDetailComment() {
 }
 
 async function copyPostShareUrl(contestRound, roundNo, shareSn) {
+    if (contestRound === 'None' || contestRound === 'undefined' || contestRound === 'null') contestRound = null;
+    if (roundNo === 'None' || roundNo === 'undefined' || roundNo === 'null') roundNo = null;
+    if (shareSn === 'None' || shareSn === 'undefined' || shareSn === 'null') shareSn = null;
+
+    if (!contestRound || !roundNo) {
+        if (window.currentDetailPostData) {
+            const p = window.currentDetailPostData;
+            contestRound = p.contest_id || p.CONTEST_ROUND || contestRound;
+            roundNo = p.round_no || p.ROUND_NO || roundNo;
+            shareSn = p.share_sn || p.SHARE_SN || shareSn;
+        }
+        if ((!contestRound || !roundNo) && window.currentDetailPostId) {
+            const parts = String(window.currentDetailPostId).split('_');
+            if (parts.length >= 2) {
+                contestRound = parts[0];
+                roundNo = parts[1];
+            }
+        }
+    }
+
     let shareUrl = '';
-    if (contestRound && roundNo && shareSn) {
-        shareUrl = `${window.location.origin}/share?contest_round=${contestRound}&round_no=${roundNo}&share_sn=${shareSn}`;
-    } else if (contestRound && roundNo) {
+    if (contestRound && roundNo) {
         try {
             const res = await fetch(`/api/contest/share_url?contest_round=${contestRound}&round_no=${roundNo}`);
             const data = await res.json();
@@ -1335,21 +1354,13 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
                 shareUrl = data.share_url;
             }
         } catch (e) {
-            console.error('copyPostShareUrl error:', e);
+            console.error('copyPostShareUrl API error:', e);
         }
     }
-    
-    if (!shareUrl && window.currentDetailPostData) {
-        const p = window.currentDetailPostData;
-        const cRound = p.contest_id || p.CONTEST_ROUND || 1;
-        const rNo = p.round_no || p.ROUND_NO || 1;
-        try {
-            const res = await fetch(`/api/contest/share_url?contest_round=${cRound}&round_no=${rNo}`);
-            const data = await res.json();
-            if (data.success && data.share_url) {
-                shareUrl = data.share_url;
-            }
-        } catch (e) {}
+
+    if (!shareUrl && contestRound && roundNo) {
+        const sn = shareSn || 'S-UUID';
+        shareUrl = `${window.location.origin}/share?contest_round=${contestRound}&round_no=${roundNo}&share_sn=${sn}`;
     }
 
     if (!shareUrl) {
@@ -1359,9 +1370,9 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
     try {
         await navigator.clipboard.writeText(shareUrl);
         if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 클립보드에 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
+            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
         } else {
-            alert('🔗 전용 공유주소가 복사되었습니다!');
+            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
     } catch (err) {
         const tempInput = document.createElement('input');
@@ -1373,7 +1384,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         if (typeof showToast === 'function') {
             showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
         } else {
-            alert('🔗 전용 공유주소가 복사되었습니다!');
+            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
     }
 }

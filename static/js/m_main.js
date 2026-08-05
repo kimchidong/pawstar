@@ -306,6 +306,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const isCommented = (postData.actions && postData.actions.is_commented) || postData.is_commented || false;
     window.currentMobileDetailPost = postData;
+    window.currentMobileDetailPostData = postData;
+    window.currentMobileDetailPostId = postData.post_id;
     window.currentMobileDetailPostIsCommented = isCommented;
 
     const btnCommentPopup = document.getElementById('mDetailBtnComment');
@@ -801,10 +803,28 @@ if (typeof window.openBadgeZoomModal === 'function') {
 }
 
 async function copyPostShareUrl(contestRound, roundNo, shareSn) {
+    if (contestRound === 'None' || contestRound === 'undefined' || contestRound === 'null') contestRound = null;
+    if (roundNo === 'None' || roundNo === 'undefined' || roundNo === 'null') roundNo = null;
+    if (shareSn === 'None' || shareSn === 'undefined' || shareSn === 'null') shareSn = null;
+
+    if (!contestRound || !roundNo) {
+        if (window.currentMobileDetailPostData) {
+            const p = window.currentMobileDetailPostData;
+            contestRound = p.contest_id || p.CONTEST_ROUND || contestRound;
+            roundNo = p.round_no || p.ROUND_NO || roundNo;
+            shareSn = p.share_sn || p.SHARE_SN || shareSn;
+        }
+        if ((!contestRound || !roundNo) && window.currentMobileDetailPostId) {
+            const parts = String(window.currentMobileDetailPostId).split('_');
+            if (parts.length >= 2) {
+                contestRound = parts[0];
+                roundNo = parts[1];
+            }
+        }
+    }
+
     let shareUrl = '';
-    if (contestRound && roundNo && shareSn) {
-        shareUrl = `${window.location.origin}/share?contest_round=${contestRound}&round_no=${roundNo}&share_sn=${shareSn}`;
-    } else if (contestRound && roundNo) {
+    if (contestRound && roundNo) {
         try {
             const res = await fetch(`/api/contest/share_url?contest_round=${contestRound}&round_no=${roundNo}`);
             const data = await res.json();
@@ -812,8 +832,13 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
                 shareUrl = data.share_url;
             }
         } catch (e) {
-            console.error('copyPostShareUrl error:', e);
+            console.error('copyPostShareUrl API error:', e);
         }
+    }
+
+    if (!shareUrl && contestRound && roundNo) {
+        const sn = shareSn || 'S-UUID';
+        shareUrl = `${window.location.origin}/share?contest_round=${contestRound}&round_no=${roundNo}&share_sn=${sn}`;
     }
 
     if (!shareUrl) {
@@ -823,9 +848,9 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
     try {
         await navigator.clipboard.writeText(shareUrl);
         if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 클립보드에 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
+            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
         } else {
-            alert('🔗 전용 공유주소가 복사되었습니다!');
+            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
     } catch (err) {
         const tempInput = document.createElement('input');
@@ -837,7 +862,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         if (typeof showToast === 'function') {
             showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +1점이 적립됩니다.');
         } else {
-            alert('🔗 전용 공유주소가 복사되었습니다!');
+            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
     }
 }
