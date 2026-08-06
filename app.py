@@ -468,30 +468,32 @@ def route_share():
     current_user_id = get_current_user_id()
     is_logged_in = bool(current_user_id)
 
+    is_closed = False
     post = None
     if contest_round and round_no:
         post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
-        if post and share_sn:
+        if post:
             is_closed = bool(
                 post.get('is_closed') or 
                 post.get('closed') or 
                 (post.get('STATUS_CD') == 'G001C002') or 
                 (post.get('CONTEST_STAT') == 'G001C002')
             )
-            session['share_info'] = {
-                'contest_round': int(contest_round),
-                'round_no': int(round_no),
-                'share_sn': str(share_sn),
-                'post_id': f"{contest_round}_{round_no}",
-                'is_closed': is_closed
-            }
+            if share_sn:
+                session['share_info'] = {
+                    'contest_round': int(contest_round),
+                    'round_no': int(round_no),
+                    'share_sn': str(share_sn),
+                    'post_id': f"{contest_round}_{round_no}",
+                    'is_closed': is_closed
+                }
 
-            # 이미 회원인 사람이 로그인되어 있는 상태에서 공유 전용 페이지로 접속한 경우 즉시 점수 반영
-            if current_user_id:
-                try:
-                    service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
-                except Exception as e:
-                    print("route_share logged_in share_referral error:", e)
+                # 이미 회원인 사람이 로그인되어 있는 상태에서 공유 전용 페이지로 접속한 경우 즉시 점수 반영
+                if current_user_id:
+                    try:
+                        service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
+                    except Exception as e:
+                        print("route_share logged_in share_referral error:", e)
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(
@@ -501,7 +503,8 @@ def route_share():
         current_user_id=current_user_id,
         contest_round=contest_round,
         round_no=round_no,
-        share_sn=share_sn
+        share_sn=share_sn,
+        is_closed=is_closed
     )
 
 @app.route('/api/post/detail/<path:post_id>', methods=['GET'])
