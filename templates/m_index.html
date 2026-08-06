@@ -71,28 +71,25 @@
         </div>
     </div>
     
-    <!-- 2번째 줄: 검색 입력상자 & 검색 버튼 (폭 100%) -->
-    <form method="GET" action="/m/" class="m-search-form">
-        <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
-        <input type="hidden" name="sort" value="{{ sort_type }}">
-        <input type="hidden" name="pet_type" value="{{ pet_type }}">
-        <input type="text" name="q" value="{{ search_q }}" placeholder="검색어 입력..." class="m-search-input">
-        <button type="submit" class="m-search-btn" title="검색">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-    </form>
+    <!-- 2번째 줄: 검색 입력상자 & 정렬 콤보박스 (한 줄 나란히 배치) -->
+    <div class="m-search-sort-row">
+        <form method="GET" action="/m/" class="m-search-form">
+            <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
+            <input type="hidden" name="sort" value="{{ sort_type }}">
+            <input type="hidden" name="pet_type" value="{{ pet_type }}">
+            <div class="m-search-input-wrapper">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="검색어 입력..." class="m-search-input">
+                <button type="submit" class="m-search-btn-inside" title="검색">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </form>
 
-    <!-- 3. 정렬 탭 (우측: 최신등록순, 높은점수순, 낮은점수순) -->
-    <div class="m-sort-tab-group">
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'latest' or not sort_type }}">
-            <i class="fa-solid fa-clock"></i> 최신등록순
-        </a>
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'score' or sort_type == 'high_score' }}">
-            <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
-        </a>
-        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=low_score&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'low_score' }}">
-            <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
-        </a>
+        <select class="m-sort-select" onchange="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=' + this.value + '&pet_type={{ pet_type }}&q={{ search_q }}';">
+            <option value="latest" {{ 'selected' if sort_type == 'latest' or not sort_type }}>🕒 최신등록순</option>
+            <option value="score" {{ 'selected' if sort_type == 'score' or sort_type == 'high_score' }}>⬆️ 높은점수순</option>
+            <option value="low_score" {{ 'selected' if sort_type == 'low_score' }}>⬇️ 낮은점수순</option>
+        </select>
     </div>
 </div>
 
