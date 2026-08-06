@@ -687,15 +687,16 @@ body.m-body {
     color: #4f46e5;
 }
 
-/* 모바일 필터 스크롤바 */
+/* 모바일 필터 스크롤바 (좌우 마진 경계선 내부로 스크롤 범위 한정) */
 .m-filter-scroll {
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding: 0 0.85rem;
+    margin: 0 0.85rem 0.75rem 0.85rem;
+    padding: 0.15rem 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    margin-bottom: 0.75rem;
+    box-sizing: border-box;
 }
 
 .m-filter-scroll::-webkit-scrollbar {
