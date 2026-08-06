@@ -993,7 +993,7 @@ function renderMobileFeedGrid(posts) {
     if (!posts || posts.length === 0) {
         feedGrid.innerHTML = `
             <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; color: #64748b; background: #ffffff; border-radius: 16px; margin: 0 0.85rem;">
-                <i class="fa-solid fa-ghost" style="font-size: 2.8rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                <i class="fa-solid fa-paw" style="font-size: 2.8rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
                 <p style="font-size: 0.95rem; font-weight: 800; color: #334155;">조건에 맞는 참가 작품이 없습니다.</p>
                 <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.4rem;">다른 검색어나 필터를 선택해 보세요!</p>
             </div>
