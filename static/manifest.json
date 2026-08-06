@@ -1,1 +1,15 @@
-﻿{\n  " name\: \포스타\,\n \short_name\: \포스타\,\n \start_url\: \/m/\,\n \display\: \standalone\,\n \background_color\: \#ffffff\,\n \theme_color\: \#7c3aed\,\n \icons\: [\n {\n \src\: \/static/image/app/app_logo_icon.jpg\,\n \sizes\: \512x512\,\n \type\: \image/jpeg\\n }\n ]\n}
+{
+  "name": "포스타",
+  "short_name": "포스타",
+  "start_url": "/m/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/static/image/app/app_logo_icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

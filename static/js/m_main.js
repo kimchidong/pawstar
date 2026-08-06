@@ -201,9 +201,24 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
         }
     }
-    document.getElementById('mDetailScoreNum').textContent = (postData.score || 0).toLocaleString();
-    document.getElementById('mDetailTitle').textContent = postData.title || '';
-    document.getElementById('mDetailContent').textContent = postData.content || '';
+    document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
+    document.getElementById('mDetailTitle').textContent = postData.title || postData.TITLE || '';
+    document.getElementById('mDetailContent').textContent = postData.content || postData.CONTS || '';
+
+    // 4요소 실시간 액션 수치 팝업 세팅
+    const viewCnt = postData.view_count || postData.VW_CNT || 0;
+    const likeCnt = postData.like_count || postData.LIKE_CNT || 0;
+    const commentCnt = postData.comment_count || postData.CMT_CNT || 0;
+    const shareCnt = postData.share_count || postData.SHARE_CNT || 0;
+
+    const mValView = document.getElementById('mDetailViewCount');
+    if (mValView) mValView.textContent = Number(viewCnt).toLocaleString();
+    const mValLike = document.getElementById('mDetailLikeCount');
+    if (mValLike) mValLike.textContent = Number(likeCnt).toLocaleString();
+    const mValComment = document.getElementById('mDetailCommentCount');
+    if (mValComment) mValComment.textContent = Number(commentCnt).toLocaleString();
+    const mValShare = document.getElementById('mDetailShareCount');
+    if (mValShare) mValShare.textContent = Number(shareCnt).toLocaleString();
 
     // 모바일 팝업 랭킹 / 수상 배지 채우기 (오직 실물 메달/배지 이미지들만 전체부문 -> 품종부문 순서로 가로 나란히 표시)
     const mMedalsLeftEl = document.getElementById('mDetailMedalsLeft');
@@ -372,7 +387,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         }
     }
     
-    const mBtnSharePopup = document.getElementById('mDetailBtnShare');
+    let mBtnSharePopup = document.getElementById('mDetailBtnShare');
     if (mBtnSharePopup) mBtnSharePopup.classList.remove('active');
 
     if (mHeartIcon) {
@@ -1179,3 +1194,80 @@ window.handleMobileSearchSubmit = handleMobileSearchSubmit;
 window.selectMobileSortOption = selectMobileSortOption;
 window.selectMobilePetType = selectMobilePetType;
 window.fetchMobilePostsAjax = fetchMobilePostsAjax;
+
+async function triggerMobileEvent(postId, eventType) {
+    if (!window.isUserLoggedIn) {
+        if (typeof showToast === 'function') {
+            showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        } else {
+            alert('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾');
+        }
+        return;
+    }
+    try {
+        const res = await fetch(`/api/event/${postId}/${eventType}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
+            const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+            
+            const mScoreEl = document.getElementById('mDetailScoreNum');
+            if (mScoreEl && finalScore) mScoreEl.textContent = finalScore.toLocaleString();
+
+            const mLikeEl = document.getElementById('mDetailLikeCount');
+            if (mLikeEl && finalLike !== undefined) mLikeEl.textContent = Number(finalLike).toLocaleString();
+
+            const mBtnLikePopup = document.getElementById('mDetailBtnLike');
+            const mHeartIcon = document.getElementById('mDetailHeartIcon');
+            if (mBtnLikePopup && mHeartIcon) {
+                const isLiked = data.is_liked !== undefined ? data.is_liked : true;
+                if (isLiked) {
+                    mBtnLikePopup.classList.add('active');
+                    mHeartIcon.className = 'fa-solid fa-heart';
+                    mHeartIcon.style.color = '#e11d48';
+                } else {
+                    mBtnLikePopup.classList.remove('active');
+                    mHeartIcon.className = 'fa-regular fa-heart';
+                    mHeartIcon.style.color = '';
+                }
+            }
+
+            const cleanId = String(postId);
+            const rawEntId = cleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`m-post-card-${cleanId}`) || 
+                         document.getElementById(`m-post-card-${rawEntId}`) ||
+                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+
+            if (card) {
+                const btnCardLike = card.querySelector('.btn-like') || card.querySelector('.m-btn-action.btn-like');
+                if (btnCardLike) {
+                    const isLiked = data.is_liked !== undefined ? data.is_liked : true;
+                    btnCardLike.classList.toggle('active', isLiked);
+                    const icon = btnCardLike.querySelector('i');
+                    if (icon) {
+                        icon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                        if (isLiked) icon.style.color = '#e11d48';
+                        else icon.style.color = '';
+                    }
+                }
+
+                const cardLike = card.querySelector('.like-count');
+                if (cardLike && finalLike !== undefined) {
+                    cardLike.textContent = Number(finalLike).toLocaleString();
+                }
+
+                const cardScore = card.querySelector('.m-card-score, .score-num');
+                if (cardScore && finalScore) {
+                    cardScore.textContent = `⭐ ${finalScore.toLocaleString()}`;
+                }
+            }
+        } else {
+            if (typeof showToast === 'function') showToast(data.message || '요청 처리 실패', 'warning');
+        }
+    } catch (err) {
+        console.error('triggerMobileEvent error:', err);
+    }
+}
+window.triggerMobileEvent = triggerMobileEvent;

@@ -80,34 +80,52 @@
 
     <!-- 모바일 상세보기 모달 -->
     <div class="m-modal-backdrop" id="mDetailModal" onclick="if(event.target===this) closeMobileDetailModal();">
-        <div class="m-modal-sheet" style="max-height: 95vh; padding: 1.25rem;">
+        <div class="m-modal-sheet" style="max-height: 92vh; padding: 1.25rem;">
             <div class="m-modal-header" style="margin-bottom: 0.75rem;">
-                <h3 id="mDetailTitle">게시물 상세</h3>
-                <button type="button" class="btn-close" onclick="closeMobileDetailModal()">&times;</button>
+                <h3 id="mDetailTitle" style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 85%;">게시물 상세</h3>
+                <button type="button" class="btn-close" onclick="closeMobileDetailModal()" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--text-muted);">&times;</button>
             </div>
-            <div style="width: 100%; aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative;">
+            <div style="width: 100%; aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative; box-shadow: var(--shadow-soft);">
                 <img id="mDetailImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
                 <div id="mDetailMedalsLeft" style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; pointer-events: auto;"></div>
                 <div id="mDetailRankBadge" style="position: absolute; top: 0.5rem; right: 0.5rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; pointer-events: auto;"></div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <img id="mDetailAuthorImg" src="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);">
-                    <div>
-                        <div id="mDetailAuthorNickname" style="font-size: 0.85rem; font-weight: 800;">집사</div>
-                        <div id="mDetailPetTag" style="font-size: 0.75rem; color: var(--accent-pink); font-weight: 700;">강아지</div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                    <img id="mDetailAuthorImg" src="" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;">
+                    <div style="min-width: 0;">
+                        <div id="mDetailAuthorNickname" style="font-size: 0.85rem; font-weight: 800; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">집사</div>
+                        <div id="mDetailPetTag" style="font-size: 0.75rem; font-weight: 700;">강아지</div>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                    <div style="background: #fffbeb; border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
+                    <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.1);">
                         ⭐ <span id="mDetailScoreNum">0</span> 점
                     </div>
-                    <button type="button" id="mDetailShareIconBtn" onclick="handleShareClick();" class="btn-share-action" title="전용 공유주소 복사 (회원가입/로그인 시 +10점)" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                    <button type="button" id="mDetailShareIconBtn" onclick="handleShareClick();" class="btn-share-action" title="전용 공유주소 복사 (회원가입/로그인 시 +10점)" style="width: 32px; height: 32px; font-size: 0.95rem; border-radius: 50%; border: 1px solid var(--border-light); background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--accent-purple);">
                         <i class="fa-solid fa-share-nodes"></i>
                     </button>
                 </div>
             </div>
-            <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;"></p>
+            
+            <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.85rem; white-space: pre-wrap; word-break: break-all;"></p>
+
+            <!-- 실시간 4요소 수치 (조회수, 좋아요, 댓글수, 공유수 - PC 팝업과 동일 스타일) -->
+            <div class="m-card-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.75rem; text-align: center;">
+                <div class="m-btn-action btn-view" id="mDetailBtnView" title="조회수" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #f0f9ff; border: 1px solid #bae6fd; color: #0284c7; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                    <i class="fa-regular fa-eye"></i> <span class="view-count" id="mDetailViewCount">0</span>
+                </div>
+                <div class="m-btn-action btn-like" id="mDetailBtnLike" title="좋아요 수" onclick="if(window.currentMobileDetailPostId) triggerMobileEvent(window.currentMobileDetailPostId, 'like');" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                    <i class="fa-regular fa-heart" id="mDetailHeartIcon"></i> <span class="like-count" id="mDetailLikeCount">0</span>
+                </div>
+                <div class="m-btn-action btn-comment" id="mDetailBtnComment" title="댓글 수" onclick="document.getElementById('mDetailCommentInput')?.focus();" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #faf5ff; border: 1px solid #e9d5ff; color: #7c3aed; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                    <i class="fa-regular fa-comment"></i> <span class="comment-count" id="mDetailCommentCount">0</span>
+                </div>
+                <div class="m-btn-action btn-share" id="mDetailBtnShare" title="공유 가입 수" onclick="handleShareClick();" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                    <i class="fa-solid fa-share-nodes"></i> <span class="share-count" id="mDetailShareCount">0</span>
+                </div>
+            </div>
 
             <!-- 모바일 한줄 댓글 입력 및 목록 -->
             <div style="border-top: 1px solid var(--border-light); padding-top: 0.75rem; margin-top: 0.75rem;">
