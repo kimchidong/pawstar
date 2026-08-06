@@ -194,12 +194,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             else if (mKindNm.includes('페럿')) icon = '🦦';
             mKindNm = `${icon} ${mKindNm}`;
         }
-        const mPetNm = postData.PET_NM || postData.pet_name || '';
-        if (mPetNm) {
-            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${mPetNm}</span>`;
-        } else {
-            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
-        }
+        mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
     }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
     document.getElementById('mDetailTitle').textContent = postData.title || postData.TITLE || '';
