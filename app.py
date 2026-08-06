@@ -178,6 +178,9 @@ def api_auth_login():
 
     success, result = service.authenticate_user(user_id, password)
     if success:
+        # 공유 유입 접속 후 기존 회원 로그인 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
+        process_signup_share_referral(new_user_id=user_id)
+
         is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
         target_url = get_post_login_redirect_url(is_mobile=is_mobile)
 
@@ -190,7 +193,7 @@ def api_auth_login():
         return jsonify({'success': False, 'message': result}), 401
 
 def process_signup_share_referral(new_user_id=None):
-    """ 공유 링크 유입 가입 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 """
+    """ 공유 링크 유입 가입/로그인 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 """
     share_info = session.get('share_info')
     if share_info and isinstance(share_info, dict):
         c_round = share_info.get('contest_round')
@@ -383,7 +386,7 @@ def auth_google_callback():
         # 3. PawStar 서비스 회원 가입/로그인 처리
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
-        if user_info and user_info.get('is_new_user'):
+        if user_info:
             process_signup_share_referral(new_user_id=user_info['user_id'])
 
         saved_next_url = session.get('next_url') or '/'
@@ -418,7 +421,7 @@ def api_auth_google():
 
     user_info = service.google_login_or_register(google_id, email, name, picture)
 
-    if user_info and user_info.get('is_new_user'):
+    if user_info:
         process_signup_share_referral(new_user_id=user_info['user_id'])
 
     is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
@@ -482,6 +485,13 @@ def route_share():
                 'post_id': f"{contest_round}_{round_no}",
                 'is_closed': is_closed
             }
+
+            # 이미 회원인 사람이 로그인되어 있는 상태에서 공유 전용 페이지로 접속한 경우 즉시 점수 반영
+            if current_user_id:
+                try:
+                    service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
+                except Exception as e:
+                    print("route_share logged_in share_referral error:", e)
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(

@@ -285,6 +285,27 @@ class PawStarService:
             print("is_user_exists error:", e)
             return False
 
+    def authenticate_user(self, user_id, password=None):
+        """ 사용자 ID로 회원 정보 확인 및 로그인 인증 처리 """
+        if not user_id:
+            return False, "아이디를 입력해주세요."
+        conn = self.get_db_connection()
+        if not conn:
+            return False, "DB 연결 실패"
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                user = cur.fetchone()
+                conn.close()
+                if user:
+                    nk = user.get('NK_NM', user_id)
+                    img = user.get('PROFILE_URL', '')
+                    return True, {'user_id': user_id, 'nickname': nk, 'profile_img': img}
+                return False, "존재하지 않는 회원입니다."
+        except Exception as e:
+            print("authenticate_user error:", e)
+            return False, "로그인 처리 중 오류가 발생했습니다."
+
     def register_user(self, user_id, nickname, password="", profile_img="", **kwargs):
         conn = self.get_db_connection()
         if not conn:
@@ -782,8 +803,8 @@ class PawStarService:
             return None
 
     def increment_share_count_on_signup(self, contest_id, round_no, share_sn, user_id=None):
-        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 시 PST_CONTEST_SHARE 저장, 공유횟수 +1 및 점수 +1 반영
-            단, 진행 중인 회차(CONTEST_STAT = 'G001C001')에 한해서만 반영. 과거(종료) 회차는 무시. """
+        """ 공유주소(CONTEST_ROUND, ROUND_NO, SHARE_SN)를 통한 회원가입 및 기존 회원 로그인 유입 시 PST_CONTEST_SHARE 저장, 공유횟수 +1 및 점수 +1 반영
+            단, 진행 중인 회차(CONTEST_STAT = 'G001C001')에 한해서만 반영. 과거(종료) 회차 및 중복 유입/자가 공유는 무시. """
         conn = self.get_db_connection()
         if not conn:
             return False
@@ -808,9 +829,9 @@ class PawStarService:
                     conn.close()
                     return False
 
-                # 2. 게시물(SHARE_SN) 존재 확인
+                # 2. 게시물(SHARE_SN) 및 작성자 정보 확인
                 cur.execute("""
-                    SELECT CONTEST_ROUND, ROUND_NO, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
+                    SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
                     FROM pst_contest_round
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_SN = %s
                 """, (contest_id, round_no, share_sn))
@@ -819,12 +840,24 @@ class PawStarService:
                     conn.close()
                     return False
 
-                # 3. 공유 가입 이력 기록
+                # 게시글 작성자 본인 유입 시 점수 반영 불가
+                author_id = row.get('ENT_USER_ID')
+                if user_id and author_id and str(user_id) == str(author_id):
+                    print(f"increment_share_count_on_signup: user {user_id} is author of contest {contest_id}-{round_no}, skip self-share.")
+                    conn.close()
+                    return False
+
+                # 3. 공유 유입 이력 기록 (중복 유입 방지)
                 if user_id:
-                    cur.execute("""
+                    affected = cur.execute("""
                         INSERT IGNORE INTO pst_contest_share (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
                         VALUES (%s, %s, %s)
                     """, (contest_id, round_no, user_id))
+                    if affected == 0:
+                        # 이미 해당 유저의 공유 유입 점수가 반영되었음
+                        print(f"increment_share_count_on_signup: user {user_id} already registered share for {contest_id}-{round_no}, skip duplicate.")
+                        conn.close()
+                        return False
 
                 # 4. 공유 카운트 및 점수 반영
                 new_share_cnt = row['SHARE_CNT'] + 1
