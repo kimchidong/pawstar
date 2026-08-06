@@ -1019,11 +1019,13 @@ function renderMobileFeedGrid(posts) {
         const pDt = (p.REG_DT || p.created_at || '').toString().substring(0, 10);
         const pPostJsonData = JSON.stringify(p).replace(/"/g, '&quot;');
 
+        const pPetNm = p.PET_NM || p.pet_name || '';
+        const pContestRound = p.CONTEST_ROUND || p.contest_id || mobileFilterState.contest_id;
+
         html += `
         <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
             <div class="m-card-thumb">
                 <img src="${pImg}" alt="${pTitle}" loading="lazy">
-                <span class="m-card-kind-badge"><i class="fa-solid fa-paw"></i> ${pKind}</span>
             </div>
 
             <div class="m-card-body">
@@ -1031,30 +1033,36 @@ function renderMobileFeedGrid(posts) {
                     <img src="${pAvatar}" alt="${pUserNm}" class="m-author-avatar">
                     <div class="m-author-info">
                         <div class="m-author-name">${pUserNm}</div>
-                        <div class="m-post-title">${pTitle}</div>
+                        <div class="m-pet-tag">
+                            <span class="m-pet-kind-text"><i class="fa-solid fa-paw"></i> ${pKind}</span>
+                            ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
+                        </div>
                     </div>
                 </div>
 
-                ${pConts ? `<div class="m-card-desc">${pConts}</div>` : ''}
+                <h3 class="m-post-title">${pTitle}</h3>
+                ${pConts ? `<p class="m-post-desc">${pConts}</p>` : ''}
 
-                <div class="m-card-meta-bar">
-                    <span class="m-post-date"><i class="fa-regular fa-clock"></i> ${pDt}</span>
-                    <span class="m-card-total-score"><i class="fa-solid fa-crown"></i> ${pScore}점</span>
+                <div class="m-card-meta-divider">
+                    <span class="m-post-date">${pDt}</span>
+                    <div class="m-card-total-score">
+                        <i class="fa-solid fa-star"></i> <span class="score-num">${pScore.toLocaleString()}</span> 점
+                    </div>
                 </div>
 
-                <div class="m-card-actions">
-                    <button type="button" class="m-btn-action" title="조회수">
-                        <i class="fa-regular fa-eye"></i> <span>${pViewCount}</span>
-                    </button>
-                    <button type="button" class="m-btn-action" title="좋아요">
-                        <i class="fa-solid fa-heart" style="color: #ef4444;"></i> <span>${pHeartCount}</span>
-                    </button>
-                    <button type="button" class="m-btn-action" title="댓글">
-                        <i class="fa-regular fa-comment"></i> <span>${pCommentCount}</span>
-                    </button>
-                    <button type="button" class="m-btn-action" title="공유점수">
-                        <i class="fa-solid fa-share-nodes" style="color: #8b5cf6;"></i> <span>${pShareScore}</span>
-                    </button>
+                <div class="m-card-actions" onclick="event.stopPropagation();">
+                    <div class="m-btn-action btn-view" title="조회수">
+                        <i class="fa-regular fa-eye"></i> <span>${pViewCount.toLocaleString()}</span>
+                    </div>
+                    <div class="m-btn-action btn-like" title="좋아요 수">
+                        <i class="fa-regular fa-heart"></i> <span>${pHeartCount.toLocaleString()}</span>
+                    </div>
+                    <div class="m-btn-action btn-comment" title="댓글 수">
+                        <i class="fa-regular fa-comment"></i> <span>${pCommentCount.toLocaleString()}</span>
+                    </div>
+                    <div class="m-btn-action btn-share" title="공유가입 수">
+                        <i class="fa-solid fa-share-nodes"></i> <span>${pShareScore.toLocaleString()}</span>
+                    </div>
                 </div>
             </div>
         </div>

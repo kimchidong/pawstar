@@ -161,49 +161,47 @@
                     <div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
             </div>
-            <div class="m-card-content">
-                <!-- 작성자 프로필 정보 -->
-                <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <img src="{{ p.PROFILE_URL or p.user_profile }}" alt="profile">
-                        <div>
-                            <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-primary);">{{ p.NK_NM or p.user_nickname }}</div>
-                            <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: var(--text-secondary);">
-                                <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
-                                {% if p.PET_NM or p.pet_name %}
-                                    <span style="color: #6d28d9; font-weight: 700;">• {{ p.PET_NM or p.pet_name }}</span>
-                                {% endif %}
-                            </div>
+            <div class="m-card-body">
+                <!-- 작성자 프로필 및 펫 태그 -->
+                <div class="m-card-author">
+                    <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or p.user_avatar or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname }}" class="m-author-avatar">
+                    <div class="m-author-info">
+                        <div class="m-author-name">{{ p.NK_NM or p.user_nickname or '익명' }}</div>
+                        <div class="m-pet-tag">
+                            <span class="m-pet-kind-text"><i class="{{ p_icon_class }}"></i> {{ p.KIND_NM or p.pet_type }}</span>
+                            {% if p.PET_NM or p.pet_name %}
+                                <span class="m-pet-name-text">• {{ p.PET_NM or p.pet_name }}</span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
-                <!-- 제목 및 본문 요약 -->
-                <div class="m-card-title">{{ p.TITLE or p.title }}</div>
+                <!-- 제목 및 본문 요약 (PC와 동일하게 제목 단독 노출) -->
+                <h3 class="m-post-title">{{ p.TITLE or p.title }}</h3>
                 {% if p.CONTS or p.content %}
-                    <div class="m-card-desc">{{ p.CONTS or p.content }}</div>
+                    <p class="m-post-desc">{{ p.CONTS or p.content }}</p>
                 {% endif %}
 
-                <!-- 등록 일시 및 총 점수 바 -->
-                <div class="m-card-meta-bar">
-                    <span><i class="fa-regular fa-clock"></i> {{ (p.ENT_DT or p.created_at)|string }}</span>
+                <!-- 구분선 + 등록일시 & PC 동일 노란 알약 총 점수 배지 -->
+                <div class="m-card-meta-divider">
+                    <span class="m-post-date">{{ (p.ENT_DT or p.created_at)|string }}</span>
                     <div class="m-card-total-score">
-                        <i class="fa-solid fa-star"></i> <span>{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}점</span>
+                        <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}</span> 점
                     </div>
                 </div>
 
                 <!-- 실시간 4요소 수치 (조회, 좋아요, 댓글, 공유가입) -->
-                <div class="m-card-footer card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; align-items: center;">
-                    <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
+                <div class="m-card-actions" onclick="event.stopPropagation();">
+                    <div class="m-btn-action btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
                     </div>
-                    <div class="action-btn btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 수">
+                    <div class="m-btn-action btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i> <span class="like-count">{{ "{:,}".format((p.like_count or p.LIKE_CNT or 0)|int) }}</span>
                     </div>
-                    <div class="action-btn btn-comment {% if is_logged_in and p.actions and p.actions.is_commented %}active{% endif %}" title="댓글 수">
+                    <div class="m-btn-action btn-comment {% if is_logged_in and p.actions and p.actions.is_commented %}active{% endif %}" title="댓글 수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i> <span class="comment-count">{{ "{:,}".format((p.comment_count or p.CMT_CNT or 0)|int) }}</span>
                     </div>
-                    <div class="action-btn btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수">
+                    <div class="m-btn-action btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수">
                         <i class="fa-solid fa-share-nodes"></i> <span class="share-count">{{ "{:,}".format((p.share_count or p.SHARE_CNT or 0)|int) }}</span>
                     </div>
                 </div>
