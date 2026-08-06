@@ -361,7 +361,7 @@ body.m-body {
 /* 모바일 필터 & 검색 통합 바 (3줄 개별 분리 구조) */
 .m-filter-section {
     padding: 0 0.85rem;
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.65rem;
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
