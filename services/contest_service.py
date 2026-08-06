@@ -491,7 +491,7 @@ class PawStarService:
                 elif join_val:
                     user_info['join_date'] = str(join_val)
                 else:
-                    user_info['join_date'] = '2026-08-01 10:00:00'
+                    user_info['join_date'] = '-'
 
                 lgn_val = user_info.get('LGN_DT') or user_info.get('lgn_dt') or user_info.get('LAST_LOGIN') or user_info.get('last_login')
                 if hasattr(lgn_val, 'strftime'):
@@ -499,7 +499,7 @@ class PawStarService:
                 elif lgn_val:
                     user_info['last_login'] = str(lgn_val)
                 else:
-                    user_info['last_login'] = '2026-08-05 06:55:00'
+                    user_info['last_login'] = '-'
 
                 query = """
                     SELECT 
@@ -667,7 +667,12 @@ class PawStarService:
                         'PROFILE_URL': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
                         'user_id': user_info['USER_ID'],
                         'nickname': user_info.get('NK_NM', user_id),
-                        'profile_img': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png')
+                        'profile_img': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
+                        'join_date': user_info.get('join_date', '-'),
+                        'last_login': user_info.get('last_login', '-'),
+                        'JOIN_DT': str(user_info.get('JOIN_DT', '')),
+                        'LGN_DT': str(user_info.get('LGN_DT', '')),
+                        'LGN_CNT': user_info.get('LGN_CNT', 0)
                     },
                     'stats': {
                         'my_post_count': my_post_count,

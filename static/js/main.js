@@ -1668,13 +1668,28 @@ document.addEventListener('keydown', (e) => {
 window.openBadgeZoomModal = openBadgeZoomModal;
 window.closeBadgeZoomModal = closeBadgeZoomModal;
 
-// 전역 모달 외부 배경(Backdrop) 클릭 시 팝업 닫기 이벤트 핸들러
-document.addEventListener('click', function(e) {
-    if (e.target && (e.target.classList.contains('modal-backdrop') || e.target.classList.contains('m-modal-backdrop'))) {
-        e.target.classList.remove('show', 'active');
-        e.target.style.display = 'none';
-        if (typeof closeGoogleAuthModal === 'function') {
-            closeGoogleAuthModal();
+// URL 쿼리 파라미터 open_post 감지 시 자동 팝업 오픈
+function checkAndAutoOpenPost() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const openPostId = urlParams.get('open_post');
+    if (openPostId) {
+        if (window.postsDataStore && window.postsDataStore[openPostId]) {
+            openDetailModal(window.postsDataStore[openPostId]);
+        } else {
+            fetch(`/api/post/detail/${openPostId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.post) {
+                        openDetailModal(data.post);
+                    }
+                })
+                .catch(err => console.error('자동 포스트 팝업 실패:', err));
         }
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(checkAndAutoOpenPost, 300);
 });

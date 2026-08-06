@@ -305,7 +305,11 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        if (data.target_url) {
+                            location.href = data.target_url;
+                        } else {
+                            location.reload();
+                        }
                     } else {
                         if (typeof showToast === 'function') showToast('❌ ' + (data.message || '로그인 실패'));
                     }
@@ -335,7 +339,13 @@
                 .then(data => {
                     if (data.success) {
                         if (typeof showToast === 'function') showToast('🎉 회원가입 성공! 로그인 중...');
-                        setTimeout(() => location.reload(), 1000);
+                        setTimeout(() => {
+                            if (data.target_url) {
+                                location.href = data.target_url;
+                            } else {
+                                location.reload();
+                            }
+                        }, 1000);
                     } else {
                         if (typeof showToast === 'function') showToast('❌ ' + (data.message || '회원가입 실패'));
                     }
@@ -420,7 +430,11 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        location.href = '/m/profile';
+                        if (data.target_url) {
+                            location.href = data.target_url;
+                        } else {
+                            location.href = '/m/profile';
+                        }
                     }
                 });
             });

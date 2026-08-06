@@ -480,7 +480,13 @@
             if (!user_id || !password) return;
             fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, password}) })
             .then(r => r.json()).then(data => {
-                if (data.success) location.reload();
+                if (data.success) {
+                    if (data.target_url) {
+                        location.href = data.target_url;
+                    } else {
+                        location.reload();
+                    }
+                }
                 else if (typeof showToast==='function') showToast('❌ ' + (data.message||'로그인 실패'));
                 else alert(data.message||'로그인 실패');
             });
@@ -494,7 +500,16 @@
             if (!user_id || !nickname || !password) return;
             fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, nickname, password}) })
             .then(r => r.json()).then(data => {
-                if (data.success) { if(typeof showToast==='function') showToast('🎉 회원가입 성공!'); setTimeout(() => location.reload(), 800); }
+                if (data.success) { 
+                    if(typeof showToast==='function') showToast('🎉 회원가입 성공!'); 
+                    setTimeout(() => {
+                        if (data.target_url) {
+                            location.href = data.target_url;
+                        } else {
+                            location.reload();
+                        }
+                    }, 800); 
+                }
                 else if (typeof showToast==='function') showToast('❌ ' + (data.message||'회원가입 실패'));
                 else alert(data.message||'회원가입 실패');
             });

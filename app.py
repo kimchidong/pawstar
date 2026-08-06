@@ -146,6 +146,26 @@ def withdraw():
         return jsonify({'success': True, 'message': 'PawStar 회원 탈퇴 및 Google 서버의 계정 연동 동의 철회가 성공적으로 처리되었습니다. 그동안 이용해주셔서 감사합니다. 🐾'})
     return redirect(url_for('index'))
 
+def get_post_login_redirect_url(is_mobile=False):
+    """
+    공유 정보(share_info)가 세션에 존재할 때,
+    - 과거(종료) 회차인 경우: 메인 피드('/m/' 또는 '/')
+    - 현재 진행 중인 회차인 경우: 메인 피드 + open_post 쿼리 파라미터('/m/?open_post=X_Y' 또는 '/?open_post=X_Y')
+    반환하며, 없는 경우 None 리턴
+    """
+    share_info = session.get('share_info')
+    if share_info and isinstance(share_info, dict):
+        is_closed = share_info.get('is_closed', False)
+        post_id = share_info.get('post_id') or (f"{share_info.get('contest_round')}_{share_info.get('round_no')}" if share_info.get('contest_round') and share_info.get('round_no') else None)
+        
+        if is_closed:
+            return '/m/' if is_mobile else '/'
+        else:
+            if post_id:
+                return f"/m/?open_post={post_id}" if is_mobile else f"/?open_post={post_id}"
+            return '/m/' if is_mobile else '/'
+    return None
+
 @app.route('/api/auth/login', methods=['POST'])
 def api_auth_login():
     """ 로그인 API (user_id & password) """
@@ -158,11 +178,14 @@ def api_auth_login():
 
     success, result = service.authenticate_user(user_id, password)
     if success:
+        is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+        target_url = get_post_login_redirect_url(is_mobile=is_mobile)
+
         session.clear()
         session['user_id'] = user_id
         session['last_activity'] = datetime.datetime.now().timestamp()
         session.pop('logged_out', None)
-        return jsonify({'success': True, 'message': f'{result["nickname"]}님 환영합니다!', 'user': result})
+        return jsonify({'success': True, 'message': f'{result["nickname"]}님 환영합니다!', 'user': result, 'target_url': target_url})
     else:
         return jsonify({'success': False, 'message': result}), 401
 
@@ -203,12 +226,15 @@ def api_auth_register():
     # 공유 유입 회원가입 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
     process_signup_share_referral(new_user_id=user_id)
 
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+    target_url = get_post_login_redirect_url(is_mobile=is_mobile)
+
     session.clear()
     session['user_id'] = user_id
     session['last_activity'] = datetime.datetime.now().timestamp()
     session.pop('logged_out', None)
 
-    return jsonify({'success': True, 'message': '회원가입이 완료되었습니다!', 'user': new_user})
+    return jsonify({'success': True, 'message': '회원가입이 완료되었습니다!', 'user': new_user, 'target_url': target_url})
 
 @app.route('/api/auth/setup_profile', methods=['POST'])
 def api_auth_setup_profile():
@@ -234,6 +260,9 @@ def api_auth_setup_profile():
     # 공유 유입 회원가입 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
     process_signup_share_referral(new_user_id=auto_uuid)
 
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+    target_url = get_post_login_redirect_url(is_mobile=is_mobile)
+
     session.clear()
     session['user_id'] = auto_uuid
     session['has_setup'] = True
@@ -244,7 +273,8 @@ def api_auth_setup_profile():
         'success': True,
         'message': f'프로필 설정 및 회원가입이 성공적으로 완료되었습니다!',
         'auth_code': password,
-        'user': new_user
+        'user': new_user,
+        'target_url': target_url
     })
 
 # Load environment variables from .env file directly if python-dotenv is not active
@@ -284,7 +314,10 @@ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI = get_google_config(
 @app.route('/auth/google')
 def auth_google_redirect():
     """ 팝업 창을 구글 공식 OAuth 2.0 Authorization Code 인증 페이지로 직접 리다이렉트 (response_type=code) """
-    next_url = request.args.get('next') or request.args.get('return_url') or '/'
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+    target_url = get_post_login_redirect_url(is_mobile=is_mobile)
+
+    next_url = request.args.get('next') or request.args.get('return_url') or target_url or '/'
     session['next_url'] = next_url
     client_id, client_secret, redirect_uri = get_google_config()
     google_auth_url = (
@@ -385,6 +418,12 @@ def api_auth_google():
 
     user_info = service.google_login_or_register(google_id, email, name, picture)
 
+    if user_info and user_info.get('is_new_user'):
+        process_signup_share_referral(new_user_id=user_info['user_id'])
+
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
+    target_url = get_post_login_redirect_url(is_mobile=is_mobile)
+
     session.clear()
     session['user_id'] = user_info['user_id']
     session['user'] = user_info
@@ -396,10 +435,9 @@ def api_auth_google():
     return jsonify({
         'success': True,
         'message': f'{user_info["nickname"]}님, Google 계정({email}) 인증으로 성공적으로 로그인되었습니다!',
-        'user': user_info
+        'user': user_info,
+        'target_url': target_url
     })
-
-
 
 def is_mobile_user_agent():
     """ 클라이언트 User-Agent를 판별하여 모바일 기기 접속 여부 반환 """
@@ -431,10 +469,18 @@ def route_share():
     if contest_round and round_no:
         post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
         if post and share_sn:
+            is_closed = bool(
+                post.get('is_closed') or 
+                post.get('closed') or 
+                (post.get('STATUS_CD') == 'G001C002') or 
+                (post.get('CONTEST_STAT') == 'G001C002')
+            )
             session['share_info'] = {
                 'contest_round': int(contest_round),
                 'round_no': int(round_no),
-                'share_sn': str(share_sn)
+                'share_sn': str(share_sn),
+                'post_id': f"{contest_round}_{round_no}",
+                'is_closed': is_closed
             }
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
@@ -447,6 +493,28 @@ def route_share():
         round_no=round_no,
         share_sn=share_sn
     )
+
+@app.route('/api/post/detail/<path:post_id>', methods=['GET'])
+def api_post_detail(post_id):
+    """ 단건 게시물 상세 정보 조회 API (자동 팝업 오픈용) """
+    contest_round = None
+    round_no = None
+    post_id_str = str(post_id)
+    if '_' in post_id_str:
+        parts = post_id_str.split('_', 1)
+        contest_round = parts[0]
+        round_no = parts[1]
+    else:
+        round_no = post_id_str
+    
+    current_user_id = get_current_user_id()
+    post = None
+    if contest_round and round_no:
+        post = service.get_post_detail(contest_round, round_no, current_user_id)
+    
+    if post:
+        return jsonify({'success': True, 'post': post})
+    return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
 
 @app.route('/api/contest/share_url', methods=['GET', 'POST'])
 def api_contest_share_url():
