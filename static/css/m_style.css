@@ -205,20 +205,28 @@ body.m-body {
 .m-nav-item.m-nav-upload.active .m-nav-upload-btn {
     box-shadow: 0 0 0 3px var(--accent-purple), 0 6px 20px rgba(124, 58, 237, 0.5);
     transform: scale(1.06);
+    border-radius: 50% !important;
 }
 
 .m-nav-upload-btn {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    min-width: 48px;
+    min-height: 48px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50% !important;
     background: var(--gradient-brand);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 15px rgba(124, 58, 237, 0.35);
-    border: 3px solid #ffffff;
-    font-size: 1.2rem;
+    border: 3.5px solid #ffffff;
+    box-sizing: border-box;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 /* 모바일 히어로 배너 */
