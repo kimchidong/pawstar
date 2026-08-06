@@ -33,6 +33,23 @@ document.addEventListener('DOMContentLoaded', function() {
         selectEl.addEventListener('change', updateSelectBg);
     });
 
+    // 모바일 커스텀 회차 드롭다운 토글 및 바깥 클릭 닫기
+    const mCustomContestDropdown = document.getElementById('mCustomContestDropdown');
+    if (mCustomContestDropdown) {
+        const trigger = mCustomContestDropdown.querySelector('.custom-contest-trigger');
+        if (trigger) {
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mCustomContestDropdown.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (!mCustomContestDropdown.contains(e.target)) {
+                mCustomContestDropdown.classList.remove('open');
+            }
+        });
+    }
+
     // 1. 모바일 자랑하기 (/m/upload 전용 페이지 전환 적용)
     const mBtnUploadNav = document.getElementById('mBtnUploadNav');
     const mUploadModal = document.getElementById('mUploadModal');
@@ -396,7 +413,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const mBtnViewPopup = document.getElementById('mDetailBtnView');
     const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
-    const mBtnSharePopup = document.getElementById('mDetailBtnShare');
+    mBtnSharePopup = mBtnSharePopup || document.getElementById('mDetailBtnShare');
 
     if (isClosedRound) {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';

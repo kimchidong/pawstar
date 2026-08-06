@@ -2,56 +2,137 @@
 
 {% block content %}
 
-<!-- 모바일 히어로 배너 (PST_THEME 테이블의 BANNER_IMG_FILE_PATH 중앙 정렬 바인딩) -->
-<div class="m-hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(79, 70, 229, 0.6) 100%), url('{{ current_contest.BANNER_IMG_FILE_PATH or current_contest.banner_img }}') center center / cover no-repeat;">
+<!-- 모바일 히어로 배너 (PST_THEME 테이블 BANNER_IMG_FILE_PATH 바인딩 + PC 스타일 D-DAY 미니 카드) -->
+<div class="m-hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.72) 0%, rgba(79, 70, 229, 0.62) 50%, rgba(225, 29, 72, 0.48) 100%), url('{{ current_contest.BANNER_IMG_FILE_PATH or current_contest.banner_img }}') center center / cover no-repeat;">
     {% set is_closed = (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str == '종료됨') if current_contest else False %}
-    {% if is_closed %}
-        <div class="m-hero-badge closed"><span>{{ current_contest.contest_year_month or '해당 년월 콘테스트' }}</span> | {{ current_contest.d_day_str or '종료' }}</div>
-    {% else %}
-        <div class="m-hero-badge">{{ current_contest.d_day_str if current_contest else 'D-DAY' }} | {{ current_contest.CONTEST_STAT_NM or current_contest.status if current_contest else '진행중' }}</div>
-    {% endif %}
-    <h2>{% if current_contest %}<span class="hero-round-badge">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}{% else %}Paw Star 콘테스트{% endif %}</h2>
+    
+    <h2>{% if current_contest %}<span class="hero-round-badge" style="color: #fef08a;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}{% else %}Paw Star 콘테스트{% endif %}</h2>
     <p>{{ current_contest.THEME_MENT or current_contest.CONTS or current_contest.description if current_contest else '대한민국 대표 펫 스타에 도전하세요!' }}</p>
-    <a href="/m/upload" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #ffffff; color: #4f46e5; font-weight: 800; font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; margin-top: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-        <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
-    </a>
+    
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 0.75rem; margin-bottom: 0.25rem;">
+        {% if is_closed %}
+            <div class="m-hero-badge closed"><span>{{ current_contest.contest_year_month or '콘테스트 마감' }}</span></div>
+        {% else %}
+            <div class="m-hero-badge"><span class="live-dot"></span> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status if current_contest else '진행중' }}</span></div>
+        {% endif %}
+        
+        <a href="/m/upload" class="m-btn-hero-cta">
+            <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
+        </a>
+    </div>
+
+    <!-- 모바일 콘테스트 기간 & D-DAY 슬림 카드 -->
+    <div class="m-hero-contest-card">
+        <div class="m-dday-period-box">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span class="period-dates">{{ ((current_contest.ST_DT or current_contest.start_date)|string)[:10] if current_contest else '2026-08-01' }} ~ {{ ((current_contest.ED_DT or current_contest.end_date)|string)[:10] if current_contest else '2026-08-31' }}</span>
+        </div>
+        <div class="m-hero-dday-badge">
+            <span>{{ current_contest.d_day_str if current_contest else 'D-DAY' }}</span>
+        </div>
+    </div>
 </div>
 
-<!-- 필터 스크롤바 -->
+<!-- 모바일 콘테스트 회차 선택 & 검색 & 정렬 탭 (3줄 개별 분리 구조) -->
+<div class="m-filter-section">
+    <!-- 1번째 줄: 커스텀 회차 선택 드롭다운 (PC 버전과 100% 동일 비주얼) -->
+    {% set curr_stat = (current_contest.CONTEST_STAT_NM or current_contest.status or '') if current_contest else '' %}
+    {% set is_curr_in_prog = ('진행' in curr_stat or curr_stat == 'IN_PROGRESS' or (current_contest and current_contest.CONTEST_STAT == 'G001C001')) %}
+
+    <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_curr_in_prog else 'stat-closed' }}" id="mCustomContestDropdown">
+        <div class="custom-contest-trigger">
+            <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden;">
+                {% if is_curr_in_prog %}
+                    <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                {% else %}
+                    <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                {% endif %}
+                <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</span>
+            </span>
+            <i class="fa-solid fa-chevron-down arrow-icon"></i>
+        </div>
+        <div class="custom-contest-options">
+            {% for c in contests %}
+                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                    {% set c_id = c.CONTEST_ROUND or c.contest_id %}
+                    {% set is_sel = (c_id == (current_contest.CONTEST_ROUND or current_contest.contest_id)) %}
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?contest_id={{ c_id }}&sort={{ sort_type }}&pet_type={{ pet_type }}&q={{ search_q }}';">
+                        {% if is_in_prog %}
+                            <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                        {% endif %}
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- 2번째 줄: 검색 입력상자 & 검색 버튼 (폭 100%) -->
+    <form method="GET" action="/m/" class="m-search-form">
+        <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
+        <input type="hidden" name="sort" value="{{ sort_type }}">
+        <input type="hidden" name="pet_type" value="{{ pet_type }}">
+        <input type="text" name="q" value="{{ search_q }}" placeholder="검색어 입력..." class="m-search-input">
+        <button type="submit" class="m-search-btn" title="검색">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+
+    <!-- 3. 정렬 탭 (우측: 최신등록순, 높은점수순, 낮은점수순) -->
+    <div class="m-sort-tab-group">
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'latest' or not sort_type }}">
+            <i class="fa-solid fa-clock"></i> 최신등록순
+        </a>
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'score' or sort_type == 'high_score' }}">
+            <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
+        </a>
+        <a href="?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=low_score&q={{ search_q }}&pet_type={{ pet_type }}" class="m-sort-tab-btn {{ 'active' if sort_type == 'low_score' }}">
+            <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
+        </a>
+    </div>
+</div>
+
+<!-- 동물종류 필터 스크롤바 -->
 <div class="m-filter-scroll">
-    <a href="/m/?pet_type=all&sort={{ sort_type }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
+    <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type=all&sort={{ sort_type }}&q={{ search_q }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
     {% for k in pet_kinds %}
         {% set k_nm = k.KIND_NM %}
         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
         {% set chip_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
-        <a href="/m/?pet_type={{ k_nm }}&sort={{ sort_type }}" class="m-chip {{ 'active' if (pet_type and (pet_type in k_nm or k_nm in pet_type)) }}"><i class="{{ chip_icon }}"></i> {{ k_clean }}</a>
+        <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type={{ k_nm }}&sort={{ sort_type }}&q={{ search_q }}" class="m-chip {{ 'active' if (pet_type and (pet_type in k_nm or k_nm in pet_type)) }}"><i class="{{ chip_icon }}"></i> {{ k_clean }}</a>
     {% endfor %}
 </div>
 
-<!-- 2열 피드 그리드 -->
+<!-- 1열 피드 그리드 (1줄 1카드 - PC 구성 요소 완전 탑재) -->
 <div class="m-feed-grid">
     {% for p in posts %}
         <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
-                <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
+                <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
+                
                 {% set p_kind = p.KIND_NM or p.pet_type or '' %}
                 {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-otter' if ('햄스터' in p_kind or '소동물' in p_kind or '토끼' in p_kind or '고슴도치' in p_kind) else ('fa-solid fa-frog' if ('거북이' in p_kind or '파충류' in p_kind or '도마뱀' in p_kind) else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind or '조류' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))))) %}
+                
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
-                    <div style="position: absolute; top: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.3rem; z-index: 10; pointer-events: none;">
+                    <div style="position: absolute; top: 0.55rem; right: 0.55rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
                             {% set aw_rank = aw.ranking or aw.RANKING %}
                             
                             {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem;">👑 슈퍼스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem;">👑 슈퍼스타</div>
                             {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
                             {% else %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span> 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span> 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -59,25 +140,43 @@
                     {% set is_family = (pet_type and pet_type != 'all') %}
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set rank_prefix = category_prefix ~ ('공동 ' if p.is_co_rank else '') %}
-                    <div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; top: 0.4rem; left: 0.4rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
+                    <div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
-                <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
+                <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}점</div>
             </div>
             <div class="m-card-content">
-                <div class="m-card-author" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <!-- 작성자 프로필 정보 -->
+                <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <img src="{{ p.PROFILE_URL or p.user_profile }}" alt="profile">
-                        <span style="font-weight: 800; font-size: 0.9rem;">{{ p.NK_NM or p.user_nickname }}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; margin-top: 0.1rem; padding-left: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
-                        <span style="color: #e11d48; font-weight: 800; white-space: nowrap; flex-shrink: 0;">{{ p.KIND_NM or p.pet_type }}</span>
-                        {% if p.PET_NM or p.pet_name %}
-                            <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.PET_NM or p.pet_name }}</span>
-                        {% endif %}
+                        <div>
+                            <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-primary);">{{ p.NK_NM or p.user_nickname }}</div>
+                            <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: var(--text-secondary);">
+                                <span style="color: #e11d48; font-weight: 800;">{{ p.KIND_NM or p.pet_type }}</span>
+                                {% if p.PET_NM or p.pet_name %}
+                                    <span style="color: #6d28d9; font-weight: 700;">• {{ p.PET_NM or p.pet_name }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="m-card-title">{{ p.title }}</div>
-                <div class="m-card-footer card-actions" onclick="event.stopPropagation();" style="margin-top: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; align-items: center; font-size: 0.75rem;">
+                
+                <!-- 제목 및 본문 요약 -->
+                <div class="m-card-title">{{ p.TITLE or p.title }}</div>
+                {% if p.CONTS or p.content %}
+                    <div class="m-card-desc">{{ p.CONTS or p.content }}</div>
+                {% endif %}
+
+                <!-- 등록 일시 및 총 점수 바 -->
+                <div class="m-card-meta-bar">
+                    <span><i class="fa-regular fa-clock"></i> {{ (p.ENT_DT or p.created_at)|string }}</span>
+                    <div class="m-card-total-score">
+                        <i class="fa-solid fa-star"></i> <span>{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}점</span>
+                    </div>
+                </div>
+
+                <!-- 실시간 4요소 수치 (조회, 좋아요, 댓글, 공유가입) -->
+                <div class="m-card-footer card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; align-items: center;">
                     <div class="action-btn btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
                     </div>
@@ -94,7 +193,8 @@
             </div>
         </div>
     {% else %}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); font-weight: 700;">
+            <i class="fa-solid fa-paw" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 0.5rem; display: block;"></i>
             등록된 출전 게시물이 없습니다.
         </div>
     {% endfor %}
