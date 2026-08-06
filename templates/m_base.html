@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paw Star Mobile 🌟</title>
+    <title>포스타 🌟</title>
+    <meta name="apple-mobile-web-app-title" content="포스타">
+    <meta name="application-name" content="포스타">
+    <meta property="og:title" content="포스타 - 반려동물도 스타가 될 수 있다">
     <!-- FontAwesome & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
     <!-- 모바일 전용 CSS (m_style.css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/m_style.css') }}">
     <!-- 모바일/브라우저 전용 앱 로고 아이콘 및 파비콘 설정 -->
+    <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" type="image/jpeg" href="/static/image/app/app_logo_icon.jpg">
     <link rel="apple-touch-icon" href="/static/image/app/app_logo_icon.jpg">
     <meta property="og:image" content="/static/image/app/app_logo_icon.jpg">
