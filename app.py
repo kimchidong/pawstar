@@ -471,6 +471,20 @@ def route_share():
     is_closed = False
     post = None
     if contest_round and round_no:
+        # 로그인 회원이 전용 공유 페이지에 들어온 경우: 곧바로 공유 수/점수 및 조회 수/이력 미리 반영
+        if current_user_id:
+            if share_sn:
+                try:
+                    service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
+                except Exception as e:
+                    print("route_share increment_share_count error:", e)
+
+            try:
+                service.increase_view_count(contest_round, round_no, view_user_id=current_user_id)
+            except Exception as e:
+                print("route_share increase_view_count error:", e)
+
+        # 최신 반영된 게시물 정보 (조회수, 공유수, 점수, actions 4요소) 가져오기
         post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
         if post:
             is_closed = bool(
@@ -487,13 +501,6 @@ def route_share():
                     'post_id': f"{contest_round}_{round_no}",
                     'is_closed': is_closed
                 }
-
-                # 이미 회원인 사람이 로그인되어 있는 상태에서 공유 전용 페이지로 접속한 경우 즉시 점수 반영
-                if current_user_id:
-                    try:
-                        service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
-                    except Exception as e:
-                        print("route_share logged_in share_referral error:", e)
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(
