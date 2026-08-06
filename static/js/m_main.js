@@ -1007,8 +1007,9 @@ function renderMobileFeedGrid(posts) {
         const entUserId = p.ENT_USER_ID;
         const pImg = (p.PHT_PATH && p.PHT_FILE1) ? `${p.PHT_PATH}/${p.PHT_FILE1}` : (p.IMAGE_PATH || p.image_path || p.media_url || '');
         const pTitle = p.TITLE || p.title || '';
-        const pKind = p.KIND_NM || p.pet_type || '반려동물';
-        const pUserNm = p.USER_NM || p.user_name || '익명출전자';
+        const pKindRaw = p.KIND_NM || p.pet_type || '반려동물';
+        const pKindClean = pKindRaw.replace(/[🐕🐈🐹🦜🐾]/g, '').trim();
+        const pUserNm = p.NK_NM || p.user_nickname || p.USER_NM || p.user_name || '출전자';
         const pAvatar = p.USER_AVATAR || p.user_avatar || p.PROFILE_URL || p.user_profile || '/static/image/profile/default_profile.png';
         const pConts = p.CONTS || p.description || '';
         const pScore = p.TOTAL_SCORE || p.total_score || p.score || 0;
@@ -1020,7 +1021,14 @@ function renderMobileFeedGrid(posts) {
         const pPostJsonData = JSON.stringify(p).replace(/"/g, '&quot;');
 
         const pPetNm = p.PET_NM || p.pet_name || '';
-        const pContestRound = p.CONTEST_ROUND || p.contest_id || mobileFilterState.contest_id;
+
+        let chipIcon = 'fa-solid fa-paw';
+        if (pKindRaw.includes('강아지') || pKindRaw.includes('개')) chipIcon = 'fa-solid fa-dog';
+        else if (pKindRaw.includes('고양이')) chipIcon = 'fa-solid fa-cat';
+        else if (pKindRaw.includes('햄스터') || pKindRaw.includes('소동물') || pKindRaw.includes('토끼')) chipIcon = 'fa-solid fa-otter';
+        else if (pKindRaw.includes('새') || pKindRaw.includes('앵무새') || pKindRaw.includes('조류')) chipIcon = 'fa-solid fa-crow';
+        else if (pKindRaw.includes('말') || pKindRaw.includes('큰동물')) chipIcon = 'fa-solid fa-horse';
+        else if (pKindRaw.includes('어류') || pKindRaw.includes('관상어')) chipIcon = 'fa-solid fa-fish';
 
         html += `
         <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
@@ -1034,7 +1042,7 @@ function renderMobileFeedGrid(posts) {
                     <div class="m-author-info">
                         <div class="m-author-name">${pUserNm}</div>
                         <div class="m-pet-tag">
-                            <span class="m-pet-kind-text"><i class="fa-solid fa-paw"></i> ${pKind}</span>
+                            <span class="m-pet-kind-text"><i class="${chipIcon}"></i> ${pKindClean}</span>
                             ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
                         </div>
                     </div>
