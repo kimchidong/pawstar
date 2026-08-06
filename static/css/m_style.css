@@ -954,7 +954,7 @@ body.m-body {
     color: #d97706;
     padding: 0.2rem 0.5rem;
     border-radius: 16px;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.74rem;
     display: inline-flex;
     align-items: center;
@@ -962,6 +962,10 @@ body.m-body {
     white-space: nowrap;
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08);
+}
+
+.m-card-total-score .score-num {
+    font-weight: 500;
 }
 
 /* 4개의 액션 수치 알약 버튼 (2열 그리드 반응형) */
@@ -980,7 +984,7 @@ body.m-body {
     box-sizing: border-box;
     border-radius: 12px;
     font-size: 0.76rem;
-    font-weight: 500;
+    font-weight: 400;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -997,7 +1001,7 @@ body.m-body {
 
 .m-btn-action span {
     font-size: 0.76rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 /* PC 동일 Active 하이라이트 배경 및 테두리 */
