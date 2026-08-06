@@ -85,11 +85,32 @@
             </div>
         </form>
 
-        <select class="m-sort-select" onchange="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=' + this.value + '&pet_type={{ pet_type }}&q={{ search_q }}';">
-            <option value="latest" {{ 'selected' if sort_type == 'latest' or not sort_type }}>🕒 최신등록순</option>
-            <option value="score" {{ 'selected' if sort_type == 'score' or sort_type == 'high_score' }}>⬆️ 높은점수순</option>
-            <option value="low_score" {{ 'selected' if sort_type == 'low_score' }}>⬇️ 낮은점수순</option>
-        </select>
+        <!-- PC 버전 동일 아이콘 적용 커스텀 정렬 드롭다운 -->
+        <div class="custom-sort-dropdown" id="mCustomSortDropdown">
+            <div class="custom-sort-trigger">
+                <span>
+                    {% if sort_type == 'score' or sort_type == 'high_score' %}
+                        <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
+                    {% elif sort_type == 'low_score' %}
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
+                    {% else %}
+                        <i class="fa-solid fa-clock"></i> 최신등록순
+                    {% endif %}
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </div>
+            <div class="custom-sort-options">
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'latest' or not sort_type }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&pet_type={{ pet_type }}&q={{ search_q }}';">
+                    <i class="fa-solid fa-clock"></i> 최신등록순
+                </div>
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'score' or sort_type == 'high_score' }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&pet_type={{ pet_type }}&q={{ search_q }}';">
+                    <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
+                </div>
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'low_score' }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=low_score&pet_type={{ pet_type }}&q={{ search_q }}';">
+                    <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

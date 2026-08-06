@@ -394,41 +394,24 @@ body.m-body {
     white-space: nowrap;
 }
 
-/* 진행중 회차 trigger 스타일 (단색 소프트 연노랑) */
-.custom-contest-dropdown.stat-in-progress .custom-contest-trigger {
-    background: #fefce8;
-    border: 1.5px solid #e2e8f0;
-    color: #713f12;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.custom-contest-dropdown.stat-in-progress .custom-contest-trigger:active {
-    background: #fef9c3;
-}
-
-/* 종료된 회차 trigger 스타일 (단색 소프트 연회색) */
+/* 회차 trigger 스타일 (모두 동일한 순백색 배경) */
+.custom-contest-dropdown.stat-in-progress .custom-contest-trigger,
 .custom-contest-dropdown.stat-closed .custom-contest-trigger {
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    color: #475569;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
+.custom-contest-dropdown.stat-in-progress .custom-contest-trigger:active,
 .custom-contest-dropdown.stat-closed .custom-contest-trigger:active {
-    background: #f1f5f9;
+    background: #f8fafc;
 }
 
 .custom-contest-trigger i.arrow-icon {
     font-size: 0.8rem;
     transition: transform 0.25s ease;
     flex-shrink: 0;
-}
-
-.custom-contest-dropdown.stat-in-progress .custom-contest-trigger i.arrow-icon {
-    color: #854d0e;
-}
-
-.custom-contest-dropdown.stat-closed .custom-contest-trigger i.arrow-icon {
     color: #64748b;
 }
 
@@ -459,11 +442,11 @@ body.m-body {
     animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 칩 스타일 (진행중 vs 종료) */
+/* 칩 스타일 (진행중 - 밝은 노란색 / 종료 - 짙은 회색에 흰글자) */
 .status-chip {
     font-size: 0.72rem;
     font-weight: 800;
-    padding: 0.25rem 0.55rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 20px;
     display: inline-flex;
     align-items: center;
@@ -472,15 +455,15 @@ body.m-body {
 }
 
 .status-chip.in-progress {
-    background: #ffffff;
-    color: #854d0e;
+    background: #fef08a;
+    color: #713f12;
     border: 1px solid #fde047;
 }
 
 .status-chip.closed {
-    background: #ffffff;
-    color: #64748b;
-    border: 1px solid #cbd5e1;
+    background: #475569;
+    color: #ffffff;
+    border: 1px solid #334155;
 }
 
 /* 드롭다운 옵션 항목 */
@@ -569,7 +552,7 @@ body.m-body {
     height: 48px;
     box-sizing: border-box;
     padding: 0 2.8rem 0 1.1rem;
-    border-radius: 24px;
+    border-radius: 14px;
     border: 1px solid var(--border-light);
     background: #ffffff;
     font-size: 0.85rem;
@@ -584,7 +567,7 @@ body.m-body {
     transform: translateY(-50%);
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: 10px;
     background: transparent;
     color: #64748b;
     border: none;
@@ -601,28 +584,107 @@ body.m-body {
     color: #4f46e5;
 }
 
-.m-sort-select {
+/* PC 버전 아이콘 적용 커스텀 정렬 드롭다운 */
+.custom-sort-dropdown {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+    width: 136px;
+    height: 48px;
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+.custom-sort-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     height: 48px;
     box-sizing: border-box;
-    padding: 0 2.2rem 0 0.9rem;
-    border-radius: 24px;
+    padding: 0 0.85rem;
+    border-radius: 14px;
     border: 1px solid var(--border-light);
-    background-color: #ffffff;
+    background: #ffffff;
     font-size: 0.82rem;
     font-weight: 800;
     color: var(--text-primary);
-    outline: none;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-    background-repeat: no-repeat;
-    background-position: right 0.8rem center;
-    background-size: 0.85rem;
     cursor: pointer;
-    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     white-space: nowrap;
+}
+
+.custom-sort-trigger span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.custom-sort-trigger i {
+    color: #4f46e5;
+    font-size: 0.85rem;
+}
+
+.custom-sort-trigger i.arrow-icon {
+    color: #64748b;
+    font-size: 0.78rem;
+    transition: transform 0.25s ease;
+}
+
+.custom-sort-dropdown.open .custom-sort-trigger i.arrow-icon {
+    transform: rotate(180deg);
+}
+
+.custom-sort-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    padding: 0.35rem;
+    z-index: 999;
+}
+
+.custom-sort-dropdown.open .custom-sort-options {
+    display: flex;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-sort-option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.custom-sort-option i {
+    color: #818cf8;
+    font-size: 0.85rem;
+}
+
+.custom-sort-option:active,
+.custom-sort-option.selected {
+    background: #f1f5f9;
+    color: #4f46e5;
+    font-weight: 800;
+}
+
+.custom-sort-option.selected i {
+    color: #4f46e5;
 }
 
 /* 모바일 필터 스크롤바 */

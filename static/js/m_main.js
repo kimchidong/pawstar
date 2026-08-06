@@ -50,6 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 모바일 커스텀 정렬 드롭다운 토글 및 바깥 클릭 닫기
+    const mCustomSortDropdown = document.getElementById('mCustomSortDropdown');
+    if (mCustomSortDropdown) {
+        const trigger = mCustomSortDropdown.querySelector('.custom-sort-trigger');
+        if (trigger) {
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mCustomSortDropdown.classList.toggle('open');
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (!mCustomSortDropdown.contains(e.target)) {
+                mCustomSortDropdown.classList.remove('open');
+            }
+        });
+    }
+
     // 1. 모바일 자랑하기 (/m/upload 전용 페이지 전환 적용)
     const mBtnUploadNav = document.getElementById('mBtnUploadNav');
     const mUploadModal = document.getElementById('mUploadModal');
