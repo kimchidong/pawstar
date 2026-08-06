@@ -392,14 +392,17 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const mCommentFormContainer = document.getElementById('mDetailCommentFormContainer');
     const mCommentScoreNotice = document.getElementById('mDetailCommentScoreNotice');
+    const mShareIconBtn = document.getElementById('mDetailShareIconBtn');
 
     const mBtnViewPopup = document.getElementById('mDetailBtnView');
     const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
+    const mBtnSharePopup = document.getElementById('mDetailBtnShare');
 
     if (isClosedRound) {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = 'none';
-        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
+        if (mShareIconBtn) mShareIconBtn.style.display = 'none';
+        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup, mBtnSharePopup].forEach(el => {
             if (el) {
                 el.style.display = 'flex';
                 el.style.pointerEvents = 'none';
@@ -410,7 +413,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     } else {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'flex';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = '';
-        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
+        if (mShareIconBtn) mShareIconBtn.style.display = 'inline-flex';
+        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup, mBtnSharePopup].forEach(el => {
             if (el) {
                 el.style.display = 'flex';
                 el.style.pointerEvents = '';
