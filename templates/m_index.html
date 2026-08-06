@@ -58,7 +58,7 @@
                     {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
                     {% set c_id = c.CONTEST_ROUND or c.contest_id %}
                     {% set is_sel = (c_id == (current_contest.CONTEST_ROUND or current_contest.contest_id)) %}
-                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?contest_id={{ c_id }}&sort={{ sort_type }}&pet_type={{ pet_type }}&q={{ search_q }}';">
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="selectMobileContestOption(this, '{{ c_id }}')">
                         {% if is_in_prog %}
                             <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
@@ -73,12 +73,12 @@
     
     <!-- 2번째 줄: 검색 입력상자 & 정렬 콤보박스 (한 줄 나란히 배치) -->
     <div class="m-search-sort-row">
-        <form method="GET" action="/m/" class="m-search-form">
-            <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
-            <input type="hidden" name="sort" value="{{ sort_type }}">
-            <input type="hidden" name="pet_type" value="{{ pet_type }}">
+        <form method="GET" action="/m/" class="m-search-form" id="mSearchForm" onsubmit="handleMobileSearchSubmit(event)">
+            <input type="hidden" name="contest_id" id="mCurrentContestId" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
+            <input type="hidden" name="sort" id="mCurrentSort" value="{{ sort_type }}">
+            <input type="hidden" name="pet_type" id="mCurrentPetType" value="{{ pet_type }}">
             <div class="m-search-input-wrapper">
-                <input type="text" name="q" value="{{ search_q }}" placeholder="검색어 입력..." class="m-search-input">
+                <input type="text" name="q" id="mSearchInput" value="{{ search_q }}" placeholder="검색어 입력..." class="m-search-input">
                 <button type="submit" class="m-search-btn-inside" title="검색">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
@@ -88,7 +88,7 @@
         <!-- PC 버전 동일 아이콘 적용 커스텀 정렬 드롭다운 -->
         <div class="custom-sort-dropdown" id="mCustomSortDropdown">
             <div class="custom-sort-trigger">
-                <span>
+                <span id="mSortTriggerLabel">
                     {% if sort_type == 'score' or sort_type == 'high_score' %}
                         <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
                     {% elif sort_type == 'low_score' %}
@@ -100,13 +100,13 @@
                 <i class="fa-solid fa-chevron-down arrow-icon"></i>
             </div>
             <div class="custom-sort-options">
-                <div class="custom-sort-option {{ 'selected' if sort_type == 'latest' or not sort_type }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=latest&pet_type={{ pet_type }}&q={{ search_q }}';">
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'latest' or not sort_type }}" data-sort="latest" onclick="selectMobileSortOption(this, 'latest')">
                     <i class="fa-solid fa-clock"></i> 최신등록순
                 </div>
-                <div class="custom-sort-option {{ 'selected' if sort_type == 'score' or sort_type == 'high_score' }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=score&pet_type={{ pet_type }}&q={{ search_q }}';">
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'score' or sort_type == 'high_score' }}" data-sort="score" onclick="selectMobileSortOption(this, 'score')">
                     <i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순
                 </div>
-                <div class="custom-sort-option {{ 'selected' if sort_type == 'low_score' }}" onclick="location.href='?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&sort=low_score&pet_type={{ pet_type }}&q={{ search_q }}';">
+                <div class="custom-sort-option {{ 'selected' if sort_type == 'low_score' }}" data-sort="low_score" onclick="selectMobileSortOption(this, 'low_score')">
                     <i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순
                 </div>
             </div>
@@ -115,13 +115,13 @@
 </div>
 
 <!-- 동물종류 필터 스크롤바 -->
-<div class="m-filter-scroll">
-    <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type=all&sort={{ sort_type }}&q={{ search_q }}" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
+<div class="m-filter-scroll" id="mPetTypeChipGroup">
+    <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type=all&sort={{ sort_type }}&q={{ search_q }}" data-pet-type="all" onclick="selectMobilePetType(event, 'all')" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
     {% for k in pet_kinds %}
         {% set k_nm = k.KIND_NM %}
         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
         {% set chip_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
-        <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type={{ k_nm }}&sort={{ sort_type }}&q={{ search_q }}" class="m-chip {{ 'active' if (pet_type and (pet_type in k_nm or k_nm in pet_type)) }}"><i class="{{ chip_icon }}"></i> {{ k_clean }}</a>
+        <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type={{ k_nm }}&sort={{ sort_type }}&q={{ search_q }}" data-pet-type="{{ k_nm }}" onclick="selectMobilePetType(event, '{{ k_nm }}')" class="m-chip {{ 'active' if (pet_type and (pet_type in k_nm or k_nm in pet_type)) }}"><i class="{{ chip_icon }}"></i> {{ k_clean }}</a>
     {% endfor %}
 </div>
 
@@ -160,7 +160,6 @@
                     {% set rank_prefix = category_prefix ~ ('공동 ' if p.is_co_rank else '') %}
                     <div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
                 {% endif %}
-                <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}점</div>
             </div>
             <div class="m-card-content">
                 <!-- 작성자 프로필 정보 -->

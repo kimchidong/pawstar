@@ -682,6 +682,34 @@ def m_index():
         response.delete_cookie('pst_user_id')
     return response
 
+@app.route('/api/m/posts')
+def api_m_posts():
+    contest_id_arg = request.args.get('contest_id', type=int)
+    if not contest_id_arg:
+        active_c = service.get_current_contest()
+        contest_id = active_c.get('CONTEST_ROUND') if active_c else 1
+    else:
+        contest_id = contest_id_arg
+
+    sort_type = request.args.get('sort', 'latest')
+    search_q = request.args.get('q', '')
+    pet_type = request.args.get('pet_type', 'all')
+    page = request.args.get('page', 1, type=int)
+    current_user_id = get_current_user_id()
+
+    current_contest = service.get_contest(contest_id)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
+
+    return jsonify({
+        'success': True,
+        'current_contest': current_contest,
+        'posts': paginated_res['posts'],
+        'pagination': paginated_res,
+        'sort_type': sort_type,
+        'search_q': search_q,
+        'pet_type': pet_type
+    })
+
 @app.route('/m/hall-of-fame')
 def m_hall_of_fame():
     contests = service.get_closed_contests()

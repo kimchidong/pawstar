@@ -818,19 +818,7 @@ body.m-body {
 }
 
 .m-card-score {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 0.3rem 0.7rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #fef08a;
-    border: 1px solid rgba(254, 240, 138, 0.3);
-    z-index: 10;
+    display: none !important;
 }
 
 .m-card-content {

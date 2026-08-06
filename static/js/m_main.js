@@ -942,3 +942,193 @@ function checkAndAutoOpenMobilePost() {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(checkAndAutoOpenMobilePost, 300);
 });
+
+// ==========================================
+// 🚀 모바일 비동기 (AJAX) 필터 & 피드 실시간 갱신 시스템
+// ==========================================
+
+let mobileFilterState = {
+    contest_id: document.getElementById('mCurrentContestId') ? document.getElementById('mCurrentContestId').value : '1',
+    sort: document.getElementById('mCurrentSort') ? document.getElementById('mCurrentSort').value : 'latest',
+    pet_type: document.getElementById('mCurrentPetType') ? document.getElementById('mCurrentPetType').value : 'all',
+    q: document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : ''
+};
+
+async function fetchMobilePostsAjax(params = {}) {
+    if (params.contest_id !== undefined) mobileFilterState.contest_id = params.contest_id;
+    if (params.sort !== undefined) mobileFilterState.sort = params.sort;
+    if (params.pet_type !== undefined) mobileFilterState.pet_type = params.pet_type;
+    if (params.q !== undefined) mobileFilterState.q = params.q;
+
+    const newUrl = `/m/?contest_id=${mobileFilterState.contest_id}&sort=${mobileFilterState.sort}&pet_type=${encodeURIComponent(mobileFilterState.pet_type)}&q=${encodeURIComponent(mobileFilterState.q)}`;
+    window.history.pushState(mobileFilterState, '', newUrl);
+
+    const feedGrid = document.querySelector('.m-feed-grid');
+    if (feedGrid) {
+        feedGrid.style.opacity = '0.45';
+        feedGrid.style.transition = 'opacity 0.2s ease';
+    }
+
+    try {
+        const apiUrl = `/api/m/posts?contest_id=${mobileFilterState.contest_id}&sort=${mobileFilterState.sort}&pet_type=${encodeURIComponent(mobileFilterState.pet_type)}&q=${encodeURIComponent(mobileFilterState.q)}`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data.success && feedGrid) {
+            renderMobileFeedGrid(data.posts);
+        }
+    } catch (err) {
+        console.error('모바일 AJAX 피드 로드 실패:', err);
+    } finally {
+        if (feedGrid) {
+            feedGrid.style.opacity = '1';
+        }
+    }
+}
+
+function renderMobileFeedGrid(posts) {
+    const feedGrid = document.querySelector('.m-feed-grid');
+    if (!feedGrid) return;
+
+    if (!posts || posts.length === 0) {
+        feedGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; padding: 4rem 1rem; text-align: center; color: #64748b; background: #ffffff; border-radius: 16px; margin: 0 0.85rem;">
+                <i class="fa-solid fa-ghost" style="font-size: 2.8rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                <p style="font-size: 0.95rem; font-weight: 800; color: #334155;">조건에 맞는 참가 작품이 없습니다.</p>
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.4rem;">다른 검색어나 필터를 선택해 보세요!</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+    posts.forEach(p => {
+        const postId = p.post_id || p.ENT_USER_ID;
+        const entUserId = p.ENT_USER_ID;
+        const pImg = (p.PHT_PATH && p.PHT_FILE1) ? `${p.PHT_PATH}/${p.PHT_FILE1}` : (p.IMAGE_PATH || p.image_path || p.media_url || '');
+        const pTitle = p.TITLE || p.title || '';
+        const pKind = p.KIND_NM || p.pet_type || '반려동물';
+        const pUserNm = p.USER_NM || p.user_name || '익명출전자';
+        const pAvatar = p.USER_AVATAR || p.user_avatar || p.PROFILE_URL || p.user_profile || '/static/image/profile/default_profile.png';
+        const pConts = p.CONTS || p.description || '';
+        const pScore = p.TOTAL_SCORE || p.total_score || p.score || 0;
+        const pHeartCount = p.HEART_COUNT || p.heart_count || p.like_count || 0;
+        const pCommentCount = p.COMMENT_COUNT || p.comment_count || 0;
+        const pShareScore = p.SHARE_SCORE || p.share_score || 0;
+        const pViewCount = p.VIEW_COUNT || p.view_count || 0;
+        const pDt = (p.REG_DT || p.created_at || '').toString().substring(0, 10);
+        const pPostJsonData = JSON.stringify(p).replace(/"/g, '&quot;');
+
+        html += `
+        <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
+            <div class="m-card-thumb">
+                <img src="${pImg}" alt="${pTitle}" loading="lazy">
+                <span class="m-card-kind-badge"><i class="fa-solid fa-paw"></i> ${pKind}</span>
+            </div>
+
+            <div class="m-card-body">
+                <div class="m-card-author">
+                    <img src="${pAvatar}" alt="${pUserNm}" class="m-author-avatar">
+                    <div class="m-author-info">
+                        <div class="m-author-name">${pUserNm}</div>
+                        <div class="m-post-title">${pTitle}</div>
+                    </div>
+                </div>
+
+                ${pConts ? `<div class="m-card-desc">${pConts}</div>` : ''}
+
+                <div class="m-card-meta-bar">
+                    <span class="m-post-date"><i class="fa-regular fa-clock"></i> ${pDt}</span>
+                    <span class="m-card-total-score"><i class="fa-solid fa-crown"></i> ${pScore}점</span>
+                </div>
+
+                <div class="m-card-actions">
+                    <button type="button" class="m-btn-action" title="조회수">
+                        <i class="fa-regular fa-eye"></i> <span>${pViewCount}</span>
+                    </button>
+                    <button type="button" class="m-btn-action" title="좋아요">
+                        <i class="fa-solid fa-heart" style="color: #ef4444;"></i> <span>${pHeartCount}</span>
+                    </button>
+                    <button type="button" class="m-btn-action" title="댓글">
+                        <i class="fa-regular fa-comment"></i> <span>${pCommentCount}</span>
+                    </button>
+                    <button type="button" class="m-btn-action" title="공유점수">
+                        <i class="fa-solid fa-share-nodes" style="color: #8b5cf6;"></i> <span>${pShareScore}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+    });
+
+    feedGrid.innerHTML = html;
+}
+
+function selectMobileContestOption(el, contestId) {
+    document.querySelectorAll('.custom-contest-option').forEach(opt => opt.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+
+    const dropdown = document.getElementById('mCustomContestDropdown');
+    if (dropdown) dropdown.classList.remove('open');
+
+    const mCurrentContestId = document.getElementById('mCurrentContestId');
+    if (mCurrentContestId) mCurrentContestId.value = contestId;
+
+    fetchMobilePostsAjax({ contest_id: contestId });
+}
+
+function handleMobileSearchSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('mSearchInput');
+    const qVal = input ? input.value : '';
+    fetchMobilePostsAjax({ q: qVal });
+}
+
+function selectMobileSortOption(el, sortVal) {
+    document.querySelectorAll('.custom-sort-option').forEach(opt => opt.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+
+    const dropdown = document.getElementById('mCustomSortDropdown');
+    if (dropdown) dropdown.classList.remove('open');
+
+    const labelEl = document.getElementById('mSortTriggerLabel');
+    if (labelEl) {
+        if (sortVal === 'score') {
+            labelEl.innerHTML = '<i class="fa-solid fa-arrow-up-wide-short"></i> 높은점수순';
+        } else if (sortVal === 'low_score') {
+            labelEl.innerHTML = '<i class="fa-solid fa-arrow-down-wide-short"></i> 낮은점수순';
+        } else {
+            labelEl.innerHTML = '<i class="fa-solid fa-clock"></i> 최신등록순';
+        }
+    }
+
+    const mCurrentSort = document.getElementById('mCurrentSort');
+    if (mCurrentSort) mCurrentSort.value = sortVal;
+
+    fetchMobilePostsAjax({ sort: sortVal });
+}
+
+function selectMobilePetType(e, petTypeVal) {
+    if (e) e.preventDefault();
+
+    const chipGroup = document.getElementById('mPetTypeChipGroup');
+    if (chipGroup) {
+        chipGroup.querySelectorAll('.m-chip').forEach(chip => {
+            chip.classList.remove('active');
+            if (chip.getAttribute('data-pet-type') === petTypeVal) {
+                chip.classList.add('active');
+            }
+        });
+    }
+
+    const mCurrentPetType = document.getElementById('mCurrentPetType');
+    if (mCurrentPetType) mCurrentPetType.value = petTypeVal;
+
+    fetchMobilePostsAjax({ pet_type: petTypeVal });
+}
+
+window.selectMobileContestOption = selectMobileContestOption;
+window.handleMobileSearchSubmit = handleMobileSearchSubmit;
+window.selectMobileSortOption = selectMobileSortOption;
+window.selectMobilePetType = selectMobilePetType;
+window.fetchMobilePostsAjax = fetchMobilePostsAjax;
