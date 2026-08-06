@@ -796,13 +796,15 @@ def upload_page():
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
     remaining_entry_count = max(0, 5 - my_entry_count)
+    now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     return render_template(
         'upload.html', 
         current_contest=current_contest, 
         contests=contests,
         my_entry_count=my_entry_count,
         remaining_entry_count=remaining_entry_count,
-        pet_kinds=service.get_pet_kinds()
+        pet_kinds=service.get_pet_kinds(),
+        now_str=now_str
     )
 
 @app.route('/m/upload', methods=['GET', 'POST'])
@@ -842,13 +844,15 @@ def m_upload_page():
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
     remaining_entry_count = max(0, 5 - my_entry_count)
+    now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     return render_template(
         'm_upload.html', 
         current_contest=current_contest, 
         contests=contests,
         my_entry_count=my_entry_count,
         remaining_entry_count=remaining_entry_count,
-        pet_kinds=service.get_pet_kinds()
+        pet_kinds=service.get_pet_kinds(),
+        now_str=now_str
     )
 
 

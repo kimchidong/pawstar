@@ -157,7 +157,7 @@
 
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">
                                     <span style="font-size: 0.78rem; color: var(--text-muted);" id="previewCardDate">
-                                        방금 전
+                                        {{ now_str }}
                                     </span>
                                     <div class="card-total-score">
                                         <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
@@ -217,7 +217,7 @@
                                     
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
                                         <span style="font-size: 0.82rem; color: var(--text-muted);" id="previewModalDate">
-                                            방금 전
+                                            {{ now_str }}
                                         </span>
                                         <div style="display: flex; align-items: center; gap: 0.6rem;">
                                             <div class="card-total-score">
@@ -330,6 +330,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const textareaContent = document.querySelector('textarea[name="content"]');
     const inputFile = document.getElementById('uploadMediaFile');
 
+    function getFormattedNowDateTime() {
+        const now = new Date();
+        const YYYY = now.getFullYear();
+        const MM = String(now.getMonth() + 1).padStart(2, '0');
+        const DD = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
+    }
+
     function updatePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
         let petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
@@ -345,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const titleText = title || '자랑 제목이 여기에 표시됩니다';
         const descText = content || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
+        const currentFormattedDate = getFormattedNowDateTime();
 
         const previewCardPetTag = document.getElementById('previewCardPetTag');
         const previewModalPetTag = document.getElementById('previewModalPetTag');
@@ -352,6 +364,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const previewModalTitle = document.getElementById('previewModalTitle');
         const previewCardDesc = document.getElementById('previewCardDesc');
         const previewModalDesc = document.getElementById('previewModalDesc');
+        const previewCardDate = document.getElementById('previewCardDate');
+        const previewModalDate = document.getElementById('previewModalDate');
 
         if (previewCardPetTag) previewCardPetTag.innerHTML = petTagHTML;
         if (previewModalPetTag) previewModalPetTag.innerHTML = petTagHTML;
@@ -359,6 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (previewModalTitle) previewModalTitle.textContent = titleText;
         if (previewCardDesc) previewCardDesc.textContent = descText;
         if (previewModalDesc) previewModalDesc.textContent = descText;
+        if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
+        if (previewModalDate) previewModalDate.textContent = currentFormattedDate;
     }
 
     if (inputPetName) inputPetName.addEventListener('input', updatePreview);
