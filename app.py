@@ -65,6 +65,47 @@ def finalize_temp_profile_image(avatar_icon):
     return f"/static/image/profile/{year_str}/{month_str}/{perm_filename}"
 
 
+@app.template_filter('m_time_ago')
+def m_time_ago_filter(dt_val):
+    if not dt_val:
+        return ''
+    try:
+        dt_str = str(dt_val).strip()
+        dt = None
+        for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d', '%Y-%m-%d %H:%M'):
+            try:
+                dt = datetime.datetime.strptime(dt_str.split('.')[0], fmt)
+                break
+            except Exception:
+                pass
+        if not dt:
+            return dt_str[:10]
+
+        now = datetime.datetime.now()
+        diff = now - dt
+        seconds = int(diff.total_seconds())
+        if seconds < 0:
+            return '방금 전'
+
+        if seconds < 60:
+            return '방금 전'
+        minutes = seconds // 60
+        if minutes < 60:
+            return f'{minutes}분 전'
+        hours = minutes // 60
+        if hours < 24:
+            return f'{hours}시간 전'
+        days = hours // 24
+        if days < 30:
+            return f'{days}일 전'
+        months = days // 30
+        if months < 12:
+            return f'{months}개월 전'
+        years = months // 12
+        return f'{years}년 전'
+    except Exception:
+        return str(dt_val)[:10]
+
 @app.before_request
 def check_session_timeout():
     """ 웹 서비스 이용(요청) 중 아무런 액션 없이 30분(1800초) 경과 시 세션 자동 만료 파기 처리 """

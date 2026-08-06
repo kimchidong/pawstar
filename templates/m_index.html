@@ -168,7 +168,7 @@
                     <div class="m-author-info">
                         <div class="m-author-name">{{ p.NK_NM or p.user_nickname or '익명' }}</div>
                         <div class="m-pet-tag">
-                            <span class="m-pet-kind-text"><i class="{{ p_icon_class }}"></i> {{ p.KIND_NM or p.pet_type }}</span>
+                            <span class="m-pet-kind-text">{{ p.KIND_NM or p.pet_type }}</span>
                             {% if p.PET_NM or p.pet_name %}
                                 <span class="m-pet-name-text">• {{ p.PET_NM or p.pet_name }}</span>
                             {% endif %}
@@ -184,7 +184,7 @@
 
                 <!-- 구분선 + 등록일시 & PC 동일 노란 알약 총 점수 배지 -->
                 <div class="m-card-meta-divider">
-                    <span class="m-post-date">{{ (p.ENT_DT or p.created_at)|string }}</span>
+                    <span class="m-post-date">{{ (p.ENT_DT or p.created_at)|m_time_ago }}</span>
                     <div class="m-card-total-score">
                         <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}</span> 점
                     </div>

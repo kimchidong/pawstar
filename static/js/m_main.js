@@ -954,6 +954,35 @@ let mobileFilterState = {
     q: document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : ''
 };
 
+function formatTimeAgo(dateStr) {
+    if (!dateStr) return '';
+    try {
+        const rawStr = dateStr.toString().trim();
+        const past = new Date(rawStr.replace(/-/g, '/').split('.')[0]);
+        if (isNaN(past.getTime())) return rawStr.substring(0, 10);
+
+        const now = new Date();
+        const diffSec = Math.floor((now - past) / 1000);
+        if (diffSec < 0 || diffSec < 60) return '방금 전';
+
+        const diffMin = Math.floor(diffSec / 60);
+        if (diffMin < 60) return `${diffMin}분 전`;
+
+        const diffHour = Math.floor(diffMin / 60);
+        if (diffHour < 24) return `${diffHour}시간 전`;
+
+        const diffDay = Math.floor(diffHour / 24);
+        if (diffDay < 30) return `${diffDay}일 전`;
+
+        const diffMonth = Math.floor(diffDay / 30);
+        if (diffMonth < 12) return `${diffMonth}개월 전`;
+
+        return `${Math.floor(diffMonth / 12)}년 전`;
+    } catch (e) {
+        return (dateStr || '').toString().substring(0, 10);
+    }
+}
+
 async function fetchMobilePostsAjax(params = {}) {
     if (params.contest_id !== undefined) mobileFilterState.contest_id = params.contest_id;
     if (params.sort !== undefined) mobileFilterState.sort = params.sort;
@@ -1017,7 +1046,8 @@ function renderMobileFeedGrid(posts) {
         const pCommentCount = p.COMMENT_COUNT || p.comment_count || 0;
         const pShareScore = p.SHARE_SCORE || p.share_score || 0;
         const pViewCount = p.VIEW_COUNT || p.view_count || 0;
-        const pDt = (p.REG_DT || p.created_at || '').toString().substring(0, 10);
+        const pDtRaw = p.REG_DT || p.created_at || p.ENT_DT || '';
+        const pDtAgo = formatTimeAgo(pDtRaw);
         const pPostJsonData = JSON.stringify(p).replace(/"/g, '&quot;');
 
         const pPetNm = p.PET_NM || p.pet_name || '';
@@ -1042,7 +1072,7 @@ function renderMobileFeedGrid(posts) {
                     <div class="m-author-info">
                         <div class="m-author-name">${pUserNm}</div>
                         <div class="m-pet-tag">
-                            <span class="m-pet-kind-text"><i class="${chipIcon}"></i> ${pKindClean}</span>
+                            <span class="m-pet-kind-text">${pKindRaw}</span>
                             ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
                         </div>
                     </div>
@@ -1052,7 +1082,7 @@ function renderMobileFeedGrid(posts) {
                 ${pConts ? `<p class="m-post-desc">${pConts}</p>` : ''}
 
                 <div class="m-card-meta-divider">
-                    <span class="m-post-date">${pDt}</span>
+                    <span class="m-post-date">${pDtAgo}</span>
                     <div class="m-card-total-score">
                         <i class="fa-solid fa-star"></i> <span class="score-num">${pScore.toLocaleString()}</span> 점
                     </div>
