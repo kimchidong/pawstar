@@ -21,7 +21,10 @@
     <header class="m-header">
         <a href="/m/" class="m-brand">
             <i class="fa-solid fa-paw"></i>
-            <span>Paw Star</span>
+            <div class="m-brand-text">
+                <span class="m-brand-title">Paw Star</span>
+                <span class="m-brand-slogan">"반려동물도 스타가 될 수 있다."</span>
+            </div>
         </a>
         <div class="m-header-actions" style="display: flex; align-items: center; gap: 0.3rem;">
             <a href="/m/" class="m-nav-header-item {{ 'active' if request.path == '/m/' or request.path == '/m' }}" style="font-size: 0.82rem; font-weight: 800; padding: 0.35rem 0.65rem; border-radius: 14px; color: {{ 'var(--accent-purple)' if (request.path == '/m/' or request.path == '/m') else 'var(--text-secondary)' }}; background: {{ '#f1f5f9' if (request.path == '/m/' or request.path == '/m') else 'transparent' }}; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
