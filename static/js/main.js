@@ -1376,7 +1376,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
     try {
         await navigator.clipboard.writeText(shareUrl);
         if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +10점이 적립됩니다.');
+            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
         } else {
             alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
@@ -1388,7 +1388,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         document.execCommand('copy');
         document.body.removeChild(tempInput);
         if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입 시 공유점수 +10점이 적립됩니다.');
+            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
         } else {
             alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
         }
