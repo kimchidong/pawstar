@@ -166,13 +166,8 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="podium-media">
-                        <div class="crown-badge">
-                            <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
-                        </div>
-                        <div class="winner-title-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
+                    <div class="podium-media"></div>
+                    <div class="podium-body" style="display: flex; align-items: center; justify-content: center; min-height: 180px;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
                     </div>
                 {% endif %}
@@ -245,13 +240,8 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="podium-media">
-                        <div class="crown-badge">
-                            <img src="/static/image/badge/P001A101.png" style="width: 52px; height: 52px; object-fit: contain;" alt="슈퍼스타 메달">
-                        </div>
-                        <div class="winner-title-badge"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
+                    <div class="podium-media"></div>
+                    <div class="podium-body" style="display: flex; align-items: center; justify-content: center; min-height: 180px;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
                     </div>
                 {% endif %}
@@ -324,13 +314,8 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="podium-media">
-                        <div class="crown-badge">
-                            <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
-                        </div>
-                        <div class="winner-title-badge"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
+                    <div class="podium-media"></div>
+                    <div class="podium-body" style="display: flex; align-items: center; justify-content: center; min-height: 180px;">
                         <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">선정된 수상자가 없습니다.</p>
                     </div>
                 {% endif %}
@@ -519,15 +504,8 @@
                                                 {% endfor %}
                                             </div>
                                         {% else %}
-                                            <div class="podium-media" style="height: 270px;">
-                                                <div class="crown-badge">
-                                                    <img src="/static/image/badge/P002A90{{ rk }}.png" style="width: 40px; height: 40px; object-fit: contain;" alt="{{ rk }}위 메달">
-                                                </div>
-                                                {% set g_kind = group.kind_nm or '' %}
-                                                {% set g_icon = 'fa-solid fa-dog' if ('강아지' in g_kind or '개' in g_kind) else ('fa-solid fa-cat' if '고양이' in g_kind else ('fa-solid fa-otter' if ('햄스터' in g_kind or '소동물' in g_kind or '토끼' in g_kind or '고슴도치' in g_kind) else ('fa-solid fa-frog' if ('거북이' in g_kind or '파충류' in g_kind or '도마뱀' in g_kind) else ('fa-solid fa-fish' if ('어류' in g_kind or '관상어' in g_kind or '물고기' in g_kind) else ('fa-solid fa-crow' if ('새' in g_kind or '앵무새' in g_kind or '조류' in g_kind) else ('fa-solid fa-horse' if ('말' in g_kind or '큰동물' in g_kind) else 'fa-solid fa-paw')))))) %}
-                                                <div class="winner-title-badge family-star-badge"><i class="{{ g_icon }}"></i> <span>패밀리스타</span></div>
-                                            </div>
-                                            <div style="display: flex; align-items: center; justify-content: center; flex: 1; min-height: 140px; width: 100%;">
+                                            <div class="podium-media" style="height: 270px;"></div>
+                                            <div class="podium-body" style="display: flex; align-items: center; justify-content: center; min-height: 140px;">
                                                 <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; text-align: center;">수상자가 없습니다.</p>
                                             </div>
                                         {% endif %}
