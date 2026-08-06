@@ -77,19 +77,28 @@ def run_monthly_award_batch():
             round_id = current_contest['CONTEST_ROUND']
             print(f"[{now}] 대상 콘테스트 회차: 제{round_id}회")
 
-            # 2. 해당 회차 모든 참가물의 실시간 DB 이력(조회/좋아요/댓글) 재집계 및 점수(SCORE) 산출
+            # 2. 해당 회차 모든 참가물의 실시간 DB 이력(조회/좋아요/댓글/공유) 재집계 및 점수(SCORE) 산출
             cur.execute("""
                 SELECT 
                     r.CONTEST_ROUND, 
                     r.ROUND_NO, 
                     r.ENT_USER_ID, 
                     r.KIND_CD,
+                    r.SHARE_CNT,
                     (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS REAL_VW_CNT,
                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS REAL_LIKE_CNT,
                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS REAL_CMT_CNT,
+                    GREATEST(
+                        COALESCE((SELECT COUNT(*) FROM pst_contest_share s WHERE s.CONTEST_ROUND = r.CONTEST_ROUND AND s.ROUND_NO = r.ROUND_NO), 0),
+                        COALESCE(r.SHARE_CNT, 0)
+                    ) AS REAL_SHARE_CNT,
                     ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
                      (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10) AS CALC_SCORE
+                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                     GREATEST(
+                         COALESCE((SELECT COUNT(*) FROM pst_contest_share s WHERE s.CONTEST_ROUND = r.CONTEST_ROUND AND s.ROUND_NO = r.ROUND_NO), 0),
+                         COALESCE(r.SHARE_CNT, 0)
+                     ) * 10) AS CALC_SCORE
                 FROM pst_contest_round r
                 WHERE r.CONTEST_ROUND = %s
             """, (round_id,))
@@ -102,18 +111,19 @@ def run_monthly_award_batch():
                 real_vw = p['REAL_VW_CNT']
                 real_like = p['REAL_LIKE_CNT']
                 real_cmt = p['REAL_CMT_CNT']
+                real_share = p['REAL_SHARE_CNT']
                 cur.execute("""
                     UPDATE pst_contest_round
-                    SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SCORE = %s
+                    SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (real_vw, real_like, real_cmt, calc_score, round_id, p['ROUND_NO']))
+                """, (real_vw, real_like, real_cmt, real_share, calc_score, round_id, p['ROUND_NO']))
 
-            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT)
+            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT -> SHARE_CNT)
             cur.execute("""
-                SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
+                SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SHARE_CNT, SCORE
                 FROM pst_contest_round
                 WHERE CONTEST_ROUND = %s
-                ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, ENT_DT ASC
+                ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, SHARE_CNT DESC, ENT_DT ASC
             """, (round_id,))
             total_sorted = cur.fetchall()
 
@@ -122,7 +132,7 @@ def run_monthly_award_batch():
             total_sorted_with_rank = []
 
             for item in total_sorted:
-                key = (item['SCORE'], item['CMT_CNT'], item['LIKE_CNT'], item['VW_CNT'])
+                key = (item['SCORE'], item['CMT_CNT'], item['LIKE_CNT'], item['VW_CNT'], item.get('SHARE_CNT', 0))
                 if prev_key is not None and key != prev_key:
                     current_rank += 1
                 
