@@ -162,25 +162,22 @@
                 {% endif %}
             </div>
             <div class="m-card-body">
-                <!-- 작성자 프로필 및 펫 태그 -->
+                <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
                 <div class="m-card-author">
                     <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or p.user_avatar or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname }}" class="m-author-avatar">
-                    <div class="m-author-info">
-                        <div class="m-author-name">{{ p.NK_NM or p.user_nickname or '익명' }}</div>
-                        <div class="m-pet-tag">
-                            <span class="m-pet-kind-text">{{ p.KIND_NM or p.pet_type }}</span>
-                            {% if p.PET_NM or p.pet_name %}
-                                <span class="m-pet-name-text">• {{ p.PET_NM or p.pet_name }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <span class="m-author-name">{{ p.NK_NM or p.user_nickname or '익명' }}</span>
+                </div>
+
+                <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
+                <div class="m-pet-tag">
+                    <span class="m-pet-kind-text">{{ p.KIND_NM or p.pet_type }}</span>
+                    {% if p.PET_NM or p.pet_name %}
+                        <span class="m-pet-name-text">• {{ p.PET_NM or p.pet_name }}</span>
+                    {% endif %}
                 </div>
                 
-                <!-- 제목 및 본문 요약 (PC와 동일하게 제목 단독 노출) -->
+                <!-- 3줄째: 게시글 제목 -->
                 <h3 class="m-post-title">{{ p.TITLE or p.title }}</h3>
-                {% if p.CONTS or p.content %}
-                    <p class="m-post-desc">{{ p.CONTS or p.content }}</p>
-                {% endif %}
 
                 <!-- 구분선 + 등록일시 & PC 동일 노란 알약 총 점수 배지 -->
                 <div class="m-card-meta-divider">

@@ -1067,19 +1067,20 @@ function renderMobileFeedGrid(posts) {
             </div>
 
             <div class="m-card-body">
+                <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
                 <div class="m-card-author">
                     <img src="${pAvatar}" alt="${pUserNm}" class="m-author-avatar">
-                    <div class="m-author-info">
-                        <div class="m-author-name">${pUserNm}</div>
-                        <div class="m-pet-tag">
-                            <span class="m-pet-kind-text">${pKindRaw}</span>
-                            ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
-                        </div>
-                    </div>
+                    <span class="m-author-name">${pUserNm}</span>
                 </div>
 
+                <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
+                <div class="m-pet-tag">
+                    <span class="m-pet-kind-text">${pKindRaw}</span>
+                    ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
+                </div>
+
+                <!-- 3줄째: 게시글 제목 -->
                 <h3 class="m-post-title">${pTitle}</h3>
-                ${pConts ? `<p class="m-post-desc">${pConts}</p>` : ''}
 
                 <div class="m-card-meta-divider">
                     <span class="m-post-date">${pDtAgo}</span>

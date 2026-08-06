@@ -851,40 +851,37 @@ body.m-body {
 .m-card-author {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    margin-bottom: 0.5rem;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .m-author-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--border-light);
     flex-shrink: 0;
 }
 
-.m-author-info {
-    min-width: 0;
-    overflow: hidden;
-    flex: 1;
-}
-
 .m-author-name {
     font-size: 0.85rem;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
-    width: 100%;
+    display: inline-block;
+    flex: 1;
+    min-width: 0;
 }
 
 .m-pet-tag {
     font-size: 0.75rem;
-    font-weight: 700;
-    margin-top: 0.05rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
     display: flex;
     align-items: center;
     gap: 0.2rem;
@@ -896,14 +893,14 @@ body.m-body {
 
 .m-pet-kind-text {
     color: #e11d48;
-    font-weight: 800;
+    font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
 .m-pet-name-text {
     color: #6d28d9;
-    font-weight: 700;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -911,11 +908,11 @@ body.m-body {
 }
 
 .m-post-title {
-    font-size: 0.9rem;
-    font-weight: 800;
+    font-size: 0.88rem;
+    font-weight: 600;
     line-height: 1.3;
     color: var(--text-primary);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -924,15 +921,7 @@ body.m-body {
 }
 
 .m-post-desc {
-    font-size: 0.76rem;
-    color: var(--text-secondary);
-    line-height: 1.35;
-    margin-bottom: 0.6rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 100%;
+    display: none !important;
 }
 
 /* 점선 구분선 및 등록일시/점수 메타바 */
@@ -950,7 +939,7 @@ body.m-body {
 .m-post-date {
     font-size: 0.72rem;
     color: #94a3b8;
-    font-weight: 600;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -965,7 +954,7 @@ body.m-body {
     color: #d97706;
     padding: 0.2rem 0.5rem;
     border-radius: 16px;
-    font-weight: 800;
+    font-weight: 600;
     font-size: 0.74rem;
     display: inline-flex;
     align-items: center;
@@ -991,7 +980,7 @@ body.m-body {
     box-sizing: border-box;
     border-radius: 12px;
     font-size: 0.76rem;
-    font-weight: 700;
+    font-weight: 500;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1008,7 +997,7 @@ body.m-body {
 
 .m-btn-action span {
     font-size: 0.76rem;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 /* PC 동일 Active 하이라이트 배경 및 테두리 */
