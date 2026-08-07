@@ -197,8 +197,16 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
     }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
-    document.getElementById('mDetailTitle').textContent = postData.title || postData.TITLE || '';
-    document.getElementById('mDetailContent').textContent = postData.content || postData.CONTS || '';
+    const mTitleEl = document.getElementById('mDetailTitle');
+    if (mTitleEl) mTitleEl.textContent = postData.title || postData.TITLE || '';
+    
+    const mContentEl = document.getElementById('mDetailContent');
+    if (mContentEl) mContentEl.textContent = postData.content || postData.CONTS || '';
+
+    const mCreatedAtEl = document.getElementById('mDetailCreatedAt');
+    if (mCreatedAtEl) {
+        mCreatedAtEl.textContent = postData.created_at || postData.ENT_DT || postData.dt_ago || '';
+    }
 
     // 4요소 실시간 액션 수치 팝업 세팅
     const viewCnt = postData.view_count || postData.VW_CNT || 0;

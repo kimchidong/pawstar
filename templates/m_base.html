@@ -91,14 +91,22 @@
                 <div id="mDetailRankBadge" style="position: absolute; top: 0.5rem; right: 0.5rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; pointer-events: auto;"></div>
             </div>
             
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-                <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
-                    <img id="mDetailAuthorImg" src="" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;">
-                    <div style="min-width: 0;">
-                        <div id="mDetailAuthorNickname" style="font-size: 0.85rem; font-weight: 800; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">집사</div>
-                        <div id="mDetailPetTag" style="font-size: 0.75rem; font-weight: 700;">강아지</div>
+            <div style="display: flex; align-items: center; gap: 0.55rem; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 0.75rem;">
+                <img id="mDetailAuthorImg" src="" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;">
+                <div style="min-width: 0; flex: 1;">
+                    <div id="mDetailAuthorNickname" style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">집사</div>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; min-width: 0; margin-top: 0.15rem;">
+                        <div id="mDetailPetTag" style="font-size: 0.76rem; font-weight: 700; flex-shrink: 0;">강아지</div>
+                        <div id="mDetailTitle" style="font-size: 0.82rem; font-weight: 800; color: #6b21a8; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; flex: 1;"></div>
                     </div>
                 </div>
+            </div>
+            
+            <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; white-space: pre-wrap; word-break: break-all;"></p>
+
+            <!-- 본문 하단 날짜 및 점수 / 하트 / 공유 액션 바 (PC 팝업 동일 구성) -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding: 0 0.1rem;">
+                <span id="mDetailCreatedAt" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;"></span>
                 <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
                     <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fde68a; color: var(--accent-gold); padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 800; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.1);">
                         ⭐ <span id="mDetailScoreNum">0</span> 점
@@ -111,8 +119,6 @@
                     </button>
                 </div>
             </div>
-            
-            <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.85rem; white-space: pre-wrap; word-break: break-all;"></p>
 
             <!-- 실시간 4요소 수치 (조회수, 좋아요, 댓글수, 공유수) -->
             <div class="m-card-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.75rem; text-align: center;">
