@@ -466,7 +466,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    const isViewed = !!data.actions.is_viewed || true;
+                    const mCurUserId = String(window.currentUserId || '').trim();
+                    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
+                    const isMine = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
+                    
+                    const isViewed = !isMine && !!(data.actions && data.actions.is_viewed);
                     mBtnViewPopup.classList.toggle('active', isViewed);
                     const icon = mBtnViewPopup.querySelector('i');
                     if (icon) icon.className = isViewed ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
@@ -1222,6 +1226,11 @@ function renderMobileFeedGrid(posts) {
             }
         }
 
+        const mCurUserId = String(window.currentUserId || '').trim();
+        const pEntUserId = String(entUserId || p.ENT_USER_ID || p.user_id || '').trim();
+        const isMine = !!(mCurUserId && pEntUserId && mCurUserId === pEntUserId);
+        const isViewActive = !isMine && !!(p.actions && p.actions.is_viewed);
+
         html += `
         <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
             <div class="m-card-thumb">
@@ -1253,8 +1262,8 @@ function renderMobileFeedGrid(posts) {
                 </div>
 
                 <div class="m-card-actions" onclick="event.stopPropagation();">
-                    <div class="m-btn-action btn-view ${p.actions && p.actions.is_viewed ? 'active' : ''}" title="조회수">
-                        <i class="fa-${p.actions && p.actions.is_viewed ? 'solid' : 'regular'} fa-eye"></i> <span class="view-count">${pViewCount.toLocaleString()}</span>
+                    <div class="m-btn-action btn-view ${isViewActive ? 'active' : ''}" title="조회수">
+                        <i class="fa-${isViewActive ? 'solid' : 'regular'} fa-eye"></i> <span class="view-count">${pViewCount.toLocaleString()}</span>
                     </div>
                     <div class="m-btn-action btn-like ${p.actions && p.actions.is_liked ? 'active' : ''}" title="좋아요 수">
                         <i class="fa-${p.actions && p.actions.is_liked ? 'solid' : 'regular'} fa-heart" ${p.actions && p.actions.is_liked ? 'style="color: #e11d48;"' : ''}></i> <span class="like-count">${pHeartCount.toLocaleString()}</span>

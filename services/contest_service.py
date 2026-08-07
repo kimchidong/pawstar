@@ -1198,11 +1198,12 @@ class PawStarService:
                         row['STATUS_CD'] = 'G001C002'
 
                     row['awards'] = awards_map.get(row['ROUND_NO'], [])
+                    is_author = bool(user_id and row.get('ENT_USER_ID') and str(user_id) == str(row.get('ENT_USER_ID')))
                     row['actions'] = {
-                        'is_liked': row['ROUND_NO'] in liked_round_nos,
-                        'is_commented': row['ROUND_NO'] in commented_round_nos,
-                        'is_viewed': row['ROUND_NO'] in viewed_round_nos,
-                        'is_shared': row['ROUND_NO'] in shared_round_nos
+                        'is_liked': False if is_author else (row['ROUND_NO'] in liked_round_nos),
+                        'is_commented': False if is_author else (row['ROUND_NO'] in commented_round_nos),
+                        'is_viewed': False if is_author else (row['ROUND_NO'] in viewed_round_nos),
+                        'is_shared': False if is_author else (row['ROUND_NO'] in shared_round_nos)
                     }
                     posts.append(row)
 
@@ -1386,6 +1387,13 @@ class PawStarService:
                     cmt_list.append(c)
 
                 post['comments'] = cmt_list
+                author_id = post.get('ENT_USER_ID') or post.get('user_id')
+                is_author = bool(current_user_id and author_id and str(current_user_id) == str(author_id))
+                if is_author:
+                    is_liked = False
+                    is_commented = False
+                    is_viewed = False
+                    is_shared = False
                 post['actions'] = {'is_liked': is_liked, 'is_commented': is_commented, 'is_viewed': is_viewed, 'is_shared': is_shared}
                 conn.close()
                 return post

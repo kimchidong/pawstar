@@ -191,8 +191,10 @@
 
                 <!-- 실시간 4요소 수치 (조회, 좋아요, 댓글, 공유가입) -->
                 <div class="m-card-actions" onclick="event.stopPropagation();">
-                    <div class="m-btn-action btn-view {% if is_logged_in and p.actions and p.actions.is_viewed %}active{% endif %}" title="조회수">
-                        <i class="fa-{% if is_logged_in and p.actions and p.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
+                    {% set is_mine = is_logged_in and current_user_id and p.ENT_USER_ID and (current_user_id|string == p.ENT_USER_ID|string) %}
+                    {% set is_view_act = is_logged_in and (not is_mine) and p.actions and p.actions.is_viewed %}
+                    <div class="m-btn-action btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                        <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
                     </div>
                     <div class="m-btn-action btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i> <span class="like-count">{{ "{:,}".format((p.like_count or p.LIKE_CNT or 0)|int) }}</span>

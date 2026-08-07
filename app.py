@@ -1065,7 +1065,7 @@ def get_user_post_actions(post_id):
         return jsonify({'success': True, 'actions': actions})
     except Exception as e:
         print("user_actions 오류:", e)
-        return jsonify({'success': True, 'actions': {'is_viewed': True, 'is_liked': False, 'is_commented': False, 'is_shared': False}})
+        return jsonify({'success': True, 'actions': {'is_viewed': False, 'is_liked': False, 'is_commented': False, 'is_shared': False}})
 
 @app.route('/api/post/liked_status/<path:post_id>', methods=['GET'])
 def get_post_liked_status(post_id):
