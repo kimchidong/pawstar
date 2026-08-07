@@ -136,6 +136,7 @@
                 {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-otter' if ('햄스터' in p_kind or '소동물' in p_kind or '토끼' in p_kind or '고슴도치' in p_kind) else ('fa-solid fa-frog' if ('거북이' in p_kind or '파충류' in p_kind or '도마뱀' in p_kind) else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind or '조류' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))))) %}
                 
                 {% set rk_cand = p.rank_candidate or p.RANK_CANDIDATE or p.rank or p.ranking %}
+                {% set is_post_closed = is_closed or p.is_closed or p.closed or (p.CONTEST_STAT == 'G001C002') or (p.STATUS_CD == 'G001C002') or (current_contest and current_contest.CONTEST_STAT == 'G001C002') %}
                 {% if p.awards and p.awards|length > 0 %}
                     <div style="position: absolute; top: 0.55rem; right: 0.55rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
@@ -154,7 +155,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                {% elif rk_cand %}
+                {% elif rk_cand and not is_post_closed %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set is_co = p.is_co_rank or p.IS_CO_RANK %}

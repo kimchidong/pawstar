@@ -325,7 +325,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         }
     } else {
         if (mBadgeEl) {
-            if (postData.rank_candidate) {
+            if (postData.rank_candidate && !isClosedRound) {
                 mBadgeEl.style.justifyContent = 'flex-start';
                 mBadgeEl.style.left = '0.5rem';
                 mBadgeEl.style.right = 'auto';
@@ -1166,9 +1166,10 @@ function renderMobileFeedGrid(posts) {
             });
             badgeHtml = `<div style="position: absolute; top: 0.45rem; right: 0.45rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
         } else {
+            const isPostClosed = p.is_closed || p.closed || p.contest_stat === 'G001C002' || p.CONTEST_STAT === 'G001C002' || p.STATUS_CD === 'G001C002' || p.is_ended || p.IS_ENDED;
             const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;
             const isCo = p.is_co_rank || p.IS_CO_RANK;
-            if (rkCand) {
+            if (rkCand && !isPostClosed) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
