@@ -725,35 +725,6 @@ function deleteMobileDetailComment(cmtUserId) {
             }
 
             const cleanId = String(mPostId);
-            const rawEntId = cleanId.replace(/^\d+_/, '');
-            const card = document.getElementById(`m-post-card-${cleanId}`) || 
-                         document.getElementById(`m-post-card-${rawEntId}`) ||
-                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
-                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
-                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
-                         
-            if (card) {
-                const btnCardComment = card.querySelector('.m-btn-comment') || card.querySelector('.btn-comment');
-                if (btnCardComment) {
-                    btnCardComment.classList.remove('active');
-                    const icon = btnCardComment.querySelector('i');
-                    if (icon) icon.className = 'fa-regular fa-comment';
-                }
-
-                const cardComment = card.querySelector('.comment-count');
-                if (cardComment && finalComment !== undefined) {
-                    cardComment.textContent = finalComment;
-                }
-                const cardScore = card.querySelector('.score-num');
-                if (cardScore && finalScore !== undefined) {
-                    cardScore.textContent = finalScore.toLocaleString();
-                }
-                const cardView = card.querySelector('.view-count');
-                if (cardView && finalView !== undefined) {
-                    cardView.textContent = finalView;
-                }
-                const cardLike = card.querySelector('.like-count');
-                if (cardLike && finalLike !== undefined) {
                     cardLike.textContent = finalLike;
                 }
             }
@@ -1345,6 +1316,18 @@ async function triggerMobileEvent(postId, eventType) {
         }
         return;
     }
+
+    if (window.currentMobileDetailPostData && String(window.currentMobileDetailPostData.post_id || window.currentMobileDetailPostData.POST_ID) === String(postId)) {
+        const entUserId = window.currentMobileDetailPostData.ENT_USER_ID || window.currentMobileDetailPostData.user_id;
+        if (window.currentUserId && entUserId && String(window.currentUserId) === String(entUserId)) {
+            if (eventType === 'like') {
+                if (typeof showToast === 'function') showToast('💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾', 'warning');
+                else alert('💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾');
+                return;
+            }
+        }
+    }
+
     try {
         const res = await fetch('/api/post/event', {
             method: 'POST',

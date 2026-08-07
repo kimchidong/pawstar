@@ -1478,7 +1478,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -1487,6 +1487,22 @@ class PawStarService:
                     conn.close()
                     return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
                 round_no = r_info['ROUND_NO']
+                author_id = r_info.get('ENT_USER_ID')
+
+                # 작성자 본인 접속 시 조회수 및 점수 가산 무시
+                if view_user_id and author_id and str(view_user_id) == str(author_id):
+                    stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
+                    conn.close()
+                    return {
+                        'view_count': stats['view_count'],
+                        'like_count': stats['like_count'],
+                        'comment_count': stats['comment_count'],
+                        'share_count': stats['share_count'],
+                        'new_score': stats['score'],
+                        'score': stats['score'],
+                        'already_viewed': True,
+                        'is_author': True
+                    }
 
                 # 1. DB pst_contest_round 의 누적 조회수(VW_CNT) 1 무조건 가산
                 cur.execute("""
@@ -1539,7 +1555,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -1548,6 +1564,16 @@ class PawStarService:
                     conn.close()
                     return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
                 round_no = r_info['ROUND_NO']
+                author_id = r_info.get('ENT_USER_ID')
+
+                # 게시글 작성자 본인 좋아요 클릭 차단
+                if like_user_id and author_id and str(like_user_id) == str(author_id):
+                    conn.close()
+                    return {
+                        'success': False,
+                        'is_author': True,
+                        'message': '💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾'
+                    }
 
                 cur.execute("""
                     SELECT 1 FROM pst_contest_like
@@ -1663,7 +1689,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -1672,6 +1698,16 @@ class PawStarService:
                     conn.close()
                     return {'success': False, 'message': '출전 게시물을 찾을 수 없습니다.'}
                 round_no = r_info['ROUND_NO']
+                author_id = r_info.get('ENT_USER_ID')
+
+                # 게시글 작성자 본인 댓글 작성 차단
+                if cmt_user_id and author_id and str(cmt_user_id) == str(author_id):
+                    conn.close()
+                    return {
+                        'success': False,
+                        'is_author': True,
+                        'message': '💡 본인이 등록한 게시물에는 댓글을 남기실 수 없습니다. 🐾'
+                    }
 
                 # 1. DB에 댓글 먼저 저장
                 cur.execute("""
