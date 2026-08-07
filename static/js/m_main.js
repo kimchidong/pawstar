@@ -371,6 +371,8 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     const mIsLiked = !!((postData.actions && postData.actions.is_liked) || postData.is_liked);
     const mBtnLikePopup = document.getElementById('mDetailBtnLike');
     const mHeartIcon = document.getElementById('mDetailHeartIcon');
+    const mHeaderLikeBtn = document.getElementById('mDetailHeaderLikeBtn');
+    const mHeaderHeartIcon = document.getElementById('mDetailHeaderHeartIcon');
     if (mBtnLikePopup) {
         const icon = mBtnLikePopup.querySelector('i');
         if (mIsLiked) {
@@ -388,6 +390,13 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     if (mHeartIcon) {
         mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
         mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
+    }
+    if (mHeaderHeartIcon) {
+        mHeaderHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        mHeaderHeartIcon.style.color = '#e11d48';
+    }
+    if (mHeaderLikeBtn) {
+        mHeaderLikeBtn.classList.toggle('active', mIsLiked);
     }
 
     fetch(`/api/post/user_actions/${postData.post_id}`)
@@ -408,6 +417,13 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 if (mHeartIcon) {
                     mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
                     mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
+                }
+                if (mHeaderHeartIcon) {
+                    mHeaderHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                    mHeaderHeartIcon.style.color = '#e11d48';
+                }
+                if (mHeaderLikeBtn) {
+                    mHeaderLikeBtn.classList.toggle('active', mIsLiked);
                 }
                 const mIsCommented = !!data.actions.is_commented;
                 if (btnCommentPopup) {
@@ -432,6 +448,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
+
+    // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거
+    if (postData.post_id) {
+        triggerMobileEvent(postData.post_id, 'view');
+    }
 
 
     const mCommentFormContainer = document.getElementById('mDetailCommentFormContainer');
@@ -1200,11 +1221,33 @@ async function triggerMobileEvent(postId, eventType) {
         return;
     }
     try {
-        const res = await fetch(`/api/event/${postId}/${eventType}`, { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
+        const res = await fetch('/api/post/event', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                event_type: eventType
+            })
+        });
+
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error('triggerMobileEvent HTTP error:', res.status, errText);
+            if (typeof showToast === 'function') showToast('서버 오류가 발생했습니다.', 'warning');
+            return;
+        }
+
+        const resData = await res.json();
+        const data = (resData && resData.data) ? resData.data : resData;
+        const isSuccess = resData.success && (data.success !== false);
+
+        if (isSuccess) {
             const finalScore = Number(data.score !== undefined ? data.score : (data.new_score !== undefined ? data.new_score : (data.event_res ? data.event_res.score : 0)));
             const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
+            const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
+            const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
             
             const mScoreEl = document.getElementById('mDetailScoreNum');
             if (mScoreEl && finalScore) mScoreEl.textContent = finalScore.toLocaleString();
@@ -1212,18 +1255,35 @@ async function triggerMobileEvent(postId, eventType) {
             const mLikeEl = document.getElementById('mDetailLikeCount');
             if (mLikeEl && finalLike !== undefined) mLikeEl.textContent = Number(finalLike).toLocaleString();
 
-            const mBtnLikePopup = document.getElementById('mDetailBtnLike');
-            const mHeartIcon = document.getElementById('mDetailHeartIcon');
-            if (mBtnLikePopup && mHeartIcon) {
+            const mViewEl = document.getElementById('mDetailViewCount');
+            if (mViewEl && finalView !== undefined) mViewEl.textContent = Number(finalView).toLocaleString();
+
+            const mCommentEl = document.getElementById('mDetailCommentCount');
+            if (mCommentEl && finalComment !== undefined) mCommentEl.textContent = Number(finalComment).toLocaleString();
+
+            if (eventType === 'like') {
+                const mBtnLikePopup = document.getElementById('mDetailBtnLike');
+                const mHeartIcon = document.getElementById('mDetailHeartIcon');
+                const mHeaderLikeBtn = document.getElementById('mDetailHeaderLikeBtn');
+                const mHeaderHeartIcon = document.getElementById('mDetailHeaderHeartIcon');
                 const isLiked = data.is_liked !== undefined ? data.is_liked : true;
-                if (isLiked) {
-                    mBtnLikePopup.classList.add('active');
-                    mHeartIcon.className = 'fa-solid fa-heart';
-                    mHeartIcon.style.color = '#e11d48';
-                } else {
-                    mBtnLikePopup.classList.remove('active');
-                    mHeartIcon.className = 'fa-regular fa-heart';
-                    mHeartIcon.style.color = '';
+
+                if (mBtnLikePopup && mHeartIcon) {
+                    if (isLiked) {
+                        mBtnLikePopup.classList.add('active');
+                        mHeartIcon.className = 'fa-solid fa-heart';
+                        mHeartIcon.style.color = '#e11d48';
+                    } else {
+                        mBtnLikePopup.classList.remove('active');
+                        mHeartIcon.className = 'fa-regular fa-heart';
+                        mHeartIcon.style.color = '';
+                    }
+                }
+
+                if (mHeaderLikeBtn && mHeaderHeartIcon) {
+                    mHeaderLikeBtn.classList.toggle('active', isLiked);
+                    mHeaderHeartIcon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                    mHeaderHeartIcon.style.color = '#e11d48';
                 }
             }
 
@@ -1236,15 +1296,17 @@ async function triggerMobileEvent(postId, eventType) {
                          document.querySelector(`[data-ent-user-id="${cleanId}"]`);
 
             if (card) {
-                const btnCardLike = card.querySelector('.btn-like') || card.querySelector('.m-btn-action.btn-like');
-                if (btnCardLike) {
-                    const isLiked = data.is_liked !== undefined ? data.is_liked : true;
-                    btnCardLike.classList.toggle('active', isLiked);
-                    const icon = btnCardLike.querySelector('i');
-                    if (icon) {
-                        icon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-                        if (isLiked) icon.style.color = '#e11d48';
-                        else icon.style.color = '';
+                if (eventType === 'like') {
+                    const btnCardLike = card.querySelector('.btn-like') || card.querySelector('.m-btn-action.btn-like');
+                    if (btnCardLike) {
+                        const isLiked = data.is_liked !== undefined ? data.is_liked : true;
+                        btnCardLike.classList.toggle('active', isLiked);
+                        const icon = btnCardLike.querySelector('i');
+                        if (icon) {
+                            icon.className = isLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                            if (isLiked) icon.style.color = '#e11d48';
+                            else icon.style.color = '';
+                        }
                     }
                 }
 
@@ -1253,13 +1315,23 @@ async function triggerMobileEvent(postId, eventType) {
                     cardLike.textContent = Number(finalLike).toLocaleString();
                 }
 
+                const cardView = card.querySelector('.view-count');
+                if (cardView && finalView !== undefined) {
+                    cardView.textContent = Number(finalView).toLocaleString();
+                }
+
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = Number(finalComment).toLocaleString();
+                }
+
                 const cardScore = card.querySelector('.m-card-score, .score-num');
                 if (cardScore && finalScore) {
                     cardScore.textContent = `⭐ ${finalScore.toLocaleString()}`;
                 }
             }
         } else {
-            if (typeof showToast === 'function') showToast(data.message || '요청 처리 실패', 'warning');
+            if (typeof showToast === 'function') showToast(data.message || resData.message || '요청 처리 실패', 'warning');
         }
     } catch (err) {
         console.error('triggerMobileEvent error:', err);
