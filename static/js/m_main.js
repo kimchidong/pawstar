@@ -442,6 +442,13 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                     const btnSharePopup = document.getElementById('mDetailBtnShare');
                     if (btnSharePopup) btnSharePopup.classList.toggle('active', mIsShared);
                 }
+                const mBtnViewPopup = document.getElementById('mDetailBtnView');
+                if (mBtnViewPopup) {
+                    const isViewed = !!data.actions.is_viewed || true;
+                    mBtnViewPopup.classList.toggle('active', isViewed);
+                    const icon = mBtnViewPopup.querySelector('i');
+                    if (icon) icon.className = isViewed ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+                }
             }
         })
         .catch(err => console.error(err));
@@ -1139,17 +1146,17 @@ function renderMobileFeedGrid(posts) {
                 </div>
 
                 <div class="m-card-actions" onclick="event.stopPropagation();">
-                    <div class="m-btn-action btn-view" title="조회수">
-                        <i class="fa-regular fa-eye"></i> <span>${pViewCount.toLocaleString()}</span>
+                    <div class="m-btn-action btn-view ${p.actions && p.actions.is_viewed ? 'active' : ''}" title="조회수">
+                        <i class="fa-${p.actions && p.actions.is_viewed ? 'solid' : 'regular'} fa-eye"></i> <span class="view-count">${pViewCount.toLocaleString()}</span>
                     </div>
-                    <div class="m-btn-action btn-like" title="좋아요 수">
-                        <i class="fa-regular fa-heart"></i> <span>${pHeartCount.toLocaleString()}</span>
+                    <div class="m-btn-action btn-like ${p.actions && p.actions.is_liked ? 'active' : ''}" title="좋아요 수">
+                        <i class="fa-${p.actions && p.actions.is_liked ? 'solid' : 'regular'} fa-heart" ${p.actions && p.actions.is_liked ? 'style="color: #e11d48;"' : ''}></i> <span class="like-count">${pHeartCount.toLocaleString()}</span>
                     </div>
-                    <div class="m-btn-action btn-comment" title="댓글 수">
-                        <i class="fa-regular fa-comment"></i> <span>${pCommentCount.toLocaleString()}</span>
+                    <div class="m-btn-action btn-comment ${p.actions && p.actions.is_commented ? 'active' : ''}" title="댓글 수">
+                        <i class="fa-${p.actions && p.actions.is_commented ? 'solid' : 'regular'} fa-comment"></i> <span class="comment-count">${pCommentCount.toLocaleString()}</span>
                     </div>
-                    <div class="m-btn-action btn-share" title="공유가입 수">
-                        <i class="fa-solid fa-share-nodes"></i> <span>${pShareScore.toLocaleString()}</span>
+                    <div class="m-btn-action btn-share ${p.actions && p.actions.is_shared ? 'active' : ''}" title="공유가입 수">
+                        <i class="fa-solid fa-share-nodes"></i> <span class="share-count">${pShareScore.toLocaleString()}</span>
                     </div>
                 </div>
             </div>

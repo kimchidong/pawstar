@@ -114,18 +114,18 @@
             
             <p id="mDetailContent" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.85rem; white-space: pre-wrap; word-break: break-all;"></p>
 
-            <!-- 실시간 4요소 수치 (조회수, 좋아요, 댓글수, 공유수 - PC 팝업과 동일 스타일) -->
+            <!-- 실시간 4요소 수치 (조회수, 좋아요, 댓글수, 공유수) -->
             <div class="m-card-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.75rem; text-align: center;">
-                <div class="m-btn-action btn-view" id="mDetailBtnView" title="조회수" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #f0f9ff; border: 1px solid #bae6fd; color: #0284c7; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                <div class="m-btn-action btn-view" id="mDetailBtnView" title="조회수">
                     <i class="fa-regular fa-eye"></i> <span class="view-count" id="mDetailViewCount">0</span>
                 </div>
-                <div class="m-btn-action btn-like" id="mDetailBtnLike" title="좋아요 수" onclick="if(window.currentMobileDetailPostId) triggerMobileEvent(window.currentMobileDetailPostId, 'like');" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                <div class="m-btn-action btn-like" id="mDetailBtnLike" title="좋아요 수" onclick="if(window.currentMobileDetailPostId) triggerMobileEvent(window.currentMobileDetailPostId, 'like');">
                     <i class="fa-regular fa-heart" id="mDetailHeartIcon"></i> <span class="like-count" id="mDetailLikeCount">0</span>
                 </div>
-                <div class="m-btn-action btn-comment" id="mDetailBtnComment" title="댓글 수" onclick="document.getElementById('mDetailCommentInput')?.focus();" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #faf5ff; border: 1px solid #e9d5ff; color: #7c3aed; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                <div class="m-btn-action btn-comment" id="mDetailBtnComment" title="댓글 수" onclick="document.getElementById('mDetailCommentInput')?.focus();">
                     <i class="fa-regular fa-comment"></i> <span class="comment-count" id="mDetailCommentCount">0</span>
                 </div>
-                <div class="m-btn-action btn-share" id="mDetailBtnShare" title="공유 가입 수" onclick="handleShareClick();" style="padding: 0.4rem 0.2rem; border-radius: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.25rem; cursor: pointer;">
+                <div class="m-btn-action btn-share" id="mDetailBtnShare" title="공유 가입 수" onclick="handleShareClick();">
                     <i class="fa-solid fa-share-nodes"></i> <span class="share-count" id="mDetailShareCount">0</span>
                 </div>
             </div>

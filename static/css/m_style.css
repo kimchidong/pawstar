@@ -994,13 +994,13 @@ body.m-body {
 .m-btn-action {
     background: #f8fafc;
     border: 1.5px solid #e2e8f0;
-    color: #475569;
+    color: #64748b;
     padding: 0.45rem 0.1rem;
     height: 50px;
     box-sizing: border-box;
     border-radius: 12px;
     font-size: 0.76rem;
-    font-weight: 400;
+    font-weight: 500;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1017,7 +1017,8 @@ body.m-body {
 
 .m-btn-action span {
     font-size: 0.76rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: #64748b;
 }
 
 /* PC 동일 Active 하이라이트 배경 및 테두리 */
