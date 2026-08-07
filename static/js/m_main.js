@@ -353,17 +353,14 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                     iconHtml = `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>`;
                     bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
                 } else {
+                    iconHtml = '<i class="fa-solid fa-medal"></i>';
                     if (postData.rank_candidate === 1) {
-                        iconHtml = '👑';
                         bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.95) 0%, rgba(245,158,11,0.92) 50%, rgba(217,119,6,0.95) 100%); color: #451a03;';
                     } else if (postData.rank_candidate === 2) {
-                        iconHtml = '🪄';
                         bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.92) 60%, rgba(203,213,225,0.9) 100%); color: #0f172a;';
                     } else if (postData.rank_candidate === 3) {
-                        iconHtml = '⭐';
                         bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95) 0%, rgba(251,146,60,0.92) 60%, rgba(234,88,12,0.95) 100%); color: #431407;';
                     } else {
-                        iconHtml = '🏆';
                         bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
                     }
                 }
@@ -1183,7 +1180,7 @@ function renderMobileFeedGrid(posts) {
                 } else {
                     const rkNum = Number(rkCand);
                     if (rkNum === 1) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.95), rgba(245,158,11,0.92)); color: #451a03;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(248,250,252,0.95), rgba(245,158,11,0.92)); color: #451a03;';
                     } else if (rkNum === 2) {
                         bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
                     } else if (rkNum === 3) {
