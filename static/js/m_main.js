@@ -914,10 +914,12 @@ if (typeof window.openBadgeZoomModal === 'function') {
     window.openBadgeZoomModal = window.openBadgeZoomModal;
 }
 
-async function copyPostShareUrl(contestRound, roundNo, shareSn) {
+async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
     if (contestRound === 'None' || contestRound === 'undefined' || contestRound === 'null') contestRound = null;
     if (roundNo === 'None' || roundNo === 'undefined' || roundNo === 'null') roundNo = null;
     if (shareSn === 'None' || shareSn === 'undefined' || shareSn === 'null') shareSn = null;
+
+    const postId = targetPostId || window.currentMobileDetailPostId;
 
     if (!contestRound || !roundNo) {
         if (window.currentMobileDetailPostData) {
@@ -926,8 +928,8 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
             roundNo = p.round_no || p.ROUND_NO || roundNo;
             shareSn = p.share_sn || p.SHARE_SN || shareSn;
         }
-        if ((!contestRound || !roundNo) && window.currentMobileDetailPostId) {
-            const parts = String(window.currentMobileDetailPostId).split('_');
+        if ((!contestRound || !roundNo) && postId) {
+            const parts = String(postId).split('_');
             if (parts.length >= 2) {
                 contestRound = parts[0];
                 roundNo = parts[1];
@@ -957,43 +959,74 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         shareUrl = window.location.href;
     }
 
-    try {
-        await navigator.clipboard.writeText(shareUrl);
-        if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-        } else {
-            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
+    // 서버 DB 공유 수(+1) 및 점수 증가 이벤트 자동 트리거
+    if (postId) {
+        try {
+            await triggerMobileEvent(postId, 'share');
+        } catch (e) {
+            console.error('triggerMobileEvent share error:', e);
         }
-    } catch (err) {
-        const tempInput = document.createElement('input');
-        tempInput.value = shareUrl;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-        } else {
-            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
+    }
+
+    // 모바일 브라우저 Web Share API 시도 (카카오톡, 메시지 등 직접 공유 기능)
+    let webShareDone = false;
+    if (navigator.share && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) {
+        try {
+            await navigator.share({
+                title: 'Paw Star - 펫 랭킹 콘테스트',
+                text: '귀여운 반려동물에게 투표해주세요! 🐾',
+                url: shareUrl
+            });
+            webShareDone = true;
+        } catch (err) {
+            console.log('Web share skipped or user cancelled, fallback to clipboard:', err);
+        }
+    }
+
+    if (!webShareDone) {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            if (typeof showToast === 'function') {
+                showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+            } else {
+                alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
+            }
+        } catch (err) {
+            const tempInput = document.createElement('input');
+            tempInput.value = shareUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            if (typeof showToast === 'function') {
+                showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+            } else {
+                alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
+            }
         }
     }
 }
 
 async function handleShareClick() {
-    if (!window.currentDetailPostId) return;
-    if (window.currentDetailPostData) {
-        const p = window.currentDetailPostData;
+    const postId = window.currentMobileDetailPostId;
+    if (window.currentMobileDetailPostData) {
+        const p = window.currentMobileDetailPostData;
         const cRound = p.contest_id || p.CONTEST_ROUND;
         const rNo = p.round_no || p.ROUND_NO;
         const sSn = p.share_sn || p.SHARE_SN;
-        await copyPostShareUrl(cRound, rNo, sSn);
+        await copyPostShareUrl(cRound, rNo, sSn, postId);
     } else {
-        await copyPostShareUrl();
+        await copyPostShareUrl(null, null, null, postId);
     }
+}
+
+async function handleShareClickForCard(postId, contestRound, roundNo, shareSn) {
+    await copyPostShareUrl(contestRound, roundNo, shareSn, postId);
 }
 
 window.copyPostShareUrl = copyPostShareUrl;
 window.handleShareClick = handleShareClick;
+window.handleShareClickForCard = handleShareClickForCard;
 
 // 모바일 URL 쿼리 파라미터 open_post 감지 시 자동 팝업 오픈
 function checkAndAutoOpenMobilePost() {
@@ -1231,7 +1264,7 @@ function renderMobileFeedGrid(posts) {
                     <div class="m-btn-action btn-comment ${p.actions && p.actions.is_commented ? 'active' : ''}" title="댓글 수">
                         <i class="fa-${p.actions && p.actions.is_commented ? 'solid' : 'regular'} fa-comment"></i> <span class="comment-count">${pCommentCount.toLocaleString()}</span>
                     </div>
-                    <div class="m-btn-action btn-share ${p.actions && p.actions.is_shared ? 'active' : ''}" title="공유가입 수">
+                    <div class="m-btn-action btn-share ${p.actions && p.actions.is_shared ? 'active' : ''}" title="공유가입 수" onclick="event.stopPropagation(); handleShareClickForCard('${postId}', '${p.contest_id || p.CONTEST_ROUND}', '${p.round_no || p.ROUND_NO}', '${p.share_sn || p.SHARE_SN}');">
                         <i class="fa-solid fa-share-nodes"></i> <span class="share-count">${pShareScore.toLocaleString()}</span>
                     </div>
                 </div>
@@ -1349,6 +1382,7 @@ async function triggerMobileEvent(postId, eventType) {
             const finalLike = (data.like_count !== undefined ? data.like_count : (data.event_res ? data.event_res.like_count : undefined));
             const finalView = (data.view_count !== undefined ? data.view_count : (data.event_res ? data.event_res.view_count : undefined));
             const finalComment = (data.comment_count !== undefined ? data.comment_count : (data.event_res ? data.event_res.comment_count : undefined));
+            const finalShare = (data.share_count !== undefined ? data.share_count : (data.share_score !== undefined ? data.share_score : (data.event_res ? data.event_res.share_count : undefined)));
             
             const mScoreEl = document.getElementById('mDetailScoreNum');
             if (mScoreEl && finalScore) mScoreEl.textContent = finalScore.toLocaleString();
@@ -1361,6 +1395,14 @@ async function triggerMobileEvent(postId, eventType) {
 
             const mCommentEl = document.getElementById('mDetailCommentCount');
             if (mCommentEl && finalComment !== undefined) mCommentEl.textContent = Number(finalComment).toLocaleString();
+
+            const mShareEl = document.getElementById('mDetailShareCount');
+            if (mShareEl && finalShare !== undefined) mShareEl.textContent = Number(finalShare).toLocaleString();
+
+            if (eventType === 'share') {
+                const mBtnSharePopup = document.getElementById('mDetailBtnShare');
+                if (mBtnSharePopup) mBtnSharePopup.classList.add('active');
+            }
 
             if (eventType === 'like') {
                 const mBtnLikePopup = document.getElementById('mDetailBtnLike');
@@ -1411,6 +1453,13 @@ async function triggerMobileEvent(postId, eventType) {
                     }
                 }
 
+                if (eventType === 'share') {
+                    const btnCardShare = card.querySelector('.btn-share') || card.querySelector('.m-btn-action.btn-share');
+                    if (btnCardShare) {
+                        btnCardShare.classList.add('active');
+                    }
+                }
+
                 const cardLike = card.querySelector('.like-count');
                 if (cardLike && finalLike !== undefined) {
                     cardLike.textContent = Number(finalLike).toLocaleString();
@@ -1426,9 +1475,14 @@ async function triggerMobileEvent(postId, eventType) {
                     cardComment.textContent = Number(finalComment).toLocaleString();
                 }
 
+                const cardShare = card.querySelector('.share-count');
+                if (cardShare && finalShare !== undefined) {
+                    cardShare.textContent = Number(finalShare).toLocaleString();
+                }
+
                 const cardScore = card.querySelector('.m-card-score, .score-num');
                 if (cardScore && finalScore) {
-                    cardScore.textContent = `⭐ ${finalScore.toLocaleString()}`;
+                    cardScore.textContent = finalScore.toLocaleString();
                 }
             }
         } else {

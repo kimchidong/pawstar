@@ -200,7 +200,7 @@
                     <div class="m-btn-action btn-comment {% if is_logged_in and p.actions and p.actions.is_commented %}active{% endif %}" title="댓글 수">
                         <i class="fa-{% if is_logged_in and p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i> <span class="comment-count">{{ "{:,}".format((p.comment_count or p.CMT_CNT or 0)|int) }}</span>
                     </div>
-                    <div class="m-btn-action btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수">
+                    <div class="m-btn-action btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수" onclick="event.stopPropagation(); handleShareClickForCard('{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}', '{{ p.contest_id or p.CONTEST_ROUND }}', '{{ p.round_no or p.ROUND_NO }}', '{{ p.share_sn or p.SHARE_SN }}');">
                         <i class="fa-solid fa-share-nodes"></i> <span class="share-count">{{ "{:,}".format((p.share_count or p.SHARE_CNT or 0)|int) }}</span>
                     </div>
                 </div>
