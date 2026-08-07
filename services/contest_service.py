@@ -1613,22 +1613,20 @@ class PawStarService:
                 'is_viewed': True
             }
         elif event_type == 'share':
+            # 단순 공유 버튼 클릭은 전용 공유 주소 전달 용도이며, 카운트 증가는 오직 공유 링크로 유입된 사용자가 가입/로그인 시에만 처리됨
             conn = self.get_db_connection()
             if conn:
                 try:
                     with conn.cursor() as cur:
                         cur.execute("""
-                            SELECT ROUND_NO, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
-                            FROM pst_contest_round
+                            SELECT ROUND_NO FROM pst_contest_round
                             WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                             ORDER BY ENT_DT DESC LIMIT 1
                         """, (contest_id, target_id, target_id))
                         r_info = cur.fetchone()
                         if r_info:
                             r_no = r_info['ROUND_NO']
-                            new_share_cnt = r_info['SHARE_CNT'] + 1
-                            stats = self.sync_and_get_post_stats(cur, contest_id, r_no, share_cnt_override=new_share_cnt)
-                            conn.commit()
+                            stats = self.sync_and_get_post_stats(cur, contest_id, r_no)
                             conn.close()
                             return {
                                 'success': True,
@@ -1638,11 +1636,11 @@ class PawStarService:
                                 'like_count': stats['like_count'],
                                 'comment_count': stats['comment_count'],
                                 'new_score': stats['score'],
-                                'score': stats['score'],
-                                'is_shared': True
+                                'score': stats['score']
                             }
                 except Exception as e:
-                    print("trigger_event share error:", e)
+                    print("trigger_event share query error:", e)
+                    if conn: conn.close()
                     if conn:
                         conn.close()
         elif event_type in ('like', 'unlike', 'toggle_like'):

@@ -959,15 +959,6 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
         shareUrl = window.location.href;
     }
 
-    // 서버 DB 공유 수(+1) 및 점수 증가 이벤트 자동 트리거
-    if (postId) {
-        try {
-            await triggerMobileEvent(postId, 'share');
-        } catch (e) {
-            console.error('triggerMobileEvent share error:', e);
-        }
-    }
-
     // 모바일 브라우저 Web Share API 시도 (카카오톡, 메시지 등 직접 공유 기능)
     let webShareDone = false;
     if (navigator.share && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) {

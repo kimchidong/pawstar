@@ -94,7 +94,7 @@
                         <i class="fa-{% if is_logged_in and post.actions and post.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment" style="font-size: 0.9rem;"></i>
                         <span id="mShareLandingCmtCnt" style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
                     </div>
-                    {% set is_share_active = (is_logged_in and post.actions and post.actions.is_shared) or share_sn %}
+                    {% set is_share_active = (is_logged_in and post.actions and post.actions.is_shared) %}
                     <div class="m-btn-action action-btn btn-share {% if is_share_active %}active{% endif %}" id="mShareLandingShareBtn" onclick="copyPostShareUrl('{{ contest_round or post.contest_round or post.CONTEST_ROUND }}', '{{ round_no or post.round_no or post.ROUND_NO }}', '{{ share_sn or post.share_sn or post.SHARE_SN }}', '{{ post.post_id or (post.contest_id ~ '_' ~ post.round_no) }}');" style="{% if is_share_active %}background: #ecfdf5; border: 1.5px solid #34d399; color: #059669;{% endif %} border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; flex: 1;" title="공유 가입 수">
                         <i class="fa-solid fa-share-nodes" style="font-size: 0.9rem; {% if is_share_active %}color: #059669;{% endif %}"></i>
                         <span id="mShareLandingShareCnt" style="font-weight: 800; font-size: 0.8rem; {% if is_share_active %}color: #059669;{% endif %}">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
