@@ -82,27 +82,28 @@
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 0.75rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 1.2rem; flex-wrap: wrap;">
                 <!-- 좌측 정렬: 평가 4요소 -->
                 <div style="display: flex; align-items: center; gap: 0.35rem; flex: 1;">
-                    <div class="action-btn btn-view {% if is_logged_in and post.actions and post.actions.is_viewed %}active{% endif %}" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default; flex: 1;" title="조회수">
-                        <i class="fa-{% if is_logged_in and post.actions and post.actions.is_viewed %}solid{% else %}regular{% endif %} fa-eye" style="font-size: 0.9rem;"></i>
-                        <span style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}</span>
+                    <div class="m-btn-action action-btn btn-view active" style="background: #e0f2fe; border: 1.5px solid #38bdf8; color: #0284c7; border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; flex: 1;" title="조회수">
+                        <i class="fa-solid fa-eye" style="font-size: 0.9rem; color: #0284c7;"></i>
+                        <span id="mShareLandingViewCnt" style="font-weight: 800; font-size: 0.8rem; color: #0284c7;">{{ "{:,}".format(post.view_count or post.VW_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-like {% if is_logged_in and post.actions and post.actions.is_liked %}active{% endif %}" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default; flex: 1;" title="좋아요 수">
+                    <div class="action-btn btn-like {% if is_logged_in and post.actions and post.actions.is_liked %}active{% endif %}" onclick="if(window.isUserLoggedIn){ triggerMobileEvent('{{ post.post_id or (post.contest_id ~ '_' ~ post.round_no) }}', 'like'); } else { if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); } }" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; flex: 1;" title="좋아요 수">
                         <i class="fa-{% if is_logged_in and post.actions and post.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" style="font-size: 0.9rem;"></i>
-                        <span style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}</span>
+                        <span id="mShareLandingLikeCnt" style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.like_count or post.LIKE_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-comment {% if is_logged_in and post.actions and post.actions.is_commented %}active{% endif %}" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default; flex: 1;" title="댓글 수">
+                    <div class="action-btn btn-comment {% if is_logged_in and post.actions and post.actions.is_commented %}active{% endif %}" onclick="window.location.href='/m/?open_post={{ contest_round or post.contest_round or post.CONTEST_ROUND }}_{{ round_no or post.round_no or post.ROUND_NO }}';" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; flex: 1;" title="댓글 수">
                         <i class="fa-{% if is_logged_in and post.actions and post.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment" style="font-size: 0.9rem;"></i>
-                        <span style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
+                        <span id="mShareLandingCmtCnt" style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" style="border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: default; flex: 1;" title="공유 가입 수">
-                        <i class="fa-solid fa-share-nodes" style="font-size: 0.9rem;"></i>
-                        <span style="font-weight: 800; font-size: 0.8rem;">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
+                    {% set is_share_active = (is_logged_in and post.actions and post.actions.is_shared) or share_sn %}
+                    <div class="m-btn-action action-btn btn-share {% if is_share_active %}active{% endif %}" id="mShareLandingShareBtn" onclick="copyPostShareUrl('{{ contest_round or post.contest_round or post.CONTEST_ROUND }}', '{{ round_no or post.round_no or post.ROUND_NO }}', '{{ share_sn or post.share_sn or post.SHARE_SN }}', '{{ post.post_id or (post.contest_id ~ '_' ~ post.round_no) }}');" style="{% if is_share_active %}background: #ecfdf5; border: 1.5px solid #34d399; color: #059669;{% endif %} border-radius: 12px; padding: 0.45rem 0.3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; flex: 1;" title="공유 가입 수">
+                        <i class="fa-solid fa-share-nodes" style="font-size: 0.9rem; {% if is_share_active %}color: #059669;{% endif %}"></i>
+                        <span id="mShareLandingShareCnt" style="font-weight: 800; font-size: 0.8rem; {% if is_share_active %}color: #059669;{% endif %}">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
                     </div>
                 </div>
 
                 <!-- 우측 정렬: 총점 뱃지 -->
                 <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde047; padding: 0.45rem 0.75rem; border-radius: 12px; color: #d97706; font-size: 0.85rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
-                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span>{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
+                    <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 총 <span id="mShareLandingScoreNum">{{ "{:,}".format(post.score or post.SCORE or 0) }}</span> 점
                 </div>
             </div>
 

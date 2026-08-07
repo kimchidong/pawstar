@@ -225,9 +225,12 @@ def api_auth_login():
         is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
         target_url = get_post_login_redirect_url(is_mobile=is_mobile)
 
+        saved_share_info = session.get('share_info')
         session.clear()
         session['user_id'] = user_id
         session['last_activity'] = datetime.datetime.now().timestamp()
+        if saved_share_info:
+            session['share_info'] = saved_share_info
         session.pop('logged_out', None)
         return jsonify({'success': True, 'message': f'{result["nickname"]}님 환영합니다!', 'user': result, 'target_url': target_url})
     else:
@@ -512,18 +515,30 @@ def route_share():
     is_closed = False
     post = None
     if contest_round and round_no:
-        # 로그인 회원이 전용 공유 페이지에 들어온 경우: 곧바로 공유 수/점수 및 조회 수/이력 미리 반영
-        if current_user_id:
-            if share_sn:
-                try:
-                    service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
-                except Exception as e:
-                    print("route_share increment_share_count error:", e)
-
+        # 1. 이미 로그인된 회원이 공유 주소로 유입된 경우: 공유 카운트 및 점수 즉시 가산
+        if current_user_id and share_sn:
             try:
-                service.increase_view_count(contest_round, round_no, view_user_id=current_user_id)
+                service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
             except Exception as e:
-                print("route_share increase_view_count error:", e)
+                print("route_share increment_share_count error:", e)
+
+        # 2. 로그인 여부 불문 조회수(+1) 무조건 즉시 반영 (IP 기준 익명 조회 기록 지원)
+        try:
+            client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+            if client_ip and ',' in client_ip:
+                client_ip = client_ip.split(',')[0].strip()
+            service.increase_view_count(contest_round, round_no, view_user_id=current_user_id, client_ip=client_ip)
+        except Exception as e:
+            print("route_share increase_view_count error:", e)
+
+        # 3. 로그인 여부 불문 공유 유입 정보를 세션에 보존 (미로그인 유저가 가입/로그인 시 공유 점수 자동 반영)
+        if share_sn:
+            session['share_info'] = {
+                'contest_round': int(contest_round),
+                'round_no': int(round_no),
+                'share_sn': str(share_sn),
+                'post_id': f"{contest_round}_{round_no}"
+            }
 
         # 최신 반영된 게시물 정보 (조회수, 공유수, 점수, actions 4요소) 가져오기
         post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
@@ -534,14 +549,7 @@ def route_share():
                 (post.get('STATUS_CD') == 'G001C002') or 
                 (post.get('CONTEST_STAT') == 'G001C002')
             )
-            if share_sn:
-                session['share_info'] = {
-                    'contest_round': int(contest_round),
-                    'round_no': int(round_no),
-                    'share_sn': str(share_sn),
-                    'post_id': f"{contest_round}_{round_no}",
-                    'is_closed': is_closed
-                }
+            session['share_info']['is_closed'] = is_closed
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(

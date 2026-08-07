@@ -1023,44 +1023,56 @@ body.m-body {
 }
 
 /* PC 동일 Active 하이라이트 배경 및 테두리 */
-.m-btn-action.btn-view.active {
-    background: #e0f2fe;
-    border-color: #38bdf8;
-    color: #0284c7;
+.m-btn-action.btn-view.active,
+.action-btn.btn-view.active {
+    background: #e0f2fe !important;
+    border: 1.5px solid #38bdf8 !important;
+    color: #0284c7 !important;
 }
 .m-btn-action.btn-view.active i,
-.m-btn-action.btn-view.active span {
-    color: #0284c7;
+.m-btn-action.btn-view.active span,
+.action-btn.btn-view.active i,
+.action-btn.btn-view.active span {
+    color: #0284c7 !important;
 }
 
-.m-btn-action.btn-like.active {
-    background: #ffe4e6;
-    border-color: #fb7185;
-    color: #e11d48;
+.m-btn-action.btn-like.active,
+.action-btn.btn-like.active {
+    background: #ffe4e6 !important;
+    border: 1.5px solid #fb7185 !important;
+    color: #e11d48 !important;
 }
 .m-btn-action.btn-like.active i,
-.m-btn-action.btn-like.active span {
-    color: #e11d48;
+.m-btn-action.btn-like.active span,
+.action-btn.btn-like.active i,
+.action-btn.btn-like.active span {
+    color: #e11d48 !important;
 }
 
-.m-btn-action.btn-comment.active {
-    background: #f3e8ff;
-    border-color: #c084fc;
-    color: #7c3aed;
+.m-btn-action.btn-comment.active,
+.action-btn.btn-comment.active {
+    background: #f3e8ff !important;
+    border: 1.5px solid #c084fc !important;
+    color: #7c3aed !important;
 }
 .m-btn-action.btn-comment.active i,
-.m-btn-action.btn-comment.active span {
-    color: #7c3aed;
+.m-btn-action.btn-comment.active span,
+.action-btn.btn-comment.active i,
+.action-btn.btn-comment.active span {
+    color: #7c3aed !important;
 }
 
-.m-btn-action.btn-share.active {
-    background: #ecfdf5;
-    border-color: #34d399;
-    color: #059669;
+.m-btn-action.btn-share.active,
+.action-btn.btn-share.active {
+    background: #ecfdf5 !important;
+    border: 1.5px solid #34d399 !important;
+    color: #059669 !important;
 }
 .m-btn-action.btn-share.active i,
-.m-btn-action.btn-share.active span {
-    color: #059669;
+.m-btn-action.btn-share.active span,
+.action-btn.btn-share.active i,
+.action-btn.btn-share.active span {
+    color: #059669 !important;
 }
 
 /* 모바일 프로필 카드 */

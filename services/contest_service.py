@@ -1396,14 +1396,21 @@ class PawStarService:
     def sync_and_get_post_stats(self, cur, contest_id, round_no, share_cnt_override=None):
         """
         4가지 평가 요소(조회/좋아요/댓글/공유) 이벤트 발생 시 공통 적용:
-        1. 하위 테이블(pst_contest_vw, pst_contest_like, pst_contest_cmt) 및 pst_contest_round(SHARE_CNT)에서 실제 4요소 개수 DB 재조회
-        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10, SHARE: 1)
+        1. 하위 테이블 및 pst_contest_round에서 실제 4요소 개수 DB 재조회
+        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10, SHARE: 10)
         3. DB pst_contest_round 테이블에 4요소 카운트 및 SCORE 반영 UPDATE
-        4. DB에서 최종 4요소 및 SCORE를 다시 SELECT하여 반환
+        4. DB에서 최종 4요소 및 SCORE를 반환
         """
-        # 1. DB에서 4요소 개수 재조회
+        # 1. DB에서 하위 테이블 개수 재조회
         cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-        vw_cnt = cur.fetchone()['cnt']
+        vw_tbl_cnt = cur.fetchone()['cnt']
+
+        cur.execute("SELECT COALESCE(VW_CNT, 0) AS r_vw, COALESCE(SHARE_CNT, 0) AS r_share FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        r_row = cur.fetchone()
+        r_vw = r_row['r_vw'] if r_row else 0
+        
+        # 조회수: 테이블 레코드 수와 round 누적값 중 더 큰 값을 적용 (최소 누적 수치 보장)
+        vw_cnt = max(vw_tbl_cnt, r_vw)
 
         cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         like_cnt = cur.fetchone()['cnt']
@@ -1414,9 +1421,7 @@ class PawStarService:
         if share_cnt_override is not None:
             share_cnt = share_cnt_override
         else:
-            cur.execute("SELECT COALESCE(SHARE_CNT, 0) AS cnt FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-            r_share = cur.fetchone()
-            share_cnt = r_share['cnt'] if r_share else 0
+            share_cnt = r_row['r_share'] if r_row else 0
 
         # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 10점)
         calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 10)
@@ -1462,7 +1467,7 @@ class PawStarService:
             if conn: conn.close()
             return False
 
-    def increase_view_count(self, contest_id, target_id, view_user_id=None):
+    def increase_view_count(self, contest_id, target_id, view_user_id=None, client_ip=None):
         if self.is_contest_closed(contest_id):
             return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': True, 'is_ended': True}
 
@@ -1483,32 +1488,26 @@ class PawStarService:
                     return {'view_count': 0, 'like_count': 0, 'comment_count': 0, 'new_score': 0, 'already_viewed': False}
                 round_no = r_info['ROUND_NO']
 
-                already_viewed = False
-                if view_user_id:
-                    cur.execute("""
-                        SELECT 1 FROM pst_contest_vw
-                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
-                    """, (contest_id, round_no, view_user_id))
-                    exists = cur.fetchone()
+                # 1. DB pst_contest_round 의 누적 조회수(VW_CNT) 1 무조건 가산
+                cur.execute("""
+                    UPDATE pst_contest_round
+                    SET VW_CNT = COALESCE(VW_CNT, 0) + 1
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                """, (contest_id, round_no))
 
-                    if not exists:
-                        # 1. DB에 조회 이력 먼저 저장
-                        cur.execute("""
-                            INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
-                            VALUES (%s, %s, %s, NOW())
-                            ON DUPLICATE KEY UPDATE VW_DT = NOW()
-                        """, (contest_id, round_no, view_user_id))
-                    else:
-                        cur.execute("""
-                            UPDATE pst_contest_vw
-                            SET VW_DT = NOW()
-                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
-                        """, (contest_id, round_no, view_user_id))
-                        already_viewed = True
-                else:
-                    already_viewed = True
+                vw_user = view_user_id
+                if not vw_user:
+                    ip_str = str(client_ip or 'GUEST').replace(':', '_').replace('.', '_')
+                    vw_user = f"ANON_{ip_str}"
 
-                # 2, 3, 4. DB에서 3요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
+                # 2. 조회 이력 테이블(pst_contest_vw)에도 저장
+                cur.execute("""
+                    INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
+                    VALUES (%s, %s, %s, NOW())
+                    ON DUPLICATE KEY UPDATE VW_DT = NOW()
+                """, (contest_id, round_no, vw_user))
+
+                # 3. DB에서 4요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
                 stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
                 conn.commit()
                 conn.close()
@@ -1517,9 +1516,10 @@ class PawStarService:
                     'view_count': stats['view_count'],
                     'like_count': stats['like_count'],
                     'comment_count': stats['comment_count'],
+                    'share_count': stats['share_count'],
                     'new_score': stats['score'],
                     'score': stats['score'],
-                    'already_viewed': already_viewed
+                    'already_viewed': False
                 }
         except Exception as e:
             print("increase_view_count error:", e)
@@ -1607,10 +1607,44 @@ class PawStarService:
                 'view_count': res_vw.get('view_count', 0),
                 'like_count': res_vw.get('like_count', 0),
                 'comment_count': res_vw.get('comment_count', 0),
+                'share_count': res_vw.get('share_count', 0),
                 'new_score': res_vw.get('new_score', 0),
                 'score': res_vw.get('score', 0),
                 'is_viewed': True
             }
+        elif event_type == 'share':
+            conn = self.get_db_connection()
+            if conn:
+                try:
+                    with conn.cursor() as cur:
+                        cur.execute("""
+                            SELECT ROUND_NO, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
+                            FROM pst_contest_round
+                            WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
+                            ORDER BY ENT_DT DESC LIMIT 1
+                        """, (contest_id, target_id, target_id))
+                        r_info = cur.fetchone()
+                        if r_info:
+                            r_no = r_info['ROUND_NO']
+                            new_share_cnt = r_info['SHARE_CNT'] + 1
+                            stats = self.sync_and_get_post_stats(cur, contest_id, r_no, share_cnt_override=new_share_cnt)
+                            conn.commit()
+                            conn.close()
+                            return {
+                                'success': True,
+                                'action': 'share',
+                                'share_count': stats['share_count'],
+                                'view_count': stats['view_count'],
+                                'like_count': stats['like_count'],
+                                'comment_count': stats['comment_count'],
+                                'new_score': stats['score'],
+                                'score': stats['score'],
+                                'is_shared': True
+                            }
+                except Exception as e:
+                    print("trigger_event share error:", e)
+                    if conn:
+                        conn.close()
         elif event_type in ('like', 'unlike', 'toggle_like'):
             if not user_id:
                 return {'success': False, 'message': '로그인이 필요합니다.'}

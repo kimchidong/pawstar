@@ -1387,21 +1387,48 @@ async function triggerMobileEvent(postId, eventType) {
             const mScoreEl = document.getElementById('mDetailScoreNum');
             if (mScoreEl && finalScore) mScoreEl.textContent = finalScore.toLocaleString();
 
+            const mLandingScoreEl = document.getElementById('mShareLandingScoreNum');
+            if (mLandingScoreEl && finalScore) mLandingScoreEl.textContent = finalScore.toLocaleString();
+
             const mLikeEl = document.getElementById('mDetailLikeCount');
             if (mLikeEl && finalLike !== undefined) mLikeEl.textContent = Number(finalLike).toLocaleString();
+
+            const mLandingLikeEl = document.getElementById('mShareLandingLikeCnt');
+            if (mLandingLikeEl && finalLike !== undefined) mLandingLikeEl.textContent = Number(finalLike).toLocaleString();
 
             const mViewEl = document.getElementById('mDetailViewCount');
             if (mViewEl && finalView !== undefined) mViewEl.textContent = Number(finalView).toLocaleString();
 
+            const mLandingViewEl = document.getElementById('mShareLandingViewCnt');
+            if (mLandingViewEl && finalView !== undefined) mLandingViewEl.textContent = Number(finalView).toLocaleString();
+
             const mCommentEl = document.getElementById('mDetailCommentCount');
             if (mCommentEl && finalComment !== undefined) mCommentEl.textContent = Number(finalComment).toLocaleString();
+
+            const mLandingCmtEl = document.getElementById('mShareLandingCmtCnt');
+            if (mLandingCmtEl && finalComment !== undefined) mLandingCmtEl.textContent = Number(finalComment).toLocaleString();
 
             const mShareEl = document.getElementById('mDetailShareCount');
             if (mShareEl && finalShare !== undefined) mShareEl.textContent = Number(finalShare).toLocaleString();
 
+            const mLandingShareEl = document.getElementById('mShareLandingShareCnt');
+            if (mLandingShareEl && finalShare !== undefined) mLandingShareEl.textContent = Number(finalShare).toLocaleString();
+
             if (eventType === 'share') {
                 const mBtnSharePopup = document.getElementById('mDetailBtnShare');
                 if (mBtnSharePopup) mBtnSharePopup.classList.add('active');
+
+                const mLandingShareBtn = document.getElementById('mShareLandingShareBtn');
+                if (mLandingShareBtn) {
+                    mLandingShareBtn.classList.add('active');
+                    mLandingShareBtn.style.background = '#ecfdf5';
+                    mLandingShareBtn.style.border = '1.5px solid #34d399';
+                    mLandingShareBtn.style.color = '#059669';
+                    const icon = mLandingShareBtn.querySelector('i');
+                    if (icon) icon.style.color = '#059669';
+                    const span = mLandingShareBtn.querySelector('span');
+                    if (span) span.style.color = '#059669';
+                }
             }
 
             if (eventType === 'like') {
