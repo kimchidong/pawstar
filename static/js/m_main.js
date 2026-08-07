@@ -785,7 +785,11 @@ function submitMobileDetailComment() {
     .then(res => res.json())
     .then(data => {
         if (!data.success) {
-            alert(data.message || '댓글 작성 실패');
+            if (typeof showToast === 'function') {
+                showToast(data.message || '댓글 작성 실패', 'warning');
+            } else {
+                alert(data.message || '댓글 작성 실패');
+            }
             if (data.require_login) {
                 const mAuthModal = document.getElementById('mAuthModal');
                 if (mAuthModal) mAuthModal.classList.add('active');

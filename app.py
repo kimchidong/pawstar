@@ -1182,7 +1182,7 @@ def add_comment_api(post_id):
         data = request.get_json() or {}
         content = data.get('content', '').strip()
         if not content:
-            return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 400
+            return jsonify({'success': False, 'message': '댓글 내용을 입력해주세요.'}), 200
 
         user_id = session.get('user_id') or 'guest'
 
@@ -1196,7 +1196,11 @@ def add_comment_api(post_id):
 
         res = service.add_comment(contest_id, ent_user_id, user_id, content)
         if not res.get('success'):
-            return jsonify({'success': False, 'message': res.get('message', '댓글 등록 중 오류가 발생했습니다.')}), 400
+            return jsonify({
+                'success': False,
+                'is_author': res.get('is_author', False),
+                'message': res.get('message', '댓글 등록 중 오류가 발생했습니다.')
+            }), 200
 
         post_detail = service.get_post_detail(contest_id, ent_user_id)
         comments = post_detail.get('comments', []) if post_detail else []
