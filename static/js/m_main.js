@@ -483,9 +483,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     loadMobileComments(postData.post_id);
 
     // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거 (단, 본인 게시물이 아닐 때만)
-    const mCurUserId = String(window.currentUserId || '').trim();
-    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
-    if (postData.post_id && (!mCurUserId || !mPostOwnerId || mCurUserId !== mPostOwnerId)) {
+    const mCurUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
+    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || postData.USER_ID || postData.ent_user_id || '').trim();
+    const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
+
+    if (postData.post_id && !isMinePost) {
         triggerMobileEvent(postData.post_id, 'view');
     }
 
@@ -521,10 +523,6 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 el.style.cursor = '';
             }
         });
-
-        if (typeof triggerEvent === 'function') {
-            triggerEvent(postData.post_id, 'view');
-        }
     }
 
     const mCleanId = String(postData.post_id);
@@ -534,7 +532,6 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                   document.querySelector(`[data-post-id="${mCleanId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
-    const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
 
     if (!isClosedRound && !isMinePost) {
         if (mCard) {
