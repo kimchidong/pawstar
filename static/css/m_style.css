@@ -1343,11 +1343,11 @@ body.m-body {
             brightness(1.05);
 }
 
-/* 🏆 스타 배지 & 순위/후보 블록 크리스탈 광택 & 펄스 애니메이션 (PC 동일) */
+/* 🏆 스타 배지 & 순위/후보 블록 크리스탈 광택 애니메이션 (스케일 크기 변경 효과 제거) */
 .m-card-badge {
     position: relative;
     overflow: hidden;
-    animation: badgePulseGlow 3.5s ease-in-out infinite;
+    transform: none !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }

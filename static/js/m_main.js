@@ -1150,9 +1150,9 @@ function renderMobileFeedGrid(posts) {
                 } else {
                     badgeText = `패밀리스타${awRank ? ` ${awRank}위` : ''}`;
                 }
-                awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem; ${bgStyle}">${badgeText}</div>`;
+                awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem; ${bgStyle}">${badgeText}</div>`;
             });
-            badgeHtml = `<div style="position: absolute; top: 0.55rem; right: 0.55rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
+            badgeHtml = `<div style="position: absolute; top: 0.45rem; right: 0.45rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
         } else {
             const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;
             const isCo = p.is_co_rank || p.IS_CO_RANK;
@@ -1175,7 +1175,7 @@ function renderMobileFeedGrid(posts) {
                     else if (rkNum === 2) iconHtml = '🪄';
                     else if (rkNum === 3) iconHtml = '⭐';
                 }
-                badgeHtml = `<div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; position: absolute; z-index: 10; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
+                badgeHtml = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.2rem 0.5rem; top: 0.45rem; left: 0.45rem; position: absolute; z-index: 10; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
             }
         }
 
