@@ -1353,21 +1353,24 @@ window.selectMobilePetType = selectMobilePetType;
 window.fetchMobilePostsAjax = fetchMobilePostsAjax;
 
 async function triggerMobileEvent(postId, eventType) {
+    const mToast = (msg, type = 'warning') => {
+        if (typeof showMobileToast === 'function') showMobileToast(msg, type);
+        else if (typeof showToast === 'function') showToast(msg, type);
+        else alert(msg);
+    };
+
     if (!window.isUserLoggedIn) {
-        if (typeof showToast === 'function') {
-            showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
-        } else {
-            alert('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾');
-        }
+        mToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
         return;
     }
 
-    if (window.currentMobileDetailPostData && String(window.currentMobileDetailPostData.post_id || window.currentMobileDetailPostData.POST_ID) === String(postId)) {
-        const entUserId = window.currentMobileDetailPostData.ENT_USER_ID || window.currentMobileDetailPostData.user_id;
-        if (window.currentUserId && entUserId && String(window.currentUserId) === String(entUserId)) {
-            if (eventType === 'like') {
-                if (typeof showToast === 'function') showToast('💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾', 'warning');
-                else alert('💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾');
+    const postData = window.currentMobileDetailPostData || window.currentMobileDetailPost;
+    if (postData) {
+        const entUserId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
+        const mUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
+        if (mUserId && entUserId && mUserId === entUserId) {
+            if (eventType === 'like' || eventType === 'unlike' || eventType === 'toggle_like') {
+                mToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
                 return;
             }
         }

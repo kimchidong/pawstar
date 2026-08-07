@@ -223,6 +223,17 @@ function initEventHandlers() {
  * @param {string} eventType ('view', 'like', 'comment', 'share')
  */
 async function triggerEvent(postId, eventType) {
+    if (window.currentDetailPostData && String(window.currentDetailPostData.post_id || window.currentDetailPostData.POST_ID) === String(postId)) {
+        const curUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(window.currentDetailPostData.ENT_USER_ID || window.currentDetailPostData.user_id || '').trim();
+        if (curUserId && postOwnerId && curUserId === postOwnerId) {
+            if (eventType === 'like' || eventType === 'unlike' || eventType === 'toggle_like') {
+                showToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
+                return false;
+            }
+        }
+    }
+
     try {
         const response = await fetch('/api/post/event', {
             method: 'POST',
@@ -249,7 +260,7 @@ async function triggerEvent(postId, eventType) {
                 window.location.href = '/auth/google';
             } else if (res.is_owner || res.is_author) {
                 if (eventType === 'like') {
-                    showToast(res.message || '💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾', 'warning');
+                    showToast(res.message || '💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
                 }
                 return false;
             } else if (res.already_viewed) {
@@ -914,6 +925,13 @@ function openDetailModal(post, isHallOfFame = false) {
         });
 
     const toggleLikeHandler = async () => {
+        const curUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
+        if (curUserId && postOwnerId && curUserId === postOwnerId) {
+            showToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
+            return;
+        }
+
         if (!isLiked) {
             const success = await triggerEvent(post.post_id, 'like');
             if (success !== false) {
