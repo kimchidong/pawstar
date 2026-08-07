@@ -478,8 +478,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
-    // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거
-    if (postData.post_id) {
+    // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거 (단, 본인 게시물이 아닐 때만)
+    const mCurUserId = String(window.currentUserId || '').trim();
+    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
+    if (postData.post_id && (!mCurUserId || !mPostOwnerId || mCurUserId !== mPostOwnerId)) {
         triggerMobileEvent(postData.post_id, 'view');
     }
 
@@ -725,7 +727,28 @@ function deleteMobileDetailComment(cmtUserId) {
             }
 
             const cleanId = String(mPostId);
-                    cardLike.textContent = finalLike;
+            const rawEntId = cleanId.replace(/^\d+_/, '');
+            const card = document.getElementById(`m-post-card-${cleanId}`) || 
+                         document.getElementById(`m-post-card-${rawEntId}`) ||
+                         document.querySelector(`[data-post-id="${cleanId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
+                         document.querySelector(`[data-ent-user-id="${cleanId}"]`);
+                         
+            if (card) {
+                const btnCardComment = card.querySelector('.m-btn-comment') || card.querySelector('.btn-comment');
+                if (btnCardComment) {
+                    btnCardComment.classList.remove('active');
+                    const icon = btnCardComment.querySelector('i');
+                    if (icon) icon.className = 'fa-regular fa-comment';
+                }
+
+                const cardComment = card.querySelector('.comment-count');
+                if (cardComment && finalComment !== undefined) {
+                    cardComment.textContent = finalComment;
+                }
+                const cardScore = card.querySelector('.score-num');
+                if (cardScore && finalScore !== undefined) {
+                    cardScore.textContent = finalScore.toLocaleString();
                 }
             }
         }
@@ -739,6 +762,15 @@ function deleteMobileDetailComment(cmtUserId) {
 function submitMobileDetailComment() {
     const inputEl = document.getElementById('mDetailCommentInput');
     if (!inputEl || !window.currentMobileDetailPostId) return;
+
+    if (window.currentMobileDetailPostData) {
+        const entUserId = window.currentMobileDetailPostData.ENT_USER_ID || window.currentMobileDetailPostData.user_id;
+        if (window.currentUserId && entUserId && String(window.currentUserId) === String(entUserId)) {
+            if (typeof showToast === 'function') showToast('💡 본인이 등록한 게시물에는 댓글을 남기실 수 없습니다. 🐾', 'warning');
+            else alert('💡 본인이 등록한 게시물에는 댓글을 남기실 수 없습니다. 🐾');
+            return;
+        }
+    }
     const content = inputEl.value.trim();
     if (!content) {
         alert('댓글 내용을 입력해주세요.');

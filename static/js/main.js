@@ -247,8 +247,10 @@ async function triggerEvent(postId, eventType) {
             if (res.require_login) {
                 showToast(res.message || '로그인이 필요한 서비스입니다.', 'warning');
                 window.location.href = '/auth/google';
-            } else if (res.is_owner) {
-                // 본인 게시물일 경우 알림창을 띄우지 않고 조용히 기능만 제어
+            } else if (res.is_owner || res.is_author) {
+                if (eventType === 'like') {
+                    showToast(res.message || '💡 본인이 등록한 게시물에는 좋아요를 누르실 수 없습니다. 🐾', 'warning');
+                }
                 return false;
             } else if (res.already_viewed) {
                 // 이미 조회한 글인 경우 조용히 무시
@@ -545,8 +547,12 @@ function openDetailModal(post, isHallOfFame = false) {
             }
         });
         
-        // 진행 중인 회차 팝업 시만 자동 조회수 증가
-        triggerEvent(post.post_id, 'view');
+        // 진행 중인 회차 팝업 시만 자동 조회수 증가 (단, 본인 게시물이 아닐 때만)
+        const curUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
+        if (!curUserId || !postOwnerId || curUserId !== postOwnerId) {
+            triggerEvent(post.post_id, 'view');
+        }
     }
 
     // 출전 포기(삭제) 버튼 제어 (진행 중인 회차 + 본인 출전물인 경우 노출)
@@ -1207,6 +1213,16 @@ function deleteDetailComment(cmtUserId) {
 function submitDetailComment() {
     const inputEl = document.getElementById('detailCommentInput');
     if (!inputEl || !window.currentDetailPostId) return;
+
+    if (window.currentDetailPostData) {
+        const curUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String(window.currentDetailPostData.ENT_USER_ID || window.currentDetailPostData.user_id || '').trim();
+        if (curUserId && postOwnerId && curUserId === postOwnerId) {
+            showToast('💡 본인이 등록한 게시물에는 댓글을 남기실 수 없습니다. 🐾', 'warning');
+            return;
+        }
+    }
+
     const content = inputEl.value.trim();
     if (!content) {
         showToast('댓글 내용을 입력해주세요.', 'warning');
