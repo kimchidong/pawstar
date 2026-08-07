@@ -556,7 +556,10 @@ function loadMobileComments(postId) {
 function renderMobileDetailComments(comments) {
     const listEl = document.getElementById('mDetailCommentList');
     const headerCountEl = document.getElementById('mDetailCommentHeaderCount');
-    if (headerCountEl) headerCountEl.textContent = `(${comments ? comments.length : 0})`;
+    const mCommentEl = document.getElementById('mDetailCommentCount');
+    const countVal = comments ? comments.length : 0;
+    if (headerCountEl) headerCountEl.textContent = `(${countVal})`;
+    if (mCommentEl) mCommentEl.textContent = Number(countVal).toLocaleString();
     
     // 댓글 목록에서 현재 접속 유저가 쓴 댓글이 포함되어 있는지 점검 (초기 isCommented 상태 유지)
     const isInitiallyCommented = window.currentMobileDetailPostIsCommented === true || (window.currentMobileDetailPost && window.currentMobileDetailPost.actions && window.currentMobileDetailPost.actions.is_commented);
@@ -787,6 +790,21 @@ function submitMobileDetailComment() {
                 mScoreEl.textContent = finalScore.toLocaleString();
             }
 
+            const mCommentEl = document.getElementById('mDetailCommentCount');
+            if (mCommentEl && finalComment !== undefined) {
+                mCommentEl.textContent = Number(finalComment || 0).toLocaleString();
+            }
+
+            const mLikeEl = document.getElementById('mDetailLikeCount');
+            if (mLikeEl && finalLike !== undefined) {
+                mLikeEl.textContent = Number(finalLike || 0).toLocaleString();
+            }
+
+            const mViewEl = document.getElementById('mDetailViewCount');
+            if (mViewEl && finalView !== undefined) {
+                mViewEl.textContent = Number(finalView || 0).toLocaleString();
+            }
+
             const mCleanId = String(mPostId);
             const mRawEntId = mCleanId.replace(/^\d+_/, '');
             const card = document.getElementById(`m-post-card-${mCleanId}`) || 
@@ -796,7 +814,7 @@ function submitMobileDetailComment() {
                          document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
 
             if (card) {
-                const btnCardComment = card.querySelector('.btn-comment');
+                const btnCardComment = card.querySelector('.btn-comment') || card.querySelector('.m-btn-comment');
                 if (btnCardComment) {
                     btnCardComment.classList.add('active');
                     const icon = btnCardComment.querySelector('i');
