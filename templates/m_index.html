@@ -145,13 +145,13 @@
                             {% set aw_rank = aw.ranking or aw.RANKING %}
                             
                             {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem;">👑 슈퍼스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem;">슈퍼스타</div>
                             {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">🪄 라이징스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">라이징스타</div>
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">⭐ 브라이트스타</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">브라이트스타</div>
                             {% else %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span> 패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -160,7 +160,7 @@
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set is_co = p.is_co_rank or p.IS_CO_RANK %}
                     {% set rank_prefix = category_prefix ~ ('공동 ' if is_co else '') %}
-                    <div class="m-card-badge" style="font-size: 0.65rem; padding: 0.2rem 0.5rem; top: 0.45rem; left: 0.45rem; position: absolute; z-index: 10; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}{% if rk_cand|int == 1 %}👑{% elif rk_cand|int == 2 %}🪄{% elif rk_cand|int == 3 %}⭐{% else %}🏆{% endif %}{% endif %} {{ rank_prefix }}{{ rk_cand }}위 후보</div>
+                    <div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{{ rank_prefix }}{{ rk_cand }}위 후보</div>
                 {% endif %}
             </div>
             <div class="m-card-body">

@@ -1151,20 +1151,20 @@ function renderMobileFeedGrid(posts) {
                 let badgeText = '수상작';
                 let bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;';
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    badgeText = '👑 슈퍼스타';
+                    badgeText = '슈퍼스타';
                     bgStyle = '';
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    badgeText = '🪄 라이징스타';
+                    badgeText = '라이징스타';
                     bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    badgeText = '⭐ 브라이트스타';
+                    badgeText = '브라이트스타';
                     bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
                 } else {
                     badgeText = `패밀리스타${awRank ? ` ${awRank}위` : ''}`;
                 }
-                awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.2rem 0.5rem; font-size: 0.65rem; ${bgStyle}">${badgeText}</div>`;
+                awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; ${bgStyle}">${badgeText}</div>`;
             });
-            badgeHtml = `<div style="position: absolute; top: 0.45rem; right: 0.45rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
+            badgeHtml = `<div style="position: absolute; top: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
         } else {
             const isPostClosed = p.is_closed || p.closed || p.contest_stat === 'G001C002' || p.CONTEST_STAT === 'G001C002' || p.STATUS_CD === 'G001C002' || p.is_ended || p.IS_ENDED;
             const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;
@@ -1177,18 +1177,20 @@ function renderMobileFeedGrid(posts) {
                 const prefix = catPrefix + (isCo ? '공동 ' : '');
                 const rankTitle = `${prefix}${rkCand}위 후보`;
                 
-                let iconHtml = '🏆';
                 let bgStyle = '';
                 if (isFamily) {
-                    iconHtml = `<span class="pet-emoji-icon"><i class="${chipIcon}"></i></span>`;
                     bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;';
                 } else {
                     const rkNum = Number(rkCand);
-                    if (rkNum === 1) iconHtml = '👑';
-                    else if (rkNum === 2) iconHtml = '🪄';
-                    else if (rkNum === 3) iconHtml = '⭐';
+                    if (rkNum === 1) {
+                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.95), rgba(245,158,11,0.92)); color: #451a03;';
+                    } else if (rkNum === 2) {
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
+                    } else if (rkNum === 3) {
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
+                    }
                 }
-                badgeHtml = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.2rem 0.5rem; top: 0.45rem; left: 0.45rem; position: absolute; z-index: 10; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
+                badgeHtml = `<div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10; ${bgStyle}">${rankTitle}</div>`;
             }
         }
 
