@@ -135,8 +135,8 @@
                 {% set p_kind = p.KIND_NM or p.pet_type or '' %}
                 {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-otter' if ('햄스터' in p_kind or '소동물' in p_kind or '토끼' in p_kind or '고슴도치' in p_kind) else ('fa-solid fa-frog' if ('거북이' in p_kind or '파충류' in p_kind or '도마뱀' in p_kind) else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind or '조류' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))))) %}
                 
-                <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
-                {% if p.awards %}
+                {% set rk_cand = p.rank_candidate or p.RANK_CANDIDATE or p.rank or p.ranking %}
+                {% if p.awards and p.awards|length > 0 %}
                     <div style="position: absolute; top: 0.55rem; right: 0.55rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
@@ -154,11 +154,12 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                {% elif p.rank_candidate and not is_closed %}
+                {% elif rk_cand %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
-                    {% set rank_prefix = category_prefix ~ ('공동 ' if p.is_co_rank else '') %}
-                    <div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}🏆{% endif %} {{ rank_prefix }}{{ p.rank_candidate }}위 후보</div>
+                    {% set is_co = p.is_co_rank or p.IS_CO_RANK %}
+                    {% set rank_prefix = category_prefix ~ ('공동 ' if is_co else '') %}
+                    <div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; position: absolute; z-index: 10; {% if is_family %}background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;{% endif %}">{% if is_family %}<span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span>{% else %}{% if rk_cand|int == 1 %}👑{% elif rk_cand|int == 2 %}🪄{% elif rk_cand|int == 3 %}⭐{% else %}🏆{% endif %}{% endif %} {{ rank_prefix }}{{ rk_cand }}위 후보</div>
                 {% endif %}
             </div>
             <div class="m-card-body">

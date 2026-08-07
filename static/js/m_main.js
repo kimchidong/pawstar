@@ -1129,10 +1129,61 @@ function renderMobileFeedGrid(posts) {
         else if (pKindRaw.includes('말') || pKindRaw.includes('큰동물')) chipIcon = 'fa-solid fa-horse';
         else if (pKindRaw.includes('어류') || pKindRaw.includes('관상어')) chipIcon = 'fa-solid fa-fish';
 
+        let badgeHtml = '';
+        if (p.awards && p.awards.length > 0) {
+            let awardsHtml = '';
+            p.awards.forEach(aw => {
+                const awardCdStr = String(aw.award_cd || aw.AWARD_CD || '');
+                const awardNmStr = String(aw.award_nm || aw.AWARD_NM || '');
+                const awRank = aw.ranking || aw.RANKING;
+                let badgeText = '수상작';
+                let bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;';
+                if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
+                    badgeText = '👑 슈퍼스타';
+                    bgStyle = '';
+                } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
+                    badgeText = '🪄 라이징스타';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
+                } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
+                    badgeText = '⭐ 브라이트스타';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
+                } else {
+                    badgeText = `패밀리스타${awRank ? ` ${awRank}위` : ''}`;
+                }
+                awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.35rem 0.75rem; font-size: 0.75rem; ${bgStyle}">${badgeText}</div>`;
+            });
+            badgeHtml = `<div style="position: absolute; top: 0.55rem; right: 0.55rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
+        } else {
+            const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;
+            const isCo = p.is_co_rank || p.IS_CO_RANK;
+            if (rkCand) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPetType = urlParams.get('pet_type') || 'all';
+                const isFamily = (currentPetType && currentPetType !== 'all');
+                const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
+                const prefix = catPrefix + (isCo ? '공동 ' : '');
+                const rankTitle = `${prefix}${rkCand}위 후보`;
+                
+                let iconHtml = '🏆';
+                let bgStyle = '';
+                if (isFamily) {
+                    iconHtml = `<span class="pet-emoji-icon"><i class="${chipIcon}"></i></span>`;
+                    bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;';
+                } else {
+                    const rkNum = Number(rkCand);
+                    if (rkNum === 1) iconHtml = '👑';
+                    else if (rkNum === 2) iconHtml = '🪄';
+                    else if (rkNum === 3) iconHtml = '⭐';
+                }
+                badgeHtml = `<div class="m-card-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; top: 0.55rem; left: 0.55rem; position: absolute; z-index: 10; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
+            }
+        }
+
         html += `
         <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
             <div class="m-card-thumb">
                 <img src="${pImg}" alt="${pTitle}" loading="lazy">
+                ${badgeHtml}
             </div>
 
             <div class="m-card-body">
