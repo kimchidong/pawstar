@@ -157,8 +157,20 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     const isClosedRound = isHallOfFame || 
                           postData.contest_stat === 'G001C002' || 
                           postData.CONTEST_STAT === 'G001C002' || 
+                          postData.is_closed === true || 
+                          postData.closed === true || 
                           postData.is_ended === true || 
                           postData.IS_ENDED === true;
+
+    // 종료된 회차의 경우 원형 핑크 하트 버튼 숨김
+    let mHeaderLikeBtn = document.getElementById('mDetailHeaderLikeBtn');
+    if (mHeaderLikeBtn) {
+        if (isClosedRound) {
+            mHeaderLikeBtn.style.display = 'none';
+        } else {
+            mHeaderLikeBtn.style.display = 'inline-flex';
+        }
+    }
 
     // 모바일 출전 포기(삭제) 버튼 제어
     const mDeleteBtn = document.getElementById('mDetailDeleteBtn');
@@ -384,7 +396,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     const mIsLiked = !!((postData.actions && postData.actions.is_liked) || postData.is_liked);
     const mBtnLikePopup = document.getElementById('mDetailBtnLike');
     const mHeartIcon = document.getElementById('mDetailHeartIcon');
-    const mHeaderLikeBtn = document.getElementById('mDetailHeaderLikeBtn');
+    mHeaderLikeBtn = mHeaderLikeBtn || document.getElementById('mDetailHeaderLikeBtn');
     const mHeaderHeartIcon = document.getElementById('mDetailHeaderHeartIcon');
     if (mBtnLikePopup) {
         const icon = mBtnLikePopup.querySelector('i');
