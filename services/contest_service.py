@@ -1512,26 +1512,39 @@ class PawStarService:
                         'is_author': True
                     }
 
-                # 1. DB pst_contest_round 의 누적 조회수(VW_CNT) 1 무조건 가산
-                cur.execute("""
-                    UPDATE pst_contest_round
-                    SET VW_CNT = COALESCE(VW_CNT, 0) + 1
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (contest_id, round_no))
-
                 vw_user = view_user_id
                 if not vw_user:
                     ip_str = str(client_ip or 'GUEST').replace(':', '_').replace('.', '_')
                     vw_user = f"ANON_{ip_str}"
 
-                # 2. 조회 이력 테이블(pst_contest_vw)에도 저장
+                # 1. 이미 동일 유저/IP가 해당 출전글을 열람한 기록이 있는지 검증
                 cur.execute("""
-                    INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
-                    VALUES (%s, %s, %s, NOW())
-                    ON DUPLICATE KEY UPDATE VW_DT = NOW()
+                    SELECT 1 FROM pst_contest_vw
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                 """, (contest_id, round_no, vw_user))
+                already_viewed = bool(cur.fetchone())
 
-                # 3. DB에서 4요소 재조회 -> 점수 계산 -> DB 업데이트 -> 최종 DB 조회
+                if not already_viewed:
+                    # 최초 조회인 경우에만 누적 조회수(VW_CNT) 1 가산 및 이력 신규 추가
+                    cur.execute("""
+                        UPDATE pst_contest_round
+                        SET VW_CNT = COALESCE(VW_CNT, 0) + 1
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                    """, (contest_id, round_no))
+
+                    cur.execute("""
+                        INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
+                        VALUES (%s, %s, %s, NOW())
+                    """, (contest_id, round_no, vw_user))
+                else:
+                    # 이미 읽은 게시물인 경우 조회 일시만 최신화 (조회수 가산 없음)
+                    cur.execute("""
+                        UPDATE pst_contest_vw
+                        SET VW_DT = NOW()
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
+                    """, (contest_id, round_no, vw_user))
+
+                # 2. DB에서 4요소 재조회 -> 점수 계산 -> DB 최신화 -> 최종 수치 반환
                 stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
                 conn.commit()
                 conn.close()
@@ -1543,7 +1556,7 @@ class PawStarService:
                     'share_count': stats['share_count'],
                     'new_score': stats['score'],
                     'score': stats['score'],
-                    'already_viewed': False
+                    'already_viewed': already_viewed
                 }
         except Exception as e:
             print("increase_view_count error:", e)
