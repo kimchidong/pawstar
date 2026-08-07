@@ -194,7 +194,12 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             else if (mKindNm.includes('페럿')) icon = '🦦';
             mKindNm = `${icon} ${mKindNm}`;
         }
-        mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
+        const mPetNm = postData.PET_NM || postData.pet_name || '';
+        if (mPetNm) {
+            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span><span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${mPetNm}</span>`;
+        } else {
+            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
+        }
     }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
     const mTitleEl = document.getElementById('mDetailTitle');
@@ -293,14 +298,14 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');">👑 슈퍼스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');">👑 슈퍼스타</div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');">🪄 라이징스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');">🪄 라이징스타</div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');">⭐ 브라이트스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');">⭐ 브라이트스타</div>`;
                 } else {
                     const titleText = awRank ? `패밀리스타 ${awRank}위` : '패밀리스타';
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.25rem 0.55rem; font-size: 0.65rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${titleText}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> ${titleText}</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${titleText}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> ${titleText}</div>`;
                 }
             });
             rightHtml += '</div>';
@@ -334,23 +339,23 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
                 if (isFamily) {
                     iconHtml = `<span class="pet-emoji-icon"><i class="${petIconClass}"></i></span>`;
-                    bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.4) 0%, rgba(192,132,252,0.38) 50%, rgba(147,51,234,0.42) 100%); color: #3b0764;';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
                 } else {
                     if (postData.rank_candidate === 1) {
                         iconHtml = '👑';
-                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.38) 0%, rgba(245,158,11,0.42) 50%, rgba(217,119,6,0.45) 100%); color: #451a03;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.95) 0%, rgba(245,158,11,0.92) 50%, rgba(217,119,6,0.95) 100%); color: #451a03;';
                     } else if (postData.rank_candidate === 2) {
                         iconHtml = '🪄';
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(241,245,249,0.38) 60%, rgba(203,213,225,0.35) 100%); color: #0f172a;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.92) 60%, rgba(203,213,225,0.9) 100%); color: #0f172a;';
                     } else if (postData.rank_candidate === 3) {
                         iconHtml = '⭐';
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.4) 0%, rgba(251,146,60,0.38) 60%, rgba(234,88,12,0.42) 100%); color: #431407;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95) 0%, rgba(251,146,60,0.92) 60%, rgba(234,88,12,0.95) 100%); color: #431407;';
                     } else {
                         iconHtml = '🏆';
-                        bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.4) 0%, rgba(192,132,252,0.38) 50%, rgba(147,51,234,0.42) 100%); color: #3b0764;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
                     }
                 }
-                mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; margin: 0; position: relative; top: 0; left: 0; font-weight: 800; ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
+                mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.82rem; padding: 0.38rem 0.75rem; margin: 0; position: relative; top: 0; left: 0; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); ${bgStyle}">${iconHtml} ${rankTitle}</div>`;
             } else {
                 mBadgeEl.innerHTML = '';
             }
@@ -1140,7 +1145,7 @@ function renderMobileFeedGrid(posts) {
                 <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
                 <div class="m-pet-tag">
                     <span class="m-pet-kind-text">${pKindRaw}</span>
-                    ${pPetNm ? `<span class="m-pet-name-text">• ${pPetNm}</span>` : ''}
+                    ${pPetNm ? `<span class="m-pet-name-text">${pPetNm}</span>` : ''}
                 </div>
 
                 <!-- 3줄째: 게시글 제목 -->

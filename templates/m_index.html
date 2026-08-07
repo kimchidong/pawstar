@@ -172,7 +172,7 @@
                 <div class="m-pet-tag">
                     <span class="m-pet-kind-text">{{ p.KIND_NM or p.pet_type }}</span>
                     {% if p.PET_NM or p.pet_name %}
-                        <span class="m-pet-name-text">• {{ p.PET_NM or p.pet_name }}</span>
+                        <span class="m-pet-name-text">{{ p.PET_NM or p.pet_name }}</span>
                     {% endif %}
                 </div>
                 
