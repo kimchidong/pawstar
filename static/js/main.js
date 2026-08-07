@@ -585,7 +585,11 @@ function openDetailModal(post, isHallOfFame = false) {
                  document.querySelector(`[data-post-id="${cleanId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${cleanId}"]`);
-    if (!isClosedRound) {
+    const curUserId = String(window.CURRENT_USER_ID || '').trim();
+    const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
+    const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
+
+    if (!isClosedRound && !isMine) {
         if (card) {
             const btnView = card.querySelector('.btn-view');
             if (btnView) {
@@ -595,31 +599,13 @@ function openDetailModal(post, isHallOfFame = false) {
             }
         }
 
-        // 팝업 모달 내부의 조회수 버튼 박스도 진행 중 회차에서 타인 게시물인 경우에만 활성화(active) 하이라이트
         const detailBtnViewPopup = document.getElementById('detailBtnView');
         if (detailBtnViewPopup) {
-            const curUserId = String(window.CURRENT_USER_ID || '').trim();
-            const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
-            const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
-
-            if (isMine) {
-                detailBtnViewPopup.classList.remove('active');
-                const icon = detailBtnViewPopup.querySelector('i');
-                if (icon) icon.className = 'fa-regular fa-eye';
-            } else {
-                detailBtnViewPopup.classList.add('active');
-                const icon = detailBtnViewPopup.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
-            }
+            detailBtnViewPopup.classList.add('active');
+            const icon = detailBtnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-eye';
         }
     } else {
-        // 종료된 회차인 경우 DB 저장이 진행되지 않으므로 active 클래스를 제거하고 비활성화 상태 유지
-        const detailBtnViewPopup = document.getElementById('detailBtnView');
-        if (detailBtnViewPopup) {
-            detailBtnViewPopup.classList.remove('active');
-            const icon = detailBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-regular fa-eye';
-        }
         if (card) {
             const btnView = card.querySelector('.btn-view');
             if (btnView) {
@@ -627,6 +613,12 @@ function openDetailModal(post, isHallOfFame = false) {
                 const icon = btnView.querySelector('i');
                 if (icon) icon.className = 'fa-regular fa-eye';
             }
+        }
+        const detailBtnViewPopup = document.getElementById('detailBtnView');
+        if (detailBtnViewPopup) {
+            detailBtnViewPopup.classList.remove('active');
+            const icon = detailBtnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-eye';
         }
     }
 

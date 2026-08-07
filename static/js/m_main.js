@@ -534,7 +534,9 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                   document.querySelector(`[data-post-id="${mCleanId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
-    if (!isClosedRound) {
+    const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
+
+    if (!isClosedRound && !isMinePost) {
         if (mCard) {
             const mBtnView = mCard.querySelector('.btn-view');
             if (mBtnView) {
