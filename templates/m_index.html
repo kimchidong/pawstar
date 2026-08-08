@@ -116,7 +116,7 @@
 
 <!-- 동물종류 필터 스크롤바 -->
 <div class="m-filter-scroll" id="mPetTypeChipGroup">
-    <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type=all&sort={{ sort_type }}&q={{ search_q }}" data-pet-type="all" onclick="selectMobilePetType(event, 'all')" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-grip"></i> 전체보기</a>
+    <a href="/m/?contest_id={{ current_contest.CONTEST_ROUND or current_contest.contest_id }}&pet_type=all&sort={{ sort_type }}&q={{ search_q }}" data-pet-type="all" onclick="selectMobilePetType(event, 'all')" class="m-chip {{ 'active' if pet_type == 'all' or not pet_type }}"><i class="fa-solid fa-layer-group"></i> 전체보기</a>
     {% for k in pet_kinds %}
         {% set k_nm = k.KIND_NM %}
         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
