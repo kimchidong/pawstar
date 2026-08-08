@@ -61,27 +61,6 @@
                 {% if part == 'G002P001' %}
                     {% set ns_global.found = true %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if rk == 1 else ('#cbd5e1' if rk == 2 else '#fed7aa') }}; border-radius: 18px; padding: 0.75rem 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer;">
-                        <!-- 상단 헤더: 순위(좌측정렬) & 스타 뱃지(우측정렬) - Exact 26px 세로높이 통일 -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; padding-bottom: 0.45rem; border-bottom: 1px dashed #f1f5f9; min-height: 26px;">
-                            <div style="display: inline-flex; align-items: center; gap: 0.35rem; height: 26px;">
-                                <span style="font-size: 0.78rem; font-weight: 800; color: #475569; line-height: 1;">전체 {{ rk }}위</span>
-                            </div>
-                            <div style="display: inline-flex; align-items: center; justify-content: center; height: 26px;">
-                                {% if rk == 1 %}
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #854d0e; border: 1.2px solid #facc15; height: 26px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 13px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.18);">
-                                        <i class="fa-solid fa-crown" style="color: #b45309; font-size: 0.74rem; line-height: 1;"></i> <span style="line-height: 1;">슈퍼스타</span>
-                                    </span>
-                                {% elif rk == 2 %}
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); color: #334155; border: 1.2px solid #cbd5e1; height: 26px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 13px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12);">
-                                        <i class="fa-solid fa-wand-magic-sparkles" style="color: #475569; font-size: 0.74rem; line-height: 1;"></i> <span style="line-height: 1;">라이징스타</span>
-                                    </span>
-                                {% elif rk == 3 %}
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; border: 1.2px solid #fdba74; height: 26px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 13px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.15);">
-                                        <i class="fa-solid fa-star" style="color: #ea580c; font-size: 0.74rem; line-height: 1;"></i> <span style="line-height: 1;">브라이트스타</span>
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <div style="flex-shrink: 0; position: relative;">
@@ -90,10 +69,25 @@
                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
-                                <!-- 1줄: 집사 프로필 -->
-                                <div style="display: flex; align-items: center; gap: 0.3rem; overflow: hidden;">
-                                    <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 15px; height: 15px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);" alt="집사 프로필">
-                                    <span style="font-size: 0.75rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ w.NK_NM or w.user_nickname }}</span>
+                                <!-- 1줄: 집사 프로필(좌) & 슈퍼스타/라이징스타/브라이트스타 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
+                                    <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
+                                        <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                        <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ w.NK_NM or w.user_nickname }}</span>
+                                    </div>
+                                    {% if rk == 1 %}
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #854d0e; border: 1.2px solid #facc15; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.18); flex-shrink: 0;">
+                                            <i class="fa-solid fa-crown" style="color: #b45309; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">슈퍼스타</span>
+                                        </span>
+                                    {% elif rk == 2 %}
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); color: #334155; border: 1.2px solid #cbd5e1; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12); flex-shrink: 0;">
+                                            <i class="fa-solid fa-wand-magic-sparkles" style="color: #475569; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">라이징스타</span>
+                                        </span>
+                                    {% elif rk == 3 %}
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; border: 1.2px solid #fdba74; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.15); flex-shrink: 0;">
+                                            <i class="fa-solid fa-star" style="color: #ea580c; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">브라이트스타</span>
+                                        </span>
+                                    {% endif %}
                                 </div>
                                 <!-- 2줄: 동물종류, 동물애칭 -->
                                 <div class="m-pet-tag" style="margin: 0;">
