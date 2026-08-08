@@ -157,10 +157,18 @@
                     {% endif %}
                 </div>
                 <div class="m-card-body">
-                    <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
-                    <div class="m-card-author">
-                        <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or user.profile_img or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname or user.nickname }}" class="m-author-avatar">
-                        <span class="m-author-name">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
+                    <!-- 1줄째: 프로필사진 + 작성자 닉네임 (전체 보기시 우측 회차 정보 표시) -->
+                    <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+                            <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or user.profile_img or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname or user.nickname }}" class="m-author-avatar">
+                            <span class="m-author-name">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
+                        </div>
+                        {% if sel_c_id == 'all' or not sel_c_id %}
+                            {% set p_round = p.CONTEST_ROUND or p.contest_id %}
+                            <span class="m-round-info-badge" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                                제{{ p_round }}회
+                            </span>
+                        {% endif %}
                     </div>
 
                     <!-- 2줄째: 동물유형명 + 동물 닉네임 -->
