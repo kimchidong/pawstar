@@ -352,13 +352,13 @@
                                 {{ a.post_title or '자랑스러운 반려동물 출전작' }}
                             </div>
 
-                            <!-- 세번째줄 - 점수, 평가요소 -->
+                            <!-- 세번째줄 - 점수, 평가요소 (공유 아이콘 1px 수직 다운 조정) -->
                             <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
                                 <span style="font-size: 0.7rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.1rem 0.45rem; border-radius: 7px;">
                                     ⭐ {{ "{:,}".format(a.score or 0) }}점
                                 </span>
-                                <span style="font-size: 0.66rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.1rem 0.45rem; border-radius: 7px;">
-                                    👁️ {{ "{:,}".format(a.view_count or 0) }} · ❤️ {{ "{:,}".format(a.like_count or 0) }} · 💬 {{ "{:,}".format(a.comment_count or 0) }} · 🔗 {{ "{:,}".format(a.share_count or 0) }}
+                                <span style="font-size: 0.66rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.1rem 0.45rem; border-radius: 7px; display: inline-flex; align-items: center; gap: 0.2rem;">
+                                    <span>👁️ {{ "{:,}".format(a.view_count or 0) }}</span> · <span>❤️ {{ "{:,}".format(a.like_count or 0) }}</span> · <span>💬 {{ "{:,}".format(a.comment_count or 0) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.56rem; transform: translateY(1px);"></i> {{ "{:,}".format(a.share_count or 0) }}</span>
                                 </span>
                             </div>
 
