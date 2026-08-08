@@ -455,7 +455,7 @@ body.m-body {
     transform: rotate(180deg);
 }
 
-/* 드랍다운 팝업 리스트 (6줄 초과 시 세로 스크롤 생성) */
+/* 드랍다운 팝업 리스트 (6줄 초과 시 세로 스크롤 생성, 둥근 모서리 안쪽으로 100% 클리핑 안착) */
 .custom-contest-options {
     position: absolute;
     top: calc(100% + 6px);
@@ -475,11 +475,18 @@ body.m-body {
 }
 
 .custom-contest-options::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
+}
+.custom-contest-options::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0; /* 상/하단 둥근 모서리 경계를 넘어서지 않도록 여백 지정 */
 }
 .custom-contest-options::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 4px;
+    border-radius: 10px;
+}
+.custom-contest-options::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .custom-contest-dropdown.open .custom-contest-options {
