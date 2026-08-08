@@ -55,12 +55,12 @@
             <h3 style="font-size: 1.05rem; font-weight: 900; color: #0f172a; margin: 0;">전체 종합 챔피언</h3>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            {% set has_global = false %}
+            {% set ns_global = namespace(found=false) %}
             {% for w in winners %}
                 {% set part = w.AWARD_PART or w.award_part %}
                 {% set rk = w.RANKING or w.ranking %}
                 {% if part == 'G002P001' %}
-                    {% set has_global = true %}
+                    {% set ns_global.found = true %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if rk == 1 else ('#cbd5e1' if rk == 2 else '#fed7aa') }}; border-radius: 18px; padding: 0.85rem 0.95rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer; position: relative;">
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <!-- 좌측 동물 썸네일 (3D 메달 상단 좌측 겹쳐 걸침) -->
@@ -112,7 +112,7 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            {% if not has_global %}
+            {% if not ns_global.found %}
                 <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); background: #ffffff; border-radius: 14px; border: 1px dashed #e2e8f0;">
                     전체 종합 챔피언 기록이 없습니다.
                 </div>
@@ -127,13 +127,13 @@
             <h3 style="font-size: 1.05rem; font-weight: 900; color: #0f172a; margin: 0;">동물종류별 패밀리 스타</h3>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            {% set has_family = false %}
+            {% set ns_family = namespace(found=false) %}
             {% for w in winners %}
                 {% set part = w.AWARD_PART or w.award_part %}
                 {% set rk = w.RANKING or w.ranking %}
                 {% set w_kind = w.KIND_NM or w.pet_type or '' %}
                 {% if part != 'G002P001' %}
-                    {% set has_family = true %}
+                    {% set ns_family.found = true %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 18px; padding: 0.85rem 0.95rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer; position: relative;">
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <!-- 좌측 동물 썸네일 (3D 메달 상단 좌측 겹쳐 걸침) -->
@@ -176,7 +176,7 @@
                     </div>
                 {% endif %}
             {% endfor %}
-            {% if not has_family %}
+            {% if not ns_family.found %}
                 <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); background: #ffffff; border-radius: 14px; border: 1px dashed #e2e8f0;">
                     동물종류별 패밀리 스타 기록이 없습니다.
                 </div>
