@@ -62,11 +62,10 @@
                 {% if part == 'G002P001' %}
                     {% set ns_global.found = true %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if rk == 1 else ('#cbd5e1' if rk == 2 else '#fed7aa') }}; border-radius: 18px; padding: 0.75rem 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer;">
-                        <!-- 상단 헤더: 메달(좌측정렬) & .. 스타(우측정렬) - Exact 26px 세로높이 통일 -->
+                        <!-- 상단 헤더: 순위(좌측정렬) & 스타 뱃지(우측정렬) - Exact 26px 세로높이 통일 -->
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; padding-bottom: 0.45rem; border-bottom: 1px dashed #f1f5f9; min-height: 26px;">
                             <div style="display: inline-flex; align-items: center; gap: 0.35rem; height: 26px;">
-                                {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk) %}
-                                <img src="/static/image/badge/{{ badge_file }}.png" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); flex-shrink: 0;" alt="수상 메달">
+                                <span style="font-size: 0.78rem; font-weight: 800; color: #475569; line-height: 1;">👑 전체 {{ rk }}위</span>
                             </div>
                             <div style="display: inline-flex; align-items: center; justify-content: center; height: 26px;">
                                 {% if rk == 1 %}
@@ -86,8 +85,10 @@
                         </div>
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
-                            <div style="flex-shrink: 0;">
+                            <div style="flex-shrink: 0; position: relative;">
                                 <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 82px; height: 82px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
+                                {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk) %}
+                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필 -->
@@ -148,8 +149,6 @@
                         <!-- 상단 헤더: 메달(좌측정렬) & .. 스타(우측정렬) - Exact 26px 세로높이 통일 -->
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; padding-bottom: 0.45rem; border-bottom: 1px dashed #f1f5f9; min-height: 26px;">
                             <div style="display: inline-flex; align-items: center; gap: 0.35rem; height: 26px;">
-                                {% set badge_file = w.AWARD_CD or ('P002A90' ~ (rk if rk <= 3 else 3)) %}
-                                <img src="/static/image/badge/{{ badge_file }}.png" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); flex-shrink: 0;" alt="수상 메달">
                                 <span style="font-size: 0.78rem; font-weight: 800; color: #6b21a8; line-height: 1; display: inline-block;">
                                     {{ w_kind }} {{ rk }}위
                                 </span>
@@ -163,8 +162,10 @@
                         </div>
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
-                            <div style="flex-shrink: 0;">
+                            <div style="flex-shrink: 0; position: relative;">
                                 <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 82px; height: 82px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
+                                {% set badge_file = w.AWARD_CD or ('P002A90' ~ (rk if rk <= 3 else 3)) %}
+                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필 -->
