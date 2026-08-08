@@ -505,22 +505,23 @@ class PawStarService:
                 user_info['nickname'] = user_info.get('NK_NM', user_id)
                 user_info['profile_img'] = user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png')
 
-                # 최초 가입일 및 최근 로그인 일시 포맷팅
+                # 최초 가입일 및 최근 로그인 일시 포맷팅 (정규식 탐지로 날짜와 시간 사이 공백 100% 보장)
                 join_val = user_info.get('JOIN_DT') or user_info.get('join_dt') or user_info.get('JOIN_DATE') or user_info.get('created_at')
-                if hasattr(join_val, 'strftime'):
-                    user_info['join_date'] = join_val.strftime('%Y-%m-%d %H:%M:%S')
-                elif join_val:
-                    user_info['join_date'] = str(join_val)
-                else:
-                    user_info['join_date'] = '-'
-
                 lgn_val = user_info.get('LGN_DT') or user_info.get('lgn_dt') or user_info.get('LAST_LOGIN') or user_info.get('last_login')
-                if hasattr(lgn_val, 'strftime'):
-                    user_info['last_login'] = lgn_val.strftime('%Y-%m-%d %H:%M:%S')
-                elif lgn_val:
-                    user_info['last_login'] = str(lgn_val)
-                else:
-                    user_info['last_login'] = '-'
+
+                def _fmt_dt(val):
+                    if not val: return '-'
+                    if hasattr(val, 'strftime'):
+                        return val.strftime('%Y-%m-%d %H:%M:%S')
+                    s = str(val).strip().replace('T', ' ')
+                    import re
+                    m = re.search(r'(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})', s)
+                    if m:
+                        return f"{m.group(1)} {m.group(2)}"
+                    return s
+
+                user_info['join_date'] = _fmt_dt(join_val)
+                user_info['last_login'] = _fmt_dt(lgn_val)
 
                 query = """
                     SELECT 
