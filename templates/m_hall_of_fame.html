@@ -143,31 +143,17 @@
                 {% set w_kind = w.KIND_NM or w.pet_type or '' %}
                 {% if part != 'G002P001' %}
                     {% set ns_family.found = true %}
-                    {% if ns_family.prev_kind and ns_family.prev_kind != w_kind %}
-                        <!-- 동물 종류 간 좌우 선 굵기가 완전히 동일한 1px 구분선 -->
-                        <div style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0.75rem 0 0.85rem 0; padding: 0 0.2rem;">
+                    {% if not ns_family.prev_kind or ns_family.prev_kind != w_kind %}
+                        <!-- 동물 종류 간 구분선 헤더 (예: 강아지 부문, 고양이 부문) -->
+                        <div style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0.85rem 0 0.75rem 0; padding: 0 0.2rem;">
                             <div style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent 0%, #d8b4fe 20%, #d8b4fe 80%, transparent 100%); transform: translateY(-50%);"></div>
-                            <div style="position: relative; z-index: 2; width: 20px; height: 20px; border-radius: 50%; background: #f8fafc; border: 1px solid #d8b4fe; box-shadow: 0 1px 4px rgba(168, 85, 247, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <i class="fa-solid fa-paw" style="font-size: 0.55rem; color: #a855f7;"></i>
+                            <div style="position: relative; z-index: 2; background: #ffffff; border: 1.2px solid #d8b4fe; padding: 0.22rem 0.85rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.1); display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <span style="font-size: 0.76rem; font-weight: 900; color: #6b21a8; line-height: 1;">{{ w_kind }} 부문</span>
                             </div>
                         </div>
                     {% endif %}
                     {% set ns_family.prev_kind = w_kind %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 18px; padding: 0.75rem 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer;">
-                        <!-- 상단 헤더: 메달(좌측정렬) & .. 스타(우측정렬) - Exact 26px 세로높이 통일 -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; padding-bottom: 0.45rem; border-bottom: 1px dashed #f1f5f9; min-height: 26px;">
-                            <div style="display: inline-flex; align-items: center; gap: 0.35rem; height: 26px;">
-                                <span style="font-size: 0.78rem; font-weight: 800; color: #6b21a8; line-height: 1; display: inline-block;">
-                                    {{ w_kind }} {{ rk }}위
-                                </span>
-                            </div>
-                            <div style="display: inline-flex; align-items: center; justify-content: center; height: 26px;">
-                                {% set w_icon = 'fa-solid fa-cat' if ('고양이' in w_kind or 'cat' in w_kind.lower()) else 'fa-solid fa-dog' %}
-                                <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%); color: #6b21a8; border: 1.2px solid #d8b4fe; height: 26px; box-sizing: border-radius; padding: 0 0.55rem; border-radius: 13px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.15);">
-                                    <i class="{{ w_icon }}" style="color: #7c3aed; font-size: 0.74rem; line-height: 1;"></i> <span style="line-height: 1;">패밀리{{ rk }}위</span>
-                                </span>
-                            </div>
-                        </div>
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <div style="flex-shrink: 0; position: relative;">
@@ -176,10 +162,16 @@
                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
-                                <!-- 1줄: 집사 프로필 -->
-                                <div style="display: flex; align-items: center; gap: 0.3rem; overflow: hidden;">
-                                    <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 15px; height: 15px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);" alt="집사 프로필">
-                                    <span style="font-size: 0.75rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ w.NK_NM or w.user_nickname }}</span>
+                                <!-- 1줄: 집사 프로필(좌) & 패밀리 N위 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
+                                    <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
+                                        <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                        <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ w.NK_NM or w.user_nickname }}</span>
+                                    </div>
+                                    {% set w_icon = 'fa-solid fa-cat' if ('고양이' in w_kind or 'cat' in w_kind.lower()) else 'fa-solid fa-dog' %}
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%); color: #6b21a8; border: 1.2px solid #d8b4fe; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.12); flex-shrink: 0;">
+                                        <i class="{{ w_icon }}" style="color: #7c3aed; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">패밀리{{ rk }}위</span>
+                                    </span>
                                 </div>
                                 <!-- 2줄: 동물종류, 동물애칭 -->
                                 <div class="m-pet-tag" style="margin: 0;">
