@@ -47,57 +47,73 @@
 </div>
 
 <div style="padding: 0 1rem 2rem 1rem;">
-    <!-- 모바일 수상자 리스트 -->
+    <!-- 모바일 수상자 리스트 (수상 트로피 카드 기반 리디자인 - 메달 이미지 위 걸침 구조) -->
     <div style="display: flex; flex-direction: column; gap: 0.85rem;">
         {% for w in winners %}
             {% set part = w.AWARD_PART or w.award_part %}
             {% set rk = w.RANKING or w.ranking %}
-            <div class="m-winner-card {{ 'super-star' if (part == 'G002P001' and rk == 1) else ('rising-star' if (part == 'G002P001' and rk == 2) else ('bright-star' if (part == 'G002P001' and rk == 3) else '')) }}" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if (part == 'G002P001' and rk == 1) else ('#e2e8f0' if (part == 'G002P001' and rk == 2) else ('#ffedd5' if (part == 'G002P001' and rk == 3) else 'var(--border-light)')) }}; border-radius: var(--radius-md); padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; box-shadow: var(--shadow-soft); position: relative; overflow: hidden; cursor: pointer;">
-                <!-- 이미지 우측 상단 우아한 .. 스타 뱃지 -->
-                {% if part == 'G002P001' and rk == 1 %}
-                    <div class="winner-title-badge"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
-                {% elif part == 'G002P001' and rk == 2 %}
-                    <div class="winner-title-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
-                {% elif part == 'G002P001' and rk == 3 %}
-                    <div class="winner-title-badge"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
-                {% else %}
-                    {% set w_kind = w.KIND_NM or w.pet_type or '' %}
-                    {% set w_icon = 'fa-solid fa-dog' if ('강아지' in w_kind or '개' in w_kind) else ('fa-solid fa-cat' if '고양이' in w_kind else ('fa-solid fa-otter' if ('햄스터' in w_kind or '소동물' in w_kind or '토끼' in w_kind or '고슴도치' in w_kind) else ('fa-solid fa-frog' if ('거북이' in w_kind or '파충류' in w_kind or '도마뱀' in w_kind) else ('fa-solid fa-fish' if ('어류' in w_kind or '관상어' in w_kind or '물고기' in w_kind) else ('fa-solid fa-crow' if ('새' in w_kind or '앵무새' in w_kind or '조류' in w_kind) else ('fa-solid fa-horse' if ('말' in w_kind or '큰동물' in w_kind) else 'fa-solid fa-paw')))))) %}
-                    <div class="winner-title-badge family-star-badge"><i class="{{ w_icon }}"></i> <span>패밀리스타</span></div>
-                {% endif %}
+            {% set w_kind = w.KIND_NM or w.pet_type or '' %}
 
-                <!-- 이미지 및 좌측 상단 메달 뱃지 -->
-                <div style="position: relative; flex-shrink: 0;">
-                    <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-light); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
-                    <div style="position: absolute; top: -10px; left: -10px; z-index: 2; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.25));">
-                        {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk if part == 'G002P001' else ('P002A90' ~ (rk if rk <= 3 else 3))) %}
-                        <img src="/static/image/badge/{{ badge_file }}.png" style="width: 32px; height: 32px; object-fit: contain;" alt="수상 메달">
+            <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid {{ '#fde68a' if (part == 'G002P001' and rk == 1) else ('#cbd5e1' if (part == 'G002P001' and rk == 2) else ('#fed7aa' if (part == 'G002P001' and rk == 3) else '#e9d5ff')) }}; border-radius: 18px; padding: 0.85rem 0.95rem; margin-bottom: 0.2rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer; position: relative;">
+                
+                <!-- 본문 라인: [좌측 동물 썸네일 (3D 메달 이미지 상단 좌측 겹쳐 걸침)] + [우측 3줄 상세] -->
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    
+                    <!-- 1. 좌측 동물 썸네일 (3D 메달/배지 이미지 상단 좌측 걸치기) -->
+                    <div style="position: relative; flex-shrink: 0;">
+                        <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 78px; height: 78px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
+                        <!-- 3D 메달/배지 이미지 (좌측 상단 모서리에 겹쳐서 걸치기) -->
+                        <div style="position: absolute; top: -10px; left: -10px; z-index: 2; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));">
+                            {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk if part == 'G002P001' else ('P002A90' ~ (rk if rk <= 3 else 3))) %}
+                            <img src="/static/image/badge/{{ badge_file }}.png" style="width: 36px; height: 36px; object-fit: contain;" alt="수상 메달">
+                        </div>
                     </div>
-                </div>
 
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 0.76rem; font-weight: 800; color: {{ 'var(--accent-gold)' if (part == 'G002P001' and rk == 1) else ('#64748b' if (part == 'G002P001' and rk == 2) else ('#b45309' if (part == 'G002P001' and rk == 3) else 'var(--accent-purple)')) }}; margin-bottom: 0.2rem; padding-right: 4.5rem;">
-                        {% if part == 'G002P001' and rk == 1 %}🥇 슈퍼 스타 (전체 1위)
-                        {% elif part == 'G002P001' and rk == 2 %}🥈 라이징 스타 (전체 2위)
-                        {% elif part == 'G002P001' and rk == 3 %}🥉 브라이트 스타 (전체 3위)
-                        {% else %}🏆 {{ w.KIND_NM or w.pet_type }} {{ rk }}위
-                        {% endif %}
-                    </div>
-                    <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        {% set w_kind = w.KIND_NM or w.pet_type %}
-                        {% set w_icon = '🐕' if ('강아지' in w_kind or '개' in w_kind) else ('🐈' if '고양이' in w_kind else ('🐹' if '햄스터' in w_kind else ('🦜' if ('새' in w_kind or '앵무새' in w_kind) else ('🐴' if ('말' in w_kind or '큰동물' in w_kind) else ('🐇' if '토끼' in w_kind else ('🦔' if '고슴도치' in w_kind else ('🦎' if '파충류' in w_kind else ('🐠' if '관상어' in w_kind else ('🐷' if '돼지' in w_kind else ('🦦' if '페럿' in w_kind else '🐾')))))))))) %}
-                        {% set w_kind_str = (w_icon ~ ' ' ~ w_kind) if not ('🐕' in w_kind or '🐈' in w_kind or '🐹' in w_kind or '🦜' in w_kind or '🐴' in w_kind or '🐇' in w_kind or '🦔' in w_kind or '🦎' in w_kind or '🐠' in w_kind or '🐷' in w_kind or '🦦' in w_kind or '🐾' in w_kind) else w_kind %}
-                        {{ w.PET_NM or w.pet_name }} ({{ w_kind_str }})
-                    </div>
-                    <div style="font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.35rem;">
-                        <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light);" alt="집사 프로필">
-                        <span><strong style="color: var(--text-primary); font-weight: 800;">{{ w.NK_NM or w.user_nickname }}</strong></span>
-                    </div>
-                    <div style="font-size: 0.73rem; color: var(--text-secondary); font-weight: 700; display: flex; align-items: center; gap: 0.65rem; margin-top: 0.25rem; flex-wrap: wrap;">
-                        <span>👀 {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span>
-                        <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span>
-                        <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span>
-                        <span style="color: var(--accent-purple); font-weight: 800; font-size: 0.72rem;">(Score {{ "{:,}".format(w.SCORE or w.score or 0) }})</span>
+                    <!-- 2. 우측 3줄 상세 영역 -->
+                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.28rem; justify-content: center;">
+                        
+                        <!-- 첫번째줄: 순위 뱃지 칩 (트로피 카드 프리미엄 알약 칩) -->
+                        <div style="display: flex; align-items: center; gap: 0.25rem; flex-wrap: wrap;">
+                            {% if part == 'G002P001' and rk == 1 %}
+                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #854d0e; border: 1.2px solid #facc15; padding: 0.16rem 0.6rem; border-radius: 12px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.18);">
+                                    <i class="fa-solid fa-crown" style="color: #b45309; font-size: 0.76rem;"></i> <span>슈퍼스타 (전체 1위)</span>
+                                </span>
+                            {% elif part == 'G002P001' and rk == 2 %}
+                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); color: #334155; border: 1.2px solid #cbd5e1; padding: 0.16rem 0.6rem; border-radius: 12px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12);">
+                                    <i class="fa-solid fa-wand-magic-sparkles" style="color: #475569; font-size: 0.76rem;"></i> <span>라이징스타 (전체 2위)</span>
+                                </span>
+                            {% elif part == 'G002P001' and rk == 3 %}
+                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; border: 1.2px solid #fdba74; padding: 0.16rem 0.6rem; border-radius: 12px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.15);">
+                                    <i class="fa-solid fa-star" style="color: #ea580c; font-size: 0.76rem;"></i> <span>브라이트스타 (전체 3위)</span>
+                                </span>
+                            {% else %}
+                                {% set w_icon = 'fa-solid fa-cat' if ('고양이' in w_kind or 'cat' in w_kind.lower()) else 'fa-solid fa-dog' %}
+                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%); color: #6b21a8; border: 1.2px solid #d8b4fe; padding: 0.16rem 0.6rem; border-radius: 12px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.15);">
+                                    <i class="{{ w_icon }}" style="color: #7c3aed; font-size: 0.76rem;"></i> <span>패밀리스타 ({{ w_kind }} {{ rk }}위)</span>
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- 두번째줄: 출전 제목 & 집사 닉네임 -->
+                        <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; margin: 0.05rem 0;">
+                            <span style="font-size: 0.88rem; color: #0f172a; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ w.TITLE or w.title or (w.PET_NM or w.pet_name) }}
+                            </span>
+                            <span style="font-size: 0.74rem; color: #64748b; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+                                <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;" alt="집사"> {{ w.NK_NM or w.user_nickname }}
+                            </span>
+                        </div>
+
+                        <!-- 세번째줄: ⭐ 점수 & 4요소 실시간 아이콘 수치 (fa-share-nodes 1px 다운) -->
+                        <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
+                            <span style="font-size: 0.7rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.1rem 0.45rem; border-radius: 7px;">
+                                ⭐ {{ "{:,}".format(w.SCORE or w.score or 0) }}점
+                            </span>
+                            <span style="font-size: 0.66rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.1rem 0.45rem; border-radius: 7px; display: inline-flex; align-items: center; gap: 0.2rem;">
+                                <span>👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.56rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
+                            </span>
+                        </div>
+
                     </div>
                 </div>
             </div>
