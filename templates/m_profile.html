@@ -83,7 +83,7 @@
                 <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                     {% if sel_c_id == 'all' %}
                         <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                        <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis;">🏆 전체 회차 종합 보기</span>
+                        <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis;">전체 회차 종합 보기</span>
                     {% else %}
                         {% if is_sel_in_prog %}
                             <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
@@ -98,7 +98,7 @@
             <div class="custom-contest-options">
                 <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
                     <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                    <span class="option-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
+                    <span class="option-text" style="font-weight: 800;">전체 회차 종합 보기</span>
                 </div>
                 {% for c in contests %}
                     {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
