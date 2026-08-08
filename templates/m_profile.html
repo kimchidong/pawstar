@@ -122,7 +122,7 @@
 
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ my_posts_pagination.total_count }}개 · 페이지 당 10개)</strong></span>
+            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ my_posts_pagination.total_count }}마리 출전)</strong></span>
             {% if my_posts_pagination and my_posts_pagination.total_pages > 0 %}
                 <span style="font-size: 0.78rem; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 800; color: #334155;">
                     {{ my_posts_pagination.page }} / {{ my_posts_pagination.total_pages }} 페이지
