@@ -136,13 +136,23 @@
             <h3 style="font-size: 1.05rem; font-weight: 900; color: #0f172a; margin: 0;">동물종류별 패밀리 스타</h3>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-            {% set ns_family = namespace(found=false) %}
-            {% for w in winners | sort(attribute='RANKING') %}
+            {% set ns_family = namespace(found=false, prev_kind=None) %}
+            {% for w in winners | sort(attribute='RANKING') | sort(attribute='KIND_NM') %}
                 {% set part = w.AWARD_PART or w.award_part %}
                 {% set rk = w.RANKING or w.ranking %}
                 {% set w_kind = w.KIND_NM or w.pet_type or '' %}
                 {% if part != 'G002P001' %}
                     {% set ns_family.found = true %}
+                    {% if ns_family.prev_kind and ns_family.prev_kind != w_kind %}
+                        <!-- 동물 종류 간 좌우 선 굵기가 완전히 동일한 1px 구분선 -->
+                        <div style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0.75rem 0 0.85rem 0; padding: 0 0.2rem;">
+                            <div style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent 0%, #d8b4fe 20%, #d8b4fe 80%, transparent 100%); transform: translateY(-50%);"></div>
+                            <div style="position: relative; z-index: 2; width: 20px; height: 20px; border-radius: 50%; background: #f8fafc; border: 1px solid #d8b4fe; box-shadow: 0 1px 4px rgba(168, 85, 247, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fa-solid fa-paw" style="font-size: 0.55rem; color: #a855f7;"></i>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% set ns_family.prev_kind = w_kind %}
                     <div class="m-winner-card" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 18px; padding: 0.75rem 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.05); cursor: pointer;">
                         <!-- 상단 헤더: 메달(좌측정렬) & .. 스타(우측정렬) - Exact 26px 세로높이 통일 -->
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.55rem; padding-bottom: 0.45rem; border-bottom: 1px dashed #f1f5f9; min-height: 26px;">
