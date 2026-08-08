@@ -128,50 +128,77 @@
 
     <div class="m-feed-grid" style="padding: 0;">
         {% for p in my_posts %}
-            <div class="m-feed-card m-my-post-card-item" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+            <div class="m-feed-card m-my-post-card-item" id="m-post-card-{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" data-post-id="{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
                 <div class="m-card-thumb">
                     <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
-                    <div class="m-card-score">⭐ {{ "{:,}".format(p.SCORE or p.score or 0) }}</div>
+                    {% set rk_cand = p.rank_candidate or p.RANK_CANDIDATE %}
+                    {% set aw_list = p.awards or p.AWARDS or [] %}
+                    {% set is_post_closed = (p.is_closed or p.closed or p.CONTEST_STAT == 'G001C002') %}
+                    {% if is_post_closed and aw_list %}
+                        <div style="position: absolute; top: 0.4rem; left: 0.4rem; z-index: 10; display: flex; flex-direction: column; gap: 0.25rem;">
+                            {% for aw in aw_list %}
+                                {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
+                                {% set award_nm_str = (aw.award_nm or aw.AWARD_NM or '')|string %}
+                                {% set aw_rank = aw.ranking or aw.RANKING %}
+                                {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
+                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem;">슈퍼스타</div>
+                                {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
+                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">라이징스타</div>
+                                {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
+                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">브라이트스타</div>
+                                {% else %}
+                                    <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% elif rk_cand and not is_post_closed %}
+                        {% set is_co = p.is_co_rank or p.IS_CO_RANK %}
+                        <div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10;">전체 {% if is_co %}공동 {% endif %}{{ rk_cand }}위 후보</div>
+                    {% endif %}
                 </div>
-                <div class="m-card-content">
-                    <div class="m-card-author" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
-                        <div style="display: flex; align-items: center; gap: 0.4rem;">
-                            <img src="{{ p.PROFILE_URL or p.user_profile or user_info.profile_img }}" alt="profile" style="width: 22px; height: 22px; border-radius: 50%;">
-                            <span style="font-weight: 800; font-size: 0.88rem;">{{ p.NK_NM or p.user_nickname or user_info.nickname }}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
-                            <span style="color: #e11d48; font-weight: 800; white-space: nowrap; flex-shrink: 0;">{{ p.KIND_NM or p.pet_type }}</span>
-                            {% if p.PET_NM or p.pet_name %}
-                                <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.PET_NM or p.pet_name }}</span>
-                            {% endif %}
+                <div class="m-card-body">
+                    <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
+                    <div class="m-card-author">
+                        <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or user.profile_img or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname or user.nickname }}" class="m-author-avatar">
+                        <span class="m-author-name">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
+                    </div>
+
+                    <!-- 2줄째: 동물유형명 + 동물 닉네임 -->
+                    <div class="m-pet-tag">
+                        <span class="m-pet-kind-text">{{ p.KIND_NM or p.pet_type }}</span>
+                        {% if p.PET_NM or p.pet_name %}
+                            <span class="m-pet-name-text">{{ p.PET_NM or p.pet_name }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 3줄째: 게시글 제목 -->
+                    <h3 class="m-post-title">{{ p.TITLE or p.title }}</h3>
+
+                    <!-- 구분선 + 등록일시 & PC 동일 노란 알약 총 점수 배지 -->
+                    <div class="m-card-meta-divider">
+                        <span class="m-post-date">{{ (p.ENT_DT or p.created_at)|m_time_ago }}</span>
+                        <div class="m-card-total-score">
+                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}</span> 점
                         </div>
                     </div>
-                    <div class="m-card-title" style="margin-top: 0.35rem; font-weight: 800;">{{ p.TITLE or p.title }}</div>
-                    <div class="m-card-footer" style="margin-top: 0.35rem; font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;">
-                        <span>{{ p.ENT_DT or p.created_at }}</span>
-                    </div>
-                    <!-- 모바일 4요소 라운드 박스 (조회, 좋아요, 댓글, 공유) 및 전용 공유버튼 -->
-                    <div class="m-card-actions" onclick="event.stopPropagation();" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; margin-top: 0.5rem; text-align: center;">
-                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #0284c7; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-eye" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format((p.VW_CNT or p.view_count or 0)|int) }}</span>
+
+                    <!-- 실시간 4요소 수치 (조회, 좋아요, 댓글, 공유가입) -->
+                    <div class="m-card-actions" onclick="event.stopPropagation();">
+                        {% set is_mine = is_logged_in and current_user_id and p.ENT_USER_ID and (current_user_id|string == p.ENT_USER_ID|string) %}
+                        {% set is_view_act = is_logged_in and (not is_mine) and p.actions and p.actions.is_viewed %}
+                        <div class="m-btn-action btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                            <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye"></i> <span class="view-count">{{ "{:,}".format((p.view_count or p.VW_CNT or 0)|int) }}</span>
                         </div>
-                        <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-heart" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format((p.LIKE_CNT or p.like_count or 0)|int) }}</span>
+                        <div class="m-btn-action btn-like {% if is_logged_in and p.actions and p.actions.is_liked %}active{% endif %}" title="좋아요 수">
+                            <i class="fa-{% if is_logged_in and p.actions and p.actions.is_liked %}solid{% else %}regular{% endif %} fa-heart" {% if is_logged_in and p.actions and p.actions.is_liked %}style="color: #e11d48;"{% endif %}></i> <span class="like-count">{{ "{:,}".format((p.like_count or p.LIKE_CNT or 0)|int) }}</span>
                         </div>
-                        <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 0.25rem 0.1rem; font-size: 0.7rem; font-weight: 800; color: #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <i class="fa-regular fa-comment" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
+                        <div class="m-btn-action btn-comment {% if is_logged_in and p.actions and p.actions.is_commented %}active{% endif %}" title="댓글 수">
+                            <i class="fa-{% if is_logged_in and p.actions and p.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment"></i> <span class="comment-count">{{ "{:,}".format((p.comment_count or p.CMT_CNT or 0)|int) }}</span>
                         </div>
-                        <div class="action-btn btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}">
-                            <i class="fa-solid fa-share-nodes" style="font-size: 0.7rem; margin-bottom: 0.1rem;"></i>
-                            <span>{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
+                        <div class="m-btn-action btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수" onclick="event.stopPropagation(); handleShareClickForCard('{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}', '{{ p.contest_id or p.CONTEST_ROUND }}', '{{ p.round_no or p.ROUND_NO }}', '{{ p.share_sn or p.SHARE_SN }}');">
+                            <i class="fa-solid fa-share-nodes"></i> <span class="share-count">{{ "{:,}".format((p.share_count or p.SHARE_CNT or 0)|int) }}</span>
                         </div>
                     </div>
-                    <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="width: 100%; margin-top: 0.4rem; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2);" title="전용 공유주소 복사 (회원가입/로그인 시 +10점)">
-                        <i class="fa-solid fa-link"></i> 전용 공유주소 복사 (+10점)
-                    </button>
                 </div>
             </div>
         {% else %}
