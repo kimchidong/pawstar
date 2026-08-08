@@ -23,6 +23,7 @@
     <div class="custom-contest-dropdown stat-closed" id="mHallOfFameCustomContestDropdown" style="width: 100%;">
         <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
             <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ current_contest.year_month if current_contest and current_contest.year_month else '2026.08' }}</span>
                 <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (current_contest.THEME_NM or current_contest.title or current_contest.CONTEST_NM or current_contest.name) if current_contest else '' }}
                 </span>
@@ -36,6 +37,7 @@
                     {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
                     {% set is_sel = (c_id == sel_c_id) %}
                     <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='/m/hall-of-fame?contest_id={{ c_id }}'">
+                        <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
                         <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
                     </div>
                 {% endif %}
