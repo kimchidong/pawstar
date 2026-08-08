@@ -302,12 +302,8 @@
                     <!-- 2번째 본문 줄: [동물 프로필 사진] + [우측 4줄 상세 영역 (명예의 전당 m_hall_of_fame.html과 100% 동일)] -->
                     <div style="display: flex; align-items: center; gap: 0.85rem;">
                         
-                        <!-- 프로필 사진 (동물 썸네일 이미지 - 96px x 96px & 상단 좌측 메달 배지 오버레이) -->
-                        <div style="flex-shrink: 0; position: relative;">
-                            <img src="{{ p_img }}" alt="수상작" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;">
-                            {% set badge_file = a.AWARD_CD or a.award_cd or 'P001A101' %}
-                            <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
-                        </div>
+                        <!-- 프로필 사진 (동물 썸네일 이미지 - 96px x 96px) -->
+                        <img src="{{ p_img }}" alt="수상작" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); flex-shrink: 0; display: block;">
 
                         <!-- 4줄 상세 영역 (명예의 전당 규격과 폰트, 크기, 간격 100% 동일) -->
                         <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
