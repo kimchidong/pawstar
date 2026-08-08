@@ -121,8 +121,13 @@
     </div>
 
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0;">
-            🐾 내 펫 출전작 ({{ my_posts|length }})
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ my_posts_pagination.total_count }}개 · 페이지 당 10개)</strong></span>
+            {% if my_posts_pagination and my_posts_pagination.total_pages > 0 %}
+                <span style="font-size: 0.78rem; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 800; color: #334155;">
+                    {{ my_posts_pagination.page }} / {{ my_posts_pagination.total_pages }} 페이지
+                </span>
+            {% endif %}
         </h3>
     </div>
 
@@ -220,6 +225,34 @@
             <p style="font-size: 0.85rem; font-weight: 700;">선택하신 회차에는 출전한 게시물이 없습니다.</p>
         </div>
     </div>
+
+    <!-- 모바일 프로필 내 펫 출전작 전용 10개 단위 페이징 컨트롤러 -->
+    {% if my_posts_pagination and my_posts_pagination.total_pages > 1 %}
+    <div class="m-pagination-bar" style="margin: 1.5rem 0 1.5rem 0; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+        {% if my_posts_pagination.has_prev %}
+            <a href="?user_id={{ user.user_id }}&contest_id={{ selected_contest_id or 'all' }}&page={{ my_posts_pagination.page - 1 }}" class="m-page-btn prev-btn" style="padding: 0.45rem 0.85rem; border-radius: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 0.82rem; font-weight: 800; text-decoration: none;">
+                <i class="fa-solid fa-chevron-left"></i> 이전
+            </a>
+        {% endif %}
+
+        <div style="display: flex; gap: 0.25rem;">
+            {% set start_p = [1, my_posts_pagination.page - 2]|max %}
+            {% set end_p = [my_posts_pagination.total_pages, start_p + 4]|min %}
+            {% set start_p = [1, end_p - 4]|max %}
+            {% for p_num in range(start_p, end_p + 1) %}
+                <a href="?user_id={{ user.user_id }}&contest_id={{ selected_contest_id or 'all' }}&page={{ p_num }}" class="m-page-btn {{ 'active' if p_num == my_posts_pagination.page }}" style="padding: 0.45rem 0.75rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; text-decoration: none; {{ 'background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #ffffff; border: 1.5px solid #4f46e5;' if p_num == my_posts_pagination.page else 'background: #ffffff; color: #334155; border: 1.5px solid #cbd5e1;' }}">
+                    {{ p_num }}
+                </a>
+            {% endfor %}
+        </div>
+
+        {% if my_posts_pagination.has_next %}
+            <a href="?user_id={{ user.user_id }}&contest_id={{ selected_contest_id or 'all' }}&page={{ my_posts_pagination.page + 1 }}" class="m-page-btn next-btn" style="padding: 0.45rem 0.85rem; border-radius: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 0.82rem; font-weight: 800; text-decoration: none;">
+                다음 <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
 
     <!-- 모바일 역대 수상 트로피 -->
     <div style="margin: 2rem 0 1rem 0;">

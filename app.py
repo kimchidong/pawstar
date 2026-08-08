@@ -713,7 +713,7 @@ def m_index():
     current_user_id = get_current_user_id()
 
     current_contest = service.get_contest(contest_id)
-    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
+    paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=10, user_id=current_user_id)
 
     response = make_response(render_template(
         'm_index.html',
@@ -785,13 +785,36 @@ def m_hall_of_fame():
 def m_profile():
     user_id = request.args.get('user_id') or session.get('user_id') or 'user1'
     contest_id = request.args.get('contest_id', 'all')
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
     profile_data = service.get_user_profile(user_id, contest_id=contest_id)
+    all_my_posts = profile_data['my_posts']
+    total_count = len(all_my_posts)
+    total_pages = max(1, (total_count + per_page - 1) // per_page)
+
+    if page < 1: page = 1
+    if page > total_pages: page = total_pages
+
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    paged_my_posts = all_my_posts[start_idx:end_idx]
+
+    my_posts_pagination = {
+        'total_count': total_count,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': total_pages,
+        'has_prev': page > 1,
+        'has_next': page < total_pages
+    }
 
     return render_template(
         'm_profile.html',
         user=profile_data['user_info'],
         stats=profile_data['stats'],
-        my_posts=profile_data['my_posts'],
+        my_posts=paged_my_posts,
+        my_posts_pagination=my_posts_pagination,
         my_awards=profile_data['my_awards'],
         contests=service.get_contests(),
         selected_contest_id=contest_id
