@@ -64,9 +64,9 @@
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <div style="flex-shrink: 0; position: relative;">
-                                <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 82px; height: 82px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
+                                <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
                                 {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk) %}
-                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
+                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필(좌) & 슈퍼스타/라이징스타/브라이트스타 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
@@ -151,9 +151,9 @@
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <div style="flex-shrink: 0; position: relative;">
-                                <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 82px; height: 82px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
+                                <img src="{{ w.IMAGE_PATH or w.image_path }}" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;" alt="{{ w.PET_NM or w.pet_name }}">
                                 {% set badge_file = w.AWARD_CD or ('P002A90' ~ (rk if rk <= 3 else 3)) %}
-                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
+                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
                             <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필(좌) & 패밀리 N위 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
