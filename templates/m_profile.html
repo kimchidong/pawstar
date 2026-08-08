@@ -332,9 +332,12 @@
                         </div>
                     </div>
 
-                    <!-- 2줄: 중앙 본문 (3D 입체 메달 + 썸네일 이미지 + 출전작 제목 & 실시간 점수) -->
+                    <!-- 2줄: 중앙 본문 (동물 썸네일 이미지 맨 좌측 + 3D 입체 메달 배지 우측 + 출전작 제목 & 실시간 점수) -->
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <!-- 메달 엠블렘 (3D 입체 배지) -->
+                        <!-- 1. 동물 썸네일 이미지 (맨 좌측 배치) -->
+                        <img src="{{ p_img }}" alt="수상작" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(124, 58, 237, 0.12); flex-shrink: 0;">
+
+                        <!-- 2. 메달 엠블렘 (3D 입체 배지 - 동물 사진 우측 배치) -->
                         <div style="display: flex; align-items: center; gap: 0.15rem; flex-shrink: 0;">
                             {% for b in (a.awards or [a]) %}
                                 {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
@@ -342,9 +345,6 @@
                                 <img src="{{ b_img_src }}" alt="메달" style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(124, 58, 237, 0.22));">
                             {% endfor %}
                         </div>
-
-                        <!-- 썸네일 이미지 -->
-                        <img src="{{ p_img }}" alt="수상작" style="width: 48px; height: 48px; border-radius: 12px; object-fit: cover; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(124, 58, 237, 0.12); flex-shrink: 0;">
 
                         <!-- 출전작 정보 및 4요소 실시간 알약 칩 -->
                         <div style="min-width: 0; flex: 1;">
