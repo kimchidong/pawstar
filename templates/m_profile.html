@@ -299,17 +299,25 @@
                         </div>
                     </div>
 
-                    <!-- 2번째 본문 줄: [동물 프로필 사진] + [우측 3줄 상세 영역 (첫번째줄: 순위, 두번째줄: 출전 제목, 세번째줄: 점수 및 평가요소)] -->
-                    <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <!-- 2번째 본문 줄: [동물 프로필 사진] + [우측 4줄 상세 영역 (명예의 전당 m_hall_of_fame.html과 100% 동일)] -->
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
                         
-                        <!-- 프로필 사진 (동물 썸네일 이미지 - 맨 좌측 배치) -->
-                        <img src="{{ p_img }}" alt="수상작" style="width: 76px; height: 76px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.18); flex-shrink: 0;">
+                        <!-- 프로필 사진 (동물 썸네일 이미지 - 96px x 96px & 상단 좌측 메달 배지 오버레이) -->
+                        <div style="flex-shrink: 0; position: relative;">
+                            <img src="{{ p_img }}" alt="수상작" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); display: block;">
+                            {% set badge_file = a.AWARD_CD or a.award_cd or 'P001A101' %}
+                            <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
+                        </div>
 
-                        <!-- 3줄 상세 영역 (첫번째줄: 순위, 두번째줄: 출전 제목, 세번째줄: 점수 및 평가요소) -->
-                        <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.3rem; justify-content: center;">
+                        <!-- 4줄 상세 영역 (명예의 전당 규격과 폰트, 크기, 간격 100% 동일) -->
+                        <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                             
-                            <!-- 첫번째줄 - 순위 뱃지 칩 (명예의 전당 규격과 100% 완벽 동일화) -->
-                            <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; min-height: 24px;">
+                            <!-- 1줄: 집사 프로필(좌) & 수상 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
+                                <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
+                                    <img src="{{ user.profile_img or a.PROFILE_URL or a.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                    <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ user.nickname or a.NK_NM or a.user_nickname }}</span>
+                                </div>
                                 {% for b in (a.awards or [a]) %}
                                     {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                                     {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
@@ -361,18 +369,29 @@
                                 {% endfor %}
                             </div>
 
-                            <!-- 두번째줄 - 출전 제목 (글자 굵게 처리 해제) -->
-                            <div style="font-size: 0.88rem; color: #334155; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0.05rem 0;">
-                                {{ a.post_title or '자랑스러운 반려동물 출전작' }}
+                            <!-- 2줄: 동물종류, 동물애칭 -->
+                            <div class="m-pet-tag" style="margin: 0;">
+                                {% set k_nm = a.KIND_NM or a.pet_type or '' %}
+                                {% set k_icon = '🐕' if ('강아지' in k_nm or '개' in k_nm) else ('🐈' if '고양이' in k_nm else ('🐹' if '햄스터' in k_nm else ('🦜' if '새' in k_nm else '🐾'))) %}
+                                <span class="m-pet-kind-text">{{ (k_icon ~ ' ' ~ k_nm) if not (k_icon in k_nm) else k_nm }}</span>
+                                {% set p_name = a.PET_NM or a.pet_name %}
+                                {% if p_name %}
+                                    <span class="m-pet-name-text">{{ p_name }}</span>
+                                {% endif %}
                             </div>
 
-                            <!-- 세번째줄 - 점수, 평가요소 (공유 아이콘 1px 수직 다운 조정) -->
+                            <!-- 3줄: 출전 제목 -->
+                            <div style="font-size: 0.84rem; color: #0f172a; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ a.post_title or a.TITLE or a.title or (a.PET_NM or a.pet_name or '자랑스러운 반려동물 출전작') }}
+                            </div>
+
+                            <!-- 4줄: 점수, 4요소 -->
                             <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
-                                <span style="font-size: 0.7rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.1rem 0.45rem; border-radius: 7px;">
-                                    ⭐ {{ "{:,}".format(a.score or 0) }}점
+                                <span style="font-size: 0.68rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.08rem 0.4rem; border-radius: 6px;">
+                                    ⭐ {{ "{:,}".format((a.score or a.SCORE or 0)|int) }}점
                                 </span>
-                                <span style="font-size: 0.66rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.1rem 0.45rem; border-radius: 7px; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                    <span>👁️ {{ "{:,}".format(a.view_count or 0) }}</span> · <span>❤️ {{ "{:,}".format(a.like_count or 0) }}</span> · <span>💬 {{ "{:,}".format(a.comment_count or 0) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.56rem; transform: translateY(1px);"></i> {{ "{:,}".format(a.share_count or 0) }}</span>
+                                <span style="font-size: 0.65rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.08rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.2rem;">
+                                    <span>👁️ {{ "{:,}".format((a.view_count or a.VW_CNT or 0)|int) }}</span> · <span>❤️ {{ "{:,}".format((a.like_count or a.LIKE_CNT or 0)|int) }}</span> · <span>💬 {{ "{:,}".format((a.comment_count or a.CMT_CNT or 0)|int) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format((a.share_count or a.SHARE_CNT or 0)|int) }}</span>
                                 </span>
                             </div>
 
