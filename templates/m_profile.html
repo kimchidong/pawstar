@@ -58,17 +58,18 @@
 {% endfor %}
 
 <div style="padding: 0 1rem 1.5rem 1rem;">
-    <!-- 콘테스트 회차 선택 커스텀 드롭다운 (메인/명예의 전당과 동일한 디자인 적용) -->
+    <!-- 콘테스트 회차 선택 커스텀 드롭다운 (회차명 필드 100% 바인딩 적용) -->
     {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
-    {% set selected_contest_obj = None %}
+    {% set ns = namespace(sel_c=None) %}
     {% if sel_c_id != 'all' %}
         {% for c in contests %}
             {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
             {% if c_id == sel_c_id %}
-                {% set selected_contest_obj = c %}
+                {% set ns.sel_c = c %}
             {% endif %}
         {% endfor %}
     {% endif %}
+    {% set selected_contest_obj = ns.sel_c %}
 
     {% set is_sel_in_prog = False %}
     {% if selected_contest_obj %}
@@ -79,20 +80,20 @@
     <div style="margin: 0.5rem 0 1rem 0;">
         <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
             <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
-                <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden;">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                     {% if sel_c_id == 'all' %}
-                        <span class="status-chip closed" style="background: #e2e8f0; color: #475569;"><i class="fa-solid fa-trophy"></i> 전체</span>
-                        <span class="selected-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
+                        <span class="status-chip closed" style="background: #e2e8f0; color: #475569; flex-shrink: 0;"><i class="fa-solid fa-trophy"></i> 전체</span>
+                        <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis;">🏆 전체 회차 종합 보기</span>
                     {% else %}
                         {% if is_sel_in_prog %}
-                            <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                            <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
-                            <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
                         {% endif %}
-                        <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ selected_contest_obj.THEME_NM or selected_contest_obj.title if selected_contest_obj else '' }}</span>
+                        <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (selected_contest_obj.THEME_NM or selected_contest_obj.title or selected_contest_obj.CONTEST_NM or selected_contest_obj.name) if selected_contest_obj else '' }}</span>
                     {% endif %}
                 </span>
-                <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem;"></i>
+                <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem; flex-shrink: 0;"></i>
             </div>
             <div class="custom-contest-options">
                 <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
