@@ -120,12 +120,16 @@
         </div>
     </div>
 
+    {% set total_cnt = (my_posts_pagination.total_count if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_count is defined) else (my_posts|length)) %}
+    {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
+    {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
+
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ my_posts_pagination.total_count }}마리 출전)</strong></span>
-            {% if my_posts_pagination and my_posts_pagination.total_pages > 0 %}
+            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ total_cnt }}마리 출전)</strong></span>
+            {% if total_p > 0 %}
                 <span style="font-size: 0.78rem; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 800; color: #334155;">
-                    {{ my_posts_pagination.page }} / {{ my_posts_pagination.total_pages }} 페이지
+                    {{ curr_p }} / {{ total_p }} 페이지
                 </span>
             {% endif %}
         </h3>
@@ -227,7 +231,7 @@
     </div>
 
     <!-- 모바일 프로필 내 펫 출전작 전용 10개 단위 페이징 컨트롤러 -->
-    {% if my_posts_pagination and my_posts_pagination.total_pages > 1 %}
+    {% if my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages > 1 %}
     <div class="m-pagination-bar" style="margin: 1.5rem 0 1.5rem 0; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
         {% if my_posts_pagination.has_prev %}
             <a href="?user_id={{ user.user_id }}&contest_id={{ selected_contest_id or 'all' }}&page={{ my_posts_pagination.page - 1 }}" class="m-page-btn prev-btn" style="padding: 0.45rem 0.85rem; border-radius: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 0.82rem; font-weight: 800; text-decoration: none;">
