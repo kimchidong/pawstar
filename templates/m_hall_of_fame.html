@@ -137,7 +137,7 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
             {% set ns_family = namespace(found=false, prev_kind=None) %}
-            {% for w in winners | sort(attribute='RANKING') | sort(attribute='KIND_NM') %}
+            {% for w in winners | sort(attribute='RANKING') | sort(attribute='KIND_CD') %}
                 {% set part = w.AWARD_PART or w.award_part %}
                 {% set rk = w.RANKING or w.ranking %}
                 {% set w_kind = w.KIND_NM or w.pet_type or '' %}
