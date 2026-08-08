@@ -28,14 +28,19 @@ class PawStarService:
                 try:
                     st_dt_obj = datetime.strptime(st_dt[:10], "%Y-%m-%d")
                     contest['contest_year_month'] = f"{st_dt_obj.year}년 {st_dt_obj.month}월 콘테스트"
+                    contest['year_month'] = f"{st_dt_obj.year}.{st_dt_obj.month:02d}"
                 except Exception:
                     contest['contest_year_month'] = "해당 년월 콘테스트"
+                    contest['year_month'] = "2026.08"
             elif hasattr(st_dt, 'year'):
                 contest['contest_year_month'] = f"{st_dt.year}년 {st_dt.month}월 콘테스트"
+                contest['year_month'] = f"{st_dt.year}.{st_dt.month:02d}"
             else:
                 contest['contest_year_month'] = "해당 년월 콘테스트"
+                contest['year_month'] = "2026.08"
         else:
             contest['contest_year_month'] = "해당 년월 콘테스트"
+            contest['year_month'] = "2026.08"
 
         stat = str(contest.get('CONTEST_STAT') or contest.get('contest_stat') or '').strip()
         stat_nm = str(contest.get('CONTEST_STAT_NM') or contest.get('status') or '').strip()

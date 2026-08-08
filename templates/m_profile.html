@@ -93,7 +93,7 @@
                         {% if is_sel_in_prog %}
                             <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
-                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
+                            <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ selected_contest_obj.year_month if selected_contest_obj and selected_contest_obj.year_month else '2026.08' }}</span>
                         {% endif %}
                         <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (selected_contest_obj.THEME_NM or selected_contest_obj.title or selected_contest_obj.CONTEST_NM or selected_contest_obj.name) if selected_contest_obj else '' }}</span>
                     {% endif %}
@@ -115,7 +115,7 @@
                             {% if is_in_prog %}
                                 <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                             {% else %}
-                                <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                                <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
                             {% endif %}
                             <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
                         </div>

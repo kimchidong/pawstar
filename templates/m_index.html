@@ -45,7 +45,7 @@
                 {% if is_curr_in_prog %}
                     <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                 {% else %}
-                    <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                    <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ current_contest.year_month or '2026.08' }}</span>
                 {% endif %}
                 <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</span>
             </span>
@@ -62,7 +62,7 @@
                         {% if is_in_prog %}
                             <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
-                            <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                            <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
                         {% endif %}
                         <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
                     </div>
