@@ -67,9 +67,6 @@
                             <div style="display: inline-flex; align-items: center; gap: 0.35rem; height: 26px;">
                                 {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk) %}
                                 <img src="/static/image/badge/{{ badge_file }}.png" style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); flex-shrink: 0;" alt="수상 메달">
-                                <span style="font-size: 0.78rem; font-weight: 800; color: #475569; line-height: 1; display: inline-block;">
-                                    {% if rk == 1 %}1위 챔피언{% elif rk == 2 %}2위 위너{% elif rk == 3 %}3위 위너{% else %}{{ rk }}위{% endif %}
-                                </span>
                             </div>
                             <div style="display: inline-flex; align-items: center; justify-content: center; height: 26px;">
                                 {% if rk == 1 %}
