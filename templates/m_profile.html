@@ -63,7 +63,23 @@
 {% endfor %}
 
 <div style="padding: 0 1rem 1.5rem 1rem;">
-    <!-- 콘테스트 회차 선택 커스텀 드롭다운 (회차명 필드 100% 바인딩 적용) -->
+    {% set total_cnt = (my_posts_pagination.total_count if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_count is defined) else (my_posts|length)) %}
+    {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
+    {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
+
+    <!-- 1. 내 펫 출전작 제목 & 페이지 상태 라인 (위치 변경) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.5rem 0 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ total_cnt }}마리 출전)</strong></span>
+            {% if total_p > 0 %}
+                <span style="font-size: 0.78rem; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 800; color: #334155;">
+                    {{ curr_p }} / {{ total_p }} 페이지
+                </span>
+            {% endif %}
+        </h3>
+    </div>
+
+    <!-- 2. 콘테스트 회차 선택 커스텀 드롭다운 (위치 변경) -->
     {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
     {% set ns = namespace(sel_c=None) %}
     {% if sel_c_id != 'all' %}
@@ -82,7 +98,7 @@
         {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
     {% endif %}
 
-    <div style="margin: 0.5rem 0 1rem 0;">
+    <div style="margin: 0 0 1rem 0;">
         <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
             <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
                 <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
@@ -123,21 +139,6 @@
                 {% endfor %}
             </div>
         </div>
-    </div>
-
-    {% set total_cnt = (my_posts_pagination.total_count if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_count is defined) else (my_posts|length)) %}
-    {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
-    {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
-
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <span>🐾 내 펫 출전작 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ total_cnt }}마리 출전)</strong></span>
-            {% if total_p > 0 %}
-                <span style="font-size: 0.78rem; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 0.15rem 0.6rem; border-radius: 12px; font-weight: 800; color: #334155;">
-                    {{ curr_p }} / {{ total_p }} 페이지
-                </span>
-            {% endif %}
-        </h3>
     </div>
 
     <div class="m-feed-grid" style="padding: 0;">
