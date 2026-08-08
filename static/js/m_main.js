@@ -33,22 +33,26 @@ document.addEventListener('DOMContentLoaded', function() {
         selectEl.addEventListener('change', updateSelectBg);
     });
 
-    // 모바일 커스텀 회차 드롭다운 토글 및 바깥 클릭 닫기
-    const mCustomContestDropdown = document.getElementById('mCustomContestDropdown');
-    if (mCustomContestDropdown) {
-        const trigger = mCustomContestDropdown.querySelector('.custom-contest-trigger');
+    // 모바일 커스텀 회차 드롭다운 토글 및 바깥 클릭 닫기 (다중 드롭다운 지원)
+    document.querySelectorAll('.custom-contest-dropdown').forEach(dd => {
+        const trigger = dd.querySelector('.custom-contest-trigger');
         if (trigger) {
             trigger.addEventListener('click', function(e) {
                 e.stopPropagation();
-                mCustomContestDropdown.classList.toggle('open');
+                document.querySelectorAll('.custom-contest-dropdown').forEach(other => {
+                    if (other !== dd) other.classList.remove('open');
+                });
+                dd.classList.toggle('open');
             });
         }
-        document.addEventListener('click', function(e) {
-            if (!mCustomContestDropdown.contains(e.target)) {
-                mCustomContestDropdown.classList.remove('open');
+    });
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.custom-contest-dropdown').forEach(dd => {
+            if (!dd.contains(e.target)) {
+                dd.classList.remove('open');
             }
         });
-    }
+    });
 
     // 모바일 커스텀 정렬 드롭다운 토글 및 바깥 클릭 닫기
     const mCustomSortDropdown = document.getElementById('mCustomSortDropdown');

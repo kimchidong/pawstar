@@ -16,23 +16,6 @@
         {% endif %}
     </div>
 
-    <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일) -->
-    <div style="margin: 0.75rem 0 1rem 0; display: flex; justify-content: center;">
-        <select id="mProfileContestSelect" class="m-select-custom" onchange="location.href='?user_id={{ user.user_id }}&contest_id=' + this.value" style="padding: 0.55rem 2.2rem 0.55rem 1rem; font-size: 0.92rem; width: fit-content; font-weight: 800; cursor: pointer; border-radius: 14px; border: 1px solid #e2e8f0; background-color: #f8fafc; color: #0f172a; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
-            <option value="all" {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}>
-                🏆 전체 회차 종합 보기
-            </option>
-            {% for c in contests %}
-                {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                {% set c_title = c.THEME_NM or c.title %}
-                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or ('진행중' if (c.CONTEST_STAT == 'G001C001') else '종료') %}
-                <option value="{{ c_id }}" {{ 'selected' if c_id == (selected_contest_id|string) }}>
-                    제{{ c_id }}회 {{ c_title }} ({{ c_stat_nm }})
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-
     <!-- 최초 가입일자 및 최근 로그인일자 모바일 정보 칩 -->
     <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.35rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
@@ -75,11 +58,71 @@
 {% endfor %}
 
 <div style="padding: 0 1rem 1.5rem 1rem;">
+    <!-- 콘테스트 회차 선택 커스텀 드롭다운 (메인/명예의 전당과 동일한 디자인 적용) -->
+    {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
+    {% set selected_contest_obj = None %}
+    {% if sel_c_id != 'all' %}
+        {% for c in contests %}
+            {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+            {% if c_id == sel_c_id %}
+                {% set selected_contest_obj = c %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% set is_sel_in_prog = False %}
+    {% if selected_contest_obj %}
+        {% set c_stat_nm = selected_contest_obj.CONTEST_STAT_NM or selected_contest_obj.status or '' %}
+        {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
+    {% endif %}
+
+    <div style="margin: 0.5rem 0 1rem 0;">
+        <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
+            <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden;">
+                    {% if sel_c_id == 'all' %}
+                        <span class="status-chip closed" style="background: #e2e8f0; color: #475569;"><i class="fa-solid fa-trophy"></i> 전체</span>
+                        <span class="selected-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
+                    {% else %}
+                        {% if is_sel_in_prog %}
+                            <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                        {% endif %}
+                        <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ selected_contest_obj.THEME_NM or selected_contest_obj.title if selected_contest_obj else '' }}</span>
+                    {% endif %}
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem;"></i>
+            </div>
+            <div class="custom-contest-options">
+                <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
+                    <span class="status-chip closed" style="background: #e2e8f0; color: #475569;"><i class="fa-solid fa-trophy"></i> 전체</span>
+                    <span class="option-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
+                </div>
+                {% for c in contests %}
+                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                    {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                        {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                        {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                        {% set is_sel = (c_id == sel_c_id) %}
+                        <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}'">
+                            {% if is_in_prog %}
+                                <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                            {% else %}
+                                <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                            {% endif %}
+                            <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0;">
             🐾 내 펫 출전작 ({{ my_posts|length }})
         </h3>
-
     </div>
 
     <div class="m-feed-grid" style="padding: 0;">

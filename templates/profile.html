@@ -47,41 +47,6 @@
                     <strong style="color: #1e3a8a; font-weight: 800; font-size: 0.82rem;">{{ user.last_login if user and user.last_login else '-' }}</strong>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- 콘테스트 회차 선택 드롭다운 (명예의 전당 스타일 커스텀 드롭다운) -->
-    <div style="margin: 1.5rem 0 1rem 0; display: flex; justify-content: center;">
-        <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 385px;">
-            <div class="custom-contest-trigger">
-                <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
-                    <span class="selected-text" style="font-weight: 800;">
-                        {% if selected_contest_id == 'all' or not selected_contest_id %}
-                            🏆 전체 회차 종합 보기
-                        {% else %}
-                            {% set sel_c = (contests | selectattr('CONTEST_ROUND', 'equalto', selected_contest_id|int) | first) or (contests | selectattr('contest_id', 'equalto', selected_contest_id|int) | first) %}
-                            <span class="round-badge-text">제{{ selected_contest_id }}회</span> {{ sel_c.THEME_NM or sel_c.title if sel_c else '' }}
-                        {% endif %}
-                    </span>
-                </span>
-                <i class="fa-solid fa-chevron-down arrow-icon"></i>
-            </div>
-            <div class="custom-contest-options">
-                <div class="custom-contest-option opt-closed {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}" data-value="all" data-url="?user_id={{ user.user_id }}&contest_id=all">
-                    <span class="option-text">🏆 전체 회차 종합 보기</span>
-                </div>
-                {% for c in contests %}
-                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                    {% set c_title = c.THEME_NM or c.title %}
-                    {% set is_sel = (c_id == (selected_contest_id|string)) %}
-                    <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
-                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
     <!-- 활동 통계 4종 카드 (Stats Grid) -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem 0;">
         <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 1rem;">
@@ -136,7 +101,39 @@
         {% endif %}
     {% endfor %}
 
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 2.5rem 0 1rem 0; flex-wrap: wrap; gap: 0.75rem;">
+    <!-- 콘테스트 회차 선택 드롭다운 (내 펫 출전 게시물 바로 위 위치) -->
+    <div style="margin: 2rem 0 1rem 0; display: flex; justify-content: center;">
+        <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 385px;">
+            <div class="custom-contest-trigger">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
+                    <span class="selected-text" style="font-weight: 800;">
+                        {% if selected_contest_id == 'all' or not selected_contest_id %}
+                            🏆 전체 회차 종합 보기
+                        {% else %}
+                            {% set sel_c = (contests | selectattr('CONTEST_ROUND', 'equalto', selected_contest_id|int) | first) or (contests | selectattr('contest_id', 'equalto', selected_contest_id|int) | first) %}
+                            <span class="round-badge-text">제{{ selected_contest_id }}회</span> {{ sel_c.THEME_NM or sel_c.title if sel_c else '' }}
+                        {% endif %}
+                    </span>
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </div>
+            <div class="custom-contest-options">
+                <div class="custom-contest-option opt-closed {{ 'selected' if selected_contest_id == 'all' or not selected_contest_id }}" data-value="all" data-url="?user_id={{ user.user_id }}&contest_id=all">
+                    <span class="option-text">🏆 전체 회차 종합 보기</span>
+                </div>
+                {% for c in contests %}
+                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                    {% set c_title = c.THEME_NM or c.title %}
+                    {% set is_sel = (c_id == (selected_contest_id|string)) %}
+                    <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 1rem 0; flex-wrap: wrap; gap: 0.75rem;">
         <h3 style="font-size: 1.4rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fa-solid fa-paw" style="color: var(--accent-purple);"></i> 내 펫 출전 게시물 ({{ my_posts|length }})
         </h3>
