@@ -11,16 +11,48 @@
     </div>
 </div>
 
-<!-- 모바일 회차 선택 가로 스크롤 칩 (회차 정보 추가) -->
-<div class="m-filter-scroll" style="padding: 0 1rem 1rem 1rem;">
-    {% for c in contests %}
-        {% set c_id = c.CONTEST_ROUND or c.contest_id %}
-        {% set c_title = c.THEME_NM or c.title %}
-        {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
-        <a href="/m/hall-of-fame?contest_id={{ c_id }}" class="m-chip {{ 'active' if c_id == cur_id }}">
-            <span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}
-        </a>
-    {% endfor %}
+<!-- 콘테스트 회차 선택 커스텀 드롭다운 패널 -->
+{% set sel_c_id = (current_contest.CONTEST_ROUND or current_contest.contest_id)|string %}
+{% set is_sel_in_prog = False %}
+{% if current_contest %}
+    {% set c_stat_nm = current_contest.CONTEST_STAT_NM or current_contest.status or '' %}
+    {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or current_contest.CONTEST_STAT == 'G001C001') %}
+{% endif %}
+
+<div style="padding: 0 1rem 1rem 1rem;">
+    <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mHallOfFameCustomContestDropdown" style="width: 100%;">
+        <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                {% if is_sel_in_prog %}
+                    <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
+                {% else %}
+                    <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
+                {% endif %}
+                <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (current_contest.THEME_NM or current_contest.title or current_contest.CONTEST_NM or current_contest.name) if current_contest else '' }}
+                </span>
+            </span>
+            <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem; flex-shrink: 0;"></i>
+        </div>
+        <div class="custom-contest-options">
+            {% for c in contests %}
+                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                    {% set is_sel = (c_id == sel_c_id) %}
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='/m/hall-of-fame?contest_id={{ c_id }}'">
+                        {% if is_in_prog %}
+                            <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed"><i class="fa-solid fa-lock"></i> 종료</span>
+                        {% endif %}
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 <div style="padding: 0 1rem 2rem 1rem;">
