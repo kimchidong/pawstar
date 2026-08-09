@@ -874,6 +874,10 @@ option.opt-closed {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.custom-pet-trigger * {
+    pointer-events: none;
+}
+
 .custom-pet-trigger:hover {
     border-color: #6366f1;
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
@@ -905,14 +909,15 @@ option.opt-closed {
     box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25) !important;
     overflow-y: auto !important;
     max-height: 250px !important;
-    display: none !important;
-    flex-direction: column;
+    display: none;
+    flex-direction: column !important;
     padding: 0.4rem;
     z-index: 99999 !important;
 }
 
 .custom-pet-dropdown.open .custom-pet-options {
     display: flex !important;
+    flex-direction: column !important;
     animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -922,9 +927,11 @@ option.opt-closed {
 }
 
 .custom-pet-option {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    white-space: nowrap !important;
     padding: 0.6rem 0.85rem;
     border-radius: 8px;
     font-size: 0.9rem;
