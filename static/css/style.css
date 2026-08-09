@@ -886,6 +886,11 @@ option.opt-closed {
 .custom-pet-trigger i.pet-icon {
     color: #475569;
     font-size: 0.95rem;
+    width: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .custom-pet-trigger i.arrow-icon {
@@ -908,10 +913,11 @@ option.opt-closed {
     border-radius: 14px;
     box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25) !important;
     overflow-y: auto !important;
-    max-height: 250px !important;
+    max-height: 290px !important;
     display: none;
     flex-direction: column !important;
-    padding: 0.4rem;
+    gap: 0.2rem !important;
+    padding: 0.5rem !important;
     z-index: 99999 !important;
 }
 
@@ -932,14 +938,24 @@ option.opt-closed {
     align-items: center !important;
     gap: 0.75rem !important;
     white-space: nowrap !important;
-    padding: 0.6rem 0.85rem;
+    padding: 0.72rem 0.95rem !important;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #1e293b !important;
     background: #ffffff !important;
     cursor: pointer;
     transition: all 0.15s ease;
+}
+
+.custom-pet-option i {
+    color: #64748b;
+    font-size: 0.95rem;
+    width: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .custom-pet-option:hover {
