@@ -62,7 +62,7 @@
     {% endif %}
 {% endfor %}
 
-<div style="padding: 0 1rem 1.5rem 1rem;">
+<div style="padding: 0 0.85rem 0.5rem 0.85rem;">
     {% set total_cnt = (my_posts_pagination.total_count if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_count is defined) else (my_posts|length)) %}
     {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
     {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
@@ -98,7 +98,7 @@
         {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
     {% endif %}
 
-    <div style="margin: 0 0 1rem 0;">
+    <div style="margin: 0 0 0.5rem 0;">
         <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
             <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
                 <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
@@ -140,8 +140,9 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div class="m-feed-grid" style="padding: 0;">
+<div class="m-feed-grid">
         {% for p in my_posts %}
             <div class="m-feed-card m-my-post-card-item" id="m-post-card-{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" data-post-id="{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
                 <div class="m-card-thumb">

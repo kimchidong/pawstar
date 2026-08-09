@@ -803,6 +803,9 @@ body.m-body {
     flex-direction: column;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100% !important;
+    max-width: 194.22px !important;
+    margin: 0 auto !important;
 }
 
 .m-feed-card:active {
@@ -810,19 +813,23 @@ body.m-body {
 }
 
 .m-card-thumb {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    max-height: 400px;
-    overflow: hidden;
-    background: #f1f5f9;
+    position: relative !important;
+    width: 194.22px !important;
+    min-width: 194.22px !important;
+    max-width: 194.22px !important;
+    aspect-ratio: 4 / 3 !important;
+    height: 145.66px !important;
+    min-height: 145.66px !important;
+    max-height: 145.66px !important;
+    overflow: hidden !important;
+    background: #f1f5f9 !important;
 }
 
 .m-card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    width: 194.22px !important;
+    height: 145.66px !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 .m-card-badge {
@@ -874,83 +881,88 @@ body.m-body {
 }
 
 .m-card-body {
-    padding: 0.75rem 0.65rem;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+    padding: 0.75rem 0.65rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
 }
 
 .m-card-author {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-bottom: 0.35rem;
-    min-width: 0;
-    overflow: hidden;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    margin-bottom: 0.35rem !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
 }
 
+.m-card-author img,
 .m-author-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--border-light);
-    flex-shrink: 0;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 1px solid var(--border-light) !important;
+    flex-shrink: 0 !important;
 }
 
 .m-author-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-    flex: 1;
-    min-width: 0;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block !important;
+    flex: 1 !important;
+    min-width: 0 !important;
 }
 
 .m-pet-tag {
-    font-size: 0.75rem;
-    font-weight: 400;
-    margin-bottom: 0.4rem;
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
+    font-size: 0.75rem !important;
+    font-weight: 400 !important;
+    margin-bottom: 0.4rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.2rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
 }
 
 .m-pet-kind-text {
-    color: #e11d48;
-    font-weight: 500;
-    white-space: nowrap;
-    flex-shrink: 0;
+    color: #e11d48 !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 .m-pet-name-text {
-    color: #6d28d9;
-    font-weight: 500;
-    margin-left: 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
+    color: #6d28d9 !important;
+    font-weight: 500 !important;
+    margin-left: 0.35rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
 }
 
 .m-post-title {
-    font-size: 0.86rem;
-    font-weight: 500;
-    line-height: 1.3;
-    color: var(--text-primary);
-    margin-bottom: 0.4rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    width: 100%;
+    font-size: 0.86rem !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 0.4rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    width: 100% !important;
 }
 
 .m-post-desc {
@@ -959,83 +971,83 @@ body.m-body {
 
 /* 점선 구분선 및 등록일시/점수 메타바 */
 .m-card-meta-divider {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 0.5rem;
-    margin-top: auto;
-    margin-bottom: 0.55rem;
-    border-top: 1px dashed #e2e8f0;
-    gap: 0.3rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding-top: 0.5rem !important;
+    margin-top: auto !important;
+    margin-bottom: 0.55rem !important;
+    border-top: 1px dashed #e2e8f0 !important;
+    gap: 0.3rem !important;
 }
 
 .m-post-date {
-    font-size: 0.72rem;
-    color: #94a3b8;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-shrink: 1;
-    min-width: 0;
+    font-size: 0.72rem !important;
+    color: #94a3b8 !important;
+    font-weight: 400 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
 }
 
 /* PC 동일 노란 알약 점수 배지 */
 .m-card-total-score {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #d97706;
-    padding: 0.2rem 0.5rem;
-    border-radius: 16px;
-    font-weight: 500;
-    font-size: 0.74rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08);
+    background: #fffbeb !important;
+    border: 1px solid #fde68a !important;
+    color: #d97706 !important;
+    padding: 0.2rem 0.5rem !important;
+    border-radius: 16px !important;
+    font-weight: 500 !important;
+    font-size: 0.74rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.2rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08) !important;
 }
 
 .m-card-total-score .score-num {
-    font-weight: 500;
+    font-weight: 500 !important;
 }
 
 /* 4개의 액션 수치 알약 버튼 (2열 그리드 반응형) */
 .m-card-actions {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.25rem;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.25rem !important;
 }
 
 .m-btn-action {
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    color: #64748b;
-    padding: 0.45rem 0.1rem;
-    height: 50px;
-    box-sizing: border-box;
-    border-radius: 12px;
-    font-size: 0.76rem;
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.15rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #64748b !important;
+    padding: 0.45rem 0.1rem !important;
+    height: 50px !important;
+    box-sizing: border-box !important;
+    border-radius: 12px !important;
+    font-size: 0.76rem !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.15rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
 }
 
 .m-btn-action i {
-    font-size: 0.95rem;
-    color: #64748b;
+    font-size: 0.95rem !important;
+    color: #64748b !important;
 }
 
 .m-btn-action span {
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: #64748b;
+    font-size: 0.76rem !important;
+    font-weight: 500 !important;
+    color: #64748b !important;
 }
 
 /* PC 동일 Active 하이라이트 배경 및 테두리 */

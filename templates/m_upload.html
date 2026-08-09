@@ -103,30 +103,47 @@
 
                 <div style="background: var(--bg-primary); border: 1px dashed var(--border-light); border-radius: var(--radius-sm); padding: 1rem 0.75rem; display: flex; align-items: center; justify-content: center; min-height: 250px;">
                     <!-- 1. 모바일 목록 카드 미리보기 (실제 2열 피드 카드 100% 동일 규격) -->
-                    <div id="mPreviewListContainer" style="width: 175px;">
+                    <div id="mPreviewListContainer" style="width: 194.22px; max-width: 194.22px; margin: 0 auto;">
                         <div class="m-feed-card" style="box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: pointer;" onclick="switchMobilePreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
                             <div class="m-card-thumb">
                                 <img id="mPreviewCardImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
-                                <div class="m-card-badge">🏆 전체 1위 후보</div>
-                                <div class="m-card-score">⭐ 0</div>
+                                <div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10;">전체 1위 후보</div>
                             </div>
-                            <div class="m-card-content">
-                                <div class="m-card-author" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile">
-                                        <span style="font-weight: 800; font-size: 0.85rem; color: var(--text-primary);">{{ current_user.nickname or '집사' }}</span>
+                            <div class="m-card-body">
+                                <!-- 1줄째: 프로필사진 + 작성자 닉네임 + 회차 배지 -->
+                                <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="m-author-avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
+                                        <span class="m-author-name">{{ current_user.nickname or '집사 닉네임' }}</span>
                                     </div>
-                                    <div id="mPreviewCardPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; margin-top: 0.1rem; padding-left: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
-                                        <span style="color: #e11d48; font-weight: 800; white-space: nowrap;">🐕 강아지</span>
-                                        <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">우리 아이</span>
+                                    <span class="m-round-info-badge" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                                        제{{ current_contest.CONTEST_ROUND or '8' }}회
+                                    </span>
+                                </div>
+
+                                <!-- 2줄째: 동물유형명 + 동물 닉네임 -->
+                                <div class="m-pet-tag" id="mPreviewCardPetTag">
+                                    <span class="m-pet-kind-text">🐕 강아지</span>
+                                    <span class="m-pet-name-text">우리 아이</span>
+                                </div>
+                                
+                                <!-- 3줄째: 게시글 제목 -->
+                                <h3 class="m-post-title" id="mPreviewCardTitle">제목 미리보기</h3>
+
+                                <!-- 구분선 + 등록일시 & PC 동일 노란 알약 총 점수 배지 -->
+                                <div class="m-card-meta-divider">
+                                    <span class="m-post-date" id="mPreviewCardDate">방금 전</span>
+                                    <div class="m-card-total-score">
+                                        <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
                                     </div>
                                 </div>
-                                <div class="m-card-title" id="mPreviewCardTitle">제목 미리보기</div>
-                                <div class="m-card-footer card-actions" style="margin-top: 0.4rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; align-items: center; font-size: 0.72rem;">
-                                    <div class="action-btn btn-view" title="조회수"><i class="fa-regular fa-eye"></i> <span class="view-count">0</span></div>
-                                    <div class="action-btn btn-like" title="좋아요 수"><i class="fa-regular fa-heart"></i> <span class="like-count">0</span></div>
-                                    <div class="action-btn btn-comment" title="댓글 수"><i class="fa-regular fa-comment"></i> <span class="comment-count">0</span></div>
-                                    <div class="action-btn btn-share" title="공유 가입 수"><i class="fa-solid fa-share-nodes"></i> <span class="share-count">0</span></div>
+
+                                <!-- 실시간 4요소 수치 (조회, 좋아요, 댓글, 공유가입) -->
+                                <div class="m-card-actions">
+                                    <div class="m-btn-action btn-view" title="조회수"><i class="fa-regular fa-eye"></i> <span class="view-count">0</span></div>
+                                    <div class="m-btn-action btn-like" title="좋아요 수"><i class="fa-regular fa-heart"></i> <span class="like-count">0</span></div>
+                                    <div class="m-btn-action btn-comment" title="댓글 수"><i class="fa-regular fa-comment"></i> <span class="comment-count">0</span></div>
+                                    <div class="m-btn-action btn-share" title="공유 가입 수"><i class="fa-solid fa-share-nodes"></i> <span class="share-count">0</span></div>
                                 </div>
                             </div>
                         </div>
@@ -244,9 +261,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let petTagHTML = '';
         if (petName) {
-            petTagHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${petType}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petName}</span>`;
+            petTagHTML = `<span class="m-pet-kind-text">${petType}</span> <span class="m-pet-name-text">${petName}</span>`;
         } else {
-            petTagHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${petType}</span>`;
+            petTagHTML = `<span class="m-pet-kind-text">${petType}</span>`;
         }
 
         const titleText = title || '제목 미리보기';

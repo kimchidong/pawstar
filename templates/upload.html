@@ -149,7 +149,7 @@
                             <div class="card-body">
                                 <div class="author-info">
                                     <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
+                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
                                         <div class="author-detail">
                                             <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
                                             <div class="pet-tag" id="previewCardPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
@@ -209,7 +209,7 @@
                                 <div class="detail-info-container" style="padding: 1.5rem 1.8rem;">
                                     <div class="author-info" style="margin-bottom: 1rem;">
                                         <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" alt="profile">
+                                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
                                             <div class="author-detail">
                                                 <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
                                                 <div class="pet-tag" id="previewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
