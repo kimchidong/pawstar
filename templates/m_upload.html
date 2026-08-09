@@ -87,10 +87,10 @@
                 <!-- 숨겨진 정식 file input -->
                 <input type="file" id="mUploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
 
-                <!-- 트렌디하고 감각적인 커스텀 파일 업로드 드롭존 -->
-                <div id="mCustomFileDropzone" onclick="document.getElementById('mUploadMediaFile').click();" style="border: 2px dashed #cbd5e1; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 14px; padding: 1.1rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
+                <div id="mCustomFileDropzone" onclick="document.getElementById('mUploadMediaFile').click();" style="border: 1px solid var(--border-light); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 1.1rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease;">
                     <div id="mCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem;">
-                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); color: #7c3aed;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.3rem;"></i>
                         </div>
                         <span style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-top: 0.2rem;">📸 예쁜 아이 사진 선택하기</span>
@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedState) selectedState.style.display = 'flex';
                 if (fileNameEl) fileNameEl.textContent = file.name;
                 if (dropzone) {
-                    dropzone.style.borderColor = '#8b5cf6';
+                    dropzone.style.borderColor = 'var(--accent-purple)';
                     dropzone.style.background = '#f5f3ff';
                 }
 
