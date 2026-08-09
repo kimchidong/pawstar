@@ -712,8 +712,9 @@ option.opt-closed {
     width: 1280px;
     margin: 0 auto 3rem auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 1.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+    gap: 1.25rem;
+    box-sizing: border-box;
 }
 
 .post-card {

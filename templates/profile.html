@@ -4,24 +4,24 @@
 
 <div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
     <!-- Profile Card Header (고급스러운 밸런스 재설계) -->
-    <div class="profile-card">
-        <div class="profile-avatar-container">
-            <div class="avatar-ring">
-                <img src="{{ user.profile_img }}" class="profile-avatar" id="currentProfileImg" alt="user profile">
+    <div class="profile-card" style="display: flex; align-items: center; gap: 1.75rem; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 1.5rem 2rem; box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06); margin-bottom: 1.5rem;">
+        <div class="profile-avatar-container" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            <div class="avatar-ring" style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; border-radius: 50% !important; overflow: hidden !important; border: 3px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); background: #ffffff;">
+                <img src="{{ user.profile_img or user.PROFILE_URL or user.user_profile or '/static/image/profile/default_profile.png' }}" class="profile-avatar" id="currentProfileImg" alt="집사 프로필" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50% !important; display: block;">
             </div>
         </div>
         
-        <div class="profile-info-body">
-            <div class="profile-header-row">
-                <div class="profile-user-identity">
-                    <h2 class="profile-user-nickname" id="currentNickname">{{ user.nickname }}</h2>
-                    <span class="user-role-chip"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
+        <div class="profile-info-body" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.6rem;">
+            <div class="profile-header-row" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div class="profile-user-identity" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+                    <h2 class="profile-user-nickname" id="currentNickname" style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; line-height: 1;">{{ user.nickname }}</h2>
+                    <span class="user-role-chip" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
                     {% if user.email %}
-                        <span class="user-google-chip"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
+                        <span class="user-google-chip" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
                     {% endif %}
                 </div>
                 
-                <div class="profile-action-btns">
+                <div class="profile-action-btns" style="display: flex; align-items: center; gap: 0.6rem;">
                     <!-- 프로필 정보 수정 버튼 -->
                     <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
                         <i class="fa-solid fa-pen-to-square"></i> 프로필 정보 수정
@@ -30,11 +30,10 @@
                     <button type="button" class="btn-withdraw-profile" id="btnWithdrawUser" title="회원 탈퇴">
                         <i class="fa-solid fa-user-xmark"></i> 회원 탈퇴
                     </button>
-
                 </div>
             </div>
 
-            <!-- 사용자 최초 가입일자 및 최근 로그인일자 정보 칩 세트 (상단 여백 좁게 0.25rem 적용) -->
+            <!-- 사용자 최초 가입일자 및 최근 로그인일자 정보 칩 세트 -->
             <div class="profile-user-dates" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; flex-wrap: wrap;">
                 <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1.5px solid #e2e8f0; padding: 0.35rem 0.8rem; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <i class="fa-solid fa-calendar-check" style="color: #7c3aed; font-size: 0.85rem; width: 1.15rem; text-align: center; display: inline-block; flex-shrink: 0;"></i>
@@ -47,6 +46,9 @@
                     <strong style="color: #1e3a8a; font-weight: 800; font-size: 0.82rem;">{{ user.last_login if user and user.last_login else '-' }}</strong>
                 </div>
             </div>
+        </div>
+    </div>
+    
     <!-- 활동 통계 4종 카드 (Stats Grid) -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem 0;">
         <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 1rem;">
@@ -139,7 +141,7 @@
         </h3>
     </div>
 
-    <div class="posts-grid" id="myPostsGrid">
+    <div class="posts-grid" id="myPostsGrid" style="width: 1280px; margin: 0 auto 3rem auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; box-sizing: border-box;">
         {% for p in my_posts %}
             <div class="post-card my-post-card-item" id="post-card-{{ p.post_id }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
