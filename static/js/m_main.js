@@ -358,14 +358,14 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                     bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
                 } else {
                     iconHtml = '<i class="fa-solid fa-medal"></i>';
-                    if (postData.rank_candidate === 1) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(254,240,138,0.95) 0%, rgba(245,158,11,0.92) 50%, rgba(217,119,6,0.95) 100%); color: #451a03;';
-                    } else if (postData.rank_candidate === 2) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.92) 60%, rgba(203,213,225,0.9) 100%); color: #0f172a;';
-                    } else if (postData.rank_candidate === 3) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95) 0%, rgba(251,146,60,0.92) 60%, rgba(234,88,12,0.95) 100%); color: #431407;';
+                    if (postData.rank_candidate == 1) {
+                        bgStyle = 'background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12; box-shadow: 0 4px 14px rgba(202, 138, 4, 0.35);';
+                    } else if (postData.rank_candidate == 2) {
+                        bgStyle = 'background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%); color: #1e293b; box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45);';
+                    } else if (postData.rank_candidate == 3) {
+                        bgStyle = 'background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #ea580c 100%); color: #431407; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);';
                     } else {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.92) 0%, rgba(192,132,252,0.9) 50%, rgba(147,51,234,0.92) 100%); color: #3b0764;';
+                        bgStyle = 'background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12;';
                     }
                 }
                 mBadgeEl.innerHTML = `<div class="m-card-badge" style="font-size: 0.82rem; padding: 0.38rem 0.75rem; margin: 0; position: relative; top: 0; left: 0; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); ${bgStyle}">${iconHtml} ${rankTitle}</div>`;

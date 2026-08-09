@@ -168,7 +168,8 @@
                     {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
                     {% set is_co = p.is_co_rank or p.IS_CO_RANK %}
                     {% set rank_prefix = category_prefix ~ ('공동 ' if is_co else '') %}
-                    <div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10;">{{ rank_prefix }}{{ rk_cand }}위 후보</div>
+                    {% set rk_class = 'rank-1' if (rk_cand == 1 or rk_cand == '1') else ('rank-2' if (rk_cand == 2 or rk_cand == '2') else ('rank-3' if (rk_cand == 3 or rk_cand == '3') else '')) %}
+                    <div class="m-card-badge {{ rk_class }}" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10;">{{ rank_prefix }}{{ rk_cand }}위 후보</div>
                 {% endif %}
             </div>
             <div class="m-card-body">
