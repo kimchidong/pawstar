@@ -268,7 +268,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         });
 
         const kindNm = postData.KIND_NM || postData.pet_type || '';
-        let petIconClass = 'fa-solid fa-paws';
+        let petIconClass = 'fa-solid fa-paw';
         if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
         else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
         else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치') || kindNm.includes('작은동물')) petIconClass = 'fa-solid fa-otter';
@@ -335,7 +335,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 mBadgeEl.style.right = 'auto';
 
                 const kindNm = postData.KIND_NM || postData.pet_type || '';
-                let petIconClass = 'fa-solid fa-paws';
+                let petIconClass = 'fa-solid fa-paw';
                 if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
                 else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
                 else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치') || kindNm.includes('작은동물')) petIconClass = 'fa-solid fa-otter';

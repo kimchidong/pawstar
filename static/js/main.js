@@ -1577,7 +1577,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
     let rawTitle = title || '수상 메달 / 배지';
 
     const getIconClassFromKind = (kindNm) => {
-        if (!kindNm) return 'fa-solid fa-paws';
+        if (!kindNm) return 'fa-solid fa-paw';
         if (kindNm.includes('강아지') || kindNm.includes('개')) return 'fa-solid fa-dog';
         if (kindNm.includes('고양이')) return 'fa-solid fa-cat';
         if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치') || kindNm.includes('작은동물')) return 'fa-solid fa-otter';
@@ -1585,7 +1585,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
         if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) return 'fa-solid fa-fish';
         if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) return 'fa-solid fa-crow';
         if (kindNm.includes('말') || kindNm.includes('큰동물')) return 'fa-solid fa-horse';
-        return 'fa-solid fa-paws';
+        return 'fa-solid fa-paw';
     };
 
     if (rawTitle.includes('슈퍼스타')) {
