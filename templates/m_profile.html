@@ -266,7 +266,7 @@
     {% endif %}
 
     <!-- 모바일 역대 수상 트로피 (모바일 프리미엄 독립 카드 뷰) -->
-    <div style="margin: 2rem 0 1rem 0;">
+    <div style="padding: 0 0.85rem; margin: 1.5rem 0 1rem 0;">
         {% set award_total_cnt = stats.award_count if (stats and stats.award_count is not none) else (my_awards | map(attribute='awards') | map('length') | sum) %}
         <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.35rem;">
             🏆 나의 역대 콘테스트 수상 트로피 <strong style="color: #6366f1; font-size: 0.88rem;">(총 {{ award_total_cnt }}개)</strong>
