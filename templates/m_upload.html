@@ -152,37 +152,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. 모바일 클릭 팝업 미리보기 (실제 모바일 바텀시트 팝업 100% 동일 규격) -->
-                    <div id="mPreviewModalContainer" style="width: 100%; display: none;">
-                        <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1rem; box-shadow: 0 8px 20px rgba(0,0,0,0.12); position: relative;">
-                            <div style="position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 0.75rem; background: #0f172a;">
-                                <img id="mPreviewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover;">
-                                <div class="m-card-badge" style="position: absolute; top: 6px; left: 6px;">🏆 전체 1위 후보</div>
-                            </div>
-                            
-                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-                                <div>
-                                    <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-primary);">{{ current_user.nickname or '집사' }}</div>
-                                    <div id="mPreviewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem;">
-                                        <span style="color: #e11d48; font-weight: 800; white-space: nowrap;">🐕 강아지</span>
-                                        <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">우리 아이</span>
-                                    </div>
-                                </div>
-                                <div style="margin-left: auto; background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%); color: #713f12; padding: 0.2rem 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(202,138,4,0.25);">
-                                    ⭐ 0 점
-                                </div>
-                            </div>
-                            <h4 id="mPreviewModalTitle" style="font-size: 0.95rem; font-weight: 900; margin-bottom: 0.35rem; color: var(--text-primary);">제목 미리보기</h4>
-                            <p id="mPreviewModalDesc" style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.75rem;">소개글 미리보기</p>
-                            
-                            <div class="card-actions detail-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; padding-top: 0.5rem; border-top: 1px solid var(--border-light);">
-                                <div class="action-btn btn-view" title="조회수"><i class="fa-regular fa-eye"></i> <span class="view-count">0</span></div>
-                                <div class="action-btn btn-like" title="좋아요 수"><i class="fa-regular fa-heart"></i> <span class="like-count">0</span></div>
-                                <div class="action-btn btn-comment" title="댓글 수"><i class="fa-regular fa-comment"></i> <span class="comment-count">0</span></div>
-                                <div class="action-btn btn-share" title="공유 가입 수"><i class="fa-solid fa-share-nodes"></i> <span class="share-count">0</span></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -209,29 +178,123 @@
     </div>
 </div>
 
+<!-- 실제 모바일 상세 팝업과 100% 동일한 팝업 모달 오버레이 -->
+<div class="m-modal-backdrop" id="mPreviewModalBackdrop" style="display: none; z-index: 999999;" onclick="if(event.target===this) closeMobilePreviewModal();">
+    <div class="m-modal-sheet" style="max-height: 92vh; padding: 1.25rem;">
+        <div class="m-modal-header" style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <h3 id="mPreviewModalTitle" style="font-size: 1.1rem; font-weight: 500; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 85%; margin: 0;">자랑 제목 미리보기</h3>
+            <button type="button" class="btn-close" onclick="closeMobilePreviewModal()" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+        
+        <!-- 팝업 이미지 -->
+        <div style="width: 100%; aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden; background: #000; margin-bottom: 0.75rem; position: relative; box-shadow: var(--shadow-soft);">
+            <img id="mPreviewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" style="width: 100%; height: 100%; object-fit: cover;">
+            <div class="m-card-badge" style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 20; font-size: 0.6rem; padding: 0.18rem 0.5rem;">🏆 전체 1위 후보</div>
+        </div>
+        
+        <!-- 작성자 + 펫 태그 프로필 박스 -->
+        <div style="display: flex; align-items: center; gap: 0.55rem; background: var(--bg-primary); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); margin-bottom: 0.75rem;">
+            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;" alt="profile">
+            <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 0.88rem; font-weight: 500; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ current_user.nickname or '집사' }}</div>
+                <div id="mPreviewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; margin-top: 0.15rem;">
+                    <span style="color: #e11d48; font-weight: 500; white-space: nowrap;">🐕 강아지</span>
+                    <span style="color: #6d28d9; font-weight: 500; white-space: nowrap;">우리 아이</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 소개글 본문 -->
+        <p id="mPreviewModalDesc" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; white-space: pre-wrap; word-break: break-all;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+
+        <!-- 등록일시 및 점수 / 하트 / 공유 액션 바 -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding: 0 0.1rem;">
+            <span id="mPreviewModalDate" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">방금 전</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
+                <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fde68a; color: #d97706; padding: 0.25rem 0.65rem; border-radius: 12px; font-weight: 500; font-size: 0.82rem; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.1);">
+                    ⭐ 0 점
+                </div>
+                <button type="button" class="btn-like-action" title="좋아요" style="width: 32px; height: 32px; font-size: 0.95rem; border-radius: 50%; border: 1px solid #fecdd3; background: #fff1f2; color: #e11d48; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+                <button type="button" class="btn-share-action" title="공유" style="width: 32px; height: 32px; font-size: 0.95rem; border-radius: 50%; border: 1px solid var(--border-light); background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #6d28d9;">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 실시간 4요소 수치 (조회수, 좋아요, 댓글수, 공유수) -->
+        <div class="m-card-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.75rem; text-align: center;">
+            <div class="m-btn-action btn-view" title="조회수"><i class="fa-regular fa-eye"></i> <span class="view-count">0</span></div>
+            <div class="m-btn-action btn-like" title="좋아요 수"><i class="fa-regular fa-heart"></i> <span class="like-count">0</span></div>
+            <div class="m-btn-action btn-comment" title="댓글 수"><i class="fa-regular fa-comment"></i> <span class="comment-count">0</span></div>
+            <div class="m-btn-action btn-share" title="공유 가입 수"><i class="fa-solid fa-share-nodes"></i> <span class="share-count">0</span></div>
+        </div>
+
+        <!-- 모바일 한줄 댓글 입력 예시 -->
+        <div style="border-top: 1px solid var(--border-light); padding-top: 0.75rem; margin-top: 0.75rem;">
+            <h4 style="font-size: 0.88rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <span>💬 한줄 댓글 <span style="color: #6d28d9; font-size: 0.82rem;">(0)</span></span>
+                <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 500;">+10점</span>
+            </h4>
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.6rem;">
+                <input type="text" class="form-control" placeholder="한줄 댓글 작성..." disabled style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); background: #f8fafc;">
+                <button type="button" disabled style="padding: 0.45rem 0.95rem; border-radius: 20px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #ffffff; border: none; font-weight: 500; font-size: 0.82rem; opacity: 0.85;">등록</button>
+            </div>
+            <div style="text-align: center; font-size: 0.78rem; color: #94a3b8; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                첫 한줄 댓글의 주인공이 되어보세요! 💬
+            </div>
+        </div>
+
+        <div style="margin-top: 0.5rem; text-align: center;">
+            <button type="button" onclick="closeMobilePreviewModal()" style="width: 100%; padding: 0.75rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 500; font-size: 0.9rem; cursor: pointer;">
+                닫기
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+function openMobilePreviewModal() {
+    if (typeof updateMobilePreview === 'function') updateMobilePreview();
+    const modal = document.getElementById('mPreviewModalBackdrop');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeMobilePreviewModal() {
+    const modal = document.getElementById('mPreviewModalBackdrop');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
 function switchMobilePreviewTab(tab) {
     const btnList = document.getElementById('mBtnPreviewList');
     const btnModal = document.getElementById('mBtnPreviewModal');
-    const containerList = document.getElementById('mPreviewListContainer');
-    const containerModal = document.getElementById('mPreviewModalContainer');
-
-    if (!btnList || !btnModal || !containerList || !containerModal) return;
 
     if (tab === 'list') {
-        btnList.style.background = 'var(--gradient-brand)';
-        btnList.style.color = '#ffffff';
-        btnModal.style.background = '#f1f5f9';
-        btnModal.style.color = 'var(--text-secondary)';
-        containerList.style.display = 'block';
-        containerModal.style.display = 'none';
+        if (btnList) {
+            btnList.style.background = 'var(--gradient-brand)';
+            btnList.style.color = '#ffffff';
+        }
+        if (btnModal) {
+            btnModal.style.background = '#f1f5f9';
+            btnModal.style.color = 'var(--text-secondary)';
+        }
     } else {
-        btnModal.style.background = 'var(--gradient-brand)';
-        btnModal.style.color = '#ffffff';
-        btnList.style.background = '#f1f5f9';
-        btnList.style.color = 'var(--text-secondary)';
-        containerList.style.display = 'none';
-        containerModal.style.display = 'block';
+        if (btnModal) {
+            btnModal.style.background = 'var(--gradient-brand)';
+            btnModal.style.color = '#ffffff';
+        }
+        if (btnList) {
+            btnList.style.background = '#f1f5f9';
+            btnList.style.color = 'var(--text-secondary)';
+        }
+        openMobilePreviewModal();
     }
 }
 

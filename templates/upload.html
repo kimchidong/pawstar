@@ -172,119 +172,29 @@
                                     </div>
                                 </div>
 
+                                    <span style="font-size: 0.78rem; color: var(--text-muted);" id="previewCardDate">{{ now_str }}</span>
+                                    <div class="card-total-score"><i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점</div>
+                                </div>
                                 <div class="card-actions">
-                                    <div class="action-btn btn-view" title="조회수">
-                                        <i class="fa-regular fa-eye"></i>
-                                        <span class="view-count">0</span>
-                                    </div>
-                                    <div class="action-btn btn-like" title="좋아요 수">
-                                        <i class="fa-regular fa-heart"></i>
-                                        <span class="like-count">0</span>
-                                    </div>
-                                    <div class="action-btn btn-comment" title="댓글 수">
-                                        <i class="fa-regular fa-comment"></i>
-                                        <span class="comment-count">0</span>
-                                    </div>
-                                    <div class="action-btn btn-share" title="공유 가입 수">
-                                        <i class="fa-solid fa-share-nodes"></i>
-                                        <span class="share-count">0</span>
-                                    </div>
+                                    <div class="action-btn btn-view"><i class="fa-regular fa-eye"></i> <span>0</span></div>
+                                    <div class="action-btn btn-like"><i class="fa-regular fa-heart"></i> <span>0</span></div>
+                                    <div class="action-btn btn-comment"><i class="fa-regular fa-comment"></i> <span>0</span></div>
+                                    <div class="action-btn btn-share"><i class="fa-solid fa-share-nodes"></i> <span>0</span></div>
                                 </div>
                             </div>
                         </div>
-                        <div style="text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
-                            💡 카드를 클릭하면 팝업 모달 미리보기로 전환됩니다.
-                        </div>
-                    </div>
-
-                    <!-- 2. 클릭 팝업 모달 미리보기 (Full Size Detail Modal Preview - 실제 상세 레이어 팝업 100% 동일 규격) -->
-                    <div id="previewModalContainer" style="width: 100%; max-width: 860px; display: none;">
-                        <div class="modal-content detail-modal-content" style="width: 100%; max-width: 860px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; background: #ffffff; position: relative;">
-                            <div class="detail-modal-body" style="min-height: 460px;">
-                                <div class="detail-media-container" style="position: relative;">
-                                    <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
-                                    <div class="rank-ribbon rank-1" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10;"><i class="fa-solid fa-medal"></i> 전체 1위 후보</div>
-                                </div>
-
-                                <div class="detail-info-container" style="padding: 1.5rem 1.8rem;">
-                                    <div class="author-info" style="margin-bottom: 1rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                            <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
-                                            <div class="author-detail">
-                                                <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
-                                                <div class="pet-tag" id="previewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
-                                                    <span style="color: #e11d48; font-weight: 800; white-space: nowrap;">🐕 강아지</span>
-                                                    <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">우리 아이</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <h2 class="detail-title" id="previewModalTitle" style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-primary);">자랑 제목이 여기에 표시됩니다</h2>
-                                    <p class="detail-content" id="previewModalDesc" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
-                                    
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                                        <span style="font-size: 0.82rem; color: var(--text-muted);" id="previewModalDate">
-                                            {{ now_str }}
-                                        </span>
-                                        <div style="display: flex; align-items: center; gap: 0.6rem;">
-                                            <div class="card-total-score">
-                                                <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
-                                            </div>
-                                            <button type="button" class="btn-heart-action" title="좋아요" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-actions detail-actions">
-                                        <div class="action-btn btn-view" title="조회수">
-                                            <i class="fa-regular fa-eye"></i>
-                                            <span class="view-count">0</span>
-                                        </div>
-                                        <div class="action-btn btn-like" title="좋아요 수">
-                                            <i class="fa-regular fa-heart"></i>
-                                            <span class="like-count">0</span>
-                                        </div>
-                                        <div class="action-btn btn-comment" title="댓글 수">
-                                            <i class="fa-regular fa-comment"></i>
-                                            <span class="comment-count">0</span>
-                                        </div>
-                                        <div class="action-btn btn-share" title="공유 가입 수">
-                                            <i class="fa-solid fa-share-nodes"></i>
-                                            <span class="share-count">0</span>
-                                        </div>
-                                    </div>
-
-                                    <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
-                                        <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-                                            <span>💬 한줄 댓글 <span style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
-                                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">작성 시 +10점 획득!</span>
-                                        </h4>
-                                        <div style="display: flex; gap: 0.4rem;">
-                                            <input type="text" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" disabled style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); background: #f8fafc;">
-                                            <button type="button" disabled style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; opacity: 0.7;">
-                                                등록
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div style="text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">💡 카드를 클릭하면 팝업 모달 미리보기로 전환됩니다.</div>
                     </div>
                 </div>
             </div>
 
             <!-- 하단 제출 버튼 영역 -->
             <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light);">
-                <a href="/" style="padding: 0.85rem 2rem; border-radius: 30px; background: #f1f5f9; color: var(--text-secondary); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-                    취소
-                </a>
+                <a href="/" style="padding: 0.85rem 2rem; border-radius: 30px; background: #f1f5f9; color: var(--text-secondary); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">취소</a>
                 <button type="submit" style="padding: 0.85rem 2.5rem; border-radius: 30px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); color: #ffffff; border: none; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35); transition: var(--transition); display: inline-flex; align-items: center; gap: 0.6rem;">
                     <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료하기
                 </button>
             </div>
-
             <!-- 출전 제한 안내 하단 팁 카드 -->
             <div style="margin-top: 1.5rem; padding: 1rem 1.4rem; background: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -301,33 +211,131 @@
     </div>
 </div>
 
+<!-- 실제 데스크톱 상세 레이어 팝업과 100% 동일한 팝업 모달 오버레이 -->
+<div class="modal-backdrop" id="previewModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem;" onclick="if(event.target===this) closeDesktopPreviewModal();">
+    <div class="modal-content detail-modal-content" style="width: 100%; max-width: 860px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid var(--border-light); border-radius: var(--radius-lg); background: #ffffff; position: relative;">
+        <button type="button" class="btn-close detail-close" onclick="closeDesktopPreviewModal()" style="position: absolute; top: 1rem; right: 1rem; z-index: 30; background: rgba(255,255,255,0.9); border: 1px solid var(--border-light); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; color: #475569; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">&times;</button>
+        <div class="detail-modal-body" style="min-height: 460px;">
+            <div class="detail-media-container" style="position: relative;">
+                <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기">
+                <div class="rank-ribbon rank-1" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10;"><i class="fa-solid fa-medal"></i> 전체 1위 후보</div>
+            </div>
+
+            <div class="detail-info-container" style="padding: 1.5rem 1.8rem;">
+                <div class="author-info" style="margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
+                        <div class="author-detail">
+                            <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+                            <div class="pet-tag" id="previewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem;">
+                                <span style="color: #e11d48; font-weight: 500; white-space: nowrap;">🐕 강아지</span>
+                                <span style="color: #6d28d9; font-weight: 500; white-space: nowrap;">우리 아이</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="detail-title" id="previewModalTitle" style="font-size: 1.25rem; font-weight: 500; margin-bottom: 0.4rem; color: var(--text-primary);">자랑 제목이 여기에 표시됩니다</h2>
+                <p class="detail-content" id="previewModalDesc" style="font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted);" id="previewModalDate">
+                        {{ now_str }}
+                    </span>
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="card-total-score">
+                            <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
+                        </div>
+                        <button type="button" class="btn-heart-action" title="좋아요" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-actions detail-actions">
+                    <div class="action-btn btn-view" title="조회수">
+                        <i class="fa-regular fa-eye"></i>
+                        <span class="view-count">0</span>
+                    </div>
+                    <div class="action-btn btn-like" title="좋아요 수">
+                        <i class="fa-regular fa-heart"></i>
+                        <span class="like-count">0</span>
+                    </div>
+                    <div class="action-btn btn-comment" title="댓글 수">
+                        <i class="fa-regular fa-comment"></i>
+                        <span class="comment-count">0</span>
+                    </div>
+                    <div class="action-btn btn-share" title="공유 가입 수">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span class="share-count">0</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
+                    <h4 style="font-size: 0.88rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                        <span>💬 한줄 댓글 <span style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
+                        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 500;">+10점</span>
+                    </h4>
+                    <div style="display: flex; gap: 0.4rem;">
+                        <input type="text" class="form-control" placeholder="한줄 댓글 작성..." disabled style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); background: #f8fafc;">
+                        <button type="button" disabled style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 500; font-size: 0.82rem; opacity: 0.85;">
+                            등록
+                        </button>
+                    </div>
+                    <div style="text-align: center; font-size: 0.78rem; color: #94a3b8; margin-top: 0.6rem;">
+                        첫 한줄 댓글의 주인공이 되어보세요! 💬
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+function openDesktopPreviewModal() {
+    if (typeof updatePreview === 'function') updatePreview();
+    const modal = document.getElementById('previewModalBackdrop');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeDesktopPreviewModal() {
+    const modal = document.getElementById('previewModalBackdrop');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
 function switchPreviewTab(tab) {
     const btnList = document.getElementById('btnPreviewList');
     const btnModal = document.getElementById('btnPreviewModal');
-    const containerList = document.getElementById('previewListContainer');
-    const containerModal = document.getElementById('previewModalContainer');
-
-    if (!btnList || !btnModal || !containerList || !containerModal) return;
 
     if (tab === 'list') {
-        btnList.style.background = 'var(--gradient-brand)';
-        btnList.style.color = '#ffffff';
-        btnList.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
-        btnModal.style.background = '#f1f5f9';
-        btnModal.style.color = 'var(--text-secondary)';
-        btnModal.style.boxShadow = 'none';
-        containerList.style.display = 'block';
-        containerModal.style.display = 'none';
+        if (btnList) {
+            btnList.style.background = 'var(--gradient-brand)';
+            btnList.style.color = '#ffffff';
+            btnList.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
+        }
+        if (btnModal) {
+            btnModal.style.background = '#f1f5f9';
+            btnModal.style.color = 'var(--text-secondary)';
+            btnModal.style.boxShadow = 'none';
+        }
     } else {
-        btnModal.style.background = 'var(--gradient-brand)';
-        btnModal.style.color = '#ffffff';
-        btnModal.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
-        btnList.style.background = '#f1f5f9';
-        btnList.style.color = 'var(--text-secondary)';
-        btnList.style.boxShadow = 'none';
-        containerList.style.display = 'none';
-        containerModal.style.display = 'block';
+        if (btnModal) {
+            btnModal.style.background = 'var(--gradient-brand)';
+            btnModal.style.color = '#ffffff';
+            btnModal.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
+        }
+        if (btnList) {
+            btnList.style.background = '#f1f5f9';
+            btnList.style.color = 'var(--text-secondary)';
+            btnList.style.boxShadow = 'none';
+        }
+        openDesktopPreviewModal();
     }
 }
 
