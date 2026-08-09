@@ -310,61 +310,63 @@
                         <!-- 4줄 상세 영역 (명예의 전당 규격과 폰트, 크기, 간격 100% 동일) -->
                         <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
                             
-                            <!-- 1줄: 집사 프로필(좌) & 수상 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
+                            <!-- 1줄: 집사 프로필(좌) & 수상 뱃지(우측 나란히 붙여서 배치) -->
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
                                 <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
-                                    <img src="{{ user.profile_img or a.PROFILE_URL or a.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
+                                    <img src="{{ user.profile_img or a.PROFILE_URL or a.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
                                     <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ user.nickname or a.NK_NM or a.user_nickname }}</span>
                                 </div>
-                                {% for b in (a.awards or [a]) %}
-                                    {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
-                                    {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
-                                    {% set b_kind = (b.KIND_CD or a.KIND_CD or b.KIND_NM or a.KIND_NM or '')|string %}
+                                <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                                    {% for b in (a.awards or [a]) %}
+                                        {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
+                                        {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
+                                        {% set b_kind = (b.KIND_CD or a.KIND_CD or b.KIND_NM or a.KIND_NM or '')|string %}
 
-                                    {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
-                                        {% set badge_bg = 'linear-gradient(135deg, #fffbeb 0%, #fef08a 100%)' %}
-                                        {% set badge_color = '#854d0e' %}
-                                        {% set badge_border = '#facc15' %}
-                                        {% set badge_shadow = '0 2px 6px rgba(245, 158, 11, 0.18)' %}
-                                        {% set badge_icon = 'fa-solid fa-crown' %}
-                                        {% set icon_color = '#b45309' %}
-                                        {% set display_title = '슈퍼스타' %}
-                                    {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
-                                        {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
-                                        {% set badge_color = '#334155' %}
-                                        {% set badge_border = '#cbd5e1' %}
-                                        {% set badge_shadow = '0 2px 6px rgba(100, 116, 139, 0.12)' %}
-                                        {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
-                                        {% set icon_color = '#475569' %}
-                                        {% set display_title = '라이징스타' %}
-                                    {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
-                                        {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
-                                        {% set badge_color = '#c2410c' %}
-                                        {% set badge_border = '#fdba74' %}
-                                        {% set badge_shadow = '0 2px 6px rgba(234, 88, 12, 0.15)' %}
-                                        {% set badge_icon = 'fa-solid fa-star' %}
-                                        {% set icon_color = '#ea580c' %}
-                                        {% set display_title = '브라이트스타' %}
-                                    {% else %}
-                                        {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
-                                        {% set badge_color = '#6b21a8' %}
-                                        {% set badge_border = '#d8b4fe' %}
-                                        {% set badge_shadow = '0 2px 6px rgba(124, 58, 237, 0.12)' %}
-                                        {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or '고양이' in b_kind or 'cat' in b_kind.lower() %}
-                                            {% set badge_icon = 'fa-solid fa-cat' %}
+                                        {% if 'P001A101' in b_cd or '슈퍼' in b_nm %}
+                                            {% set badge_bg = 'linear-gradient(135deg, #fffbeb 0%, #fef08a 100%)' %}
+                                            {% set badge_color = '#854d0e' %}
+                                            {% set badge_border = '#facc15' %}
+                                            {% set badge_shadow = '0 2px 6px rgba(245, 158, 11, 0.18)' %}
+                                            {% set badge_icon = 'fa-solid fa-crown' %}
+                                            {% set icon_color = '#b45309' %}
+                                            {% set display_title = '슈퍼스타' %}
+                                        {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
+                                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
+                                            {% set badge_color = '#334155' %}
+                                            {% set badge_border = '#cbd5e1' %}
+                                            {% set badge_shadow = '0 2px 6px rgba(100, 116, 139, 0.12)' %}
+                                            {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
+                                            {% set icon_color = '#475569' %}
+                                            {% set display_title = '라이징스타' %}
+                                        {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
+                                            {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
+                                            {% set badge_color = '#c2410c' %}
+                                            {% set badge_border = '#fdba74' %}
+                                            {% set badge_shadow = '0 2px 6px rgba(234, 88, 12, 0.15)' %}
+                                            {% set badge_icon = 'fa-solid fa-star' %}
+                                            {% set icon_color = '#ea580c' %}
+                                            {% set display_title = '브라이트스타' %}
                                         {% else %}
-                                            {% set badge_icon = 'fa-solid fa-dog' %}
+                                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
+                                            {% set badge_color = '#6b21a8' %}
+                                            {% set badge_border = '#d8b4fe' %}
+                                            {% set badge_shadow = '0 2px 6px rgba(124, 58, 237, 0.12)' %}
+                                            {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or '고양이' in b_kind or 'cat' in b_kind.lower() %}
+                                                {% set badge_icon = 'fa-solid fa-cat' %}
+                                            {% else %}
+                                                {% set badge_icon = 'fa-solid fa-dog' %}
+                                            {% endif %}
+                                            {% set icon_color = '#7c3aed' %}
+                                            {% set b_rk = b.RANKING or b.ranking or a.RANKING or a.ranking or (b_cd[-1] if (b_cd and b_cd[-1].isdigit()) else '1') %}
+                                            {% set display_title = '패밀리' ~ b_rk ~ '위' %}
                                         {% endif %}
-                                        {% set icon_color = '#7c3aed' %}
-                                        {% set b_rk = b.RANKING or b.ranking or a.RANKING or a.ranking or (b_cd[-1] if (b_cd and b_cd[-1].isdigit()) else '1') %}
-                                        {% set display_title = '패밀리' ~ b_rk ~ '위' %}
-                                    {% endif %}
 
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.2px solid {{ badge_border }}; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">
-                                        <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.72rem; line-height: 1;"></i>
-                                        <span style="line-height: 1;">{{ display_title }}</span>
-                                    </span>
-                                {% endfor %}
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.2px solid {{ badge_border }}; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">
+                                            <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.72rem; line-height: 1;"></i>
+                                            <span style="line-height: 1;">{{ display_title }}</span>
+                                        </span>
+                                    {% endfor %}
+                                </div>
                             </div>
 
                             <!-- 2줄: 동물종류, 동물애칭 -->
