@@ -196,25 +196,24 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     
     const mPetTagEl = document.getElementById('mDetailPetTag');
     if (mPetTagEl) {
-        let mKindNm = postData.KIND_NM || postData.pet_type || '반려동물';
-        if (!/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰]/.test(mKindNm)) {
-            let icon = '🐾';
-            if (mKindNm.includes('강아지') || mKindNm.includes('개')) icon = '🐕';
-            else if (mKindNm.includes('고양이')) icon = '🐈';
-            else if (mKindNm.includes('햄스터')) icon = '🐹';
-            else if (mKindNm.includes('앵무새') || mKindNm.includes('새')) icon = '🦜';
-            else if (mKindNm.includes('토끼')) icon = '🐇';
-            else if (mKindNm.includes('고슴도치')) icon = '🦔';
-            else if (mKindNm.includes('파충류')) icon = '🦎';
-            else if (mKindNm.includes('어류') || mKindNm.includes('관상어')) icon = '🐠';
-            else if (mKindNm.includes('페럿')) icon = '🦦';
-            mKindNm = `${icon} ${mKindNm}`;
-        }
+        let rawKind = postData.KIND_NM || postData.pet_type || '반려동물';
+        const cleanKind = rawKind.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim();
+        
+        let faIcon = 'fa-solid fa-paw';
+        if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
+        else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
+        else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼') || cleanKind.includes('고슴도치') || cleanKind.includes('작은동물')) faIcon = 'fa-solid fa-otter';
+        else if (cleanKind.includes('거북이') || cleanKind.includes('파충류') || cleanKind.includes('도마뱀')) faIcon = 'fa-solid fa-frog';
+        else if (cleanKind.includes('어류') || cleanKind.includes('관상어') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
+        else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
+        else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
+
         const mPetNm = postData.PET_NM || postData.pet_name || '';
+        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
         if (mPetNm) {
-            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span><span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${mPetNm}</span>`;
+            mPetTagEl.innerHTML = `${kindHtml}<span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${mPetNm}</span>`;
         } else {
-            mPetTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${mKindNm}</span>`;
+            mPetTagEl.innerHTML = kindHtml;
         }
     }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();

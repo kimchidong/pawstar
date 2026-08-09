@@ -638,25 +638,24 @@ function openDetailModal(post, isHallOfFame = false) {
 
     const petTagEl = document.getElementById('detailPetTag');
     if (petTagEl) {
-        let kindNm = post.KIND_NM || post.pet_type || '반려동물';
-        if (!/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰]/.test(kindNm)) {
-            let icon = '🐾';
-            if (kindNm.includes('강아지') || kindNm.includes('개')) icon = '🐕';
-            else if (kindNm.includes('고양이')) icon = '🐈';
-            else if (kindNm.includes('햄스터')) icon = '🐹';
-            else if (kindNm.includes('앵무새') || kindNm.includes('새')) icon = '🦜';
-            else if (kindNm.includes('토끼')) icon = '🐇';
-            else if (kindNm.includes('고슴도치')) icon = '🦔';
-            else if (kindNm.includes('파충류')) icon = '🦎';
-            else if (kindNm.includes('어류') || kindNm.includes('관상어')) icon = '🐠';
-            else if (kindNm.includes('페럿')) icon = '🦦';
-            kindNm = `${icon} ${kindNm}`;
-        }
+        let rawKind = post.KIND_NM || post.pet_type || '반려동물';
+        const cleanKind = rawKind.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim();
+        
+        let faIcon = 'fa-solid fa-paw';
+        if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
+        else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
+        else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼') || cleanKind.includes('고슴도치') || cleanKind.includes('작은동물')) faIcon = 'fa-solid fa-otter';
+        else if (cleanKind.includes('거북이') || cleanKind.includes('파충류') || cleanKind.includes('도마뱀')) faIcon = 'fa-solid fa-frog';
+        else if (cleanKind.includes('어류') || cleanKind.includes('관상어') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
+        else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
+        else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
+
         const petNm = post.PET_NM || post.pet_name || '';
+        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
         if (petNm) {
-            petTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${kindNm}</span> <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petNm}</span>`;
+            petTagEl.innerHTML = `${kindHtml} <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petNm}</span>`;
         } else {
-            petTagEl.innerHTML = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap;">${kindNm}</span>`;
+            petTagEl.innerHTML = kindHtml;
         }
     }
 
