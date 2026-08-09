@@ -268,10 +268,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         });
 
         const kindNm = postData.KIND_NM || postData.pet_type || '';
-        let petIconClass = 'fa-solid fa-paw';
+        let petIconClass = 'fa-solid fa-paws';
         if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
         else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
-        else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치')) petIconClass = 'fa-solid fa-otter';
+        else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치') || kindNm.includes('작은동물')) petIconClass = 'fa-solid fa-otter';
         else if (kindNm.includes('거북이') || kindNm.includes('파충류') || kindNm.includes('도마뱀')) petIconClass = 'fa-solid fa-frog';
         else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
         else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
@@ -335,10 +335,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 mBadgeEl.style.right = 'auto';
 
                 const kindNm = postData.KIND_NM || postData.pet_type || '';
-                let petIconClass = 'fa-solid fa-paw';
+                let petIconClass = 'fa-solid fa-paws';
                 if (kindNm.includes('강아지') || kindNm.includes('개')) petIconClass = 'fa-solid fa-dog';
                 else if (kindNm.includes('고양이')) petIconClass = 'fa-solid fa-cat';
-                else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치')) petIconClass = 'fa-solid fa-otter';
+                else if (kindNm.includes('햄스터') || kindNm.includes('소동물') || kindNm.includes('토끼') || kindNm.includes('고슴도치') || kindNm.includes('작은동물')) petIconClass = 'fa-solid fa-otter';
                 else if (kindNm.includes('거북이') || kindNm.includes('파충류') || kindNm.includes('도마뱀')) petIconClass = 'fa-solid fa-frog';
                 else if (kindNm.includes('어류') || kindNm.includes('관상어') || kindNm.includes('물고기')) petIconClass = 'fa-solid fa-fish';
                 else if (kindNm.includes('앵무새') || kindNm.includes('새') || kindNm.includes('조류')) petIconClass = 'fa-solid fa-crow';
