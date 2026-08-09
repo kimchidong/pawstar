@@ -1245,8 +1245,11 @@ option.opt-closed {
     max-width: 40px !important;
     max-height: 40px !important;
     border-radius: 50% !important;
+    -webkit-border-radius: 50% !important;
     object-fit: cover !important;
     flex-shrink: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    overflow: hidden !important;
     border: 1px solid var(--border-light);
 }
 
