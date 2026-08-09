@@ -4,23 +4,28 @@
 
 <div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
     <!-- 상단 페이지 타이틀 헤더 -->
-    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-lg); padding: 2.5rem 3rem; color: #ffffff; margin-bottom: 2rem; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
-        <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.15; font-size: 15rem; color: #ffffff; pointer-events: none;">
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-lg); padding: 2.2rem 2.75rem; color: #ffffff; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2); position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.12; font-size: 15rem; color: #ffffff; pointer-events: none;">
             <i class="fa-solid fa-paw"></i>
         </div>
         <div style="position: relative; z-index: 2;">
-            <div style="display: inline-flex; align-items: center; gap: 0.65rem; background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); padding: 0.45rem 1.1rem; border-radius: 30px; font-weight: 800; font-size: 0.95rem; margin-bottom: 0.85rem; border: 1px solid rgba(255,255,255,0.25);">
-                <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+            <!-- 1줄: 회차 정보 태그 & 진행 상태 태그 -->
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; flex-wrap: wrap;">
+                <div style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px); padding: 0.3rem 0.85rem; border-radius: 14px; font-weight: 800; font-size: 0.88rem; color: #ffffff; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <span style="color: #fde047; font-weight: 900;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span>
-                    <span style="font-weight: 800; color: #ffffff;">{{ current_contest.THEME_NM or current_contest.title }}</span>
-                </span>
-                <span style="font-size: 0.8rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #713f12; border: 1.2px solid #facc15; padding: 0.2rem 0.75rem; border-radius: 20px; font-weight: 900; box-shadow: 0 2px 8px rgba(234, 179, 8, 0.25); display: inline-flex; align-items: center; gap: 0.25rem;">
+                    <span>콘테스트</span>
+                </div>
+                <div style="font-size: 0.82rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #713f12; border: 1.2px solid #facc15; padding: 0.3rem 0.85rem; border-radius: 14px; font-weight: 900; box-shadow: 0 2px 8px rgba(234, 179, 8, 0.25); display: inline-flex; align-items: center; gap: 0.25rem;">
                     {{ current_contest.CONTEST_STAT_NM or current_contest.status or '진행중' }}
-                </span>
+                </div>
             </div>
-            <h1 style="font-size: 2.4rem; font-weight: 900; margin-bottom: 0.6rem;">🐾 우리 아이 콘테스트 출전 신청</h1>
-            <p style="font-size: 1.05rem; opacity: 0.92; font-weight: 500;">
-                귀엽고 사랑스러운 반려동물의 매력을 마음껏 자랑해보세요! 스타가 될 준비가 되었나요?
+            <!-- 2줄: 대회 주제 타이틀 -->
+            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; line-height: 1.25; letter-spacing: -0.02em; text-shadow: 0 2px 10px rgba(0,0,0,0.18);">
+                {{ current_contest.THEME_NM or current_contest.title }}
+            </h1>
+            <!-- 3줄: 안내 서브 문구 -->
+            <p style="font-size: 1.05rem; opacity: 0.92; font-weight: 500; margin: 0;">
+                🐾 우리 아이 출전 신청 — 사랑스러운 반려동물의 매력을 콘테스트에 당당히 자랑해보세요!
             </p>
         </div>
     </div>

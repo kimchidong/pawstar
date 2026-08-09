@@ -4,19 +4,24 @@
 
 <div style="padding: 1.25rem 1rem 2rem 1rem;">
     <!-- 모바일 타이틀 카드 -->
-    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-md); padding: 1.5rem 1.25rem; color: #ffffff; margin-bottom: 1.25rem; box-shadow: var(--shadow-soft);">
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); padding: 0.38rem 0.95rem; border-radius: 20px; font-weight: 800; font-size: 0.82rem; margin-bottom: 0.65rem; border: 1px solid rgba(255,255,255,0.25); flex-wrap: wrap;">
-            <span style="display: inline-flex; align-items: center; gap: 0.3rem;">
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-md); padding: 1.35rem 1.15rem; color: #ffffff; margin-bottom: 1.25rem; box-shadow: var(--shadow-soft);">
+        <!-- 1줄: 회차 정보 태그 & 진행 상태 태그 -->
+        <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.55rem; flex-wrap: wrap;">
+            <div style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(8px); padding: 0.22rem 0.65rem; border-radius: 10px; font-weight: 800; font-size: 0.78rem; color: #ffffff; display: inline-flex; align-items: center; gap: 0.3rem;">
                 <span style="color: #fde047; font-weight: 900;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span>
-                <span style="font-weight: 800; color: #ffffff;">{{ current_contest.THEME_NM or current_contest.title or current_contest.CONTEST_NM or current_contest.name }}</span>
-            </span>
-            <span style="font-size: 0.74rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #713f12; border: 1.2px solid #facc15; padding: 0.18rem 0.65rem; border-radius: 16px; font-weight: 900; box-shadow: 0 2px 6px rgba(234, 179, 8, 0.25); display: inline-flex; align-items: center; gap: 0.2rem;">
+                <span>콘테스트</span>
+            </div>
+            <div style="font-size: 0.74rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #713f12; border: 1.2px solid #facc15; padding: 0.22rem 0.65rem; border-radius: 10px; font-weight: 900; box-shadow: 0 2px 6px rgba(234, 179, 8, 0.25); display: inline-flex; align-items: center; gap: 0.2rem;">
                 {{ current_contest.CONTEST_STAT_NM or current_contest.status or '진행중' }}
-            </span>
+            </div>
         </div>
-        <h2 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 0.35rem;">🐾 우리 아이 출전 신청</h2>
-        <p style="font-size: 0.85rem; opacity: 0.92; line-height: 1.4;">
-            사랑스러운 반려동물의 매력을 콘테스트에 당당히 자랑해보세요!
+        <!-- 2줄: 대회 주제 타이틀 -->
+        <h2 style="font-size: 1.35rem; font-weight: 900; margin-bottom: 0.4rem; line-height: 1.3; letter-spacing: -0.01em; text-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            {{ current_contest.THEME_NM or current_contest.title or current_contest.CONTEST_NM or current_contest.name }}
+        </h2>
+        <!-- 3줄: 안내 서브 문구 -->
+        <p style="font-size: 0.85rem; opacity: 0.92; line-height: 1.4; margin: 0;">
+            🐾 우리 아이 출전 신청 — 사랑스러운 반려동물의 매력을 자랑해보세요!
         </p>
     </div>
 
