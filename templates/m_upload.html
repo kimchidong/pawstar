@@ -312,17 +312,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateMobilePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
-        let petType = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.options[selectPetType.selectedIndex].text : '🐾 미선택';
-        const title = inputTitle ? inputTitle.value.trim() : '';
-        const content = textareaContent ? textareaContent.value.trim() : '';
+        let petTypeRaw = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.value : '미선택';
+        const cleanKind = petTypeRaw.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim() || '미선택';
+        
+        let faIcon = 'fa-solid fa-paw';
+        if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
+        else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
+        else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼') || cleanKind.includes('고슴도치') || cleanKind.includes('작은동물')) faIcon = 'fa-solid fa-otter';
+        else if (cleanKind.includes('거북이') || cleanKind.includes('파충류') || cleanKind.includes('도마뱀')) faIcon = 'fa-solid fa-frog';
+        else if (cleanKind.includes('어류') || cleanKind.includes('관상어') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
+        else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
+        else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
+
+        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
 
         let petTagHTML = '';
         if (petName) {
-            petTagHTML = `<span class="m-pet-kind-text">${petType}</span> <span class="m-pet-name-text">${petName}</span>`;
+            petTagHTML = `${kindHtml}<span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${petName}</span>`;
         } else {
-            petTagHTML = `<span class="m-pet-kind-text">${petType}</span>`;
+            petTagHTML = kindHtml;
         }
 
+        const title = inputTitle ? inputTitle.value.trim() : '';
+        const content = textareaContent ? textareaContent.value.trim() : '';
         const titleText = title || '제목 미리보기';
         const descText = content || '소개글 미리보기';
         const currentFormattedDate = getFormattedNowDateTime();
