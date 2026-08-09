@@ -184,6 +184,11 @@ body {
     box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
 }
 
+.nav-item a.active i,
+.nav-item a.active i.fa-solid {
+    color: #ffffff !important;
+}
+
 .btn-upload {
     background: #ffffff !important;
     color: var(--text-primary) !important;
