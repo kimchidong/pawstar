@@ -125,10 +125,10 @@
     {% endfor %}
 </div>
 
-<!-- 총 게시물 수 & 현재 페이지 / 전체 페이지 안내 카운터 바 (프로필 내 펫 출전작 탭 서브헤더와 100% 동일 규격 적용) -->
+<!-- 총 게시물 수 & 현재 페이지 / 전체 페이지 안내 카운터 바 (프로필 규격 적용 및 페이지 수 회색 표기) -->
 <div style="padding: 0 0.85rem; margin: 0.85rem 0 0.55rem 0; display: flex; align-items: center; justify-content: space-between;">
     <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800;">총 {{ pagination.total_count }}마리 출전</span>
-    <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800; flex-shrink: 0; white-space: nowrap;">
+    <span style="color: #64748b; font-size: 0.85rem; font-weight: 800; flex-shrink: 0; white-space: nowrap;">
         {{ pagination.page }} / {{ pagination.total_pages }} 페이지
     </span>
 </div>
