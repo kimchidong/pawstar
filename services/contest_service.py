@@ -116,35 +116,11 @@ class PawStarService:
 
     def format_pet_kind(self, kind_nm):
         if not kind_nm:
-            return '🐾 반려동물'
+            return '반려동물'
         nm = str(kind_nm).strip()
-        if any(c in nm for c in ['🐕', '🐈', '🐹', '🦜', '🐇', '🦔', '🦎', '🐠', '🦦', '🐾', '🐶', '🐱', '🐰']):
-            return nm
-        if '강아지' in nm or '개' in nm:
-            icon = '🐕'
-        elif '고양이' in nm:
-            icon = '🐈'
-        elif '햄스터' in nm:
-            icon = '🐹'
-        elif '앵무새' in nm or '새' in nm or '조류' in nm:
-            icon = '🦜'
-        elif '토끼' in nm:
-            icon = '🐇'
-        elif '고슴도치' in nm:
-            icon = '🦔'
-        elif '파충류' in nm or '도마뱀' in nm:
-            icon = '🦎'
-        elif '말' in nm or '큰동물' in nm:
-            icon = '🐴'
-        elif '돼지' in nm or '피그' in nm:
-            icon = '🐷'
-        elif '어류' in nm or '물고기' in nm or '관상어' in nm:
-            icon = '🐠'
-        elif '페럿' in nm:
-            icon = '🦦'
-        else:
-            icon = '🐾'
-        return f"{icon} {nm}"
+        for c in ['🐕', '🐈', '🐹', '🦜', '🐇', '🦔', '🦎', '🐠', '🦦', '🐾', '🐶', '🐱', '🐰', '🐟', '🐢', '🐴', '🐷', '☎️']:
+            nm = nm.replace(c, '').strip()
+        return nm
 
     def get_pet_kinds(self):
         conn = self.get_db_connection()
