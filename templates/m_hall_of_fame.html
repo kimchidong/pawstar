@@ -77,15 +77,15 @@
                                     </div>
                                     {% if rk == 1 %}
                                         <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #854d0e; border: 1.2px solid #facc15; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.18); flex-shrink: 0;">
-                                            <i class="fa-solid fa-crown" style="color: #b45309; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">슈퍼스타</span>
+                                            <i class="fa-solid fa-star" style="color: #f59e0b; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">슈퍼스타</span>
                                         </span>
                                     {% elif rk == 2 %}
                                         <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); color: #334155; border: 1.2px solid #cbd5e1; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12); flex-shrink: 0;">
-                                            <i class="fa-solid fa-wand-magic-sparkles" style="color: #475569; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">라이징스타</span>
+                                            <i class="fa-solid fa-star" style="color: #94a3b8; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">라이징스타</span>
                                         </span>
                                     {% elif rk == 3 %}
                                         <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; border: 1.2px solid #fdba74; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(234, 88, 12, 0.15); flex-shrink: 0;">
-                                            <i class="fa-solid fa-star" style="color: #ea580c; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">브라이트스타</span>
+                                            <i class="fa-solid fa-star" style="color: #b45309; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">브라이트스타</span>
                                         </span>
                                     {% endif %}
                                 </div>
@@ -162,7 +162,7 @@
                                         <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
                                         <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ w.NK_NM or w.user_nickname }}</span>
                                     </div>
-                                    {% set w_icon = 'fa-solid fa-cat' if ('고양이' in w_kind or 'cat' in w_kind.lower()) else 'fa-solid fa-dog' %}
+                                    {% set w_icon = 'fa-solid fa-star' %}
                                     <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%); color: #6b21a8; border: 1.2px solid #d8b4fe; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.12); flex-shrink: 0;">
                                         <i class="{{ w_icon }}" style="color: #7c3aed; font-size: 0.72rem; line-height: 1;"></i> <span style="line-height: 1;">패밀리{{ rk }}위</span>
                                     </span>

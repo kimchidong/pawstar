@@ -429,16 +429,16 @@
                                             {% set badge_color = '#854d0e' %}
                                             {% set badge_border = '#facc15' %}
                                             {% set badge_shadow = '0 2px 6px rgba(245, 158, 11, 0.18)' %}
-                                            {% set badge_icon = 'fa-solid fa-crown' %}
-                                            {% set icon_color = '#b45309' %}
+                                            {% set badge_icon = 'fa-solid fa-star' %}
+                                            {% set icon_color = '#f59e0b' %}
                                             {% set display_title = '슈퍼스타' %}
                                         {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
                                             {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
                                             {% set badge_color = '#334155' %}
                                             {% set badge_border = '#cbd5e1' %}
                                             {% set badge_shadow = '0 2px 6px rgba(100, 116, 139, 0.12)' %}
-                                            {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
-                                            {% set icon_color = '#475569' %}
+                                            {% set badge_icon = 'fa-solid fa-star' %}
+                                            {% set icon_color = '#94a3b8' %}
                                             {% set display_title = '라이징스타' %}
                                         {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
                                             {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
@@ -446,18 +446,14 @@
                                             {% set badge_border = '#fdba74' %}
                                             {% set badge_shadow = '0 2px 6px rgba(234, 88, 12, 0.15)' %}
                                             {% set badge_icon = 'fa-solid fa-star' %}
-                                            {% set icon_color = '#ea580c' %}
+                                            {% set icon_color = '#b45309' %}
                                             {% set display_title = '브라이트스타' %}
                                         {% else %}
                                             {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
                                             {% set badge_color = '#6b21a8' %}
                                             {% set badge_border = '#d8b4fe' %}
                                             {% set badge_shadow = '0 2px 6px rgba(124, 58, 237, 0.12)' %}
-                                            {% if b_kind in ['K005', 'K006', 'K007', 'K008'] or '고양이' in b_kind or 'cat' in b_kind.lower() %}
-                                                {% set badge_icon = 'fa-solid fa-cat' %}
-                                            {% else %}
-                                                {% set badge_icon = 'fa-solid fa-dog' %}
-                                            {% endif %}
+                                            {% set badge_icon = 'fa-solid fa-star' %}
                                             {% set icon_color = '#7c3aed' %}
                                             {% set b_rk = b.RANKING or b.ranking or a.RANKING or a.ranking or (b_cd[-1] if (b_cd and b_cd[-1].isdigit()) else '1') %}
                                             {% set display_title = '패밀리' ~ b_rk ~ '위' %}
