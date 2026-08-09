@@ -159,13 +159,13 @@
                             {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
                                 <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">브라이트스타</div>
                             {% else %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">패밀리스타{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;">패밀리{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
                 {% elif rk_cand and not is_post_closed %}
                     {% set is_family = (pet_type and pet_type != 'all') %}
-                    {% set category_prefix = '패밀리스타 ' if is_family else '전체 ' %}
+                    {% set category_prefix = '패밀리 ' if is_family else '전체 ' %}
                     {% set is_co = p.is_co_rank or p.IS_CO_RANK %}
                     {% set rank_prefix = category_prefix ~ ('공동 ' if is_co else '') %}
                     {% set rk_class = 'rank-1' if (rk_cand == 1 or rk_cand == '1') else ('rank-2' if (rk_cand == 2 or rk_cand == '2') else ('rank-3' if (rk_cand == 3 or rk_cand == '3') else '')) %}
