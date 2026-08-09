@@ -715,7 +715,9 @@ option.opt-closed {
     background: var(--bg-surface);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
-    overflow: hidden;
+    overflow: hidden !important;
+    -webkit-mask-image: -webkit-radial-gradient(white, black) !important;
+    transform: translateZ(0);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
@@ -733,7 +735,10 @@ option.opt-closed {
     width: 100% !important;
     height: 240px !important;
     overflow: hidden !important;
-    background: #f1f5f9 !important;
+    background: transparent !important;
+    border-top-left-radius: calc(var(--radius-md) - 1px) !important;
+    border-top-right-radius: calc(var(--radius-md) - 1px) !important;
+    -webkit-mask-image: -webkit-radial-gradient(white, black) !important;
 }
 
 .card-media img {
@@ -741,6 +746,8 @@ option.opt-closed {
     height: 100% !important;
     object-fit: cover !important;
     display: block !important;
+    border-top-left-radius: calc(var(--radius-md) - 1px) !important;
+    border-top-right-radius: calc(var(--radius-md) - 1px) !important;
     transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -2605,4 +2612,24 @@ option.opt-closed {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-6px); }
     40%, 80% { transform: translateX(6px); }
+}
+
+/* 🛡️ 카드 썸네일 및 팝업 모달 이미지 4개 모서리 서브픽셀 선/테두리 비침 방지 글로벌 픽스 */
+.post-card,
+.card-media,
+.winner-card,
+.hall-of-fame-card,
+#detailImg,
+#mDetailImg {
+    -webkit-mask-image: -webkit-radial-gradient(white, black) !important;
+    mask-image: -webkit-radial-gradient(white, black) !important;
+    isolation: isolate;
+}
+
+.card-media img,
+.post-card img,
+#detailImg,
+#mDetailImg {
+    border-radius: inherit !important;
+    clip-path: inset(0) !important;
 }
