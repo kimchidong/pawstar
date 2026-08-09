@@ -366,9 +366,13 @@
 <!-- 2. 탭 컨텐츠: 수상 트로피 -->
 <div id="mTabContentAwards" class="m-tab-content">
     <div style="padding: 0 0.85rem; margin: 0.5rem 0 1rem 0;">
-        <h3 style="font-size: 1.02rem; font-weight: 800; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.35rem; color: #6366f1;">
-            <span style="font-size: 0.88rem; font-weight: 800;">총 {{ award_total_cnt }}개 수상</span>
-        </h3>
+        <!-- 수상 트로피 서브 헤더 (총 개수 & 10개 단위 페이지 상태) -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.3rem 0 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
+            <h3 style="font-size: 1.02rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800;">총 {{ award_total_cnt }}개 수상</span>
+                <span id="mAwardsPageIndicator" style="font-size: 0.85rem; font-weight: 800; color: #64748b; display: none;"></span>
+            </h3>
+        </div>
         <div>
             {% for a in my_awards %}
                 {% set a_cd = (a.AWARD_CD or a.award_cd or '')|string %}
@@ -376,7 +380,7 @@
                 {% set c_id = a.CONTEST_ROUND or a.contest_id %}
                 {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
-                <div class="trophy-card-item" onclick="openMobileDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 16px; padding: 0.85rem 0.95rem; margin-bottom: 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.06); cursor: pointer;">
+                <div class="trophy-card-item m-award-trophy-item" onclick="openMobileDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 16px; padding: 0.85rem 0.95rem; margin-bottom: 0.85rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.06); cursor: pointer;">
                     
                     <!-- 1번째 상단 줄: 제N회 회차명 (좌측) + 우측 상단 3D 메달/배지 엠블렘 (가로 나란히 배치) -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.65rem; border-bottom: 1px dashed #f3e8ff; padding-bottom: 0.55rem;">
@@ -502,6 +506,9 @@
                 </div>
             {% endfor %}
         </div>
+
+        <!-- 모바일 수상 트로피 전용 10개 단위 페이징 바 -->
+        <div id="mAwardsPaginationBar" class="m-pagination-bar" style="margin: 1.5rem 0 1.5rem 0; display: flex; align-items: center; justify-content: center; gap: 0.4rem;"></div>
     </div>
 </div>
 
@@ -556,6 +563,77 @@ function filterMobileMyPostsByRound(selectedRound) {
         emptyMsg.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
     }
 }
+
+let currentTrophyPage = 1;
+const TROPHIES_PER_PAGE = 10;
+
+function renderTrophyPagination(page) {
+    const trophyItems = document.querySelectorAll('.m-award-trophy-item');
+    const totalItems = trophyItems.length;
+    if (totalItems === 0) return;
+
+    const totalPages = Math.ceil(totalItems / TROPHIES_PER_PAGE);
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    currentTrophyPage = page;
+
+    const startIdx = (page - 1) * TROPHIES_PER_PAGE;
+    const endIdx = startIdx + TROPHIES_PER_PAGE;
+
+    trophyItems.forEach((item, idx) => {
+        if (idx >= startIdx && idx < endIdx) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    const pageIndicator = document.getElementById('mAwardsPageIndicator');
+    if (pageIndicator) {
+        if (totalPages > 1) {
+            pageIndicator.textContent = `${page} / ${totalPages} 페이지`;
+            pageIndicator.style.display = 'inline';
+        } else {
+            pageIndicator.style.display = 'none';
+        }
+    }
+
+    const pagBar = document.getElementById('mAwardsPaginationBar');
+    if (!pagBar) return;
+
+    if (totalPages <= 1) {
+        pagBar.style.display = 'none';
+        pagBar.innerHTML = '';
+        return;
+    }
+
+    pagBar.style.display = 'flex';
+    let html = '';
+
+    if (page > 1) {
+        html += `<button type="button" class="m-page-btn prev-btn" onclick="renderTrophyPagination(${page - 1})" style="padding: 0.45rem 0.85rem; border-radius: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 0.82rem; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-chevron-left"></i> 이전</button>`;
+    }
+
+    const startP = Math.max(1, page - 2);
+    const endP = Math.min(totalPages, startP + 4);
+    const realStartP = Math.max(1, endP - 4);
+
+    html += `<div style="display: flex; gap: 0.25rem;">`;
+    for (let p = realStartP; p <= endP; p++) {
+        if (p === page) {
+            html += `<button type="button" class="m-page-btn active" style="padding: 0.45rem 0.75rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #ffffff; border: 1.5px solid #4f46e5; cursor: pointer;">${p}</button>`;
+        } else {
+            html += `<button type="button" class="m-page-btn" onclick="renderTrophyPagination(${p})" style="padding: 0.45rem 0.75rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; background: #ffffff; color: #334155; border: 1.5px solid #cbd5e1; cursor: pointer;">${p}</button>`;
+        }
+    }
+    html += `</div>`;
+
+    if (page < totalPages) {
+        html += `<button type="button" class="m-page-btn next-btn" onclick="renderTrophyPagination(${page + 1})" style="padding: 0.45rem 0.85rem; border-radius: 10px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 0.82rem; font-weight: 800; cursor: pointer;">다음 <i class="fa-solid fa-chevron-right"></i></button>`;
+    }
+
+    pagBar.innerHTML = html;
+}
 </script>
 
 <!-- 모바일 프로필 수정 레이어 바텀시트 모달 -->
@@ -586,6 +664,9 @@ function filterMobileMyPostsByRound(selectedRound) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 수상 트로피 10개 단위 페이징 초기화
+    renderTrophyPagination(1);
+
     // URL tab 파라미터 확인 및 탭 초기화
     const urlParams = new URLSearchParams(window.location.search);
     const initialTab = urlParams.get('tab');
