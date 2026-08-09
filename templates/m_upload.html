@@ -84,7 +84,26 @@
 
             <div class="m-form-group" style="margin-bottom: 1.25rem;">
                 <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🖼️ 출전 사진 파일 첨부</label>
-                <input type="file" id="mUploadMediaFile" name="media_file" accept="image/*" class="m-form-control" required style="width: 100%; padding: 0.75rem; background: var(--bg-primary);">
+                <!-- 숨겨진 정식 file input -->
+                <input type="file" id="mUploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
+
+                <!-- 트렌디하고 감각적인 커스텀 파일 업로드 드롭존 -->
+                <div id="mCustomFileDropzone" onclick="document.getElementById('mUploadMediaFile').click();" style="border: 2px dashed #cbd5e1; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 14px; padding: 1.1rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <div id="mCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); color: #7c3aed;">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.3rem;"></i>
+                        </div>
+                        <span style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-top: 0.2rem;">📸 예쁜 아이 사진 선택하기</span>
+                        <span style="font-size: 0.75rem; color: #64748b;">터치하여 갤러리에서 사진 업로드 (JPG, PNG, WEBP)</span>
+                    </div>
+                    <div id="mCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                        <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden; text-align: left;">
+                            <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.2rem; flex-shrink: 0;"></i>
+                            <span id="mCustomFileName" style="font-weight: 800; font-size: 0.82rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.3rem 0.65rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
+                    </div>
+                </div>
             </div>
 
             <!-- 모바일 실시간 원본 크기 미리보기 섹션 (Full Width) -->
@@ -432,6 +451,20 @@ document.addEventListener('DOMContentLoaded', function() {
         inputFile.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                // 모바일 커스텀 파일 첨부 드롭존 UI 상태 업데이트
+                const emptyState = document.getElementById('mCustomFileEmptyState');
+                const selectedState = document.getElementById('mCustomFileSelectedState');
+                const fileNameEl = document.getElementById('mCustomFileName');
+                const dropzone = document.getElementById('mCustomFileDropzone');
+
+                if (emptyState) emptyState.style.display = 'none';
+                if (selectedState) selectedState.style.display = 'flex';
+                if (fileNameEl) fileNameEl.textContent = file.name;
+                if (dropzone) {
+                    dropzone.style.borderColor = '#8b5cf6';
+                    dropzone.style.background = '#f5f3ff';
+                }
+
                 const tempFormData = new FormData();
                 tempFormData.append('media_file', file);
                 
