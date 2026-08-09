@@ -2415,25 +2415,28 @@ option.opt-closed {
 }
 
 .detail-title {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.45rem;
     line-height: 1.4;
 }
 
 .detail-content {
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    flex: 1;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex: 0 0 auto;
+    word-break: break-all;
+    white-space: pre-wrap;
 }
 
 .detail-actions {
-    margin-top: auto;
+    margin-top: 0.2rem;
+    margin-bottom: 1rem;
     border-top: 1px solid var(--border-light);
-    padding-top: 1.25rem;
+    padding-top: 0.85rem;
 }
 
 /* Edit Profile Button Styling */
