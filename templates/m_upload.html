@@ -494,11 +494,13 @@ document.addEventListener('DOMContentLoaded', function() {
             toast = document.createElement('div');
             toast.id = 'pawCustomToast';
             toast.className = 'paw-custom-toast-container';
-            toast.innerHTML = `<i class="fa-solid ${iconClass} paw-custom-toast-icon"></i><span id="pawCustomToastMsg"></span>`;
+            toast.innerHTML = `<i id="pawCustomToastIcon" class="fa-solid ${iconClass} paw-custom-toast-icon"></i><span id="pawCustomToastMsg"></span>`;
             document.body.appendChild(toast);
         }
         const msgEl = document.getElementById('pawCustomToastMsg');
+        const iconEl = document.getElementById('pawCustomToastIcon');
         if (msgEl) msgEl.textContent = message;
+        if (iconEl && iconClass) iconEl.className = `fa-solid ${iconClass} paw-custom-toast-icon`;
 
         toast.classList.add('show');
         clearTimeout(window.pawToastTimer);
@@ -529,13 +531,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('mUploadMediaFile') || document.querySelector('input[type="file"]');
 
             if (!petName) {
-                showCustomToast('🐶 아이 이름을 입력해주세요!', 'fa-paw');
+                showCustomToast('🐶 아이 이름을 입력해주세요!', 'fa-dog');
                 highlightInvalidField(inputPetName);
                 return;
             }
 
             if (!petType) {
-                showCustomToast('🐾 동물 종류를 선택해주세요!', 'fa-list');
+                showCustomToast('🐾 동물 종류를 선택해주세요!', 'fa-paw');
                 highlightInvalidField(selectPetType);
                 return;
             }

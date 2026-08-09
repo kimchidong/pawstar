@@ -1422,6 +1422,43 @@ body.m-body {
     animation: starPulse 2.5s ease-in-out infinite;
 }
 
+/* 🚨 모바일 커스텀 토스트 알림 팝업 디자인 */
+.paw-custom-toast-container {
+    position: fixed !important;
+    top: 60px !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(-25px) !important;
+    z-index: 999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    padding: 0.75rem 1.3rem !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    color: #ffffff !important;
+    border: 1.2px solid rgba(225, 29, 72, 0.5) !important;
+    border-radius: 30px !important;
+    box-shadow: 0 12px 32px rgba(225, 29, 72, 0.35) !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.paw-custom-toast-container.show {
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+.paw-custom-toast-icon {
+    font-size: 1.05rem !important;
+    color: #f43f5e !important;
+}
+
 @keyframes badgePulseGlowSuper {
     0%, 100% { box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
     50% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.55); }
