@@ -1329,15 +1329,129 @@ body.m-body {
 /* ==========================================================================
    🏆 모바일 명예의 전당 우측 상단 "... 스타" 럭셔리 뱃지 디자인 (Mobile Star Badge)
    ========================================================================== */
+/* 🏆 명예의 전당 배지 (슈퍼스타, 라이징스타, 브라이트스타, 패밀리스타) 애니메이션 및 크리스탈 광택 효과 */
+.winner-title-badge {
+    position: relative !important;
+    overflow: hidden !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+    height: 24px !important;
+    box-sizing: border-box !important;
+    padding: 0 0.6rem !important;
+    border-radius: 12px !important;
+    font-weight: 900 !important;
+    font-size: 0.74rem !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+.winner-title-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(25deg);
+    animation: elegantShimmer 3.2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* 🥇 슈퍼스타 배지 애니메이션 */
+.winner-title-badge.superstar-badge {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef08a 50%, #facc15 100%) !important;
+    color: #854d0e !important;
+    border: 1.2px solid #facc15 !important;
+    box-shadow: none !important;
+}
+.winner-title-badge.superstar-badge i {
+    color: #b45309 !important;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    animation: starPulse 2.5s ease-in-out infinite;
+}
+
+/* 🥈 라이징스타 배지 애니메이션 */
+.winner-title-badge.risingstar-badge {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
+    color: #1e293b !important;
+    border: 1.2px solid #cbd5e1 !important;
+    box-shadow: none !important;
+}
+.winner-title-badge.risingstar-badge i {
+    color: #475569 !important;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    animation: starPulse 2.5s ease-in-out infinite;
+}
+
+/* 🥉 브라이트스타 배지 애니메이션 */
+.winner-title-badge.brightstar-badge {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%) !important;
+    color: #c2410c !important;
+    border: 1.2px solid #fdba74 !important;
+    box-shadow: none !important;
+}
+.winner-title-badge.brightstar-badge i {
+    color: #ea580c !important;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    animation: starPulse 2.5s ease-in-out infinite;
+}
+
+/* 🐾 패밀리스타 배지 애니메이션 */
+.winner-title-badge.family-badge {
+    background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 50%, #e9d5ff 100%) !important;
+    color: #6b21a8 !important;
+    border: 1.2px solid #d8b4fe !important;
+    box-shadow: none !important;
+}
+.winner-title-badge.family-badge i {
+    color: #7c3aed !important;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    animation: starPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes badgePulseGlowSuper {
+    0%, 100% { box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
+    50% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.55); }
+}
+
+@keyframes badgePulseGlowRising {
+    0%, 100% { box-shadow: 0 2px 8px rgba(100, 116, 139, 0.2); }
+    50% { box-shadow: 0 4px 16px rgba(100, 116, 139, 0.45); }
+}
+
+@keyframes badgePulseGlowBright {
+    0%, 100% { box-shadow: 0 2px 8px rgba(234, 88, 12, 0.22); }
+    50% { box-shadow: 0 4px 16px rgba(234, 88, 12, 0.5); }
+}
+
+@keyframes badgePulseGlowFamily {
+    0%, 100% { box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2); }
+    50% { box-shadow: 0 4px 16px rgba(124, 58, 237, 0.48); }
+}
+
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
 .m-winner-card .winner-title-badge,
 .m-body .winner-title-badge {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    padding: 0.28rem 0.75rem;
-    font-size: 0.72rem;
-    gap: 0.35rem;
-    border-radius: 20px;
+    position: relative;
+    top: 0;
+    right: 0;
     z-index: 5;
 }
 
