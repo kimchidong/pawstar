@@ -36,10 +36,10 @@
         </a>
         <div class="m-header-actions" style="display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; white-space: nowrap;">
             <a href="/m/" class="m-nav-header-item {{ 'active' if request.path == '/m/' or request.path == '/m' }}" style="font-size: 0.8rem; font-weight: 800; padding: 0.35rem 0.5rem; border-radius: 14px; color: {{ 'var(--accent-purple)' if (request.path == '/m/' or request.path == '/m') else 'var(--text-secondary)' }}; background: {{ '#f1f5f9' if (request.path == '/m/' or request.path == '/m') else 'transparent' }}; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; flex-shrink: 0;">
-                <i class="fa-solid fa-ranking-star" style="font-size: 0.85rem; color: {{ '#eab308' if (request.path == '/m/' or request.path == '/m') else 'var(--text-secondary)' }};"></i> 콘테스트
+                <i class="fa-solid fa-trophy" style="font-size: 0.85rem; color: {{ '#eab308' if (request.path == '/m/' or request.path == '/m') else 'var(--text-secondary)' }};"></i> 콘테스트
             </a>
             <a href="/m/hall-of-fame" class="m-nav-header-item {{ 'active' if request.path == '/m/hall-of-fame' }}" style="font-size: 0.8rem; font-weight: 800; padding: 0.35rem 0.5rem; border-radius: 14px; color: {{ 'var(--accent-purple)' if request.path == '/m/hall-of-fame' else 'var(--text-secondary)' }}; background: {{ '#f1f5f9' if request.path == '/m/hall-of-fame' else 'transparent' }}; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; flex-shrink: 0;">
-                <i class="fa-solid fa-trophy" style="font-size: 0.85rem; color: {{ '#eab308' if request.path == '/m/hall-of-fame' else 'var(--text-secondary)' }};"></i> 명예의 전당
+                <i class="fa-solid fa-ranking-star" style="font-size: 0.85rem; color: {{ '#eab308' if request.path == '/m/hall-of-fame' else 'var(--text-secondary)' }};"></i> 명예의 전당
             </a>
         </div>
     </header>
@@ -52,11 +52,11 @@
     <!-- 모바일 하단 내비게이션 바 -->
     <nav class="m-bottom-nav">
         <a href="/m/" class="m-nav-item {{ 'active' if request.path == '/m/' or request.path == '/m' }}">
-            <i class="fa-solid fa-ranking-star"></i>
+            <i class="fa-solid fa-trophy"></i>
             <span>콘테스트</span>
         </a>
         <a href="/m/hall-of-fame" class="m-nav-item {{ 'active' if request.path == '/m/hall-of-fame' }}">
-            <i class="fa-solid fa-trophy"></i>
+            <i class="fa-solid fa-ranking-star"></i>
             <span>명예전당</span>
         </a>
         <a href="/m/upload" class="m-nav-item m-nav-upload {{ 'active' if request.path == '/m/upload' }}">
