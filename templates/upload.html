@@ -226,7 +226,7 @@
 <!-- 실제 데스크톱 상세 레이어 팝업과 100% 동일한 팝업 모달 오버레이 -->
 <div class="modal-backdrop" id="previewModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem;" onclick="if(event.target===this) closeDesktopPreviewModal();">
     <div class="modal-content detail-modal-content" style="position: relative; border: none !important; box-shadow: 0 20px 50px rgba(0,0,0,0.25); outline: none !important;">
-        <button type="button" class="btn-close detail-close" onclick="closeDesktopPreviewModal()">&times;</button>
+        <button type="button" class="btn-close detail-close" onclick="closeDesktopPreviewModal()"><i class="fa-solid fa-xmark"></i></button>
         <div class="detail-modal-body">
             <div class="detail-media-container" style="position: relative; overflow: hidden !important; background: transparent !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0); border: none !important; outline: none !important;">
                 <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; border: none !important;">
