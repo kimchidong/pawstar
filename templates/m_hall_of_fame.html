@@ -68,7 +68,7 @@
                                 {% set badge_file = w.AWARD_CD or ('P001A10' ~ rk) %}
                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
-                            <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
+                            <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.1rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필(좌) & 슈퍼스타/라이징스타/브라이트스타 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
                                     <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
@@ -98,8 +98,8 @@
                                         <span class="m-pet-name-text">{{ w.PET_NM or w.pet_name }}</span>
                                     {% endif %}
                                 </div>
-                                <!-- 3줄: 출전 제목 -->
-                                <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <!-- 3줄: 출전 제목 (위쪽 간격은 좁히고 아래쪽 간격은 늘림) -->
+                                <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.05rem; margin-bottom: 0.32rem; line-height: 1.18;">
                                     {{ w.TITLE or w.title or (w.PET_NM or w.pet_name) }}
                                 </div>
                                 <!-- 4줄: 점수, 4요소 -->
@@ -155,7 +155,7 @@
                                 {% set badge_file = w.AWARD_CD or ('P002A90' ~ (rk if rk <= 3 else 3)) %}
                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); z-index: 2;" alt="수상 메달">
                             </div>
-                            <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.18rem; justify-content: center;">
+                            <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.1rem; justify-content: center;">
                                 <!-- 1줄: 집사 프로필(좌) & 패밀리 N위 뱃지(우) - 높이 및 수직 중앙 정렬 완벽 동기화 -->
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; width: 100%; min-height: 24px;">
                                     <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
@@ -176,8 +176,8 @@
                                         <span class="m-pet-name-text">{{ w.PET_NM or w.pet_name }}</span>
                                     {% endif %}
                                 </div>
-                                <!-- 3줄: 출전 제목 -->
-                                <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <!-- 3줄: 출전 제목 (위쪽 간격은 좁히고 아래쪽 간격은 늘림) -->
+                                <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.05rem; margin-bottom: 0.32rem; line-height: 1.18;">
                                     {{ w.TITLE or w.title or (w.PET_NM or w.pet_name) }}
                                 </div>
                                 <!-- 4줄: 점수, 4요소 -->
