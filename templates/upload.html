@@ -72,7 +72,7 @@
                                     </span>
                                     <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: auto; pointer-events: none;"></i>
                                 </div>
-                                <div class="custom-pet-options" style="display: none; top: calc(100% + 4px); z-index: 99999; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 14px 35px rgba(0,0,0,0.22);">
+                                <div class="custom-pet-options" style="display: none; margin-top: 8px !important; top: calc(100% + 10px) !important; z-index: 99999; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 14px 35px rgba(0,0,0,0.22);">
                                     {% for k in pet_kinds %}
                                         {% set k_nm = k.KIND_NM %}
                                         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}

@@ -906,7 +906,8 @@ option.opt-closed {
 
 .custom-pet-options {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 10px) !important;
+    margin-top: 8px !important;
     left: 0;
     right: 0;
     background: #ffffff !important;
@@ -918,7 +919,7 @@ option.opt-closed {
     display: none;
     flex-direction: column !important;
     gap: 0.2rem !important;
-    padding: 0.5rem !important;
+    padding: 0.45rem !important;
     z-index: 99999 !important;
 }
 
@@ -1062,7 +1063,8 @@ option.opt-closed {
 /* 드랍다운 팝업 리스트 (custom-pet-options와 100% 동일) */
 .custom-contest-options {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 10px) !important;
+    margin-top: 8px !important;
     left: 0;
     width: 100%;
     box-sizing: border-box;
