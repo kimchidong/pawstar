@@ -847,7 +847,11 @@ option.opt-closed {
     user-select: none;
     width: 175px;
     height: 51.05px;
-    z-index: 100;
+    z-index: 10;
+}
+
+.custom-pet-dropdown.open {
+    z-index: 99999 !important;
 }
 
 .custom-pet-trigger {
@@ -895,20 +899,20 @@ option.opt-closed {
     top: calc(100% + 6px);
     left: 0;
     right: 0;
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
     border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-    overflow-y: auto;
-    max-height: 250px;
-    display: none;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25) !important;
+    overflow-y: auto !important;
+    max-height: 250px !important;
+    display: none !important;
     flex-direction: column;
     padding: 0.4rem;
-    z-index: 9999;
+    z-index: 99999 !important;
 }
 
 .custom-pet-dropdown.open .custom-pet-options {
-    display: flex;
+    display: flex !important;
     animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -925,9 +929,15 @@ option.opt-closed {
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 700;
-    color: #334155;
+    color: #1e293b !important;
+    background: #ffffff !important;
     cursor: pointer;
     transition: all 0.15s ease;
+}
+
+.custom-pet-option:hover {
+    background: #f1f5f9 !important;
+    color: #4f46e5 !important;
 }
 
 .custom-pet-option i {

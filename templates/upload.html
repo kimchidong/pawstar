@@ -65,19 +65,19 @@
 
                             <!-- 검색 블럭과 100% 동일한 단색 FontAwesome 아이콘 커스텀 셀렉트 드롭다운 -->
                             <div class="custom-pet-dropdown" id="uploadPetTypeDropdown" style="width: 100%; height: 48px;">
-                                <div class="custom-pet-trigger" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary);">
-                                    <span style="display: inline-flex; align-items: center; gap: 0.6rem;">
-                                        <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon"></i>
-                                        <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted);">동물 종류 선택</span>
+                                <div class="custom-pet-trigger" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem;">
+                                    <span style="display: inline-flex; align-items: center; gap: 0.6rem; line-height: 1;">
+                                        <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon" style="font-size: 0.95rem;"></i>
+                                        <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted); line-height: 1;">종류 선택</span>
                                     </span>
-                                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                                    <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: auto;"></i>
                                 </div>
-                                <div class="custom-pet-options" style="top: calc(100% + 4px); z-index: 1000; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                                <div class="custom-pet-options" style="display: none; top: calc(100% + 4px); z-index: 99999; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 14px 35px rgba(0,0,0,0.22);">
                                     {% for k in pet_kinds %}
                                         {% set k_nm = k.KIND_NM %}
                                         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
-                                        {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
-                                        {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
+                                        {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-grip' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
+                                        {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
                                         <div class="custom-pet-option" data-value="{{ opt_text }}" data-icon="{{ k_icon }}" data-text="{{ k_clean }}" style="cursor: pointer; padding: 0.65rem 0.9rem;">
                                             <i class="{{ k_icon }}"></i> <span>{{ k_clean }}</span>
                                         </div>
