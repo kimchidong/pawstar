@@ -1409,17 +1409,20 @@ body.m-body {
     animation: starPulse 2.5s ease-in-out infinite;
 }
 
-/* 🐾 패밀리스타 배지 애니메이션 */
-.winner-title-badge.family-badge {
+/* 🐾 패밀리스타 배지 (확대축소 애니메이션 제거) */
+.winner-title-badge.family-badge,
+.winner-title-badge.family-star-badge {
     background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 50%, #e9d5ff 100%) !important;
     color: #6b21a8 !important;
     border: 1.2px solid #d8b4fe !important;
     box-shadow: none !important;
 }
-.winner-title-badge.family-badge i {
+.winner-title-badge.family-badge i,
+.winner-title-badge.family-star-badge i {
     color: #7c3aed !important;
     filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
-    animation: starPulse 2.5s ease-in-out infinite;
+    animation: none !important;
+    transform: none !important;
 }
 
 /* 🚨 모바일 커스텀 토스트 알림 팝업 디자인 */

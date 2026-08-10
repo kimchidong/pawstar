@@ -1758,6 +1758,8 @@ option.opt-closed {
 .podium-card:not(.super-star):not(.rising-star):not(.bright-star) .winner-title-badge i {
     color: #581c87;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+    animation: none !important;
+    transform: none !important;
 }
 
 /* 🐾 동물 아이콘 전용 - 슈퍼스타와 동일한 약한 흰색 빛(drop-shadow) 글로우 효과 적용 */
