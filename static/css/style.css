@@ -1464,7 +1464,7 @@ option.opt-closed {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    margin-bottom: 3.5rem;
+    margin-bottom: 5.5rem;
     align-items: flex-end;
 }
 
