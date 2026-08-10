@@ -127,11 +127,27 @@ def inject_global_vars():
     is_logged_in = bool(user_id and not session.get('logged_out', False))
 
     if is_logged_in:
-        profile_data = service.get_user_profile(user_id)
-        current_user = profile_data.get('user_info', {})
+        # DB에 실제 회원 레코드가 존재하는지 검증 (DB 초기화/Truncate 시 세션 자동 리셋)
+        if not service.is_user_exists(user_id):
+            session.clear()
+            is_logged_in = False
+            current_user = {
+                'nickname': '프로필',
+                'NK_NM': '프로필',
+                'profile_img': '/static/image/profile/default_profile.png'
+            }
+        else:
+            profile_data = service.get_user_profile(user_id)
+            current_user = profile_data.get('user_info', {})
+            # 64자리 해시 닉네임 노출 방지 안전 처리
+            from services.contest_service import sanitize_nickname
+            clean_nk = sanitize_nickname(current_user.get('NK_NM') or current_user.get('nickname'), fallback="집사")
+            current_user['NK_NM'] = clean_nk
+            current_user['nickname'] = clean_nk
     else:
         current_user = {
             'nickname': '프로필',
+            'NK_NM': '프로필',
             'profile_img': '/static/image/profile/default_profile.png'
         }
 

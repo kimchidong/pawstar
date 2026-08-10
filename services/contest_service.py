@@ -34,37 +34,46 @@ def hash_google_id(google_id):
 
     return hashlib.sha256(raw_val.encode('utf-8')).hexdigest()
 
+def sanitize_nickname(nickname, fallback="집사"):
+    """
+    닉네임이 없거나 64자리 헥스 해시값 형태인 경우 64자리 해시 문자열 노출을 방지하고 정제된 기본 닉네임을 반환합니다.
+    """
+    if not nickname:
+        return fallback
+    nk_str = str(nickname).strip()
+    if len(nk_str) == 64 and all(c in '0123456789abcdefABCDEF' for c in nk_str):
+        return fallback
+    if nk_str.startswith("google_"):
+        return fallback
+    return nk_str
+
 class PawStarService:
     def __init__(self):
         pass
 
     def is_nickname_taken(self, nickname, exclude_user_id=None, conn=None):
         """ DB 내 닉네임 중복 검사 (exclude_user_id 지정 시 본인 제외) """
-        if not nickname or not nickname.strip():
+        if not nickname or not str(nickname).strip():
             return False
         
-        should_close = False
-        if not conn:
-            conn = self.get_db_connection()
-            should_close = True
-        
-        if not conn:
+        # 커서 충돌 방지를 위해 별도의 전용 조회 커넥션 사용
+        check_conn = self.get_db_connection()
+        if not check_conn:
             return False
         
         try:
-            with conn.cursor() as cur:
+            with check_conn.cursor() as cur:
                 if exclude_user_id:
-                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) AND USER_ID != %s LIMIT 1", (nickname.strip(), exclude_user_id))
+                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) AND USER_ID != %s LIMIT 1", (str(nickname).strip(), exclude_user_id))
                 else:
-                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) LIMIT 1", (nickname.strip(),))
+                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) LIMIT 1", (str(nickname).strip(),))
                 res = cur.fetchone()
-                if should_close:
-                    conn.close()
+                check_conn.close()
                 return bool(res)
         except Exception as e:
             print("is_nickname_taken error:", e)
-            if should_close and conn:
-                try: conn.close()
+            if check_conn:
+                try: check_conn.close()
                 except Exception: pass
             return False
 
@@ -103,7 +112,7 @@ class PawStarService:
             rand_part = ''.join(random.choices(chars, k=4))
             cand_nk = f"{korean_part}_{rand_part}"
             
-            if not self.is_nickname_taken(cand_nk, conn=conn):
+            if not self.is_nickname_taken(cand_nk):
                 return cand_nk
         
         unique_suffix = uuid.uuid4().hex[:4]
@@ -443,7 +452,7 @@ class PawStarService:
 
                 if not user:
                     # 회원가입 시 절대 중복 불가능한 무작위 고유 닉네임 생성
-                    nickname = self.generate_unique_nickname(conn=conn)
+                    nickname = self.generate_unique_nickname()
                     cur.execute("""
                         INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                         VALUES (%s, %s, %s, 1, NOW(), NOW())
@@ -596,10 +605,13 @@ class PawStarService:
                 user_info = cur.fetchone()
 
                 if not user_info:
-                    user_info = {'USER_ID': user_id, 'NK_NM': user_id, 'PROFILE_URL': '/static/image/profile/default_profile.png'}
+                    user_info = {'USER_ID': user_id, 'NK_NM': '집사', 'PROFILE_URL': '/static/image/profile/default_profile.png'}
 
+                clean_nk = sanitize_nickname(user_info.get('NK_NM'), fallback="집사")
+                user_info['USER_ID'] = user_info.get('USER_ID', user_id)
+                user_info['NK_NM'] = clean_nk
                 user_info['user_id'] = user_info.get('USER_ID', user_id)
-                user_info['nickname'] = user_info.get('NK_NM', user_id)
+                user_info['nickname'] = clean_nk
                 user_info['profile_img'] = user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png')
 
                 # 최초 가입일 및 최근 로그인 일시 포맷팅 (정규식 탐지로 날짜와 시간 사이 공백 100% 보장)

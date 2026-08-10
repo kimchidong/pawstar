@@ -22,3 +22,18 @@ git push -f origin main
 # 수상 당선 배치
 0 0 1 * * /usr/bin/python3 /d/dev/workspace1/pawstar/monthly_award_batch.py >> /d/dev/workspace1/pawstar/batch.log 2>&1
 
+
+# 데이터 초기화
+-- 1. 외래키 제약조건 잠시 해제
+SET FOREIGN_KEY_CHECKS = 0;
+-- 2. 해당 테이블 데이터 전체 삭제 및 AUTO_INCREMENT 초기화
+TRUNCATE TABLE pst_contest_cmt;
+TRUNCATE TABLE pst_contest_like;
+TRUNCATE TABLE pst_contest_vw;
+TRUNCATE TABLE pst_contest_share;
+TRUNCATE TABLE pst_contest_award; -- (선택) 수상 기록 테이블도 초기화가 필요한 경우 포함
+TRUNCATE TABLE pst_contest_round;
+TRUNCATE TABLE pst_user;
+-- 3. 외래키 제약조건 재설정
+SET FOREIGN_KEY_CHECKS = 1;
+

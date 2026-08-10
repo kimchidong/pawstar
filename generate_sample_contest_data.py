@@ -303,11 +303,11 @@ def run_seed():
                             cur.execute("""
                                 UPDATE pst_contest_round SET KIND_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                             """, (rk, c_round, k_winner['ROUND_NO']))
-            # 8. 사용자 google_111293809055278216802 실수상 데이터 5개 보장
-            target_user = hash_google_id('google_111293809055278216802')
+            # 8. 샘플 시딩 전용 더미 사용자 실수상 데이터 5개 보장 (실제 구글 계정과 매칭 방지)
+            target_user = 'sample_dummy_target_user'
             cur.execute("""
                 INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
-                VALUES (%s, '별별22', '/static/image/profile/default_profile.png', 1, NOW(), NOW())
+                VALUES (%s, '시딩더미유저', '/static/image/profile/default_profile.png', 1, NOW(), NOW())
                 ON DUPLICATE KEY UPDATE LGN_CNT = LGN_CNT + 1, LGN_DT = NOW()
             """, (target_user,))
 
