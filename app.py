@@ -674,6 +674,12 @@ def index():
         response.delete_cookie('pst_user_id')
     return response
 
+# 📜 개인정보 처리 방침 (Privacy Policy)
+@app.route('/privacy')
+@app.route('/m/privacy')
+def privacy_policy():
+    return render_template('privacy.html')
+
 # 2. 명예의 전당 (Hall of Fame)
 @app.route('/hall-of-fame')
 def hall_of_fame():
