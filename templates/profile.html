@@ -143,9 +143,33 @@
 
     <div class="posts-grid" id="myPostsGrid" style="width: 1280px; margin: 0 auto 3rem auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; box-sizing: border-box;">
         {% for p in my_posts %}
-            <div class="post-card my-post-card-item" id="post-card-{{ p.post_id }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
+            <div class="post-card my-post-card-item" id="post-card-{{ p.post_id or p.ENT_USER_ID }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
-                    <img src="{{ p.IMAGE_PATH or p.image_path or p.media_url }}" alt="{{ p.TITLE or p.title }}" loading="lazy">
+                    <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
+                    
+                    <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
+                    {% set p_kind = p.KIND_NM or p.pet_type or '' %}
+                    {% set p_icon_class = 'fa-solid fa-dog' if ('강아지' in p_kind or '개' in p_kind) else ('fa-solid fa-cat' if '고양이' in p_kind else ('fa-solid fa-otter' if ('햄스터' in p_kind or '소동물' in p_kind or '토끼' in p_kind or '고슴도치' in p_kind or '작은동물' in p_kind) else ('fa-solid fa-frog' if ('거북이' in p_kind or '파충류' in p_kind or '도마뱀' in p_kind) else ('fa-solid fa-fish' if ('어류' in p_kind or '관상어' in p_kind or '물고기' in p_kind) else ('fa-solid fa-crow' if ('새' in p_kind or '앵무새' in p_kind or '조류' in p_kind) else ('fa-solid fa-horse' if ('말' in p_kind or '큰동물' in p_kind) else 'fa-solid fa-paw')))))) %}
+                    
+                    {% if p.awards %}
+                        <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; right: 0.65rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; z-index: 10; pointer-events: none;">
+                            {% for aw in p.awards %}
+                                {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
+                                {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
+                                {% set aw_rank = aw.ranking or aw.RANKING %}
+                                
+                                {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
+                                    <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
+                                {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
+                                    <div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
+                                {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
+                                    <div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
+                                {% else %}
+                                    <div class="winner-title-badge family-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><span class="pet-emoji-icon"><i class="{{ p_icon_class }}"></i></span> <span>패밀리{% if aw_rank %} {{ aw_rank }}위{% endif %}</span></div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="author-info">
@@ -174,33 +198,28 @@
                             {{ p.ENT_DT or p.created_at }}
                         </span>
                         <div class="card-total-score">
-                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format(p.SCORE or p.score or 0) }}</span> 점
+                            <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}</span> 점
                         </div>
                     </div>
 
-                    <!-- 이미지 캡처 스타일 4요소 박스 (조회, 좋아요, 댓글, 공유) & 전용 공유링크 복사 -->
-                    <div class="card-actions" onclick="event.stopPropagation();" style="margin-top: 0.4rem; display: flex; align-items: center; justify-content: space-between; gap: 0.3rem;">
-                        <div style="display: flex; align-items: center; gap: 0.3rem;">
-                            <div class="action-btn btn-view" title="조회수">
-                                <i class="fa-regular fa-eye"></i>
-                                <span class="view-count">{{ "{:,}".format((p.VW_CNT or p.view_count or 0)|int) }}</span>
-                            </div>
-                            <div class="action-btn btn-like" title="좋아요 수">
-                                <i class="fa-regular fa-heart"></i>
-                                <span class="like-count">{{ "{:,}".format((p.LIKE_CNT or p.like_count or 0)|int) }}</span>
-                            </div>
-                            <div class="action-btn btn-comment" title="댓글 수">
-                                <i class="fa-regular fa-comment"></i>
-                                <span class="comment-count">{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
-                            </div>
-                            <div class="action-btn btn-share {% if is_logged_in and p.actions and p.actions.is_shared %}active{% endif %}" title="공유 가입 수">
-                                <i class="fa-solid fa-share-nodes"></i>
-                                <span class="share-count">{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
-                            </div>
+                    <!-- 수치 표시 현황 (조회, 좋아요, 댓글, 공유가입 - 회차 목록 카드와 100% 동일한 4등분 그리드 버튼) -->
+                    <div class="card-actions" onclick="event.stopPropagation();">
+                        <div class="action-btn btn-view" title="조회수">
+                            <i class="fa-regular fa-eye"></i>
+                            <span class="view-count">{{ "{:,}".format((p.VW_CNT or p.view_count or 0)|int) }}</span>
                         </div>
-                        <button type="button" class="btn-copy-share" onclick="event.stopPropagation(); copyPostShareUrl('{{ p.CONTEST_ROUND or p.contest_id }}', '{{ p.ROUND_NO or p.round_no }}', '{{ p.SHARE_SN or p.share_sn or '' }}');" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; border-radius: 8px; padding: 0.25rem 0.55rem; font-size: 0.72rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 6px rgba(109, 40, 217, 0.2); transition: all 0.2s;" title="전용 공유주소 복사 (회원가입/로그인 시 +10점)">
-                            <i class="fa-solid fa-link"></i> 전용공유
-                        </button>
+                        <div class="action-btn btn-like" title="좋아요 수">
+                            <i class="fa-regular fa-heart"></i>
+                            <span class="like-count">{{ "{:,}".format((p.LIKE_CNT or p.like_count or 0)|int) }}</span>
+                        </div>
+                        <div class="action-btn btn-comment" title="댓글 수">
+                            <i class="fa-regular fa-comment"></i>
+                            <span class="comment-count">{{ "{:,}".format((p.CMT_CNT or p.comment_count or 0)|int) }}</span>
+                        </div>
+                        <div class="action-btn btn-share" title="공유 가입 수">
+                            <i class="fa-solid fa-share-nodes"></i>
+                            <span class="share-count">{{ "{:,}".format((p.SHARE_CNT or p.share_count or 0)|int) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
