@@ -13,6 +13,7 @@ import random
 import pymysql
 from datetime import datetime, timedelta
 from config import db_config
+from services.contest_service import hash_google_id
 
 # Windows 콘솔 인코딩 출력 설정
 if sys.platform == 'win32':
@@ -303,7 +304,7 @@ def run_seed():
                                 UPDATE pst_contest_round SET KIND_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                             """, (rk, c_round, k_winner['ROUND_NO']))
             # 8. 사용자 google_111293809055278216802 실수상 데이터 5개 보장
-            target_user = 'google_111293809055278216802'
+            target_user = hash_google_id('google_111293809055278216802')
             cur.execute("""
                 INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                 VALUES (%s, '별별22', '/static/image/profile/default_profile.png', 1, NOW(), NOW())

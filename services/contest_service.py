@@ -5,7 +5,33 @@ Paw Star Contest Service (get_posts & get_post_detail query rewrite)
 from datetime import datetime, timedelta
 import pymysql
 import uuid
+import hashlib
 from config import db_config
+
+def hash_google_id(google_id):
+    """
+    'google_식별자숫자' (예: 'google_101790422708324681983' 또는 '101790422708324681983')
+    전체 문자열을 통째로 복호화 불가능한 64자리 SHA-256 단방향 해시로 변환하여 반환합니다.
+    """
+    if not google_id:
+        return google_id
+    
+    s_id = str(google_id).strip()
+    
+    # 이미 64자리 hex 해시값인 경우 그대로 반환 (멱등성 보장)
+    if len(s_id) == 64 and all(c in '0123456789abcdefABCDEF' for c in s_id):
+        return s_id
+    
+    # google_ 71자 형태 (google_ + 64자 해시)로 들어온 경우도 내부 64자 해시만 추출 또는 재계산 방지
+    if s_id.startswith("google_"):
+        raw_val = s_id
+        after_prefix = s_id[7:]
+        if len(after_prefix) == 64 and all(c in '0123456789abcdefABCDEF' for c in after_prefix):
+            return after_prefix
+    else:
+        raw_val = f"google_{s_id}"
+
+    return hashlib.sha256(raw_val.encode('utf-8')).hexdigest()
 
 class PawStarService:
     def __init__(self):
@@ -317,8 +343,13 @@ class PawStarService:
             print("register_user error:", e)
             return None
 
+    def hash_google_id(self, google_id):
+        return hash_google_id(google_id)
+
     def google_login_or_register(self, google_id, email, name, picture="", **kwargs):
-        user_id = f"google_{google_id}" if google_id else (email or "google_user")
+        # 구글 사용자 식별자를 복호화 불가능한 SHA-256 단방향 해시로 변환
+        raw_user_id = f"google_{google_id}" if google_id else (email or "google_user")
+        user_id = hash_google_id(raw_user_id)
         nickname = name or (email.split('@')[0] if email else "구글집사")
         profile_img = picture or '/static/image/profile/default_profile.png'
 

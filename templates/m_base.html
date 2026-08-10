@@ -237,10 +237,155 @@
                 </a>
             </div>
 
-            <div style="background: #f8fafc; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.75rem; color: var(--text-muted); text-align: left; line-height: 1.4;">
-                ℹ️ <strong>프로필 안내</strong><br>
-                프로필 정보는 구글 계정 식별번호, 프로필 이미지, 닉네임을 사용합니다.<br>
-                닉네임은 Paw Star에서 직접 생성할 수 있습니다.
+            <div style="background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.74rem; color: var(--text-muted); text-align: left; line-height: 1.5;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem;">
+                    <span style="font-weight: 700; color: #6d28d9; display: flex; align-items: center; gap: 0.25rem;">
+                        <i class="fa-solid fa-shield-halved"></i> PawStar 개인정보 보호 안내
+                    </span>
+                    <button type="button" onclick="if(typeof openPrivacyNoticeModal==='function'){openPrivacyNoticeModal();}else{const m=document.getElementById('privacyNoticeModal');if(m){m.style.display='flex';m.classList.add('show','active');}}" style="background: none; border: none; color: #7c3aed; font-size: 0.72rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0;">
+                        전문 보기 <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+                    </button>
+                </div>
+                • <strong>Google 식별자 안전 저장</strong>: Google 수집 식별자는 원본을 저장하지 않으며 복호화가 불가능한 <strong>일방향 암호화(SHA-256 해시)</strong> 방식으로 저장됩니다.<br>
+                • <strong>최소 개인정보 수집</strong>: 비밀번호, 전화번호 등 불필요한 정보는 수집하지 않으며 서비스 제공에 필요한 최소한의 정보만 이용합니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- PawStar 개인정보 처리 안내 전문 모달 (모바일 프리미엄 UI) -->
+    <div class="m-modal-backdrop" id="privacyNoticeModal" style="z-index: 999999; display: none; backdrop-filter: blur(6px); background: rgba(15, 23, 42, 0.7);" onclick="if(event.target===this){ this.classList.remove('active','show'); this.style.display='none'; }">
+        <div class="m-modal-sheet" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; padding: 0; border-radius: 24px 24px 0 0; overflow: hidden; border: none; background: #ffffff;">
+            
+            <!-- 모달 헤더 -->
+            <div style="padding: 1.15rem 1.25rem; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #ffffff;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #ffffff;">
+                            개인정보 처리 안내
+                        </h3>
+                        <span style="font-size: 0.72rem; color: rgba(255, 255, 255, 0.85);">
+                            PawStar의 개인정보 보호 방침
+                        </span>
+                    </div>
+                </div>
+                <button type="button" onclick="const m=document.getElementById('privacyNoticeModal'); if(m){ m.classList.remove('active','show'); m.style.display='none'; }" style="background: rgba(255, 255, 255, 0.15); border: none; width: 30px; height: 30px; border-radius: 50%; color: #ffffff; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- 모달 본문 (카드 스타일) -->
+            <div style="padding: 1.25rem 1.15rem; overflow-y: auto; font-size: 0.84rem; color: #334155; line-height: 1.6; text-align: left; background: #f8fafc;">
+                
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #7c3aed; border-radius: 14px; padding: 0.85rem; margin-bottom: 0.85rem;">
+                    <p style="margin: 0; color: #475569; font-size: 0.8rem; font-weight: 500;">
+                        🐾 PawStar는 이용자의 개인정보를 최소한으로 수집하고 안전하게 보호하기 위해 노력합니다.
+                    </p>
+                </div>
+
+                <!-- 1 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">01</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">회원가입 방법</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        PawStar는 <strong style="color: #6d28d9; background: #f3e8ff; padding: 0.1rem 0.3rem; border-radius: 4px;">Google 인증을 통한 회원가입만 제공</strong>합니다. 이용자는 Google 계정 인증 완료 후 가입할 수 있으며 최소한의 정보만 처리합니다.
+                    </p>
+                </div>
+
+                <!-- 2 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">02</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">Google 인증을 통해 처리하는 정보</h4>
+                    </div>
+                    <div style="background: #f8fafc; border-radius: 10px; padding: 0.6rem 0.75rem; margin: 0.4rem 0; font-size: 0.8rem;">
+                        <div style="margin-bottom: 0.25rem;">• <strong>Google 식별자</strong>: 회원 계정 식별용 고유 식별자</div>
+                        <div>• <strong>Google 프로필 이미지 주소</strong>: 프로필 이미지 표시 정보</div>
+                    </div>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.76rem; color: #991b1b;">
+                        PawStar는 Google 계정의 <strong>비밀번호, 이메일 내용, 연락처 등의 정보를 수집하거나 저장하지 않습니다.</strong>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">03</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">Google 식별자 보호</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        제공받은 식별자는 <strong style="color: #047857; background: #d1fae5; padding: 0.1rem 0.3rem; border-radius: 4px;">복호화할 수 없는 일방향 암호화(해시) 방식으로 처리하여 저장</strong>하며, 저장된 암호화 식별자만으로는 원본 식별자를 복원할 수 없습니다.
+                    </p>
+                </div>
+
+                <!-- 4 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">04</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">개인정보의 이용 목적</h4>
+                    </div>
+                    <ul style="margin: 0; padding-left: 1rem; color: #334155; font-size: 0.8rem; line-height: 1.6;">
+                        <li>회원가입 및 회원 식별, Google 인증 로그인</li>
+                        <li>프로필 이미지 표시, 중복 계정/부정 이용 방지</li>
+                        <li>서비스 운영 및 회원 관리</li>
+                    </ul>
+                </div>
+
+                <!-- 5 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">05</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">개인정보의 최소 수집</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        PawStar가 저장하는 회원정보는 <strong>암호화된 Google 식별자와 Google 프로필 이미지 주소</strong>로 최소화되어 있습니다.
+                    </p>
+                </div>
+
+                <!-- 6 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">06</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">개인정보의 안전한 관리</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        기술적·관리적 보호조치를 적용하고 있으며, Google 식별자는 원본 값을 직접 저장하지 않고 일방향 암호화하여 저장합니다.
+                    </p>
+                </div>
+
+                <!-- 7 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">07</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">개인정보의 제3자 제공</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        원칙적으로 제3자에게 제공하지 않으며, 법령에 따라 적법한 요청이 있는 경우 법령 절차에 따라 제공될 수 있습니다.
+                    </p>
+                </div>
+
+                <!-- 8 -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.9rem; margin-bottom: 0.4rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                        <span style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 6px;">08</span>
+                        <h4 style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a;">개인정보 관련 문의</h4>
+                    </div>
+                    <p style="margin: 0; color: #334155; font-size: 0.82rem;">
+                        문의사항이 있으신 경우 운영자에게 문의해 주시기 바랍니다. 안전한 서비스 이용 환경을 제공하기 위해 최선의 노력을 다하겠습니다.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- 모달 푸터 -->
+            <div style="padding: 0.9rem 1.15rem; border-top: 1px solid #e2e8f0; text-align: center; background: #ffffff;">
+                <button type="button" onclick="const m=document.getElementById('privacyNoticeModal'); if(m){ m.classList.remove('active','show'); m.style.display='none'; }" style="width: 100%; padding: 0.75rem; border-radius: 14px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-size: 0.92rem; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);">
+                    확인 및 닫기
+                </button>
             </div>
         </div>
     </div>

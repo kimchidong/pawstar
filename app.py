@@ -207,6 +207,16 @@ def get_post_login_redirect_url(is_mobile=False):
             return '/m/' if is_mobile else '/'
     return None
 
+@app.route('/privacy')
+def privacy_page():
+    """ PawStar 개인정보 처리 안내 웹 페이지 """
+    return render_template('privacy.html')
+
+@app.route('/m/privacy')
+def m_privacy_page():
+    """ PawStar 개인정보 처리 안내 모바일 페이지 """
+    return render_template('m_privacy.html')
+
 @app.route('/api/auth/login', methods=['POST'])
 def api_auth_login():
     """ 로그인 API (user_id & password) """

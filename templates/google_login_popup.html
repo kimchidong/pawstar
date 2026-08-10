@@ -3,56 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google 계정으로 로그인</title>
+    <title>Google 계정으로 로그인 - PawStar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #ffffff;
+            background-color: #f8fafc;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: #202124;
+            padding: 1rem;
+            box-sizing: border-box;
         }
         .g-card {
+            background: #ffffff;
             border: 1px solid #dadce0;
-            border-radius: 28px;
+            border-radius: 24px;
             width: 100%;
             max-width: 440px;
-            padding: 2.5rem 2rem;
+            padding: 2.25rem 2rem;
             box-sizing: border-box;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            position: relative;
         }
         .g-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         .g-logo {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 0.75rem;
+            width: 44px;
+            height: 44px;
+            margin-bottom: 0.5rem;
         }
         .g-title {
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin: 0 0 0.5rem 0;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 0 0 0.4rem 0;
         }
         .g-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #5f6368;
             margin: 0;
         }
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
         .form-control {
             width: 100%;
-            padding: 0.9rem 1rem;
+            padding: 0.85rem 1rem;
             border: 1px solid #dadce0;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-sizing: border-box;
             outline: none;
             transition: border-color 0.2s;
@@ -60,7 +64,7 @@
         .form-control:focus {
             border-color: #1a73e8;
             border-width: 2px;
-            padding: 0.85rem 0.95rem;
+            padding: 0.8rem 0.95rem;
         }
         .btn-submit {
             background-color: #1a73e8;
@@ -78,12 +82,93 @@
             background-color: #1557b0;
             box-shadow: 0 1px 3px rgba(60,64,67,0.3);
         }
-        .g-footer-note {
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: #70757a;
-            text-align: center;
-            line-height: 1.4;
+        .privacy-box {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 0.9rem;
+            margin-top: 1.25rem;
+            font-size: 0.78rem;
+            color: #475569;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .privacy-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.4rem;
+        }
+        .btn-privacy-detail {
+            color: #2563eb;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        .privacy-modal {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 500px;
+            max-height: 80vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .privacy-modal-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .privacy-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .privacy-section-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .privacy-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #f1f5f9;
+            text-align: right;
+            background: #fafafa;
+        }
+        .btn-close-modal {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: none;
+            border-radius: 12px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -96,7 +181,7 @@
                 <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
             </svg>
-            <h1 class="g-title">로그인</h1>
+            <h1 class="g-title">Google 계정 로그인</h1>
             <p class="g-subtitle">PawStar 서비스로 이동</p>
         </div>
 
@@ -107,15 +192,84 @@
             <div class="form-group">
                 <input type="password" id="gPassword" class="form-control" placeholder="비밀번호 입력" required>
             </div>
-            <button type="submit" class="btn-submit">다음 (구글 계정 인증)</button>
+            <button type="submit" class="btn-submit">다음 (Google 인증 진행)</button>
         </form>
 
-        <div class="g-footer-note">
-            Google 계정으로 인증하여 PawStar를 계속 이용합니다.
+        <div class="privacy-box">
+            <div class="privacy-header">
+                <span>🔒 PawStar 개인정보 처리 안내</span>
+                <button type="button" class="btn-privacy-detail" onclick="openPrivacyModal()">전문 보기</button>
+            </div>
+            • <strong>Google 인증 회원가입</strong>: PawStar는 Google 인증을 통한 회원가입만 제공하며 최소한의 정보만 처리합니다.<br>
+            • <strong>식별자 일방향 암호화</strong>: Google 수집 식별자는 복호화할 수 없는 <strong>일방향 암호화(해시) 방식</strong>으로 저장하여 안전하게 보호합니다.
+        </div>
+    </div>
+
+    <!-- 개인정보 처리 안내 전문 레이어 모달 -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="privacy-modal">
+            <div class="privacy-modal-header">
+                <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a; display: flex; align-items: center; gap: 0.4rem;">
+                    🐾 PawStar 개인정보 처리 안내
+                </h3>
+                <button type="button" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:#64748b;" onclick="closePrivacyModal()">✕</button>
+            </div>
+            <div class="privacy-modal-body">
+                <p style="margin-top: 0; color: #64748b; font-size: 0.8rem;">
+                    PawStar(이하 “서비스”)는 이용자의 개인정보를 최소한으로 수집하고 안전하게 보호하기 위해 노력합니다.
+                </p>
+
+                <div class="privacy-section-title">1. 회원가입 방법</div>
+                PawStar는 <strong>Google 인증을 통한 회원가입만 제공</strong>합니다.<br>
+                이용자는 Google 계정으로 인증을 완료한 후 PawStar 회원으로 가입할 수 있으며, PawStar는 회원가입 및 서비스 이용에 필요한 최소한의 정보만 처리합니다.
+
+                <div class="privacy-section-title">2. Google 인증을 통해 처리하는 정보</div>
+                Google 인증을 통해 회원가입할 경우 PawStar가 처리하는 정보는 다음과 같습니다.<br>
+                - <strong>Google 식별자</strong>: 회원 계정을 식별하기 위한 고유 식별자<br>
+                - <strong>Google 프로필 이미지 주소</strong>: PawStar 내 프로필 이미지 표시를 위한 정보<br>
+                <em>PawStar는 Google 계정의 비밀번호, 이메일 내용, 연락처 등의 정보를 별도로 수집하거나 저장하지 않습니다.</em>
+
+                <div class="privacy-section-title">3. Google 식별자 보호</div>
+                PawStar는 회원 식별을 위해 Google에서 제공받은 식별자를 사용하며, 해당 식별자는 <strong>복호화할 수 없는 일방향 암호화(해시) 방식으로 처리하여 저장</strong>합니다.<br>
+                따라서 데이터베이스에 저장된 암호화된 식별자만으로는 원래의 Google 식별자를 복원할 수 없습니다.
+
+                <div class="privacy-section-title">4. 개인정보의 이용 목적</div>
+                수집·처리되는 정보는 다음의 목적으로만 이용됩니다.<br>
+                • 회원가입 및 회원 식별<br>
+                • Google 인증을 통한 로그인<br>
+                • 서비스 내 프로필 이미지 표시<br>
+                • 중복 계정 및 부정 이용 방지<br>
+                • 서비스 운영 및 회원 관리
+
+                <div class="privacy-section-title">5. 개인정보의 최소 수집</div>
+                PawStar는 서비스 이용에 불필요한 개인정보를 수집하지 않습니다.<br>
+                Google 인증을 통한 회원가입 과정에서 PawStar가 저장하는 회원정보는 <strong>암호화된 Google 식별자와 Google 프로필 이미지 주소</strong>로 최소화되어 있습니다.
+
+                <div class="privacy-section-title">6. 개인정보의 안전한 관리</div>
+                PawStar는 이용자의 개인정보를 안전하게 보호하기 위해 필요한 기술적·관리적 보호조치를 적용하고 있으며, 개인정보에 대한 접근을 최소한으로 제한합니다.<br>
+                특히 회원 식별에 사용되는 Google 식별자는 원본 값을 직접 저장하지 않고 일방향 암호화하여 저장합니다.
+
+                <div class="privacy-section-title">7. 개인정보의 제3자 제공</div>
+                PawStar는 이용자의 개인정보를 원칙적으로 제3자에게 제공하지 않습니다. 다만, 법령에 따라 관계 기관의 적법한 요청이 있는 경우에는 관련 법령에서 정한 절차에 따라 제공될 수 있습니다.
+
+                <div class="privacy-section-title">8. 개인정보 관련 문의</div>
+                개인정보 처리와 관련하여 문의사항이 있는 경우 PawStar 운영자에게 문의해 주시기 바랍니다.<br>
+                PawStar는 이용자의 개인정보를 최소한으로 수집하고 안전하게 보호하기 위해 지속적으로 노력하겠습니다.
+            </div>
+            <div class="privacy-modal-footer">
+                <button type="button" class="btn-close-modal" onclick="closePrivacyModal()">확인 및 닫기</button>
+            </div>
         </div>
     </div>
 
     <script>
+    function openPrivacyModal() {
+        document.getElementById('privacyModal').style.display = 'flex';
+    }
+    function closePrivacyModal() {
+        document.getElementById('privacyModal').style.display = 'none';
+    }
+
     document.getElementById('googleLoginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const email = document.getElementById('gEmail').value.trim();
