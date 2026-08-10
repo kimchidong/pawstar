@@ -54,11 +54,8 @@
                             <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
                         </a>
                     {% else %}
-                        <a href="#" id="btnNavRegister" onclick="openGoogleAuthModal(); return false;">
-                            <i class="fa-solid fa-user-plus"></i> 회원가입
-                        </a>
-                        <a href="/auth/google" id="btnNavLogin" style="margin-left: 0.4rem;">
-                            <i class="fa-solid fa-right-to-bracket"></i> 로그인
+                        <a href="/auth/google" id="btnNavLogin" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
+                            <i class="fa-solid fa-right-to-bracket"></i> 가입/로그인
                         </a>
                     {% endif %}
                 </li>
