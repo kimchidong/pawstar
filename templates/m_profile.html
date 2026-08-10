@@ -402,7 +402,7 @@
                             {% for b in (a.awards or [a]) %}
                                 {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                                 {% set b_img_src = b.badge_img or b.BADGE_IMG_PATH_FILE or ('/static/image/badge/' ~ b_cd ~ '.png') %}
-                                <img src="{{ b_img_src }}" alt="메달" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(124, 58, 237, 0.28));">
+                                <img src="{{ b_img_src }}" alt="메달" class="hall-medal-effect" style="width: 32px; height: 32px; object-fit: contain;">
                             {% endfor %}
                         </div>
                     </div>
@@ -464,7 +464,7 @@
                                             {% set display_title = '패밀리' ~ b_rk ~ '위' %}
                                         {% endif %}
 
-                                        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.2px solid {{ badge_border }}; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">
+                                        <span class="winner-title-badge" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.2px solid {{ badge_border }}; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: {{ badge_shadow }}; flex-shrink: 0; position: relative; overflow: hidden;">
                                             <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.72rem; line-height: 1;"></i>
                                             <span style="line-height: 1;">{{ display_title }}</span>
                                         </span>

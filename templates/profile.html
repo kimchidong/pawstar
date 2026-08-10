@@ -278,7 +278,7 @@
                     {% for b in (a.awards or [a]) %}
                         {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                         {% set b_img_src = b.badge_img or b.BADGE_IMG_PATH_FILE or ('/static/image/badge/' ~ b_cd ~ '.png') %}
-                        <img src="{{ b_img_src }}" alt="메달/배지" style="width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(124, 58, 237, 0.22)); flex-shrink: 0;">
+                        <img src="{{ b_img_src }}" alt="메달/배지" class="hall-medal-effect" style="width: 38px; height: 38px; object-fit: contain; flex-shrink: 0;">
                     {% endfor %}
                 </div>
 
@@ -368,7 +368,7 @@
                             {% set display_title = '패밀리' ~ b_rk ~ '위' %}
                         {% endif %}
 
-                        <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 900; font-size: 0.8rem; box-shadow: {{ badge_shadow }}; letter-spacing: -0.01em; white-space: nowrap; flex-shrink: 0;">
+                        <div class="winner-title-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 900; font-size: 0.8rem; box-shadow: {{ badge_shadow }}; letter-spacing: -0.01em; white-space: nowrap; flex-shrink: 0; position: relative; overflow: hidden;">
                             <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.85rem;"></i>
                             <span>{{ display_title }}</span>
                         </div>
