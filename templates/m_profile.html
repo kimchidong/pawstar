@@ -457,10 +457,11 @@
                                             {% set badge_color = '#6b21a8' %}
                                             {% set badge_border = '#d8b4fe' %}
                                             {% set badge_shadow = '0 2px 6px rgba(124, 58, 237, 0.12)' %}
-                                            {% set badge_icon = 'fa-solid fa-star' %}
+                                            {% set k_clean_b = (a.KIND_NM or a.pet_type or b.KIND_NM or b.pet_type or '')|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
+                                            {% set badge_icon = 'fa-solid fa-dog' if ('강아지' in k_clean_b or '개' in k_clean_b) else ('fa-solid fa-cat' if '고양이' in k_clean_b else ('fa-solid fa-otter' if ('햄스터' in k_clean_b or '소동물' in k_clean_b or '토끼' in k_clean_b or '고슴도치' in k_clean_b or '작은동물' in k_clean_b) else ('fa-solid fa-frog' if ('거북이' in k_clean_b or '파충류' in k_clean_b or '도마뱀' in k_clean_b) else ('fa-solid fa-fish' if ('어류' in k_clean_b or '관상어' in k_clean_b or '물고기' in k_clean_b) else ('fa-solid fa-crow' if ('새' in k_clean_b or '앵무새' in k_clean_b or '조류' in k_clean_b) else ('fa-solid fa-horse' if ('말' in k_clean_b or '큰동물' in k_clean_b) else 'fa-solid fa-paw')))))) %}
                                             {% set icon_color = '#7c3aed' %}
                                             {% set b_rk = b.RANKING or b.ranking or a.RANKING or a.ranking or (b_cd[-1] if (b_cd and b_cd[-1].isdigit()) else '1') %}
-                                            {% set display_title = '패밀리스타' ~ b_rk ~ '위' %}
+                                            {% set display_title = '패밀리' ~ b_rk ~ '위' %}
                                         {% endif %}
 
                                         <span style="display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.2px solid {{ badge_border }}; height: 24px; box-sizing: border-box; padding: 0 0.55rem; border-radius: 12px; font-weight: 900; font-size: 0.74rem; line-height: 1; box-shadow: {{ badge_shadow }}; flex-shrink: 0;">

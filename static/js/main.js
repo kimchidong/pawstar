@@ -1593,7 +1593,7 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
         displayHtml = '<span style="margin-right: 0.45rem; color: #38bdf8; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-star"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 2위</span><span style="color: #38bdf8; font-weight: 900; text-shadow: 0 0 12px rgba(56, 189, 248, 0.85);">라이징스타</span>';
     } else if (rawTitle.includes('브라이트스타')) {
         displayHtml = '<span style="margin-right: 0.45rem; color: #fb923c; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-star"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 3위</span><span style="color: #fb923c; font-weight: 900; text-shadow: 0 0 12px rgba(251, 146, 60, 0.85);">브라이트스타</span>';
-    } else if (rawTitle.includes('패밀리스타')) {
+    } else if (rawTitle.includes('패밀리스타') || rawTitle.includes('패밀리')) {
         let resolvedIcon = petIcon;
         if (!resolvedIcon) {
             const curPost = window.currentDetailPost || window.currentMobileDetailPost;
@@ -1614,9 +1614,9 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
             else if (rankStr === '2위') rankColor = '#cbd5e1';
             else if (rankStr === '3위') rankColor = '#fed7aa';
 
-            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85); margin-right: 0.35rem;">패밀리스타</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
+            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85); margin-right: 0.35rem;">패밀리</span><span style="color: ${rankColor}; font-weight: 800;">${rankStr}</span>`;
         } else {
-            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85);">패밀리스타</span>`;
+            displayHtml = `${iconHtml}<span style="color: #c084fc; font-weight: 900; text-shadow: 0 0 12px rgba(192, 132, 252, 0.85);">패밀리</span>`;
         }
     } else if (rawTitle.includes('루키스타')) {
         const rankMatch = rawTitle.match(/(\d+위)/);
