@@ -680,6 +680,12 @@ def index():
 def privacy_policy():
     return render_template('privacy.html')
 
+# 📜 이용약관 (Terms of Service)
+@app.route('/terms')
+@app.route('/m/terms')
+def terms_of_service():
+    return render_template('terms.html')
+
 # 2. 명예의 전당 (Hall of Fame)
 @app.route('/hall-of-fame')
 def hall_of_fame():
