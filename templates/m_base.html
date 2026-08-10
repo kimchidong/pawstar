@@ -545,16 +545,26 @@
         const mBtnCloseGoogle = document.getElementById('mBtnCloseGoogle');
         const mGoogleAuthForm = document.getElementById('mGoogleAuthForm');
 
-        function openMGoogleAuthWindow() {
-            window.location.href = '/auth/google';
-        }
+        window.openGoogleAuthModal = function() {
+            const mModal = document.getElementById('mGoogleAuthModal') || document.getElementById('googleAuthModal');
+            if (mModal) {
+                mModal.style.display = 'flex';
+                mModal.classList.add('show', 'active');
+            } else {
+                window.location.href = '/auth/google';
+            }
+        };
+
+        window.openMGoogleAuthWindow = function() {
+            window.openGoogleAuthModal();
+        };
 
         if (mBtnNavProfile) {
             mBtnNavProfile.addEventListener('click', function(e) {
                 {% if not is_logged_in %}
                     e.preventDefault();
                     e.stopPropagation();
-                    openMGoogleAuthWindow();
+                    openGoogleAuthModal();
                 {% endif %}
             });
         }
@@ -562,8 +572,8 @@
         const mBtnOfficialGoogleAuth = document.getElementById('mBtnOfficialGoogleAuth');
         if (mBtnOfficialGoogleAuth) {
             mBtnOfficialGoogleAuth.addEventListener('click', function(e) {
-                e.preventDefault();
-                openMGoogleAuthWindow();
+                // 모달 내부의 공식 버튼 클릭 시 실제 Google 인증 페이지로 이동
+                window.location.href = '/auth/google';
             });
         }
 

@@ -137,14 +137,17 @@ document.addEventListener('DOMContentLoaded', function() {
 // 3. 모바일 전용 게시물 상세보기 모달 open
 function openMobileDetailModal(postData, isHallOfFame = false) {
     if (!window.isUserLoggedIn) {
-        if (typeof showToast === 'function') {
-            showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
         } else {
-            alert('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾');
+            const mModal = document.getElementById('mGoogleAuthModal') || document.getElementById('googleAuthModal');
+            if (mModal) {
+                mModal.style.display = 'flex';
+                mModal.classList.add('show', 'active');
+            } else {
+                window.location.href = '/auth/google';
+            }
         }
-        setTimeout(() => {
-            window.location.href = '/auth/google';
-        }, 400);
         return;
     }
 
@@ -1362,7 +1365,11 @@ async function triggerMobileEvent(postId, eventType) {
     };
 
     if (!window.isUserLoggedIn) {
-        mToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
+        } else {
+            mToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
+        }
         return;
     }
 
