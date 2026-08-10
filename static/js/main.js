@@ -788,9 +788,9 @@ function openDetailModal(post, isHallOfFame = false) {
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || awardNmStr.includes('슈퍼')) {
-                    rightHtml += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');"><i class="fa-solid fa-star"></i> <span>슈퍼스타</span></div>`;
                 } else if (awardCdStr.includes('P001A102') || awardNmStr.includes('라이징')) {
-                    rightHtml += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>`;
+                    rightHtml += `<div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');"><i class="fa-solid fa-star"></i> <span>라이징스타</span></div>`;
                 } else if (awardCdStr.includes('P001A103') || awardNmStr.includes('브라이트')) {
                     rightHtml += `<div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 1.05rem; padding: 0.45rem 1.05rem; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>`;
                 } else {
@@ -1588,9 +1588,9 @@ function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = 
     };
 
     if (rawTitle.includes('슈퍼스타')) {
-        displayHtml = '<span style="margin-right: 0.45rem; color: #fbbf24; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-crown"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 1위</span><span style="color: #fbbf24; font-weight: 900; text-shadow: 0 0 12px rgba(251, 191, 36, 0.85);">슈퍼스타</span>';
+        displayHtml = '<span style="margin-right: 0.45rem; color: #fbbf24; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-star"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 1위</span><span style="color: #fbbf24; font-weight: 900; text-shadow: 0 0 12px rgba(251, 191, 36, 0.85);">슈퍼스타</span>';
     } else if (rawTitle.includes('라이징스타')) {
-        displayHtml = '<span style="margin-right: 0.45rem; color: #38bdf8; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 2위</span><span style="color: #38bdf8; font-weight: 900; text-shadow: 0 0 12px rgba(56, 189, 248, 0.85);">라이징스타</span>';
+        displayHtml = '<span style="margin-right: 0.45rem; color: #38bdf8; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-star"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 2위</span><span style="color: #38bdf8; font-weight: 900; text-shadow: 0 0 12px rgba(56, 189, 248, 0.85);">라이징스타</span>';
     } else if (rawTitle.includes('브라이트스타')) {
         displayHtml = '<span style="margin-right: 0.45rem; color: #fb923c; font-size: 1.1em; display: inline-flex; align-items: center; justify-content: center; filter: none !important;"><i class="fa-solid fa-star"></i></span><span style="color: #e2e8f0; font-weight: 700; margin-right: 0.35rem;">전체 3위</span><span style="color: #fb923c; font-weight: 900; text-shadow: 0 0 12px rgba(251, 146, 60, 0.85);">브라이트스타</span>';
     } else if (rawTitle.includes('패밀리스타')) {

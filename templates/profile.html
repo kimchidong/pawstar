@@ -159,9 +159,9 @@
                                 {% set aw_rank = aw.ranking or aw.RANKING %}
                                 
                                 {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
-                                    <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-crown"></i> <span>슈퍼스타</span></div>
+                                    <div class="winner-title-badge superstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>슈퍼스타</span></div>
                                 {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                    <div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>라이징스타</span></div>
+                                    <div class="winner-title-badge risingstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>라이징스타</span></div>
                                 {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
                                     <div class="winner-title-badge brightstar-badge" style="position: relative; top: 0; right: 0; margin: 0; font-size: 0.8rem; padding: 0.35rem 0.85rem;"><i class="fa-solid fa-star"></i> <span>브라이트스타</span></div>
                                 {% else %}
@@ -337,7 +337,7 @@
                             {% set badge_color = '#854d0e' %}
                             {% set badge_border = '#facc15' %}
                             {% set badge_shadow = '0 3px 10px rgba(245, 158, 11, 0.2)' %}
-                            {% set badge_icon = 'fa-solid fa-crown' %}
+                            {% set badge_icon = 'fa-solid fa-star' %}
                             {% set icon_color = '#b45309' %}
                             {% set display_title = '슈퍼스타' %}
                         {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
@@ -345,7 +345,7 @@
                             {% set badge_color = '#334155' %}
                             {% set badge_border = '#cbd5e1' %}
                             {% set badge_shadow = '0 3px 10px rgba(100, 116, 139, 0.14)' %}
-                            {% set badge_icon = 'fa-solid fa-wand-magic-sparkles' %}
+                            {% set badge_icon = 'fa-solid fa-star' %}
                             {% set icon_color = '#475569' %}
                             {% set display_title = '라이징스타' %}
                         {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
