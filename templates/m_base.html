@@ -47,6 +47,21 @@
     <!-- 메인 컨텐츠 영역 -->
     <main>
         {% block content %}{% endblock %}
+    <!-- 모바일 약관 및 개인정보 처리 안내 푸터 링크 바 (가로 나란히 배치) -->
+    <div style="padding: 1.5rem 1rem 5.5rem 1rem; text-align: center; background: #f8fafc; border-top: 1px solid #e2e8f0; margin-top: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <a href="#" onclick="if(typeof openPrivacyNoticeModal==='function'){openPrivacyNoticeModal();}else{const m=document.getElementById('privacyNoticeModal');if(m){m.style.display='flex';m.classList.add('show','active');}} return false;" style="color: #6d28d9; text-decoration: underline;">
+                개인정보처리방침
+            </a>
+            <span style="color: #cbd5e1;">|</span>
+            <a href="#" onclick="if(typeof openPrivacyNoticeModal==='function'){openPrivacyNoticeModal();}else{const m=document.getElementById('privacyNoticeModal');if(m){m.style.display='flex';m.classList.add('show','active');}} return false;" style="color: #475569; text-decoration: none;">
+                이용약관
+            </a>
+        </div>
+        <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 500;">
+            Copyright ⓒ <strong>Paw Star</strong>. All rights reserved.
+        </div>
+    </div>
     </main>
 
     <!-- 모바일 하단 내비게이션 바 -->
