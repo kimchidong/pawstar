@@ -1015,7 +1015,7 @@ def upload_profile():
         web_url = f"/static/image/temp/profile/{unique_name}"
         return jsonify({"success": True, "url": web_url})
 
-# 4-2. 프로필 수정 API
+# 4-2. 프로필 수정 API (닉네임 중복 검사 적용)
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
     user_id = session.get('user_id')
@@ -1024,8 +1024,35 @@ def api_profile_update():
     data = request.json or {}
     nickname = data.get('nickname')
     profile_img = data.get('profile_img')
-    updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, profile_img=profile_img)
-    return jsonify({'success': True, 'message': '프로필 정보가 수정되었습니다.', 'data': updated_user})
+    
+    success, message, updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, profile_img=profile_img)
+    if not success:
+        return jsonify({'success': False, 'message': message}), 400
+
+    # 세션 내 프로필 정보 갱신
+    if updated_user:
+        session['user'] = updated_user
+        session['nickname'] = updated_user.get('NK_NM')
+        if updated_user.get('PROFILE_URL'):
+            session['profile_img'] = updated_user.get('PROFILE_URL')
+
+    return jsonify({'success': True, 'message': message, 'data': updated_user})
+
+# 4-3. 닉네임 중복 확인 API
+@app.route('/api/profile/check_nickname', methods=['GET', 'POST'])
+def api_check_nickname():
+    user_id = session.get('user_id')
+    data = request.args if request.method == 'GET' else (request.json or {})
+    nickname = (data.get('nickname') or '').strip()
+    
+    if not nickname:
+        return jsonify({'success': False, 'available': False, 'message': '검사할 닉네임을 입력해주세요.'}), 400
+        
+    is_taken = service.is_nickname_taken(nickname, exclude_user_id=user_id)
+    if is_taken:
+        return jsonify({'success': True, 'available': False, 'message': '이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.'})
+    else:
+        return jsonify({'success': True, 'available': True, 'message': '사용 가능한 닉네임입니다.'})
 
 
 

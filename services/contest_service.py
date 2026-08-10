@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pymysql
 import uuid
 import hashlib
+import random
 from config import db_config
 
 def hash_google_id(google_id):
@@ -36,6 +37,77 @@ def hash_google_id(google_id):
 class PawStarService:
     def __init__(self):
         pass
+
+    def is_nickname_taken(self, nickname, exclude_user_id=None, conn=None):
+        """ DB 내 닉네임 중복 검사 (exclude_user_id 지정 시 본인 제외) """
+        if not nickname or not nickname.strip():
+            return False
+        
+        should_close = False
+        if not conn:
+            conn = self.get_db_connection()
+            should_close = True
+        
+        if not conn:
+            return False
+        
+        try:
+            with conn.cursor() as cur:
+                if exclude_user_id:
+                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) AND USER_ID != %s LIMIT 1", (nickname.strip(), exclude_user_id))
+                else:
+                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) LIMIT 1", (nickname.strip(),))
+                res = cur.fetchone()
+                if should_close:
+                    conn.close()
+                return bool(res)
+        except Exception as e:
+            print("is_nickname_taken error:", e)
+            if should_close and conn:
+                try: conn.close()
+                except Exception: pass
+            return False
+
+    def generate_unique_nickname(self, conn=None):
+        """
+        회원가입 시 규격: '4자한글_4자무작위' (예: '행복집사_a8f2')
+        절대 중복이 불가능한 고유 닉네임을 자동 생성하여 반환합니다.
+        """
+        adj_2chars = [
+            "행복", "귀여", "슬기", "사랑", "당당", "용감", "포근", "빛나", 
+            "상큼", "명랑", "늠름", "따뜻", "발랄", "도도", "듬직", "신난", 
+            "멋진", "달콤", "새콤", "단단", "튼튼", "씩씩", "화사", "푸른"
+        ]
+        noun_2chars = [
+            "집사", "냥이", "멍이", "댕댕", "냥냥", "파우", "스타", "젤리", 
+            "냥즈", "멍즈", "토리", "보리", "초코", "쿠키", "라떼", "모카"
+        ]
+        
+        full_4korean = [
+            "행복한집", "귀여운냥", "슬기로운", "사랑스런", "당당한집", "용감한멍",
+            "포근한냥", "빛나는별", "상큼한집", "명랑한냥", "늠름한멍", "따뜻한집",
+            "발랄한냥", "도도한캣", "듬직한집", "달콤한냥", "씩씩한멍", "화사한별"
+        ]
+
+        chars = '0123456789abcdefghijklmnopqrstuvwxyz'
+        
+        for _ in range(200):
+            if random.random() < 0.5:
+                korean_part = random.choice(adj_2chars) + random.choice(noun_2chars)
+            else:
+                korean_part = random.choice(full_4korean)
+            
+            if len(korean_part) != 4:
+                korean_part = (korean_part + "집사")[:4]
+
+            rand_part = ''.join(random.choices(chars, k=4))
+            cand_nk = f"{korean_part}_{rand_part}"
+            
+            if not self.is_nickname_taken(cand_nk, conn=conn):
+                return cand_nk
+        
+        unique_suffix = uuid.uuid4().hex[:4]
+        return f"파우집사_{unique_suffix}"
 
     def get_db_connection(self):
         try:
@@ -350,11 +422,11 @@ class PawStarService:
         # 구글 사용자 식별자를 복호화 불가능한 SHA-256 단방향 해시로 변환
         raw_user_id = f"google_{google_id}" if google_id else (email or "google_user")
         user_id = hash_google_id(raw_user_id)
-        nickname = name or (email.split('@')[0] if email else "구글집사")
         profile_img = picture or '/static/image/profile/default_profile.png'
 
         conn = self.get_db_connection()
         if not conn:
+            nickname = self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
                 'NK_NM': nickname,
@@ -370,6 +442,8 @@ class PawStarService:
                 user = cur.fetchone()
 
                 if not user:
+                    # 회원가입 시 절대 중복 불가능한 무작위 고유 닉네임 생성
+                    nickname = self.generate_unique_nickname(conn=conn)
                     cur.execute("""
                         INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                         VALUES (%s, %s, %s, 1, NOW(), NOW())
@@ -385,6 +459,7 @@ class PawStarService:
                         'is_new_user': True
                     }
                 else:
+                    nickname = user.get('NK_NM')
                     # 로그인 성공 시 전달받은 최신 프로필 이미지가 유효하면 DB 및 반환 객체에 최신 프로필 이미지 항상 갱신 저장
                     if picture and picture.strip() and picture != '/static/image/profile/default_profile.png':
                         cur.execute("""
@@ -404,10 +479,10 @@ class PawStarService:
                     conn.commit()
                     user_info = {
                         'USER_ID': user['USER_ID'],
-                        'NK_NM': user.get('NK_NM', nickname),
+                        'NK_NM': nickname,
                         'PROFILE_URL': latest_img,
                         'user_id': user['USER_ID'],
-                        'nickname': user.get('NK_NM', nickname),
+                        'nickname': nickname,
                         'profile_img': latest_img
                     }
 
@@ -415,27 +490,31 @@ class PawStarService:
                 return user_info
         except Exception as e:
             print("google_login_or_register error:", e)
+            fallback_nk = self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
-                'NK_NM': nickname,
+                'NK_NM': fallback_nk,
                 'PROFILE_URL': profile_img,
                 'user_id': user_id,
-                'nickname': nickname,
+                'nickname': fallback_nk,
                 'profile_img': profile_img
             }
 
     def update_user_profile(self, user_id, nickname, profile_img="", **kwargs):
+        nickname = (nickname or '').strip()
+        if not nickname:
+            return False, "변경할 닉네임을 입력해주세요.", None
+
         conn = self.get_db_connection()
         if not conn:
-            return {
-                'USER_ID': user_id,
-                'NK_NM': nickname,
-                'PROFILE_URL': profile_img or '/static/image/profile/default_profile.png',
-                'user_id': user_id,
-                'nickname': nickname,
-                'profile_img': profile_img or '/static/image/profile/default_profile.png'
-            }
+            return False, "DB 연결에 실패하였습니다.", None
+            
         try:
+            # 닉네임 중복 체크 (본인 제외 타 회원 사용 여부)
+            if self.is_nickname_taken(nickname, exclude_user_id=user_id, conn=conn):
+                conn.close()
+                return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
+
             with conn.cursor() as cur:
                 if profile_img:
                     cur.execute("""
@@ -459,7 +538,7 @@ class PawStarService:
                 final_nk = user.get('NK_NM', nickname) if user else nickname
                 final_img = user.get('PROFILE_URL', profile_img or '/static/image/profile/default_profile.png') if user else (profile_img or '/static/image/profile/default_profile.png')
 
-                return {
+                updated_user = {
                     'USER_ID': user_id,
                     'NK_NM': final_nk,
                     'PROFILE_URL': final_img,
@@ -467,7 +546,13 @@ class PawStarService:
                     'nickname': final_nk,
                     'profile_img': final_img
                 }
+                return True, "프로필 정보가 정상적으로 수정되었습니다.", updated_user
         except Exception as e:
+            print("update_user_profile error:", e)
+            if conn:
+                try: conn.close()
+                except Exception: pass
+            return False, "프로필 수정 중 오류가 발생했습니다.", None
             print("update_user_profile error:", e)
             return {
                 'USER_ID': user_id,
