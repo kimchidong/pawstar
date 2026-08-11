@@ -188,23 +188,23 @@
                             <p id="detailContent" style="font-size: 0.88rem; color: #334155; line-height: 1.7; margin: 0; white-space: pre-wrap; word-break: break-all; font-weight: 400;"></p>
                         </div>
 
-                        <!-- 실시간 4요소 귀여운 젤리 버블 버튼 (사용자가 평가 참여 시에만 해당 블럭 active 활성화) -->
+                        <!-- 실시간 4요소 귀여운 젤리 버블 버튼 -->
                         <div class="card-actions detail-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-bottom: 0.85rem; text-align: center;">
-                            <div class="action-btn btn-view" id="detailBtnView" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
-                                <i class="fa-regular fa-eye" style="font-size: 0.95rem;"></i>
-                                <span class="view-count" id="detailViewCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            <div class="action-btn btn-view" id="detailBtnView" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; background: #e0f2fe; border: 1.5px solid #bae6fd; color: #0284c7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                                <i class="fa-solid fa-eye" style="font-size: 0.95rem; color: #0284c7;"></i>
+                                <span class="view-count" id="detailViewCount" style="font-size: 0.8rem; font-weight: 900; color: #0284c7;">0</span>
                             </div>
-                            <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
-                                <i class="fa-regular fa-heart" id="detailHeartIcon" style="font-size: 0.95rem;"></i>
-                                <span class="like-count" id="detailLikeCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" style="padding: 0.55rem 0.2rem; border-radius: 18px; background: #ffe4e6; border: 1.5px solid #fecdd3; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-solid fa-heart" id="detailBtnLikeIcon" style="font-size: 0.95rem; color: #e11d48;"></i>
+                                <span class="like-count" id="detailLikeCount" style="font-size: 0.8rem; font-weight: 900; color: #e11d48;">0</span>
                             </div>
-                            <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
-                                <i class="fa-regular fa-comment" style="font-size: 0.95rem;"></i>
-                                <span class="comment-count" id="detailCommentCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();" style="padding: 0.55rem 0.2rem; border-radius: 18px; background: #f3e8ff; border: 1.5px solid #e9d5ff; color: #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-solid fa-comment" style="font-size: 0.95rem; color: #7c3aed;"></i>
+                                <span class="comment-count" id="detailCommentCount" style="font-size: 0.8rem; font-weight: 900; color: #7c3aed;">0</span>
                             </div>
-                            <div class="action-btn btn-share" id="detailBtnShare" title="공유 가입 수" onclick="handleShareClick();" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
-                                <i class="fa-solid fa-share-nodes" style="font-size: 0.95rem;"></i>
-                                <span class="share-count" id="detailShareCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            <div class="action-btn btn-share" id="detailBtnShare" title="공유 가입 수" onclick="handleShareClick();" style="padding: 0.55rem 0.2rem; border-radius: 18px; background: #f1f5f9; border: 1.5px solid #e2e8f0; color: #64748b; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-solid fa-share-nodes" style="font-size: 0.95rem; color: #64748b;"></i>
+                                <span class="share-count" id="detailShareCount" style="font-size: 0.8rem; font-weight: 900; color: #64748b;">0</span>
                             </div>
                         </div>
 
