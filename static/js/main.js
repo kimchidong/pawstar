@@ -380,20 +380,19 @@ async function triggerEvent(postId, eventType) {
         if (dLike && data && data.like_count !== undefined) dLike.textContent = Number(data.like_count || 0).toLocaleString();
         if (data && data.is_liked !== undefined) {
             const detailBtnLike = document.getElementById('detailBtnLike');
+            const detailHeartLikeBtn = document.getElementById('detailHeartLikeBtn');
             const detailHeartIcon = document.getElementById('detailHeartIcon');
             if (detailBtnLike) {
+                detailBtnLike.classList.toggle('active', !!data.is_liked);
                 const icon = detailBtnLike.querySelector('i');
-                if (data.is_liked) {
-                    detailBtnLike.classList.add('active');
-                    if (icon) icon.className = 'fa-solid fa-heart';
-                } else {
-                    detailBtnLike.classList.remove('active');
-                    if (icon) icon.className = 'fa-regular fa-heart';
-                }
+                if (icon) icon.className = data.is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            }
+            if (detailHeartLikeBtn) {
+                detailHeartLikeBtn.classList.toggle('active', !!data.is_liked);
             }
             if (detailHeartIcon) {
                 detailHeartIcon.className = data.is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-                detailHeartIcon.style.color = data.is_liked ? '#e11d48' : '';
+                detailHeartIcon.style.color = '';
             }
         }
         const dComment = document.getElementById('detailCommentCount');
@@ -889,19 +888,20 @@ function openDetailModal(post, isHallOfFame = false) {
     let isLiked = !!((post.actions && post.actions.is_liked) || post.is_liked);
 
     const updatePopupLikeUI = (likedState) => {
-        if (btnLike) {
-            const icon = btnLike.querySelector('i');
-            if (likedState) {
-                btnLike.classList.add('active');
-                if (icon) icon.className = 'fa-solid fa-heart';
-            } else {
-                btnLike.classList.remove('active');
-                if (icon) icon.className = 'fa-regular fa-heart';
-            }
+        const heartBtnPopup = document.getElementById('detailHeartLikeBtn');
+        const heartIconPopup = document.getElementById('detailHeartIcon');
+        const btnLikePopup = document.getElementById('detailBtnLike');
+
+        if (btnLikePopup) {
+            btnLikePopup.classList.toggle('active', !!likedState);
+            const icon = btnLikePopup.querySelector('i');
+            if (icon) icon.className = likedState ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
         }
-        if (heartIcon) {
-            heartIcon.className = likedState ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-            heartIcon.style.color = likedState ? '#e11d48' : '';
+        if (heartBtnPopup) {
+            heartBtnPopup.classList.toggle('active', !!likedState);
+        }
+        if (heartIconPopup) {
+            heartIconPopup.className = likedState ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
         }
     };
 

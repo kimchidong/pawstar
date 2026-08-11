@@ -1424,6 +1424,19 @@ option.opt-closed {
     color: #e11d48 !important;
 }
 
+/* 하단 우측 원형 하트 버튼 active 상태 (좋아요 투표 완료 시 로즈 젤리 활성화) */
+#detailHeartLikeBtn.active,
+.btn-heart-action.active {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+    border-color: #e11d48 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35) !important;
+}
+#detailHeartLikeBtn.active i,
+.btn-heart-action.active i {
+    color: #ffffff !important;
+}
+
 /* 댓글(Comment) active 상태 스타일 (내가 한줄댓글 평가 참여 시 파스텔 퍼플 활성화) */
 .action-btn.btn-comment.active, #detailBtnComment.active {
     background: #f3e8ff !important;
