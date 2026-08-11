@@ -319,9 +319,13 @@ async function triggerEvent(postId, eventType) {
             }
 
             const scoreDisplay = card.querySelector('.score-num');
+            const cardTotalScoreEl = card.querySelector('.card-total-score');
             if (scoreDisplay) {
                 const cardScoreVal = Number((data && data.new_score !== undefined) ? data.new_score : ((data && data.score) || 0));
                 scoreDisplay.textContent = cardScoreVal.toLocaleString();
+                if (cardTotalScoreEl) {
+                    cardTotalScoreEl.classList.toggle('has-score', cardScoreVal >= 1);
+                }
                 
                 // 애니메이션 효과
                 scoreDisplay.style.color = '#f43f5e';
