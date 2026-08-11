@@ -379,8 +379,14 @@ async function triggerEvent(postId, eventType) {
         const dLike = document.getElementById('detailLikeCount');
         if (dLike && data && data.like_count !== undefined) dLike.textContent = Number(data.like_count || 0).toLocaleString();
         if (data && data.is_liked !== undefined) {
+            const detailBtnLike = document.getElementById('detailBtnLike');
             const detailHeartLikeBtn = document.getElementById('detailHeartLikeBtn');
             const detailHeartIcon = document.getElementById('detailHeartIcon');
+            if (detailBtnLike) {
+                detailBtnLike.classList.toggle('active', !!data.is_liked);
+                const icon = detailBtnLike.querySelector('i');
+                if (icon) icon.className = data.is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            }
             if (detailHeartLikeBtn) {
                 detailHeartLikeBtn.classList.toggle('active', !!data.is_liked);
             }
@@ -884,7 +890,13 @@ function openDetailModal(post, isHallOfFame = false) {
     const updatePopupLikeUI = (likedState) => {
         const heartBtnPopup = document.getElementById('detailHeartLikeBtn');
         const heartIconPopup = document.getElementById('detailHeartIcon');
+        const btnLikePopup = document.getElementById('detailBtnLike');
 
+        if (btnLikePopup) {
+            btnLikePopup.classList.toggle('active', !!likedState);
+            const icon = btnLikePopup.querySelector('i');
+            if (icon) icon.className = likedState ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+        }
         if (heartBtnPopup) {
             heartBtnPopup.classList.toggle('active', !!likedState);
         }
