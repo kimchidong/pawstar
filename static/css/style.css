@@ -1397,42 +1397,67 @@ option.opt-closed {
     border-color: #f43f5e !important;
     color: #e11d48 !important;
 }
+/* 실시간 4요소 버블 버튼 기본 (평가 미참여 시 차분한 비활성 톤) */
+.detail-actions .action-btn {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    color: #94a3b8;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: none;
+}
+
+.detail-actions .action-btn i,
+.detail-actions .action-btn span {
+    color: #94a3b8;
+    transition: color 0.25s ease;
+}
+
+/* 좋아요(Like) active 상태 스타일 (내가 투표/좋아요 평가 참여 시 파스텔 로즈 활성화) */
+.action-btn.btn-like.active, #detailBtnLike.active {
+    background: #ffe4e6 !important;
+    border-color: #fecdd3 !important;
+    color: #e11d48 !important;
+    box-shadow: 0 3px 8px rgba(225, 29, 72, 0.15) !important;
+}
 .action-btn.btn-like.active i, #detailBtnLike.active i,
 .action-btn.btn-like.active span, #detailBtnLike.active span {
     color: #e11d48 !important;
 }
 
-/* 댓글 작성 완료 active 상태 스타일 */
+/* 댓글(Comment) active 상태 스타일 (내가 한줄댓글 평가 참여 시 파스텔 퍼플 활성화) */
 .action-btn.btn-comment.active, #detailBtnComment.active {
     background: #f3e8ff !important;
-    border-color: #a855f7 !important;
+    border-color: #e9d5ff !important;
     color: #7c3aed !important;
+    box-shadow: 0 3px 8px rgba(124, 58, 237, 0.15) !important;
 }
 .action-btn.btn-comment.active i, #detailBtnComment.active i,
 .action-btn.btn-comment.active span, #detailBtnComment.active span {
     color: #7c3aed !important;
 }
 
-/* 조회(View) active 상태 스타일 (시안/블루 하이라이트) */
+/* 조회(View) active 상태 스타일 (내가 읽기/조회 평가 참여 시 파스텔 블루 활성화) */
 .action-btn.btn-view.active, #detailBtnView.active {
     background: #e0f2fe !important;
-    border-color: #38bdf8 !important;
+    border-color: #bae6fd !important;
     color: #0284c7 !important;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15) !important;
 }
 .action-btn.btn-view.active i, #detailBtnView.active i,
 .action-btn.btn-view.active span, #detailBtnView.active span {
     color: #0284c7 !important;
 }
 
-/* 공유(Share) active 상태 스타일 (민트/에메랄드 하이라이트) */
+/* 공유(Share) active 상태 스타일 (내가 공유 평가 참여 시 파스텔 민트 활성화) */
 .action-btn.btn-share.active, #detailBtnShare.active {
-    background: #ecfdf5 !important;
-    border-color: #34d399 !important;
-    color: #059669 !important;
+    background: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+    color: #15803d !important;
+    box-shadow: 0 3px 8px rgba(21, 128, 61, 0.15) !important;
 }
 .action-btn.btn-share.active i, #detailBtnShare.active i,
 .action-btn.btn-share.active span, #detailBtnShare.active span {
-    color: #059669 !important;
+    color: #15803d !important;
 }
 
 .action-btn .score-plus {
@@ -2740,4 +2765,23 @@ option.opt-closed {
 #mDetailImg {
     border-radius: inherit !important;
     clip-path: inset(0) !important;
+}
+
+/* PC 상세 모달 우측 스크롤 영역 슬림 파스텔 스크롤바 */
+.detail-info-container::-webkit-scrollbar {
+    width: 5px;
+}
+.detail-info-container::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.detail-info-container::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.25);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+.detail-info-container:hover::-webkit-scrollbar-thumb,
+.detail-info-container:active::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.65);
 }

@@ -622,7 +622,44 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    // 데이터 채우기 (팝업용 고화질 이미지 바인딩)
+    // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
+    const pcContestBadge = document.getElementById('detailContestBadge');
+    if (pcContestBadge) {
+        let rawRound = post.CONTEST_ROUND || post.contest_round || post.contest_id || post.ROUND_NO || post.round_no;
+        if (!rawRound) {
+            const pageRoundEl = document.querySelector('.hero-round-badge') || document.querySelector('.round-badge-text') || document.getElementById('selectedContestRound');
+            if (pageRoundEl) {
+                let txt = pageRoundEl.innerText || pageRoundEl.textContent || '';
+                let m = txt.match(/\d+/);
+                if (m) rawRound = m[0];
+            }
+        }
+        let roundNo = '1';
+        if (rawRound) {
+            let m = String(rawRound).match(/\d+/);
+            roundNo = m ? m[0] : String(rawRound).trim();
+        }
+        
+        let contestTitle = post.CONTEST_TITLE || post.contest_title || post.THEME_NM || post.theme_nm || post.CONTEST_NM || post.contest_nm || post.theme_title || '';
+        if (!contestTitle) {
+            const pageContestEl = document.querySelector('.hero-title') || document.querySelector('.selected-text') || document.getElementById('selectedContestTitle');
+            if (pageContestEl) {
+                let fullTxt = pageContestEl.innerText || pageContestEl.textContent || '';
+                contestTitle = fullTxt.replace(/제\s*\d+\s*회/g, '').trim();
+            }
+        }
+        if (!contestTitle) contestTitle = '포스타 콘테스트';
+
+        pcContestBadge.innerHTML = `
+            <span style="font-size: 0.75rem; font-weight: 800; color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; padding: 0.22rem 0.65rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12); display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+                🏆 제 ${roundNo}회
+            </span>
+            <span style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
+                ${contestTitle}
+            </span>
+        `;
+    }
+
     const imgEl = document.getElementById('detailImg');
     const imgSrc = post.popup_image_path || post.POPUP_IMAGE_PATH || post.IMAGE_PATH || post.image_path || post.media_url || 
         ((post.file_path && post.list_file_name) ? (post.file_path.endsWith('/') ? post.file_path : post.file_path + '/') + post.list_file_name : '');
@@ -651,9 +688,9 @@ function openDetailModal(post, isHallOfFame = false) {
         else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
 
         const petNm = post.PET_NM || post.pet_name || '';
-        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+        const kindHtml = `<span style="background: #ffe4e6; color: #e11d48; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 5px rgba(225, 29, 72, 0.08);"><i class="${faIcon}"></i> ${cleanKind}</span>`;
         if (petNm) {
-            petTagEl.innerHTML = `${kindHtml} <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petNm}</span>`;
+            petTagEl.innerHTML = `${kindHtml}<span style="background: #f3e8ff; color: #7c3aed; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; margin-left: 0.3rem; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 2px 5px rgba(124, 58, 237, 0.08);">${petNm}</span>`;
         } else {
             petTagEl.innerHTML = kindHtml;
         }
@@ -883,8 +920,14 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     };
 
-    // 팝업 열릴 때 즉각 하트 상태 100% 명시적 초기화 및 색상 채우기
-    updatePopupLikeUI(isLiked);
+    const updatePopupViewUI = (viewedState) => {
+        const btnView = document.getElementById('detailBtnView');
+        if (btnView) {
+            btnView.classList.toggle('active', !!viewedState);
+            const icon = btnView.querySelector('i');
+            if (icon) icon.className = viewedState ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+        }
+    };
 
     const updatePopupShareUI = (sharedState) => {
         const btnShare = document.getElementById('detailBtnShare');
@@ -893,7 +936,11 @@ function openDetailModal(post, isHallOfFame = false) {
         if (iconShare) iconShare.classList.toggle('active', !!sharedState);
     };
 
-    updatePopupShareUI(false);
+    // 팝업 열릴 때 초기 상태 동기화
+    updatePopupLikeUI(isLiked);
+    updatePopupCommentUI(!!isCommented);
+    updatePopupViewUI(!!(post.is_viewed || (post.actions && post.actions.is_viewed)));
+    updatePopupShareUI(!!(post.is_shared || (post.actions && post.actions.is_shared)));
 
     fetch(`/api/post/user_actions/${post.post_id}`)
         .then(res => res.json())
@@ -907,6 +954,9 @@ function openDetailModal(post, isHallOfFame = false) {
                 }
                 if (data.actions.is_shared !== undefined) {
                     updatePopupShareUI(!!data.actions.is_shared);
+                }
+                if (data.actions.is_viewed !== undefined) {
+                    updatePopupViewUI(!!data.actions.is_viewed);
                 }
             }
         })

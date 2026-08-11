@@ -138,90 +138,117 @@
 
     <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
     <div class="modal-backdrop" id="postDetailModal" onclick="if(event.target===this) closeDetailModal();">
-        <div class="modal-content detail-modal-content">
-            <button type="button" class="btn-close detail-close" id="btnCloseDetailModal"><i class="fa-solid fa-xmark"></i></button>
-            <div class="detail-modal-body">
-                <div class="detail-media-container" style="position: relative; overflow: hidden !important; background: transparent !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0);">
+        <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; max-width: 900px; padding: 0;">
+            <div class="detail-modal-body" style="position: relative; display: flex; flex-direction: row; min-height: 540px; max-height: 85vh;">
+                
+                <!-- 우측 상단 고정 닫기 버튼 -->
+                <button type="button" class="btn-close detail-close" id="btnCloseDetailModal" style="position: absolute; top: 0.78rem; right: 0.85rem; z-index: 50; background: #ffe4e6; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e11d48; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);"><i class="fa-solid fa-xmark"></i></button>
+
+                <!-- 좌측 미디어 이미지 뷰어 -->
+                <div class="detail-media-container" style="flex: 1.1; position: relative; overflow: hidden !important; background: #0f172a !important; border-top-left-radius: 26px; border-bottom-left-radius: 26px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0); min-height: 480px;">
                     <img id="detailImg" src="" alt="pet image" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block;">
-                    <div id="detailMedalsLeft" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; pointer-events: auto;"></div>
-                    <div id="detailRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.75rem; right: 0.75rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; pointer-events: auto;"></div>
+                    <div id="detailMedalsLeft" style="position: absolute; top: 0.85rem; left: 0.75rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; pointer-events: auto;"></div>
+                    <div id="detailRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.85rem; right: 0.75rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; pointer-events: auto;"></div>
                 </div>
-                <div class="detail-info-container">
-                    <div class="author-info" style="margin-bottom: 0.85rem;">
-                        <div style="display: flex; align-items: center; gap: 0.65rem;">
-                            <img id="detailAuthorImg" src="" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
-                            <div class="author-detail">
-                                <div class="nickname" id="detailAuthorNickname">집사 닉네임</div>
-                                <div class="pet-tag" id="detailPetTag">🐕 강아지 뽀삐</div>
+
+                <!-- 우측 상세 정보 스크롤 컨테이너 (상단 패딩 0.85rem으로 좌측 배지와 Y축 높이 완전 동일 정렬) -->
+                <div class="detail-info-container" style="flex: 1; padding: 0.85rem 1.35rem 1.35rem 1.35rem; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <!-- 헤더 타이틀 (대회 회차 + 대회명 분리 뱃지) -->
+                        <div style="margin-bottom: 0.85rem; padding: 0; width: 100%; display: flex; align-items: center; min-height: 32px;">
+                            <div id="detailContestBadge" style="display: flex; align-items: center; gap: 0.5rem; width: 100%; min-width: 0; padding-right: 2.2rem;">
+                                <span style="font-size: 0.75rem; font-weight: 800; color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; padding: 0.22rem 0.65rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12); display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+                                    🏆 제 1회
+                                </span>
+                                <span style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
+                                    포스타 콘테스트
+                                </span>
                             </div>
                         </div>
-                    </div>
 
-                    <h2 class="detail-title" id="detailTitle">게시물 제목</h2>
-                    <p class="detail-content" id="detailContent">게시물 본문 내용이 이곳에 표시됩니다.</p>
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <span style="font-size: 0.82rem; color: var(--text-muted);" id="detailCreatedAt">
-                            2026-07-28 00:00:00
-                        </span>
-                        <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            <div class="card-total-score">
-                                <i class="fa-solid fa-star"></i> <span id="detailScoreNum" class="score-num">0</span> 점
+                        <!-- 아기자기한 작성자 프로필 카드 -->
+                        <div style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);">
+                            <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%;">
+                                <img id="detailAuthorImg" src="" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ffffff; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.2); flex-shrink: 0;" alt="profile">
+                                <div style="min-width: 0; flex: 1;">
+                                    <div id="detailAuthorNickname" style="font-size: 0.76rem; font-weight: 700; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin-bottom: 0.2rem;">집사 닉네임</div>
+                                    <div id="detailPetTag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">반려동물</div>
+                                </div>
                             </div>
-                            <!-- 우측 하트 좋아요 버튼 -->
-                            <button type="button" id="detailHeartLikeBtn" class="btn-heart-action" title="좋아요 누르기" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; cursor: pointer; transition: all 0.2s ease;">
-                                <i class="fa-regular fa-heart" id="detailHeartIcon"></i>
-                            </button>
-                            <!-- 하트 우측 전용공유 아이콘 버튼 -->
-                            <button type="button" id="detailShareIconBtn" onclick="handleShareClick();" class="btn-share-action" title="전용 공유주소 복사 (회원가입/로그인 시 +10점)">
-                                <i class="fa-solid fa-share-nodes"></i>
-                            </button>
                         </div>
-                    </div>
 
-                    <!-- 실시간 수치 현황 표시 영역 (4요소: 조회, 좋아요, 댓글, 공유가입) -->
-                    <div class="card-actions detail-actions">
-                        <div class="action-btn btn-view" id="detailBtnView" title="조회수">
-                            <i class="fa-regular fa-eye"></i>
-                            <span class="view-count" id="detailViewCount">0</span>
+                        <!-- 아기자기 몽글몽글 러블리 편지지 카드 (제목-내용 사이 구분선 제거) -->
+                        <div id="detailContentBox" style="position: relative; background: linear-gradient(180deg, #ffffff 0%, #fffbf5 100%); border: 1.5px solid #fbcfe8; border-radius: 22px; padding: 1.05rem 1.15rem; margin-bottom: 0.85rem; box-shadow: 0 6px 18px rgba(244, 114, 182, 0.08);">
+                            <!-- 게시글 제목 (구분선 제거) -->
+                            <h3 id="detailTitle" style="font-size: 1.02rem; font-weight: normal !important; color: #1e293b; line-height: 1.45; margin: 0 0 0.65rem 0; word-break: break-all; display: flex; align-items: center; gap: 0.35rem;">
+                                <span>💌</span> <span style="flex: 1;">게시물 제목</span>
+                            </h3>
+                            
+                            <!-- 게시글 본문 (편지글 느낌) -->
+                            <p id="detailContent" style="font-size: 0.88rem; color: #334155; line-height: 1.7; margin: 0; white-space: pre-wrap; word-break: break-all; font-weight: 400;"></p>
                         </div>
-                        <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');">
-                            <i class="fa-regular fa-heart"></i>
-                            <span class="like-count" id="detailLikeCount">0</span>
-                        </div>
-                        <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();">
-                            <i class="fa-regular fa-comment"></i>
-                            <span class="comment-count" id="detailCommentCount">0</span>
-                        </div>
-                        <div class="action-btn btn-share" id="detailBtnShare" title="공유 가입 수" onclick="handleShareClick();">
-                            <i class="fa-solid fa-share-nodes"></i>
-                            <span class="share-count" id="detailShareCount">0</span>
-                        </div>
-                    </div>
 
-                        <!-- 한줄 댓글 입력 및 목록 섹션 -->
-                        <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
-                            <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-                                <span>💬 한줄 댓글 <span id="detailCommentHeaderCount" style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
-                                <span id="detailCommentScoreNotice" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">작성 시 +10점 획득!</span>
-                            </h4>
+                        <!-- 실시간 4요소 귀여운 젤리 버블 버튼 (사용자가 평가 참여 시에만 해당 블럭 active 활성화) -->
+                        <div class="card-actions detail-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-bottom: 0.85rem; text-align: center;">
+                            <div class="action-btn btn-view" id="detailBtnView" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                                <i class="fa-regular fa-eye" style="font-size: 0.95rem;"></i>
+                                <span class="view-count" id="detailViewCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            </div>
+                            <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-regular fa-heart" id="detailHeartIcon" style="font-size: 0.95rem;"></i>
+                                <span class="like-count" id="detailLikeCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            </div>
+                            <div class="action-btn btn-comment" id="detailBtnComment" title="댓글 수" onclick="document.getElementById('detailCommentInput')?.focus();" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-regular fa-comment" style="font-size: 0.95rem;"></i>
+                                <span class="comment-count" id="detailCommentCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            </div>
+                            <div class="action-btn btn-share" id="detailBtnShare" title="공유 가입 수" onclick="handleShareClick();" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
+                                <i class="fa-solid fa-share-nodes" style="font-size: 0.95rem;"></i>
+                                <span class="share-count" id="detailShareCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                            </div>
+                        </div>
 
-                            <!-- 댓글 입력 폼 -->
-                            <div id="detailCommentFormContainer" style="display: flex; gap: 0.4rem; margin-bottom: 0.6rem;">
-                                <input type="text" id="detailCommentInput" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); outline: none; box-shadow: none;" onkeypress="if(event.key==='Enter') submitDetailComment()">
-                                <button type="button" onclick="submitDetailComment()" style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap;">
+                        <!-- 버블 카운터 아래: 별점 총점 뱃지 & 등록일시 & 숏컷 버튼 바 (높이 34px 통일) -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding: 0 0.15rem; gap: 0.5rem; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                <span id="detailCreatedAt" style="height: 34px; font-size: 0.76rem; color: #a855f7; font-weight: 600; background: #faf5ff; padding: 0 0.75rem; border-radius: 17px; border: 1px solid #f3e8ff; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">⏰ 등록일시</span>
+                            </div>
+
+                            <!-- 우측: 별점 총점 노란 젤리 뱃지 & 원형 버튼들 (동일 34px 높이 정렬) -->
+                            <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
+                                <div style="height: 34px; background: #ffffff; border: 1.5px solid #fde047; color: #d97706; padding: 0 0.85rem; border-radius: 17px; font-weight: 900; font-size: 0.82rem; box-shadow: 0 3px 8px rgba(217, 119, 6, 0.12); display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; box-sizing: border-box;">
+                                    ✨ <span id="detailScoreNum">0</span>점
+                                </div>
+                                <button type="button" id="detailHeartLikeBtn" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" class="btn-heart-action" title="좋아요" style="width: 34px; height: 34px; font-size: 0.95rem; border-radius: 50%; border: 1.5px solid #fecdd3; background: #ffffff; color: #e11d48; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(225,29,72,0.15); box-sizing: border-box;">
+                                    <i class="fa-regular fa-heart" id="detailHeartIcon"></i>
+                                </button>
+                                <button type="button" id="detailShareIconBtn" onclick="handleShareClick();" class="btn-share-action" title="전용 공유주소 복사" style="width: 34px; height: 34px; font-size: 0.95rem; border-radius: 50%; border: 1.5px solid #e9d5ff; background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #7c3aed; box-shadow: 0 3px 8px rgba(124, 58, 237, 0.15); box-sizing: border-box;">
+                                    <i class="fa-solid fa-share-nodes"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 한줄 댓글 입력 및 목록 섹션 (아기자기 몽글몽글 구름 폼) -->
+                        <div style="border-top: 1.5px dashed #fbcfe8; padding-top: 0.9rem; margin-top: 0.5rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem;">
+                                <span style="font-size: 0.85rem; font-weight: 800; color: #1e293b;">💬 응원 한줄 댓글 <span id="detailCommentHeaderCount" style="color: #db2777;">(0)</span></span>
+                                <span id="detailCommentScoreNotice" style="font-size: 0.72rem; color: #be185d; font-weight: 700; background: #fce7f3; padding: 0.18rem 0.55rem; border-radius: 12px; border: 1px solid #fbcfe8;">작성시 +10점 🎁</span>
+                            </div>
+                            <div id="detailCommentFormContainer" style="display: flex; gap: 0.45rem; margin-bottom: 0.8rem;">
+                                <input type="text" id="detailCommentInput" class="form-control" placeholder="아이에게 따뜻한 응원을 남겨주세요 🐾" style="flex: 1; padding: 0.6rem 0.95rem; font-size: 0.82rem; border-radius: 22px; border: 1.5px solid #fbcfe8; outline: none; background: #fff5f5; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onkeypress="if(event.key==='Enter') submitDetailComment()">
+                                <button type="button" onclick="submitDetailComment()" style="padding: 0.6rem 1.05rem; border-radius: 22px; background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%); color: #ffffff; border: none; font-weight: 900; font-size: 0.82rem; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.35);">
                                     등록
                                 </button>
                             </div>
-
-                        <!-- 댓글 리스트 목록 -->
-                        <div id="detailCommentList" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                            <!-- JS 동적 렌더링 -->
+                            <div id="detailCommentList" style="max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- 동적 렌더링 -->
+                            </div>
                         </div>
                     </div>
 
                     <!-- 팝업창 우측 맨 하단 출전 포기 버튼 영역 -->
-                    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
-                        <button type="button" id="detailDeleteBtn" onclick="deleteCurrentPost()" style="display: none; align-items: center; gap: 0.35rem; padding: 0.35rem 0.85rem; border-radius: 12px; background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="margin-top: 0.85rem; display: flex; justify-content: flex-end;">
+                        <button type="button" id="detailDeleteBtn" onclick="deleteCurrentPost()" style="display: none; align-items: center; gap: 0.3rem; padding: 0.35rem 0.85rem; border-radius: 14px; background: #fff1f2; border: 1.5px solid #fecdd3; color: #e11d48; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
                             <i class="fa-solid fa-trash-can"></i> 출전 포기
                         </button>
                     </div>
