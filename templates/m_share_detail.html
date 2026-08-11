@@ -37,8 +37,8 @@
             <div style="display: flex; align-items: center; gap: 0.6rem;">
                 <img src="{{ post.user_profile or post.PROFILE_URL or '/static/image/profile/default_profile.png' }}" alt="프로필" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid #e2e8f0;">
                 <div>
-                    <div style="font-size: 0.88rem; font-weight: 800; color: #1e293b;">{{ post.user_nickname or post.NK_NM or '집사' }}</div>
-                    <div style="font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 0.3rem; margin-top: 0.1rem;">
+                    <div style="font-size: 0.75rem; font-weight: normal; color: #1e293b;">{{ post.user_nickname or post.NK_NM or '집사' }}</div>
+                    <div style="font-size: 0.75rem; font-weight: normal; display: flex; align-items: center; gap: 0.3rem; margin-top: 0.1rem;">
                         {% set kind_str = post.pet_type or post.KIND_NM or '' %}
                         {% if '강아지' in kind_str or '개' in kind_str %}
                             <span>🐶</span>
@@ -71,7 +71,7 @@
 
         <!-- 본문 정보 -->
         <div style="padding: 1.1rem 1rem;">
-            <h1 style="font-size: 1.15rem; font-weight: 900; color: #0f172a; margin-bottom: 0.6rem; line-height: 1.35;">
+            <h1 style="font-size: 1.15rem; font-weight: normal; color: #0f172a; margin-bottom: 0.6rem; line-height: 1.35;">
                 {{ post.title }}
             </h1>
             <p style="font-size: 0.88rem; color: #334155; line-height: 1.55; white-space: pre-line; margin-bottom: 1.2rem;">

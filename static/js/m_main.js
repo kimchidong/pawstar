@@ -197,6 +197,45 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
     
+    // 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
+    const mContestBadge = document.getElementById('mDetailContestBadge');
+    if (mContestBadge) {
+        let rawRound = postData.CONTEST_ROUND || postData.contest_round || postData.contest_id || postData.ROUND_NO || postData.round_no;
+        if (!rawRound) {
+            const pageRoundEl = document.querySelector('.hero-round-badge') || document.querySelector('.round-badge-text') || document.getElementById('selectedContestRound');
+            if (pageRoundEl) {
+                let txt = pageRoundEl.innerText || pageRoundEl.textContent || '';
+                let m = txt.match(/\d+/);
+                if (m) rawRound = m[0];
+            }
+        }
+        let roundNo = '1';
+        if (rawRound) {
+            let m = String(rawRound).match(/\d+/);
+            roundNo = m ? m[0] : String(rawRound).trim();
+        }
+        
+        let contestTitle = postData.CONTEST_TITLE || postData.contest_title || postData.THEME_NM || postData.theme_nm || postData.CONTEST_NM || postData.contest_nm || postData.theme_title || '';
+        
+        if (!contestTitle) {
+            const pageContestEl = document.querySelector('.hero-title') || document.querySelector('.selected-text') || document.getElementById('selectedContestTitle');
+            if (pageContestEl) {
+                let fullTxt = pageContestEl.innerText || pageContestEl.textContent || '';
+                contestTitle = fullTxt.replace(/제\s*\d+\s*회/g, '').trim();
+            }
+        }
+        if (!contestTitle) contestTitle = '포스타 콘테스트';
+
+        mContestBadge.innerHTML = `
+            <span style="font-size: 0.75rem; font-weight: 800; color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; padding: 0.22rem 0.65rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12); display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+                🏆 제 ${roundNo}회
+            </span>
+            <span style="font-size: 0.95rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
+                ${contestTitle}
+            </span>
+        `;
+    }
+
     const mPetTagEl = document.getElementById('mDetailPetTag');
     if (mPetTagEl) {
         let rawKind = postData.KIND_NM || postData.pet_type || '반려동물';
@@ -212,9 +251,9 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
 
         const mPetNm = postData.PET_NM || postData.pet_name || '';
-        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+        const kindHtml = `<span style="background: #ffe4e6; color: #e11d48; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 5px rgba(225, 29, 72, 0.08);"><i class="${faIcon}"></i> ${cleanKind}</span>`;
         if (mPetNm) {
-            mPetTagEl.innerHTML = `${kindHtml}<span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${mPetNm}</span>`;
+            mPetTagEl.innerHTML = `${kindHtml}<span style="background: #f3e8ff; color: #7c3aed; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; margin-left: 0.3rem; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 2px 5px rgba(124, 58, 237, 0.08);">${mPetNm}</span>`;
         } else {
             mPetTagEl.innerHTML = kindHtml;
         }
@@ -224,7 +263,12 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     if (mTitleEl) mTitleEl.textContent = postData.title || postData.TITLE || '';
     
     const mContentEl = document.getElementById('mDetailContent');
-    if (mContentEl) mContentEl.textContent = postData.content || postData.CONTS || '';
+    const mContentBox = document.getElementById('mDetailContentBox');
+    const contentText = (postData.content || postData.CONTS || '').trim();
+    if (mContentEl) mContentEl.textContent = contentText;
+    if (mContentBox) {
+        mContentBox.style.display = contentText ? 'block' : 'none';
+    }
 
     const mCreatedAtEl = document.getElementById('mDetailCreatedAt');
     if (mCreatedAtEl) {

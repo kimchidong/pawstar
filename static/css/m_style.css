@@ -935,7 +935,7 @@ body.m-body {
 }
 
 .m-author-name {
-    font-size: 0.85rem !important;
+    font-size: 0.75rem !important;
     font-weight: 500 !important;
     color: var(--text-primary) !important;
     white-space: nowrap !important;
@@ -978,7 +978,7 @@ body.m-body {
 
 .m-post-title {
     font-size: 0.86rem !important;
-    font-weight: 500 !important;
+    font-weight: normal !important;
     line-height: 1.3 !important;
     color: var(--text-primary) !important;
     margin-bottom: 0.4rem !important;
@@ -1650,6 +1650,48 @@ body.m-body {
 #detailImg {
     border-radius: inherit !important;
     clip-path: inset(0) !important;
+}
+
+/* 모바일 상세 팝업 전용 스크롤 커스텀: 평소엔 숨김/슬림, 위아래 둥근 모서리 안쪽에만 위치 */
+.m-modal-scroll-body {
+    max-height: calc(92vh - 68px);
+    overflow-y: auto;
+    padding: 0.2rem 1rem 1.5rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(244, 114, 182, 0.3) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.m-modal-scroll-body::-webkit-scrollbar,
+.m-modal-sheet::-webkit-scrollbar {
+    width: 4px;
+}
+
+.m-modal-scroll-body::-webkit-scrollbar-track,
+.m-modal-sheet::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 12px;
+    margin-bottom: 18px;
+}
+
+.m-modal-scroll-body::-webkit-scrollbar-thumb,
+.m-modal-sheet::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.m-modal-scroll-body:hover::-webkit-scrollbar-thumb,
+.m-modal-scroll-body:active::-webkit-scrollbar-thumb,
+.m-modal-sheet:hover::-webkit-scrollbar-thumb,
+.m-modal-sheet:active::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.65);
+}
+
+/* 모바일 상세 팝업 게시글 제목 font-weight 굵은 글씨 제거 */
+#mDetailTitle,
+#mDetailTitle span {
+    font-weight: normal !important;
 }
 
 
