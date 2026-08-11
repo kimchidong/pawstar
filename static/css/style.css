@@ -2812,21 +2812,30 @@ option.opt-closed {
     clip-path: inset(0) !important;
 }
 
-/* PC 상세 모달 우측 스크롤 영역 슬림 파스텔 스크롤바 */
+/* PC 상세 모달 우측 스크롤 영역: 서서히 페이드 인/아웃(Fade Effect) 되는 파스텔 스크롤바 */
+.detail-info-container {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+.detail-info-container.is-scrolling {
+    scrollbar-color: rgba(244, 114, 182, 0.12) transparent;
+}
 .detail-info-container::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
 }
 .detail-info-container::-webkit-scrollbar-track {
     background: transparent;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 50px;    /* 상단 표시선(닫기버튼 아래) 넘어오지 않게 안쪽 격리 */
+    margin-bottom: 30px; /* 하단 표시선 넘어오지 않게 안쪽 격리 */
 }
 .detail-info-container::-webkit-scrollbar-thumb {
-    background: rgba(244, 114, 182, 0.25);
+    background: rgba(244, 114, 182, 0) !important; /* 스크롤 안 할 땐 완전 투명 (0.45초 서서히 디졸브 페이드아웃) */
+    opacity: 0 !important;
     border-radius: 10px;
-    transition: background 0.3s ease;
+    transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
-.detail-info-container:hover::-webkit-scrollbar-thumb,
-.detail-info-container:active::-webkit-scrollbar-thumb {
-    background: rgba(244, 114, 182, 0.65);
+.detail-info-container.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.12) !important; /* 스크롤 움직일 때 아주 옅은 파스텔 핑크(0.12)로 표출 */
+    opacity: 1 !important;
+    transition: background 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }

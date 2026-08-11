@@ -1027,6 +1027,20 @@ function openDetailModal(post, isHallOfFame = false) {
         if (btnLike) btnLike.onclick = null;
     }
 
+    // PC 상세보기 팝업 우측 스크롤바 동적 감지 (스크롤 안 하면 100% 완전 숨김)
+    const detailInfoScrollContainer = modal.querySelector('.detail-info-container');
+    if (detailInfoScrollContainer) {
+        detailInfoScrollContainer.classList.remove('is-scrolling');
+        let scrollTimer = null;
+        detailInfoScrollContainer.onscroll = () => {
+            detailInfoScrollContainer.classList.add('is-scrolling');
+            if (scrollTimer) clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => {
+                detailInfoScrollContainer.classList.remove('is-scrolling');
+            }, 800);
+        };
+    }
+
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
