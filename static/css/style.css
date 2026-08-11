@@ -1425,16 +1425,29 @@ option.opt-closed {
     color: #e11d48 !important;
 }
 
-/* 하단 우측 원형 하트 버튼 active 상태 (버튼 배경은 흰색 유지, 내부 하트 아이콘만 진분홍 색 채움) */
+/* 하단 우측 원형 하트 버튼 active 상태 (소프트 핑크 파스텔 배경 + 진분홍 채운 하트) */
 #detailHeartLikeBtn.active,
 .btn-heart-action.active {
-    background: #ffffff !important;
+    background: #ffe4e6 !important;
     border-color: #fecdd3 !important;
     box-shadow: 0 3px 10px rgba(225, 29, 72, 0.2) !important;
 }
 #detailHeartLikeBtn.active i,
 .btn-heart-action.active i {
     color: #e11d48 !important;
+}
+
+/* 하단 우측 원형 공유 버튼 active 상태 (소프트 민트 파스텔 배경) */
+#detailShareIconBtn.active,
+.btn-share-action.active {
+    background: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+    color: #15803d !important;
+    box-shadow: 0 3px 10px rgba(21, 128, 61, 0.2) !important;
+}
+#detailShareIconBtn.active i,
+.btn-share-action.active i {
+    color: #15803d !important;
 }
 
 /* 댓글(Comment) active 상태 스타일 (내가 한줄댓글 평가 참여 시 파스텔 퍼플 활성화) */
