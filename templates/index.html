@@ -217,23 +217,23 @@
 
             <div class="card-body">
                 <div class="author-info">
-                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0; width: 100%;">
                         <img src="{{ p.PROFILE_URL or p.user_profile or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
-                        <div class="author-detail">
-                            <div class="nickname">{{ p.NK_NM or p.user_nickname }}</div>
-                            <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
+                        <div class="author-detail" style="min-width: 0; flex: 1; overflow: hidden;">
+                            <div class="nickname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.NK_NM or p.user_nickname }}</div>
+                            <div class="pet-tag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; min-width: 0;">
                                 {% set p_kind_clean = (p.KIND_NM or p.pet_type or '')|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
                                 {% set p_kind_fa_icon = 'fa-solid fa-dog' if ('강아지' in p_kind_clean or '개' in p_kind_clean) else ('fa-solid fa-cat' if '고양이' in p_kind_clean else ('fa-solid fa-otter' if ('햄스터' in p_kind_clean or '소동물' in p_kind_clean or '토끼' in p_kind_clean or '고슴도치' in p_kind_clean or '작은동물' in p_kind_clean) else ('fa-solid fa-frog' if ('거북이' in p_kind_clean or '파충류' in p_kind_clean or '도마뱀' in p_kind_clean) else ('fa-solid fa-fish' if ('어류' in p_kind_clean or '관상어' in p_kind_clean or '물고기' in p_kind_clean) else ('fa-solid fa-crow' if ('새' in p_kind_clean or '앵무새' in p_kind_clean or '조류' in p_kind_clean) else ('fa-solid fa-horse' if ('말' in p_kind_clean or '큰동물' in p_kind_clean) else 'fa-solid fa-paw')))))) %}
                                 <span style="color: #e11d48; font-weight: 800; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="{{ p_kind_fa_icon }}"></i> {{ p_kind_clean }}</span>
                                 {% if p.PET_NM or p.pet_name %}
-                                    <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.PET_NM or p.pet_name }}</span>
+                                    <span style="color: #6d28d9; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; display: inline-block;">{{ p.PET_NM or p.pet_name }}</span>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <h3 class="post-title">{{ p.TITLE or p.title }}</h3>
+                <h3 class="post-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; display: block;">{{ p.TITLE or p.title }}</h3>
 
                 <!-- 등록 일시 (시분초) 및 총 점수 -->
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.6rem;">

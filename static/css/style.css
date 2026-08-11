@@ -1028,30 +1028,30 @@ option.opt-closed {
     white-space: nowrap;
 }
 
-/* 진행중 회차 trigger 스타일 (단색 소프트 연노랑) */
+/* 진행중 회차 trigger 스타일 (단색 소프트 연노랑, 테두리 통일) */
 .custom-contest-dropdown.stat-in-progress .custom-contest-trigger {
     background: #fefce8;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #cbd5e1;
     color: #713f12;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .custom-contest-dropdown.stat-in-progress .custom-contest-trigger:hover {
     background: #fef9c3;
-    border-color: #cbd5e1;
+    border-color: #6366f1;
 }
 
-/* 종료된 회차 trigger 스타일 (단색 소프트 연회색) */
+/* 종료된 회차 trigger 스타일 (단색 소프트 연회색, 테두리 통일) */
 .custom-contest-dropdown.stat-closed .custom-contest-trigger {
     background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #cbd5e1;
     color: #64748b;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .custom-contest-dropdown.stat-closed .custom-contest-trigger:hover {
     background: #f1f5f9;
-    border-color: #cbd5e1;
+    border-color: #6366f1;
 }
 
 .custom-contest-trigger i.arrow-icon {
@@ -1294,10 +1294,11 @@ option.opt-closed {
     line-height: 1.4;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100%;
+    display: block;
 }
 
 .post-desc {
