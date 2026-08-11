@@ -362,17 +362,24 @@ async function triggerEvent(postId, eventType) {
             mDetailViewCountEl.textContent = Number(data.view_count || 0).toLocaleString();
         }
 
-        const detailScoreNumEl = document.getElementById('detailScoreNum');
-        if (detailScoreNumEl && (data.new_score !== undefined || data.score !== undefined)) {
+        if (data.new_score !== undefined || data.score !== undefined) {
             const scoreVal = Number(data.new_score !== undefined ? data.new_score : data.score);
-            detailScoreNumEl.textContent = scoreVal.toLocaleString();
-        }
-
-        // 모달 내부 수치 동기화 갱신
-        const detailScore = document.getElementById('detailScoreNum');
-        if (detailScore) {
-            const modalScoreVal = Number((data && data.new_score !== undefined) ? data.new_score : ((data && data.score) || 0));
-            detailScore.textContent = modalScoreVal.toLocaleString();
+            const scoreBadge = document.getElementById('detailScoreBadge');
+            const detailScoreNumEl = document.getElementById('detailScoreNum');
+            if (detailScoreNumEl) detailScoreNumEl.textContent = scoreVal.toLocaleString();
+            if (scoreBadge) {
+                if (scoreVal >= 1) {
+                    scoreBadge.style.background = '#fefce8';
+                    scoreBadge.style.borderColor = '#fde047';
+                    scoreBadge.style.color = '#d97706';
+                    scoreBadge.style.boxShadow = '0 3px 10px rgba(234, 179, 8, 0.2)';
+                } else {
+                    scoreBadge.style.background = '#ffffff';
+                    scoreBadge.style.borderColor = '#e2e8f0';
+                    scoreBadge.style.color = '#94a3b8';
+                    scoreBadge.style.boxShadow = 'none';
+                }
+            }
         }
         const dView = document.getElementById('detailViewCount');
         if (dView && data && data.view_count !== undefined) dView.textContent = Number(data.view_count || 0).toLocaleString();
@@ -695,8 +702,27 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    const scoreNumEl = document.getElementById('detailScoreNum');
-    if (scoreNumEl) scoreNumEl.textContent = Number(post.score || 0).toLocaleString();
+    const updateScoreBadgeUI = (scoreVal) => {
+        const num = Number(scoreVal || 0);
+        const scoreBadge = document.getElementById('detailScoreBadge');
+        const scoreNumEl = document.getElementById('detailScoreNum');
+        if (scoreNumEl) scoreNumEl.textContent = num.toLocaleString();
+        if (scoreBadge) {
+            if (num >= 1) {
+                scoreBadge.style.background = '#fefce8';
+                scoreBadge.style.borderColor = '#fde047';
+                scoreBadge.style.color = '#d97706';
+                scoreBadge.style.boxShadow = '0 3px 10px rgba(234, 179, 8, 0.2)';
+            } else {
+                scoreBadge.style.background = '#ffffff';
+                scoreBadge.style.borderColor = '#e2e8f0';
+                scoreBadge.style.color = '#94a3b8';
+                scoreBadge.style.boxShadow = 'none';
+            }
+        }
+    };
+
+    updateScoreBadgeUI(post.score || post.SCORE || 0);
 
     const titleEl = document.getElementById('detailTitle');
     if (titleEl) titleEl.textContent = post.title || '';

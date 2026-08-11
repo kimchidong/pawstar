@@ -216,7 +216,7 @@
 
                             <!-- 우측: 별점 총점 노란 젤리 뱃지 & 원형 버튼들 (동일 34px 높이 정렬) -->
                             <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
-                                <div style="height: 34px; background: #ffffff; border: 1.5px solid #fde047; color: #d97706; padding: 0 0.85rem; border-radius: 17px; font-weight: 900; font-size: 0.82rem; box-shadow: 0 3px 8px rgba(217, 119, 6, 0.12); display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; box-sizing: border-box;">
+                                <div id="detailScoreBadge" style="height: 34px; background: #ffffff; border: 1.5px solid #fde047; color: #d97706; padding: 0 0.85rem; border-radius: 17px; font-weight: 900; font-size: 0.82rem; box-shadow: 0 3px 8px rgba(217, 119, 6, 0.12); display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; box-sizing: border-box; transition: all 0.25s ease;">
                                     ✨ <span id="detailScoreNum">0</span>점
                                 </div>
                                 <button type="button" id="detailHeartLikeBtn" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" class="btn-heart-action" title="좋아요" style="width: 34px; height: 34px; font-size: 0.95rem; border-radius: 50%; border: 1.5px solid #fecdd3; background: #ffffff; color: #e11d48; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(225,29,72,0.15); box-sizing: border-box;">
