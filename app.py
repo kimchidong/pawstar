@@ -678,12 +678,16 @@ def index():
 @app.route('/privacy')
 @app.route('/m/privacy')
 def privacy_policy():
+    if request.path.startswith('/m') or (is_mobile_user_agent() and not request.args.get('desktop')):
+        return render_template('m_privacy.html')
     return render_template('privacy.html')
 
 # 📜 이용약관 (Terms of Service)
 @app.route('/terms')
 @app.route('/m/terms')
 def terms_of_service():
+    if request.path.startswith('/m') or (is_mobile_user_agent() and not request.args.get('desktop')):
+        return render_template('m_terms.html')
     return render_template('terms.html')
 
 # 2. 명예의 전당 (Hall of Fame)
