@@ -4,48 +4,55 @@
 
 {% block content %}
 <div class="m-container" style="padding: 1.25rem 1rem 3rem 1rem;">
-    <div style="background: var(--bg-card); border-radius: var(--radius-lg); padding: 1.25rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
-        <!-- 헤더 -->
-        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-            <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
-                <i class="fa-solid fa-file-contract"></i>
-            </div>
-            <div>
-                <h1 style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin: 0;">PawStar 이용약관</h1>
-                <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0 0;">시행일: 2026년 8월 10일</p>
-            </div>
+    <!-- 헤더 -->
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; background: #ffffff; padding: 1rem 1.1rem; border-radius: 18px; border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); flex-shrink: 0;">
+            <i class="fa-solid fa-file-contract"></i>
+        </div>
+        <div>
+            <h1 style="font-size: 1.15rem; font-weight: 900; color: #0f172a; margin: 0; line-height: 1.3;">PawStar 이용약관</h1>
+            <span style="font-size: 0.76rem; color: #64748b; font-weight: 600;">시행일: 2026년 8월 10일</span>
+        </div>
+    </div>
+
+    <!-- 약관 항목 카드 리스트 -->
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <!-- 커뮤니티 가이드 카드 -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: 16px; padding: 0.9rem 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <p style="margin: 0 0 0.3rem 0; color: #047857; font-size: 0.85rem; font-weight: 800;">
+                PawStar는 건전한 반려동물 커뮤니티 문화를 지향합니다.
+            </p>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.55;">
+                회원은 본 약관을 준수하고 다른 회원을 존중하며 유익한 소통 환경을 만들어가야 합니다.
+            </p>
         </div>
 
-        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-            <!-- 커뮤니티 가이드 카드 -->
-            <div style="background: rgba(16, 185, 129, 0.08); border-left: 3.5px solid #10b981; border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem;">
-                <p style="margin: 0 0 0.35rem 0; color: #047857; font-size: 0.85rem; font-weight: 800;">
-                    PawStar는 건전한 반려동물 커뮤니티 문화를 지향합니다.
-                </p>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.55;">
-                    회원은 본 약관을 준수하고 다른 회원을 존중하며 유익한 소통 환경을 만들어가야 합니다.
-                </p>
-            </div>
-
-            <!-- 약관 주요 항목 요약 -->
-            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1.1rem; margin-bottom: 0.35rem;">제1조 (목적)</h3>
-            <p style="margin: 0;">본 약관은 PawStar가 제공하는 반려동물 커뮤니티 서비스의 이용에 관한 제반 사항을 규정합니다.</p>
-
-            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1.1rem; margin-bottom: 0.35rem;">제2조 (회원가입 및 계정)</h3>
-            <p style="margin: 0;">1. 서비스는 Google 계정 인증을 통해 회원가입을 이용할 수 있습니다.<br>2. 회원은 본인의 식별 정보를 보호해야 하며 부정 사용 방지에 협조해야 합니다.</p>
-
-            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1.1rem; margin-bottom: 0.35rem;">제3조 (게시물 및 관리)</h3>
-            <p style="margin: 0;">1. 회원이 작성한 게시물의 저작권은 해당 회원에게 귀속됩니다.<br>2. 타인의 명예를 훼손하거나 불쾌감을 주는 게시물은 사전 통보 없이 제재될 수 있습니다.</p>
-
-            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 1.1rem; margin-bottom: 0.35rem;">제4조 (서비스 이용 제한)</h3>
-            <p style="margin: 0;">부정 이용, 욕설, 서비스 운영 방해 등의 행위 적발 시 서비스 이용이 일시적 또는 영구적으로 제한될 수 있습니다.</p>
-
-            <div style="margin-top: 1.5rem; text-align: center;">
-                <a href="/m/" style="display: inline-block; padding: 0.6rem 1.5rem; border-radius: 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
-                    콘테스트 메인으로 돌아가기
-                </a>
-            </div>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <h3 style="font-size: 0.92rem; font-weight: 800; color: #7c3aed; margin-top: 0; margin-bottom: 0.4rem;">제1조 (목적)</h3>
+            <p style="margin: 0; font-size: 0.82rem; color: #334155; line-height: 1.6;">본 약관은 PawStar가 제공하는 반려동물 커뮤니티 서비스의 이용과 관련하여 서비스와 회원 간의 권리, 의무 및 책임사항을 규정합니다.</p>
         </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <h3 style="font-size: 0.92rem; font-weight: 800; color: #7c3aed; margin-top: 0; margin-bottom: 0.4rem;">제2조 (회원가입 및 계정)</h3>
+            <p style="margin: 0; font-size: 0.82rem; color: #334155; line-height: 1.6;">1. 서비스는 Google 계정 인증을 통해 회원가입을 제공합니다.<br>2. 회원은 본인의 식별 정보를 보호해야 하며 부정 사용 방지에 협조해야 합니다.</p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <h3 style="font-size: 0.92rem; font-weight: 800; color: #7c3aed; margin-top: 0; margin-bottom: 0.4rem;">제3조 (게시물 관리 및 책임)</h3>
+            <p style="margin: 0; font-size: 0.82rem; color: #334155; line-height: 1.6;">1. 회원이 작성한 게시물의 권리는 작성자 본인에게 귀속됩니다.<br>2. 타인의 명예를 훼손하거나 불쾌감을 주는 게시물은 사전 통보 없이 제재될 수 있습니다.</p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+            <h3 style="font-size: 0.92rem; font-weight: 800; color: #7c3aed; margin-top: 0; margin-bottom: 0.4rem;">제4조 (서비스 이용 제한)</h3>
+            <p style="margin: 0; font-size: 0.82rem; color: #334155; line-height: 1.6;">부정 이용, 욕설, 서비스 운영 방해 등의 행위 적발 시 서비스 이용이 일시적 또는 영구적으로 제한될 수 있습니다.</p>
+        </div>
+    </div>
+
+    <!-- 하단 메인 버튼 -->
+    <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="/m/" style="display: inline-block; width: 100%; padding: 0.75rem 1.6rem; border-radius: 18px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 0.88rem; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3); text-align: center;">
+            콘테스트 메인으로 돌아가기
+        </a>
     </div>
 </div>
 {% endblock %}
