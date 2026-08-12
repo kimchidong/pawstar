@@ -2535,17 +2535,6 @@ option.opt-closed {
     background: #ffffff;
 }
 
-/* PC 상세보기 팝업 내부 요소들의 가로 폭을 스크롤 유무와 무관하게 항상 407.05px로 고정 */
-.detail-info-container > div,
-.detail-info-container #detailContentBox,
-.detail-info-container .detail-actions,
-.detail-info-container #detailCommentList {
-    width: 407.05px !important;
-    min-width: 407.05px !important;
-    max-width: 407.05px !important;
-    box-sizing: border-box !important;
-}
-
 #detailCommentList {
     scrollbar-width: none;
     -ms-overflow-style: none;

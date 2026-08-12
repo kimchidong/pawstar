@@ -1,204 +1,406 @@
 {% extends 'base.html' %}
 
+
+
 {% block content %}
 
+
+
 <div style="width: 1280px; margin: 2rem auto; padding: 0; box-sizing: border-box;">
+
     <!-- 상단 페이지 타이틀 헤더 -->
+
     <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); border-radius: var(--radius-lg); padding: 2.2rem 2.75rem; color: #ffffff; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2); position: relative; overflow: hidden;">
+
         <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.12; font-size: 15rem; color: #ffffff; pointer-events: none;">
+
             <i class="fa-solid fa-paw"></i>
+
         </div>
+
         <div style="position: relative; z-index: 2;">
+
             <!-- 1줄: 회차 정보 태그 & 진행 상태 태그 -->
+
             <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.65rem; flex-wrap: wrap;">
+
                 <div style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px); padding: 0.3rem 0.85rem; border-radius: 14px; font-weight: 800; font-size: 0.88rem; color: #ffffff; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
                     <span style="color: #fde047; font-weight: 900;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span>
+
                     <span>콘테스트</span>
+
                 </div>
+
                 <div style="font-size: 0.82rem; background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); color: #713f12; border: 1.2px solid #facc15; padding: 0.3rem 0.85rem; border-radius: 14px; font-weight: 900; box-shadow: 0 2px 8px rgba(234, 179, 8, 0.25); display: inline-flex; align-items: center; gap: 0.25rem;">
+
                     {{ current_contest.CONTEST_STAT_NM or current_contest.status or '진행중' }}
+
                 </div>
+
             </div>
+
             <!-- 2줄: 대회 주제 타이틀 -->
+
             <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; line-height: 1.25; letter-spacing: -0.02em; text-shadow: 0 2px 10px rgba(0,0,0,0.18);">
+
                 {{ current_contest.THEME_NM or current_contest.title }}
+
             </h1>
+
             <!-- 3줄: 안내 서브 문구 -->
+
             <p style="font-size: 1.05rem; opacity: 0.95; font-weight: 500; margin: 0;">
+
                 <span style="color: #ffffff; filter: brightness(0) invert(1); display: inline-block; margin-right: 0.3rem;">🐾</span>우리 아이 출전 신청 — 사랑스러운 반려동물의 매력을 콘테스트에 당당히 자랑해보세요!
+
             </p>
+
         </div>
+
     </div>
 
+
+
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
+
         <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data" novalidate>
+
             <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
 
+
+
             <!-- 상단: 2열 입력 폼 영역 -->
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
+
                 <!-- 좌측 폼 컨트롤 그룹 -->
+
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
+
+
                     <!-- 2. 이름 & 동물 종류 -->
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                                🐶 이름
-                            </label>
-                            <input type="text" name="pet_name" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
-                        </div>
 
                         <div class="form-group" style="margin-bottom: 0;">
+
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                                🐾 동물 종류
+
+                                🐶 이름
+
                             </label>
+
+                            <input type="text" name="pet_name" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+
+                        </div>
+
+
+
+                        <div class="form-group" style="margin-bottom: 0;">
+
+                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+
+                                🐾 동물 종류
+
+                            </label>
+
                             <!-- 숨겨진 정식 select (폼 전송 & 라이브 프리뷰 100% 연동) -->
+
                             <select name="pet_type" id="hiddenUploadPetType" required style="display: none;">
+
                                 <option value="" selected>선택</option>
+
                                 {% for k in pet_kinds %}
+
                                     {% set k_nm = k.KIND_NM %}
+
                                     {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
+
                                     {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
+
                                     <option value="{{ opt_text }}">{{ opt_text }}</option>
+
                                 {% endfor %}
+
                             </select>
 
+
+
                             <!-- 검색 블럭과 100% 동일한 단색 FontAwesome 아이콘 커스텀 셀렉트 드롭다운 -->
+
                             <div class="custom-pet-dropdown" id="uploadPetTypeDropdown" style="width: 100%; height: 48px;">
+
                                 <div class="custom-pet-trigger" onclick="toggleUploadPetDropdown(this, event)" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 0 0.9rem; cursor: pointer;">
+
                                     <span style="display: inline-flex; align-items: center; gap: 0.6rem; line-height: 1; pointer-events: none;">
+
                                         <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon" style="width: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: #475569;"></i>
+
                                         <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted); line-height: 1;">종류 선택</span>
+
                                     </span>
+
                                     <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: auto; pointer-events: none;"></i>
+
                                 </div>
+
                                 <div class="custom-pet-options" style="display: none; margin-top: 8px !important; top: calc(100% + 10px) !important; z-index: 99999; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 14px 35px rgba(0,0,0,0.22);">
+
                                     {% for k in pet_kinds %}
+
                                         {% set k_nm = k.KIND_NM %}
+
                                         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
+
                                         {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
+
                                         {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
+
                                         <div class="custom-pet-option" onclick="selectUploadPetOption(this, '{{ opt_text }}', '{{ k_icon }}', '{{ k_clean }}', event)" data-value="{{ opt_text }}" data-icon="{{ k_icon }}" data-text="{{ k_clean }}" style="cursor: pointer; padding: 0.8rem 0.9rem; margin-bottom: 5px; border-radius: 8px; display: flex; align-items: center; gap: 0.6rem;">
+
                                             <i class="{{ k_icon }}" style="width: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: #64748b;"></i> <span style="line-height: 1;">{{ k_clean }}</span>
+
                                         </div>
+
                                     {% endfor %}
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
 
                     <!-- 3. 자랑 게시물 제목 -->
+
                     <div class="form-group" style="margin-bottom: 0;">
+
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+
                             ✨ 자랑 제목
+
                         </label>
+
                         <input type="text" name="title" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+
                     </div>
+
+
 
                     <!-- 4. 파일 업로드 -->
+
                     <div class="form-group" style="margin-bottom: 0;">
+
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+
                             🖼️ 출전 사진 파일 첨부
+
                         </label>
+
                         <!-- 숨겨진 정식 file input -->
+
                         <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
 
+
+
                         <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
+
                         <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 1.1rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease;">
+
                             <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem;">
+
                                 <div style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
+
                                     <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.3rem;"></i>
+
                                 </div>
+
                                 <span style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-top: 0.2rem;">📸 예쁜 아이 사진 선택하기</span>
+
                                 <span style="font-size: 0.78rem; color: #64748b;">클릭하여 컴퓨터에서 사진 업로드 (JPG, PNG, WEBP)</span>
+
                             </div>
+
                             <div id="pcCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+
                                 <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden; text-align: left;">
+
                                     <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.2rem; flex-shrink: 0;"></i>
+
                                     <span id="pcCustomFileName" style="font-weight: 800; font-size: 0.85rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
+
                                 </div>
+
                                 <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.3rem 0.75rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
+
 
                 <!-- 우측: 자랑 내용 및 소개글 -->
+
                 <div style="display: flex; flex-direction: column;">
+
                     <div class="form-group" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
+
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+
                             📝 자랑 내용 및 소개글
+
                         </label>
+
                         <textarea name="content" class="form-control" required style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 240px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
             <!-- 하단: 실시간 출전 미리보기 전폭(Full Width) 섹션 -->
+
             <div class="form-group" style="margin-bottom: 2rem; border-top: 1px solid var(--border-light); padding-top: 2rem;">
+
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+
                     <div>
+
                         <label style="font-weight: 900; font-size: 1.1rem; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+
                             👀 출전 미리보기 <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">(실제 화면 크기 그대로)</span>
+
                         </label>
+
                     </div>
+
                     <div class="preview-tabs" style="display: flex; gap: 0.5rem;">
+
                         <button type="button" id="btnPreviewList" onclick="switchPreviewTab('list')" style="padding: 0.45rem 1.1rem; border-radius: 20px; border: 1px solid var(--border-light); font-weight: 800; font-size: 0.88rem; cursor: pointer; background: var(--gradient-brand); color: #ffffff; transition: var(--transition); box-shadow: 0 2px 8px rgba(79,70,229,0.25);">
+
                             <i class="fa-solid fa-table-cells-large"></i> 목록 카드
+
                         </button>
+
                         <button type="button" id="btnPreviewModal" onclick="switchPreviewTab('modal')" style="padding: 0.45rem 1.1rem; border-radius: 20px; border: 1px solid var(--border-light); font-weight: 800; font-size: 0.88rem; cursor: pointer; background: #f1f5f9; color: var(--text-secondary); transition: var(--transition);">
+
                             <i class="fa-solid fa-window-restore"></i> 클릭 팝업
+
                         </button>
+
                     </div>
+
                 </div>
 
+
+
                 <!-- 미리보기 캔버스 (넉넉한 전폭 공간 제공으로 모달 깨짐 완전 방지) -->
+
                 <div style="background: var(--bg-primary); border: 2px dashed var(--border-light); border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; display: flex; align-items: center; justify-content: center; min-height: 480px; width: 100%;">
+
                     <!-- 1. 목록 카드 미리보기 (Feed List Card Preview - 메인 피드 카드 100% 동일 규격) -->
+
                     <div id="previewListContainer" style="width: 100%; max-width: 340px;">
+
                         <div class="post-card" style="box-shadow: 0 15px 35px rgba(0,0,0,0.12); cursor: pointer; border: none !important;" onclick="switchPreviewTab('modal')" title="클릭시 팝업 미리보기로 전환">
+
                             <div class="card-media" style="overflow: hidden; border-top-left-radius: inherit; border-top-right-radius: inherit; isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black);">
+
                                 <img id="previewCardImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="display: block; border: none !important;">
+
                                 <div class="rank-ribbon rank-1" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; top: 0.65rem; left: 0.65rem;"><i class="fa-solid fa-medal"></i> 전체 1위 후보</div>
+
                             </div>
 
+
+
                             <div class="card-body">
+
                                 <div class="author-info" style="margin-bottom: 0.85rem;">
+
                                     <div style="display: flex; align-items: center; gap: 0.65rem;">
+
                                         <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
+
                                         <div class="author-detail">
+
                                             <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+
                                             <div class="pet-tag" id="previewCardPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
+
                                                 <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
+
                                             </div>
+
                                         </div>
+
                                     </div>
+
                                 </div>
+
+
 
                                 <h3 class="post-title" id="previewCardTitle" style="margin-bottom: 0.45rem;">자랑 제목이 여기에 표시됩니다</h3>
 
+
+
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.85rem;">
+
                                     <span style="font-size: 0.78rem; color: var(--text-muted);" id="previewCardDate">
+
                                         {{ now_str }}
+
                                     </span>
+
                                     <div class="card-total-score">
+
                                         <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
+
                                     </div>
+
                                 </div>
+
+
 
                                 <div class="card-actions" style="margin-top: 0; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+
                                     <div class="action-btn btn-view"><i class="fa-regular fa-eye"></i> <span class="view-count">0</span></div>
+
                                     <div class="action-btn btn-like"><i class="fa-regular fa-heart"></i> <span class="like-count">0</span></div>
+
                                     <div class="action-btn btn-comment"><i class="fa-regular fa-comment"></i> <span class="comment-count">0</span></div>
+
                                     <div class="action-btn btn-share"><i class="fa-solid fa-share-nodes"></i> <span class="share-count">0</span></div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                         <div style="text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">💡 카드를 클릭하면 팝업 모달 미리보기로 전환됩니다.</div>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
+            
             <!-- 하단 제출 버튼 영역 -->
             <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light);">
                 <a href="/" style="padding: 0.85rem 2rem; border-radius: 30px; background: #f1f5f9; color: var(--text-secondary); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">취소</a>
@@ -222,81 +424,118 @@
     </div>
 </div>
 
-<!-- 실제 데스크톱 상세 레이어 팝업과 100% 동일한 팝업 모달 오버레이 -->
+
+<!-- 실제 회차 목록 게시물 상세 레이어 팝업(#postDetailModal)과 100% 완벽히 똑같은 미리보기 팝업 모달 -->
 <div class="modal-backdrop" id="previewModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem;" onclick="if(event.target===this) closeDesktopPreviewModal();">
-    <div class="modal-content detail-modal-content" style="position: relative; border: none !important; box-shadow: 0 20px 50px rgba(0,0,0,0.25); outline: none !important;">
-        <button type="button" class="btn-close detail-close" onclick="closeDesktopPreviewModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div class="detail-modal-body">
-            <div class="detail-media-container" style="position: relative; overflow: hidden !important; background: transparent !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0); border: none !important; outline: none !important;">
-                <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; border: none !important;">
-                <div class="rank-ribbon rank-1" style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 10; font-size: 0.8rem; padding: 0.35rem 0.85rem; border-radius: 20px; background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12; font-weight: 800; box-shadow: 0 4px 12px rgba(202,138,4,0.35);"><i class="fa-solid fa-medal" style="color: #78350f; margin-right: 0.25rem;"></i> 전체 1위 후보</div>
+    <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; max-width: 900px; padding: 0;">
+        <div class="detail-modal-body" style="position: relative; display: grid; grid-template-columns: 1.2fr 1fr; height: 560px; max-height: 85vh; overflow: hidden;">
+            
+            <!-- 우측 상단 고정 닫기 버튼 (원본 팝업과 1:1 동일) -->
+            <button type="button" class="btn-close detail-close" onclick="closeDesktopPreviewModal()" style="position: absolute; top: 0.78rem; right: 0.85rem; z-index: 50; background: #ffe4e6; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e11d48; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);"><i class="fa-solid fa-xmark"></i></button>
+
+            <!-- 좌측 미디어 이미지 뷰어 (원본 팝업과 1:1 동일한 메달/뱃지 구도 적용) -->
+            <div class="detail-media-container" style="position: relative; overflow: hidden !important; background: #0f172a !important; border-top-left-radius: 26px; border-bottom-left-radius: 26px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0); min-height: 480px; height: 100%;">
+                <img id="previewModalImg" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80" alt="미리보기" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block;">
+                <div id="previewMedalsLeft" style="position: absolute; top: 0.85rem; left: 0.75rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; pointer-events: auto;"></div>
+                <div id="previewRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.85rem; left: 0.75rem; right: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-start; gap: 0.4rem; pointer-events: auto;">
+                    <div class="rank-ribbon rank-1" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-radius: 20px; background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12; font-weight: 800; box-shadow: 0 4px 12px rgba(202,138,4,0.35); display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;"><i class="fa-solid fa-medal" style="color: #78350f;"></i> 전체 1위 후보</div>
+                </div>
             </div>
 
-            <div class="detail-info-container">
-                <div class="author-info" style="margin-bottom: 0.85rem;">
-                    <div style="display: flex; align-items: center; gap: 0.65rem;">
-                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
-                        <div class="author-detail">
-                            <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
-                            <div class="pet-tag" id="previewModalPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
-                                <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
+            <!-- 우측 상세 정보 스크롤 컨테이너 (원본 팝업과 1:1 동일한 구조) -->
+            <div class="detail-info-container" style="padding: 0.85rem 1.35rem 1.35rem 1.35rem; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; background: #ffffff;">
+                <div>
+                    <!-- 헤더 타이틀 (대회 회차 + 대회명 분리 뱃지 - 원본 팝업과 100% 동일) -->
+                    <div style="margin-bottom: 0.85rem; padding: 0; width: 100%; display: flex; align-items: center; min-height: 32px;">
+                        <div id="previewContestBadge" style="display: flex; align-items: center; gap: 0.5rem; width: 100%; min-width: 0; padding-right: 2.2rem;">
+                            <span style="font-size: 0.75rem; font-weight: 800; color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; padding: 0.22rem 0.65rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12); display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+                                🏆 제 {{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회
+                            </span>
+                            <span style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
+                                {{ current_contest.THEME_NM or current_contest.title }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 아기자기한 작성자 프로필 카드 (원본 팝업과 1:1 동일) -->
+                    <div style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);">
+                        <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%;">
+                            <img id="previewAuthorImg" src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 50px !important; height: 50px !important; min-width: 50px !important; min-height: 50px !important; border-radius: 50% !important; object-fit: cover !important; border: 2.5px solid #ffffff !important; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.22) !important; flex-shrink: 0 !important;" alt="profile">
+                            <div style="min-width: 0; flex: 1;">
+                                <div id="previewAuthorNickname" class="nickname" style="font-size: 0.76rem; font-weight: 700; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin-bottom: 0.2rem;">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                <div id="previewModalPetTag" class="pet-tag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
+                                    <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <h2 class="detail-title" id="previewModalTitle">자랑 제목이 여기에 표시됩니다</h2>
-                <p class="detail-content" id="previewModalDesc">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                    <!-- 아기자기 몽글몽글 러블리 편지지 카드 (원본 팝업과 1:1 동일) -->
+                    <div id="previewContentBox" style="position: relative; background: linear-gradient(180deg, #ffffff 0%, #fffbf5 100%); border: 1.5px solid #fbcfe8; border-radius: 22px; padding: 1.05rem 1.15rem; margin-bottom: 0.85rem; box-shadow: 0 6px 18px rgba(244, 114, 182, 0.08);">
+                        <!-- 게시글 제목 (구분선 제거) -->
+                        <h3 id="previewModalTitle" style="font-size: 1.02rem; font-weight: normal !important; color: #1e293b; line-height: 1.45; margin: 0 0 0.65rem 0; word-break: break-all; display: flex; align-items: center; gap: 0.35rem;">
+                            <span>💌</span> <span style="flex: 1;">자랑 제목이 여기에 표시됩니다</span>
+                        </h3>
+                        
+                        <!-- 게시글 본문 (편지글 느낌) -->
+                        <p id="previewModalDesc" style="font-size: 0.88rem; color: #334155; line-height: 1.7; margin: 0; white-space: pre-wrap; word-break: break-all; font-weight: 400;">우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.</p>
+                    </div>
 
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                    <span style="font-size: 0.82rem; color: var(--text-muted);" id="previewModalDate">
-                        {{ now_str }}
-                    </span>
-                    <div style="display: flex; align-items: center; gap: 0.45rem;">
-                        <div class="card-total-score">
-                            <i class="fa-solid fa-star"></i> <span class="score-num">0</span> 점
+                    <!-- 실시간 4요소 귀여운 젤리 버블 버튼 (원본 팝업과 1:1 동일) -->
+                    <div class="card-actions detail-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-bottom: 0.85rem; text-align: center;">
+                        <div class="action-btn btn-view" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                            <i class="fa-regular fa-eye" style="font-size: 0.95rem;"></i>
+                            <span class="view-count" style="font-size: 0.8rem; font-weight: 900;">0</span>
                         </div>
-                        <button type="button" class="btn-heart-action" title="좋아요 누르기" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.25); color: #f43f5e; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; cursor: pointer; transition: all 0.2s ease;">
-                            <i class="fa-regular fa-heart"></i>
-                        </button>
-                        <button type="button" class="btn-share-action" title="전용 공유주소 복사">
-                            <i class="fa-solid fa-share-nodes"></i>
-                        </button>
+                        <div class="action-btn btn-like" title="좋아요 수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                            <i class="fa-regular fa-heart" style="font-size: 0.95rem;"></i>
+                            <span class="like-count" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                        </div>
+                        <div class="action-btn btn-comment" title="댓글 수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                            <i class="fa-regular fa-comment" style="font-size: 0.95rem;"></i>
+                            <span class="comment-count" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                        </div>
+                        <div class="action-btn btn-share" title="공유 가입 수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                            <i class="fa-solid fa-share-nodes" style="font-size: 0.95rem;"></i>
+                            <span class="share-count" style="font-size: 0.8rem; font-weight: 900;">0</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card-actions detail-actions">
-                    <div class="action-btn btn-view" title="조회수">
-                        <i class="fa-regular fa-eye"></i>
-                        <span class="view-count">0</span>
-                    </div>
-                    <div class="action-btn btn-like" title="좋아요 수">
-                        <i class="fa-regular fa-heart"></i>
-                        <span class="like-count">0</span>
-                    </div>
-                    <div class="action-btn btn-comment" title="댓글 수">
-                        <i class="fa-regular fa-comment"></i>
-                        <span class="comment-count">0</span>
-                    </div>
-                    <div class="action-btn btn-share" title="공유 가입 수">
-                        <i class="fa-solid fa-share-nodes"></i>
-                        <span class="share-count">0</span>
-                    </div>
-                </div>
+                    <!-- 버블 카운터 아래: 별점 총점 뱃지 & 등록일시 & 숏컷 버튼 바 (원본 팝업과 1:1 동일) -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                            <span id="previewModalDate" style="height: 34px; font-size: 0.76rem; color: #a855f7; font-weight: 600; background: #faf5ff; padding: 0 0.75rem; border-radius: 17px; border: 1px solid #f3e8ff; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">⏰ {{ now_str }}</span>
+                        </div>
 
-                <div style="margin-top: 0.85rem; border-top: 1px solid var(--border-light); padding-top: 0.75rem;">
-                    <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
-                        <span>💬 한줄 댓글 <span style="color: var(--accent-purple); font-size: 0.82rem;">(0)</span></span>
-                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">작성 시 +10점 획득!</span>
-                    </h4>
-                    <div style="display: flex; gap: 0.4rem; margin-bottom: 0.6rem;">
-                        <input type="text" class="form-control" placeholder="사랑스러운 응원의 한줄 댓글을 남겨보세요!" disabled style="flex: 1; padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 20px; border: 1px solid var(--border-light); background: #f8fafc; outline: none; box-shadow: none;">
-                        <button type="button" disabled style="padding: 0.45rem 0.95rem; border-radius: 20px; background: var(--gradient-brand); color: #ffffff; border: none; font-weight: 800; font-size: 0.82rem; opacity: 0.85; white-space: nowrap;">
-                            등록
-                        </button>
+                        <!-- 우측: 별점 총점 노란 젤리 뱃지 & 원형 버튼들 (원본 팝업과 1:1 동일) -->
+                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
+                            <div id="previewScoreBadge" style="height: 34px; background: #ffffff; border: 1.5px solid #e2e8f0; color: #94a3b8; padding: 0 0.85rem; border-radius: 17px; font-weight: 900; font-size: 0.82rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; box-sizing: border-box; transition: all 0.25s ease;">
+                                ✨ <span class="score-num">0</span>점
+                            </div>
+                            <button type="button" class="btn-heart-action" title="좋아요" style="width: 34px; height: 34px; font-size: 0.95rem; border-radius: 50%; border: 1.5px solid #fecdd3; background: #ffffff; color: #e11d48; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(225,29,72,0.15); box-sizing: border-box;">
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+                            <button type="button" class="btn-share-action" title="전용 공유주소 복사" style="width: 34px; height: 34px; font-size: 0.95rem; border-radius: 50%; border: 1.5px solid #e9d5ff; background: #ffffff; display: inline-flex; align-items: center; justify-content: center; color: #7c3aed; box-shadow: 0 3px 8px rgba(124, 58, 237, 0.15); box-sizing: border-box;">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div style="text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.6rem;">
-                        첫 한줄 댓글의 주인공이 되어보세요! 💬
+
+                    <!-- 한줄 댓글 입력 및 목록 섹션 (원본 팝업과 1:1 동일) -->
+                    <div style="border-top: 1.5px dashed #fbcfe8; padding-top: 0.9rem; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem;">
+                            <span style="font-size: 0.85rem; font-weight: 800; color: #1e293b;">💬 응원 한줄 댓글 <span style="color: #db2777;">(0)</span></span>
+                            <span style="font-size: 0.72rem; color: #be185d; font-weight: 700; background: #fce7f3; padding: 0.18rem 0.55rem; border-radius: 12px; border: 1px solid #fbcfe8;">작성시 +10점 🎁</span>
+                        </div>
+                        <div style="display: flex; gap: 0.45rem; margin-bottom: 0.8rem;">
+                            <input type="text" class="form-control" placeholder="아이에게 따뜻한 응원을 남겨주세요 🐾" disabled style="flex: 1; padding: 0.6rem 0.95rem; font-size: 0.82rem; border-radius: 22px; border: 1.5px solid #fbcfe8; outline: none; background: #fff5f5; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                            <button type="button" disabled style="padding: 0.6rem 1.05rem; border-radius: 22px; background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%); color: #ffffff; border: none; font-weight: 900; font-size: 0.82rem; opacity: 0.85; white-space: nowrap; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.35);">
+                                등록
+                            </button>
+                        </div>
+                        <div style="text-align: center; font-size: 0.78rem; color: #94a3b8; margin-top: 0.6rem;">
+                            첫 한줄 댓글의 주인공이 되어보세요! 💬
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,6 +550,20 @@ function openDesktopPreviewModal() {
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // 미리보기 팝업에도 스크롤 동작 시에만 스크롤바 페이드인 표출 감지 바인딩
+        const detailInfoScrollContainer = modal.querySelector('.detail-info-container');
+        if (detailInfoScrollContainer) {
+            detailInfoScrollContainer.classList.remove('is-scrolling');
+            let scrollTimer = null;
+            detailInfoScrollContainer.onscroll = () => {
+                detailInfoScrollContainer.classList.add('is-scrolling');
+                if (scrollTimer) clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    detailInfoScrollContainer.classList.remove('is-scrolling');
+                }, 800);
+            };
+        }
     }
 }
 
@@ -337,296 +590,175 @@ function switchPreviewTab(tab) {
             btnModal.style.color = 'var(--text-secondary)';
             btnModal.style.boxShadow = 'none';
         }
-    } else {
-        if (btnModal) {
-            btnModal.style.background = 'var(--gradient-brand)';
-            btnModal.style.color = '#ffffff';
-            btnModal.style.boxShadow = '0 2px 8px rgba(79,70,229,0.25)';
-        }
-        if (btnList) {
-            btnList.style.background = '#f1f5f9';
-            btnList.style.color = 'var(--text-secondary)';
-            btnList.style.boxShadow = 'none';
-        }
+    } else if (tab === 'modal') {
         openDesktopPreviewModal();
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const inputPetName = document.querySelector('input[name="pet_name"]');
-    const selectPetType = document.querySelector('select[name="pet_type"]');
-    const inputTitle = document.querySelector('input[name="title"]');
+function getFormattedNowDateTime() {
+    const now = new Date();
+    const YYYY = now.getFullYear();
+    const MM = String(now.getMonth() + 1).padStart(2, '0');
+    const DD = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
+}
+
+function updatePreview() {
+    const inputPetName = document.getElementById('uploadPetName');
+    const selectPetType = document.getElementById('uploadPetTypeSelect');
+    const inputTitle = document.getElementById('uploadTitle');
     const textareaContent = document.querySelector('textarea[name="content"]');
-    const inputFile = document.getElementById('uploadMediaFile');
 
-    function getFormattedNowDateTime() {
-        const now = new Date();
-        const YYYY = now.getFullYear();
-        const MM = String(now.getMonth() + 1).padStart(2, '0');
-        const DD = String(now.getDate()).padStart(2, '0');
-        const hh = String(now.getHours()).padStart(2, '0');
-        const mm = String(now.getMinutes()).padStart(2, '0');
-        const ss = String(now.getSeconds()).padStart(2, '0');
-        return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
+    const petName = inputPetName ? inputPetName.value.trim() : '';
+    const petTypeVal = selectPetType ? selectPetType.value : '';
+
+    let cleanKind = petTypeVal.replace('🐕 ', '').replace('🐈 ', '').replace('🐹 ', '').replace('🦜 ', '').replace('🐾 ', '');
+    if (!cleanKind || cleanKind === 'all') cleanKind = '미선택';
+
+    let faIcon = 'fa-solid fa-paw';
+    if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
+    else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
+    else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼')) faIcon = 'fa-solid fa-otter';
+    else if (cleanKind.includes('거북이') || cleanKind.includes('파충류')) faIcon = 'fa-solid fa-frog';
+    else if (cleanKind.includes('어류') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
+    else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
+    else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
+
+    const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+
+    let petTagHTML = '';
+    if (petName) {
+        petTagHTML = `${kindHtml} <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petName}</span>`;
+    } else {
+        petTagHTML = kindHtml;
     }
 
-    function updatePreview() {
-        const petName = inputPetName ? inputPetName.value.trim() : '';
-        let petTypeRaw = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.value : '미선택';
-        const cleanKind = petTypeRaw.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim() || '미선택';
-        
-        let faIcon = 'fa-solid fa-paw';
-        if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
-        else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
-        else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼') || cleanKind.includes('고슴도치') || cleanKind.includes('작은동물')) faIcon = 'fa-solid fa-otter';
-        else if (cleanKind.includes('거북이') || cleanKind.includes('파충류') || cleanKind.includes('도마뱀')) faIcon = 'fa-solid fa-frog';
-        else if (cleanKind.includes('어류') || cleanKind.includes('관상어') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
-        else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
-        else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
+    const titleText = inputTitle ? (inputTitle.value.trim() || '자랑 제목이 여기에 표시됩니다') : '자랑 제목이 여기에 표시됩니다';
+    const descText = textareaContent ? (textareaContent.value.trim() || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.') : '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
+    const currentFormattedDate = getFormattedNowDateTime();
 
-        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+    const previewCardPetTag = document.getElementById('previewCardPetTag');
+    const previewModalPetTag = document.getElementById('previewModalPetTag');
+    const previewCardTitle = document.getElementById('previewCardTitle');
+    const previewModalTitle = document.getElementById('previewModalTitle');
+    const previewCardDesc = document.getElementById('previewCardDesc');
+    const previewModalDesc = document.getElementById('previewModalDesc');
+    const previewCardDate = document.getElementById('previewCardDate');
+    const previewModalDate = document.getElementById('previewModalDate');
 
-        let petTagHTML = '';
-        if (petName) {
-            petTagHTML = `${kindHtml} <span style="color: #6d28d9; font-weight: 700; white-space: nowrap;">${petName}</span>`;
-        } else {
-            petTagHTML = kindHtml;
-        }
+    if (previewCardPetTag) previewCardPetTag.innerHTML = petTagHTML;
+    if (previewModalPetTag) previewModalPetTag.innerHTML = petTagHTML;
+    if (previewCardTitle) previewCardTitle.textContent = titleText;
+    if (previewModalTitle) previewModalTitle.textContent = titleText;
+    if (previewCardDesc) previewCardDesc.textContent = descText;
+    if (previewModalDesc) previewModalDesc.textContent = descText;
+    if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
+    if (previewModalDate) previewModalDate.textContent = '⏰ ' + currentFormattedDate;
+}
 
-        const titleText = inputTitle ? (inputTitle.value.trim() || '자랑 제목이 여기에 표시됩니다') : '자랑 제목이 여기에 표시됩니다';
-        const descText = textareaContent ? (textareaContent.value.trim() || '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.') : '우리 아이의 자랑 내용 및 소개글이 여기에 표시됩니다.';
-        const currentFormattedDate = getFormattedNowDateTime();
-
-        const previewCardPetTag = document.getElementById('previewCardPetTag');
-        const previewModalPetTag = document.getElementById('previewModalPetTag');
-        const previewCardTitle = document.getElementById('previewCardTitle');
-        const previewModalTitle = document.getElementById('previewModalTitle');
-        const previewCardDesc = document.getElementById('previewCardDesc');
-        const previewModalDesc = document.getElementById('previewModalDesc');
-        const previewCardDate = document.getElementById('previewCardDate');
-        const previewModalDate = document.getElementById('previewModalDate');
-
-        if (previewCardPetTag) previewCardPetTag.innerHTML = petTagHTML;
-        if (previewModalPetTag) previewModalPetTag.innerHTML = petTagHTML;
-        if (previewCardTitle) previewCardTitle.textContent = titleText;
-        if (previewModalTitle) previewModalTitle.textContent = titleText;
-        if (previewCardDesc) previewCardDesc.textContent = descText;
-        if (previewModalDesc) previewModalDesc.textContent = descText;
-        if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
-        if (previewModalDate) previewModalDate.textContent = currentFormattedDate;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const inputPetName = document.getElementById('uploadPetName');
+    const selectPetType = document.getElementById('uploadPetTypeSelect');
+    const inputTitle = document.getElementById('uploadTitle');
+    const textareaContent = document.querySelector('textarea[name="content"]');
+    const mediaFileInput = document.getElementById('uploadMediaFile');
 
     if (inputPetName) inputPetName.addEventListener('input', updatePreview);
     if (selectPetType) selectPetType.addEventListener('change', updatePreview);
     if (inputTitle) inputTitle.addEventListener('input', updatePreview);
     if (textareaContent) textareaContent.addEventListener('input', updatePreview);
 
-    // 커스텀 동물 종류 드롭다운 전역 토글 & 옵션 선택 함수
-    window.toggleUploadPetDropdown = function(triggerEl, e) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        const dropdown = triggerEl ? triggerEl.closest('.custom-pet-dropdown') : document.getElementById('uploadPetTypeDropdown');
-        if (!dropdown) return;
-        const optionsBox = dropdown.querySelector('.custom-pet-options');
-
-        if (dropdown.classList.contains('open')) {
-            dropdown.classList.remove('open');
-            if (optionsBox) optionsBox.style.display = 'none';
-        } else {
-            dropdown.classList.add('open');
-            if (optionsBox) {
-                optionsBox.style.display = 'flex';
-                optionsBox.style.flexDirection = 'column';
-            }
-        }
-    };
-
-    window.selectUploadPetOption = function(optionEl, val, iconClass, text, e) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        const dropdown = optionEl ? optionEl.closest('.custom-pet-dropdown') : document.getElementById('uploadPetTypeDropdown');
-        if (dropdown) {
-            dropdown.classList.remove('open');
-            const optionsBox = dropdown.querySelector('.custom-pet-options');
-            if (optionsBox) optionsBox.style.display = 'none';
-
-            const triggerIcon = dropdown.querySelector('.pet-icon');
-            const triggerText = dropdown.querySelector('.selected-text');
-            if (triggerIcon) triggerIcon.className = `pet-icon ${iconClass}`;
-            if (triggerText) {
-                triggerText.textContent = text;
-                triggerText.style.color = '#1e293b';
-            }
-            const options = dropdown.querySelectorAll('.custom-pet-option');
-            options.forEach(o => o.classList.remove('selected'));
-            optionEl.classList.add('selected');
-        }
-
-        const hiddenSelect = document.getElementById('hiddenUploadPetType');
-        if (hiddenSelect) {
-            hiddenSelect.value = val;
-            for (let i = 0; i < hiddenSelect.options.length; i++) {
-                if (hiddenSelect.options[i].value === val) {
-                    hiddenSelect.selectedIndex = i;
-                    break;
-                }
-            }
-            if (typeof updatePreview === 'function') updatePreview();
-        }
-    };
-
-    document.addEventListener('click', function(e) {
-        const dropdown = document.getElementById('uploadPetTypeDropdown');
-        if (dropdown && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('open');
-            const optionsBox = dropdown.querySelector('.custom-pet-options');
-            if (optionsBox) optionsBox.style.display = 'none';
-        }
-    });
-
-    let currentTempFilename = '';
-
-    if (inputFile) {
-        inputFile.addEventListener('change', function(e) {
+    // 첨부한 예쁜 아이 사진을 미리보기 팝업 이미지(#previewModalImg) & 카드 이미지(#previewCardImg)에 100% 실시간 동기화!
+    if (mediaFileInput) {
+        mediaFileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                // PC 커스텀 파일 첨부 드롭존 UI 상태 업데이트
-                const emptyState = document.getElementById('pcCustomFileEmptyState');
-                const selectedState = document.getElementById('pcCustomFileSelectedState');
-                const fileNameEl = document.getElementById('pcCustomFileName');
-                const dropzone = document.getElementById('pcCustomFileDropzone');
-
-                if (emptyState) emptyState.style.display = 'none';
-                if (selectedState) selectedState.style.display = 'flex';
-                if (fileNameEl) fileNameEl.textContent = file.name;
-                if (dropzone) {
-                    dropzone.style.borderColor = 'var(--accent-purple)';
-                    dropzone.style.background = '#f5f3ff';
-                }
-
-                const tempFormData = new FormData();
-                tempFormData.append('media_file', file);
-                
-                fetch('/api/post/upload-temp', {
-                    method: 'POST',
-                    body: tempFormData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        currentTempFilename = data.temp_filename;
-                        const previewCardImg = document.getElementById('previewCardImg');
-                        const previewModalImg = document.getElementById('previewModalImg');
-                        // static/image/temp/paw/ 경로 임시 이미지 URL로 미리보기 반영
-                        if (previewCardImg) previewCardImg.src = data.temp_url;
-                        if (previewModalImg) previewModalImg.src = data.temp_url;
-                    }
-                })
-                .catch(err => console.error('임시 업로드 실패:', err));
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const imgSrc = evt.target.result;
+                    const previewModalImg = document.getElementById('previewModalImg');
+                    const previewCardImg = document.getElementById('previewCardImg');
+                    if (previewModalImg) previewModalImg.src = imgSrc;
+                    if (previewCardImg) previewCardImg.src = imgSrc;
+                };
+                reader.readAsDataURL(file);
             }
-        });
-    }
-
-    function showCustomToast(message, iconClass = 'fa-circle-exclamation') {
-        let toast = document.getElementById('pawCustomToast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'pawCustomToast';
-            toast.className = 'paw-custom-toast-container';
-            toast.innerHTML = `<i class="fa-solid ${iconClass} paw-custom-toast-icon"></i><span id="pawCustomToastMsg"></span>`;
-            document.body.appendChild(toast);
-        }
-        const msgEl = document.getElementById('pawCustomToastMsg');
-        if (msgEl) msgEl.textContent = message;
-
-        toast.classList.add('show');
-        clearTimeout(window.pawToastTimer);
-        window.pawToastTimer = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3200);
-    }
-
-    function highlightInvalidField(element) {
-        if (!element) return;
-        element.classList.remove('input-invalid-shake');
-        void element.offsetWidth;
-        element.classList.add('input-invalid-shake');
-        element.focus();
-        element.addEventListener('input', () => { element.classList.remove('input-invalid-shake'); }, { once: true });
-        element.addEventListener('change', () => { element.classList.remove('input-invalid-shake'); }, { once: true });
-    }
-
-    const uploadForm = document.getElementById('postUploadForm');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const petName = inputPetName ? inputPetName.value.trim() : '';
-            const petType = selectPetType ? selectPetType.value.trim() : '';
-            const title = inputTitle ? inputTitle.value.trim() : '';
-            const content = textareaContent ? textareaContent.value.trim() : '';
-            const fileInput = document.getElementById('uploadMediaFile');
-
-            if (!petName) {
-                showCustomToast('🐶 반려동물 이름을 입력해주세요!', 'fa-paw');
-                highlightInvalidField(inputPetName);
-                return;
-            }
-
-            if (!petType) {
-                showCustomToast('🐾 반려동물 종류를 선택해주세요!', 'fa-paw');
-                highlightInvalidField(selectPetType);
-                return;
-            }
-
-            if (!title) {
-                showCustomToast('✨ 자랑 제목을 입력해주세요!', 'fa-pen-nib');
-                highlightInvalidField(inputTitle);
-                return;
-            }
-
-            if (!content) {
-                showCustomToast('📝 자랑 내용 및 소개글을 입력해주세요!', 'fa-align-left');
-                highlightInvalidField(textareaContent);
-                return;
-            }
-
-            if (!currentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
-                showCustomToast('🖼️ 출전시킬 반려동물 사진 이미지를 반드시 첨부해주세요!', 'fa-image');
-                highlightInvalidField(fileInput);
-                return;
-            }
-
-            const formData = new FormData(uploadForm);
-            if (currentTempFilename) {
-                formData.append('temp_filename', currentTempFilename);
-            }
-            fetch('/api/post/create', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('🎉 펫 콘테스트 출전 신청이 성공적으로 완료되었습니다!');
-                    location.href = '/';
-                } else {
-                    alert('출전 신청 실패: ' + data.message);
-                }
-            })
-            .catch(err => {
-                console.error('업로드 실패:', err);
-                alert('이미지 파일 업로드 중 오류가 발생했습니다.');
-            });
         });
     }
 
     updatePreview();
 });
-</script>
 
+window.toggleUploadPetDropdown = function(triggerEl, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const dropdown = triggerEl ? triggerEl.closest('.custom-pet-dropdown') : document.getElementById('uploadPetTypeDropdown');
+    if (!dropdown) return;
+    const optionsBox = dropdown.querySelector('.custom-pet-options');
+    const isOpen = dropdown.classList.contains('open');
+
+    document.querySelectorAll('.custom-pet-dropdown.open').forEach(d => {
+        if (d !== dropdown) {
+            d.classList.remove('open');
+            const box = d.querySelector('.custom-pet-options');
+            if (box) box.style.display = 'none';
+        }
+    });
+
+    if (isOpen) {
+        dropdown.classList.remove('open');
+        if (optionsBox) optionsBox.style.display = 'none';
+    } else {
+        dropdown.classList.add('open');
+        if (optionsBox) optionsBox.style.display = 'flex';
+    }
+};
+
+window.selectUploadPetOption = function(optionEl, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const dropdown = optionEl.closest('.custom-pet-dropdown');
+    const val = optionEl.getAttribute('data-value');
+
+    const selectEl = document.getElementById('uploadPetTypeSelect');
+    if (selectEl) {
+        selectEl.value = val;
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    if (dropdown) {
+        const triggerText = dropdown.querySelector('.selected-text');
+        const triggerIcon = dropdown.querySelector('.pet-icon');
+        const optionIcon = optionEl.querySelector('i');
+        const optionText = optionEl.querySelector('span');
+
+        if (triggerText && optionText) triggerText.textContent = optionText.textContent;
+        if (triggerIcon && optionIcon) triggerIcon.className = 'pet-icon ' + optionIcon.className;
+
+        dropdown.querySelectorAll('.custom-pet-option').forEach(opt => opt.classList.remove('selected'));
+        optionEl.classList.add('selected');
+
+        dropdown.classList.remove('open');
+        const optionsBox = dropdown.querySelector('.custom-pet-options');
+        if (optionsBox) optionsBox.style.display = 'none';
+    }
+};
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.custom-pet-dropdown')) {
+        document.querySelectorAll('.custom-pet-dropdown.open').forEach(d => {
+            d.classList.remove('open');
+            const box = d.querySelector('.custom-pet-options');
+            if (box) box.style.display = 'none';
+        });
+    }
+});
+</script>
 {% endblock %}
