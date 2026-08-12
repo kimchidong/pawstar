@@ -138,8 +138,8 @@
 
     <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
     <div class="modal-backdrop" id="postDetailModal" onclick="if(event.target===this) closeDetailModal();">
-        <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; max-width: 900px; padding: 0;">
-            <div class="detail-modal-body" style="position: relative; display: flex; flex-direction: row; min-height: 540px; max-height: 85vh;">
+        <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; width: 900px !important; min-width: 900px !important; max-width: 900px !important; height: 562px !important; min-height: 562px !important; max-height: 562px !important; padding: 0;">
+            <div class="detail-modal-body" style="position: relative; display: grid; grid-template-columns: 1.2fr 1fr; width: 100% !important; height: 562px !important; min-height: 562px !important; max-height: 562px !important; overflow: hidden;">
                 
                 <!-- 우측 상단 고정 닫기 버튼 -->
                 <button type="button" class="btn-close detail-close" id="btnCloseDetailModal" style="position: absolute; top: 0.78rem; right: 0.85rem; z-index: 50; background: #ffe4e6; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e11d48; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);"><i class="fa-solid fa-xmark"></i></button>

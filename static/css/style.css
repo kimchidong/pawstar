@@ -2437,15 +2437,17 @@ option.opt-closed {
     gap: 0.4rem;
 }
 
-/* Post Detail Layer Popup Modal Styling */
+/* Post Detail Layer Popup Modal Styling - 항상 900x562 고정 규격 적용 */
 .detail-modal-content {
-    max-width: 860px;
-    width: 92%;
-    padding: 0;
-    overflow: visible;
+    width: 900px !important;
+    min-width: 900px !important;
+    max-width: 900px !important;
+    height: 562px !important;
+    min-height: 562px !important;
+    max-height: 562px !important;
+    padding: 0 !important;
     position: relative;
-    border: none;
-    max-height: 90vh;
+    box-sizing: border-box !important;
 }
 
 .detail-close {
@@ -2478,10 +2480,13 @@ option.opt-closed {
 .detail-modal-body {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
-    height: 560px;
-    max-height: 85vh;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 562px !important;
+    max-height: 562px !important;
     overflow: hidden;
     border-radius: var(--radius-lg);
+    box-sizing: border-box !important;
 }
 
 @media (max-width: 768px) {
