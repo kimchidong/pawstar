@@ -9,7 +9,7 @@ import uuid
 import shutil
 import random
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response, flash
 from werkzeug.utils import secure_filename
 from services.contest_service import service
 
@@ -929,7 +929,8 @@ def upload_page():
             return redirect('/upload')
 
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
-        return redirect('/profile')
+        flash('출전 등록이 완료되었습니다! 🐾🎉', 'success')
+        return redirect('/?uploaded=true')
 
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
@@ -977,7 +978,8 @@ def m_upload_page():
             return redirect('/m/upload')
 
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
-        return redirect('/m/profile')
+        flash('출전 등록이 완료되었습니다! 🐾🎉', 'success')
+        return redirect('/m?uploaded=true')
 
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)

@@ -265,5 +265,15 @@
 
     <!-- 모바일 전용 JS 스크립트 -->
     <script src="{{ url_for('static', filename='js/m_main.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('uploaded') === 'true') {
+            alert('출전 등록이 완료되었습니다! 🐾🎉');
+            const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]uploaded=true/, '').replace(/^&/, '?');
+            window.history.replaceState({}, document.title, cleanUrl || '/m');
+        }
+    });
+    </script>
 </body>
 </html>

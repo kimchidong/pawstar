@@ -92,7 +92,7 @@
 
                             </label>
 
-                            <input type="text" name="pet_name" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                            <input type="text" name="pet_name" id="uploadPetName" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
 
                         </div>
 
@@ -108,7 +108,7 @@
 
                             <!-- 숨겨진 정식 select (폼 전송 & 라이브 프리뷰 100% 연동) -->
 
-                            <select name="pet_type" id="hiddenUploadPetType" required style="display: none;">
+                            <select name="pet_type" id="hiddenUploadPetType" class="upload-pet-type-select" required style="display: none;">
 
                                 <option value="" selected>선택</option>
 
@@ -186,7 +186,7 @@
 
                         </label>
 
-                        <input type="text" name="title" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                        <input type="text" name="title" id="uploadTitle" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
 
                     </div>
 
@@ -607,23 +607,23 @@ function getFormattedNowDateTime() {
 }
 
 function updatePreview() {
-    const inputPetName = document.getElementById('uploadPetName');
-    const selectPetType = document.getElementById('uploadPetTypeSelect');
-    const inputTitle = document.getElementById('uploadTitle');
+    const inputPetName = document.getElementById('uploadPetName') || document.querySelector('input[name="pet_name"]');
+    const selectPetType = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect') || document.querySelector('select[name="pet_type"]');
+    const inputTitle = document.getElementById('uploadTitle') || document.querySelector('input[name="title"]');
     const textareaContent = document.querySelector('textarea[name="content"]');
 
     const petName = inputPetName ? inputPetName.value.trim() : '';
     const petTypeVal = selectPetType ? selectPetType.value : '';
 
-    let cleanKind = petTypeVal.replace('🐕 ', '').replace('🐈 ', '').replace('🐹 ', '').replace('🦜 ', '').replace('🐾 ', '');
+    let cleanKind = petTypeVal.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim();
     if (!cleanKind || cleanKind === 'all') cleanKind = '미선택';
 
     let faIcon = 'fa-solid fa-paw';
     if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
     else if (cleanKind.includes('고양이')) faIcon = 'fa-solid fa-cat';
-    else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼')) faIcon = 'fa-solid fa-otter';
-    else if (cleanKind.includes('거북이') || cleanKind.includes('파충류')) faIcon = 'fa-solid fa-frog';
-    else if (cleanKind.includes('어류') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
+    else if (cleanKind.includes('햄스터') || cleanKind.includes('소동물') || cleanKind.includes('토끼') || cleanKind.includes('고슴도치') || cleanKind.includes('작은동물')) faIcon = 'fa-solid fa-otter';
+    else if (cleanKind.includes('거북이') || cleanKind.includes('파충류') || cleanKind.includes('도마뱀')) faIcon = 'fa-solid fa-frog';
+    else if (cleanKind.includes('어류') || cleanKind.includes('관상어') || cleanKind.includes('물고기')) faIcon = 'fa-solid fa-fish';
     else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
     else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
 
@@ -660,9 +660,9 @@ function updatePreview() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const inputPetName = document.getElementById('uploadPetName');
-    const selectPetType = document.getElementById('uploadPetTypeSelect');
-    const inputTitle = document.getElementById('uploadTitle');
+    const inputPetName = document.getElementById('uploadPetName') || document.querySelector('input[name="pet_name"]');
+    const selectPetType = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect') || document.querySelector('select[name="pet_type"]');
+    const inputTitle = document.getElementById('uploadTitle') || document.querySelector('input[name="title"]');
     const textareaContent = document.querySelector('textarea[name="content"]');
     const mediaFileInput = document.getElementById('uploadMediaFile');
 
@@ -719,35 +719,49 @@ window.toggleUploadPetDropdown = function(triggerEl, e) {
     }
 };
 
-window.selectUploadPetOption = function(optionEl, e) {
-    if (e) {
+window.selectUploadPetOption = function(optionEl, val, iconClass, text, e) {
+    if (typeof val === 'object' && !iconClass) {
+        e = val;
+        val = optionEl ? optionEl.getAttribute('data-value') : '';
+    }
+    if (e && typeof e.preventDefault === 'function') {
         e.preventDefault();
         e.stopPropagation();
     }
-    const dropdown = optionEl.closest('.custom-pet-dropdown');
-    const val = optionEl.getAttribute('data-value');
+    const dropdown = optionEl ? optionEl.closest('.custom-pet-dropdown') : document.getElementById('uploadPetTypeDropdown');
+    const selectedVal = val || (optionEl ? optionEl.getAttribute('data-value') : '');
 
-    const selectEl = document.getElementById('uploadPetTypeSelect');
+    const selectEl = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect');
     if (selectEl) {
-        selectEl.value = val;
+        selectEl.value = selectedVal;
+        for (let i = 0; i < selectEl.options.length; i++) {
+            if (selectEl.options[i].value === selectedVal) {
+                selectEl.selectedIndex = i;
+                break;
+            }
+        }
         selectEl.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
     if (dropdown) {
-        const triggerText = dropdown.querySelector('.selected-text');
-        const triggerIcon = dropdown.querySelector('.pet-icon');
-        const optionIcon = optionEl.querySelector('i');
-        const optionText = optionEl.querySelector('span');
-
-        if (triggerText && optionText) triggerText.textContent = optionText.textContent;
-        if (triggerIcon && optionIcon) triggerIcon.className = 'pet-icon ' + optionIcon.className;
-
-        dropdown.querySelectorAll('.custom-pet-option').forEach(opt => opt.classList.remove('selected'));
-        optionEl.classList.add('selected');
-
         dropdown.classList.remove('open');
         const optionsBox = dropdown.querySelector('.custom-pet-options');
         if (optionsBox) optionsBox.style.display = 'none';
+
+        const triggerText = dropdown.querySelector('.selected-text');
+        const triggerIcon = dropdown.querySelector('.pet-icon');
+        const optionIcon = optionEl ? optionEl.querySelector('i') : null;
+
+        if (triggerText) {
+            triggerText.textContent = text || (optionEl ? optionEl.getAttribute('data-text') || optionEl.textContent.trim() : selectedVal);
+            triggerText.style.color = 'var(--text-primary)';
+        }
+        if (triggerIcon && (iconClass || optionIcon)) {
+            triggerIcon.className = 'pet-icon ' + (iconClass || (optionIcon ? optionIcon.className : ''));
+        }
+
+        dropdown.querySelectorAll('.custom-pet-option').forEach(opt => opt.classList.remove('selected'));
+        if (optionEl) optionEl.classList.add('selected');
     }
 };
 
