@@ -1252,7 +1252,7 @@ function renderMobileFeedGrid(posts) {
                     badgeText = '브라이트스타';
                     bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
                 } else {
-                    badgeText = `<i class="${chipIcon}"></i> 패밀리스타${awRank ? ` ${awRank}위` : ''}`;
+                    badgeText = `<i class="${chipIcon}"></i> 패밀리${awRank ? ` ${awRank}위` : ''}`;
                 }
                 awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; ${bgStyle}">${badgeText}</div>`;
             });
@@ -1265,7 +1265,7 @@ function renderMobileFeedGrid(posts) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentPetType = urlParams.get('pet_type') || 'all';
                 const isFamily = (currentPetType && currentPetType !== 'all');
-                const catPrefix = isFamily ? '패밀리스타 ' : '전체 ';
+                const catPrefix = isFamily ? '패밀리 ' : '전체 ';
                 const prefix = catPrefix + (isCo ? '공동 ' : '');
                 const rankTitle = `${prefix}${rkCand}위 후보`;
                 
