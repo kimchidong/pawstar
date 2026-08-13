@@ -1590,9 +1590,17 @@ option.opt-closed {
 }
 
 /* 메인 챔피언 TOP 3 시상대 전용 카드 배치 (패밀리 스타 섹션에는 절대 영향 없음) */
-.hall-container > .winners-podium > .podium-card-wrapper:nth-child(2) {
-    transform: translateY(-40px);
-    z-index: 5;
+.hall-container > .winners-podium > .podium-card-wrapper {
+    position: relative;
+}
+
+.hall-container > .winners-podium > .podium-card-wrapper .co-tabs-top {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    margin-bottom: 0.65rem;
+    z-index: 10;
 }
 
 .hall-container > .winners-podium > .podium-card-wrapper:nth-child(1) {
@@ -1600,16 +1608,21 @@ option.opt-closed {
     z-index: 4;
 }
 
+.hall-container > .winners-podium > .podium-card-wrapper:nth-child(2) {
+    transform: translateY(-45px);
+    z-index: 5;
+}
+
 .hall-container > .winners-podium > .podium-card-wrapper:nth-child(3) {
-    transform: translateY(0);
+    transform: translateY(30px);
     z-index: 3;
 }
 
-/* 🏆 챔피언 TOP 3 시상대 단상 바디 (스크린샷 3 100% 동일) */
+/* 🏆 챔피언 TOP 3 시상대 단상 바디 (카드 밑줄과 step-front-panel 상단 간격 20px 1, 2, 3위 동일) */
 .podium-stage-wrapper {
     position: relative;
     width: 100%;
-    margin-top: 0;
+    margin-top: -25px;
     margin-bottom: 4.5rem;
     padding: 0;
     box-sizing: border-box;
@@ -2539,6 +2552,9 @@ option.opt-closed {
 /* Responsive */
 @media (max-width: 768px) {
     .winners-podium { grid-template-columns: 1fr; }
+    .hall-container > .winners-podium > .podium-card-wrapper { transform: none !important; }
+    .hall-container > .winners-podium > .podium-card-wrapper .co-tabs-top { position: relative; bottom: auto; }
+    .podium-stage-wrapper { margin-top: 0; }
     .podium-step.step-1 { height: 135px; }
     .podium-step.step-2 { height: 95px; }
     .podium-step.step-3 { height: 70px; }
