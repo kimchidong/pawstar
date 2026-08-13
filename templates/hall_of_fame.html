@@ -595,8 +595,9 @@
                             </h4>
                         </div>
 
-                        <!-- 1위, 2위, 3위 가로 3분할 정렬 (수상 등급 상관 없이 카드의 높이 및 요소 크기 동일 - 원래 스타일 100% 원복) -->
-                        <div class="family-podium-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 0; align-items: stretch; width: 100%; box-sizing: border-box;">
+                        <!-- 1위, 2위, 3위 가로 3분할 정렬 (co-tabs-top 유무에 따라 상단 패딩 가변 처리) -->
+                        {% set has_co_tabs = (group[1]|length > 1 or group[2]|length > 1 or group[3]|length > 1) %}
+                        <div class="family-podium-grid {% if has_co_tabs %}has-co-tabs{% endif %}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 0; align-items: stretch; width: 100%; box-sizing: border-box;">
                             {% for rk in [1, 2, 3] %}
                                 {% set stars = group[rk] %}
                                 <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box; transform: none !important;">
