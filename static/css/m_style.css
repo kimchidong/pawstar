@@ -1344,12 +1344,14 @@ body.m-body {
     pointer-events: none !important;
 }
 
-.award-badges-overlay .winner-title-badge {
+.award-badges-overlay .winner-title-badge,
+.award-badges-overlay .m-card-badge {
     position: relative !important;
     top: 0 !important;
     right: 0 !important;
     left: 0 !important;
     margin: 0 !important;
+    display: inline-flex !important;
 }
 
 .winner-title-badge {
