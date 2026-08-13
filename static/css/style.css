@@ -1638,7 +1638,7 @@ option.opt-closed {
 }
 
 .podium-card:hover {
-    transform: translateY(-6px) scale(1.005) !important;
+    transform: none !important;
 }
 
 .podium-card.super-star {
