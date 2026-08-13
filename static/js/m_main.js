@@ -1252,7 +1252,7 @@ function renderMobileFeedGrid(posts) {
                     badgeText = '브라이트스타';
                     bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
                 } else {
-                    badgeText = `<i class="${chipIcon}"></i> 패밀리${awRank ? ` ${awRank}위` : ''}`;
+                    badgeText = `<i class="${chipIcon}" style="margin-right: 0.25rem;"></i> 패밀리${awRank ? ` ${awRank}위` : ''}`;
                 }
                 awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; ${bgStyle}">${badgeText}</div>`;
             });

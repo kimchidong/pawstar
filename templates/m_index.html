@@ -168,7 +168,7 @@
                             {% set award_nm_str = (aw.award_nm or aw.AWARD_NM or '')|string %}
                             {% set aw_rank = aw.ranking or aw.RANKING %}
                             {% if not ('P001A101' in award_cd_str or '슈퍼' in award_nm_str or 'P001A102' in award_cd_str or '라이징' in award_nm_str or 'P001A103' in award_cd_str or '브라이트' in award_nm_str) %}
-                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><i class="{{ p_chip_icon }}"></i> 패밀리{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
+                                <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><i class="{{ p_chip_icon }}" style="margin-right: 0.25rem;"></i> 패밀리{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                             {% endif %}
                         {% endfor %}
                     </div>
