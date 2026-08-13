@@ -786,9 +786,50 @@ class PawStarService:
                     }
                     grouped_awards[key]['awards'].append(award_item)
 
+                def _sort_awards_fn(awards_list):
+                    def _key(aw):
+                        cd = str(aw.get('award_cd') or aw.get('AWARD_CD') or '')
+                        nm = str(aw.get('award_nm') or aw.get('AWARD_NM') or '')
+                        part = str(aw.get('award_part') or aw.get('AWARD_PART') or '')
+                        rk = int(aw.get('ranking') or aw.get('RANKING') or 0)
+                        if cd.startswith('P001') or 'G002P001' in part or any(x in nm for x in ['슈퍼', '라이징', '브라이트']):
+                            return (0, rk)
+                        return (1, rk)
+                    return sorted(awards_list, key=_key)
+
+                for item in grouped_awards.values():
+                    item['awards'] = _sort_awards_fn(item['awards'])
+
                 my_awards = list(grouped_awards.values())
                 # 가장 최근 회차 순으로 정렬 (CONTEST_ROUND 내림차순)
                 my_awards.sort(key=lambda x: int(x.get('CONTEST_ROUND') or 0), reverse=True)
+
+                # my_posts 각 게시물에도 해당 게시물의 awards 리스트 매핑
+                post_awards_map = {}
+                for a in raw_awards:
+                    pk = (str(a.get('CONTEST_ROUND')), str(a.get('ROUND_NO')))
+                    if pk not in post_awards_map:
+                        post_awards_map[pk] = []
+                    b_img = a.get('badge_img') or a.get('BADGE_IMG_PATH_FILE') or ''
+                    if not b_img and a.get('AWARD_CD'):
+                        b_img = f"/static/image/badge/{a.get('AWARD_CD')}.png"
+                    post_awards_map[pk].append({
+                        'award_cd': a.get('AWARD_CD'),
+                        'AWARD_CD': a.get('AWARD_CD'),
+                        'award_part': a.get('AWARD_PART'),
+                        'AWARD_PART': a.get('AWARD_PART'),
+                        'award_nm': a.get('AWARD_NM') or a.get('prize_name'),
+                        'AWARD_NM': a.get('AWARD_NM') or a.get('prize_name'),
+                        'ranking': a.get('RANKING'),
+                        'RANKING': a.get('RANKING'),
+                        'badge_img': b_img,
+                        'BADGE_IMG_PATH_FILE': b_img
+                    })
+
+                for p in my_posts:
+                    pk = (str(p.get('CONTEST_ROUND')), str(p.get('ROUND_NO')))
+                    p['awards'] = _sort_awards_fn(post_awards_map.get(pk, []))
+                    p['AWARDS'] = p['awards']
 
                 conn.close()
                 return {
@@ -1307,7 +1348,13 @@ class PawStarService:
                         row['CONTEST_STAT'] = 'G001C002'
                         row['STATUS_CD'] = 'G001C002'
 
-                    row['awards'] = awards_map.get(row['ROUND_NO'], [])
+                    raw_post_awards = awards_map.get(row['ROUND_NO'], [])
+                    row['awards'] = sorted(raw_post_awards, key=lambda aw: (
+                        0 if (str(aw.get('award_cd') or aw.get('AWARD_CD') or '').startswith('P001') or 
+                              'G002P001' in str(aw.get('award_part') or aw.get('AWARD_PART') or '') or 
+                              any(x in str(aw.get('award_nm') or aw.get('AWARD_NM') or '') for x in ['슈퍼', '라이징', '브라이트'])) else 1,
+                        int(aw.get('ranking') or aw.get('RANKING') or 0)
+                    ))
                     is_author = bool(user_id and row.get('ENT_USER_ID') and str(user_id) == str(row.get('ENT_USER_ID')))
                     row['actions'] = {
                         'is_liked': False if is_author else (row['ROUND_NO'] in liked_round_nos),

@@ -308,9 +308,15 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     if (awardsData.length > 0) {
         const sortedAwards = [...awardsData].sort((a, b) => {
-            const partA = a.award_part || a.AWARD_PART || '';
-            const partB = b.award_part || b.AWARD_PART || '';
-            return partA.localeCompare(partB);
+            const cdA = String(a.award_cd || a.AWARD_CD || '');
+            const nmA = String(a.award_nm || a.AWARD_NM || '');
+            const isStarA = (cdA.includes('P001') || nmA.includes('슈퍼') || nmA.includes('라이징') || nmA.includes('브라이트'));
+            const cdB = String(b.award_cd || b.AWARD_CD || '');
+            const nmB = String(b.award_nm || b.AWARD_NM || '');
+            const isStarB = (cdB.includes('P001') || nmB.includes('슈퍼') || nmB.includes('라이징') || nmB.includes('브라이트'));
+            if (isStarA && !isStarB) return -1;
+            if (!isStarA && isStarB) return 1;
+            return 0;
         });
 
         const kindNm = postData.KIND_NM || postData.pet_type || '';
