@@ -369,11 +369,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 const awRank = aw.ranking || aw.RANKING;
 
                 if (awardCdStr.includes('P001A101') || (!awardCdStr && awardNmStr.includes('슈퍼'))) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');"><i class="fa-solid fa-star"></i> 슈퍼스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(254,249,195,0.95), rgba(253,224,71,0.9)); color: #713f12; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '슈퍼스타');"><i class="fa-solid fa-star"></i> 슈퍼스타</div>`;
                 } else if (awardCdStr.includes('P001A102') || (!awardCdStr && awardNmStr.includes('브라이트'))) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');"><i class="fa-solid fa-star"></i> 브라이트스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(240,249,255,0.95), rgba(125,211,252,0.9)); color: #0369a1; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '브라이트스타');"><i class="fa-solid fa-star"></i> 브라이트스타</div>`;
                 } else if (awardCdStr.includes('P001A103') || (!awardCdStr && awardNmStr.includes('라이징'))) {
-                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');"><i class="fa-solid fa-star"></i> 라이징스타</div>`;
+                    rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(247,254,231,0.95), rgba(163,230,53,0.9)); color: #3f6212; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '라이징스타');"><i class="fa-solid fa-star"></i> 라이징스타</div>`;
                 } else {
                     const titleText = awRank ? `패밀리 ${awRank}위` : '패밀리';
                     rightHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.38rem 0.75rem; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764; cursor: pointer;" onclick="event.stopPropagation(); openBadgeZoomModal('${badgeImgSrc}', '${titleText}');"><span class="pet-emoji-icon"><i class="${petIconClass}"></i></span> ${titleText}</div>`;
@@ -414,11 +414,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 } else {
                     iconHtml = '<i class="fa-solid fa-medal"></i>';
                     if (postData.rank_candidate == 1) {
-                        bgStyle = 'background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12; box-shadow: 0 4px 14px rgba(202, 138, 4, 0.35);';
+                        bgStyle = 'background: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%); color: #713f12; box-shadow: 0 4px 14px rgba(253, 224, 71, 0.45);';
                     } else if (postData.rank_candidate == 2) {
-                        bgStyle = 'background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #ea580c 100%); color: #431407; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);';
+                        bgStyle = 'background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%); color: #0369a1; box-shadow: 0 4px 14px rgba(125, 211, 252, 0.45);';
                     } else if (postData.rank_candidate == 3) {
-                        bgStyle = 'background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%); color: #1e293b; box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45);';
+                        bgStyle = 'background: linear-gradient(135deg, #f7fee7 0%, #ecfccb 50%, #d9f99d 100%); color: #3f6212; box-shadow: 0 4px 14px rgba(163, 230, 53, 0.45);';
                     } else {
                         bgStyle = 'background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%); color: #713f12;';
                     }
@@ -1247,13 +1247,13 @@ function renderMobileFeedGrid(posts) {
                 let bgStyle = 'background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;';
                 if (awardCdStr.includes('P001A101') || (!awardCdStr && awardNmStr.includes('슈퍼'))) {
                     badgeText = '슈퍼스타';
-                    bgStyle = '';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(254,249,195,0.95), rgba(253,224,71,0.9)); color: #713f12;';
                 } else if (awardCdStr.includes('P001A102') || (!awardCdStr && awardNmStr.includes('브라이트'))) {
                     badgeText = '브라이트스타';
-                    bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(240,249,255,0.95), rgba(125,211,252,0.9)); color: #0369a1;';
                 } else if (awardCdStr.includes('P001A103') || (!awardCdStr && awardNmStr.includes('라이징'))) {
                     badgeText = '라이징스타';
-                    bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
+                    bgStyle = 'background: linear-gradient(135deg, rgba(247,254,231,0.95), rgba(163,230,53,0.9)); color: #3f6212;';
                 } else {
                     badgeText = `<i class="${chipIcon}" style="margin-right: 0.25rem;"></i> 패밀리${awRank ? ` ${awRank}위` : ''}`;
                 }
@@ -1278,11 +1278,11 @@ function renderMobileFeedGrid(posts) {
                 } else {
                     const rkNum = Number(rkCand);
                     if (rkNum === 1) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(248,250,252,0.95), rgba(245,158,11,0.92)); color: #451a03;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(254,249,195,0.95), rgba(253,224,71,0.9)); color: #713f12;';
                     } else if (rkNum === 2) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(240,249,255,0.95), rgba(125,211,252,0.9)); color: #0369a1;';
                     } else if (rkNum === 3) {
-                        bgStyle = 'background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;';
+                        bgStyle = 'background: linear-gradient(135deg, rgba(247,254,231,0.95), rgba(163,230,53,0.9)); color: #3f6212;';
                     }
                 }
                 badgeHtml = `<div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10; ${bgStyle}">${rankTitle}</div>`;

@@ -60,7 +60,7 @@
                 {% set rk = w.RANKING or w.ranking %}
                 {% if part == 'G002P001' %}
                     {% set ns_global.found = true %}
-                    <div class="m-winner-card m-champion-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border-radius: 18px; padding: 0.75rem 0.85rem; cursor: pointer;">
+                    <div class="m-winner-card m-champion-card {{ 'super-star' if rk == 1 else ('bright-star' if rk == 2 else 'rising-star') }}" onclick="openMobileDetailModal({{ w | tojson | forceescape }}, true)" style="background: #ffffff; border-radius: 18px; padding: 0.75rem 0.85rem; cursor: pointer;">
                         <!-- 하단 바디: 동물사진(좌측) / 상세 4줄(우측) -->
                         <div style="display: flex; align-items: center; gap: 0.85rem;">
                             <div style="flex-shrink: 0; position: relative;">

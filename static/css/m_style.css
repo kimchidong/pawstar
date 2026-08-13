@@ -866,21 +866,21 @@ body.m-body {
 }
 
 .m-card-badge.rank-1 {
-    background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%) !important;
+    background: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%) !important;
     color: #713f12 !important;
-    box-shadow: 0 4px 14px rgba(202, 138, 4, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(253, 224, 71, 0.45) !important;
 }
 
 .m-card-badge.rank-2 {
-    background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #ea580c 100%) !important;
-    color: #431407 !important;
-    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4) !important;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
+    color: #0369a1 !important;
+    box-shadow: 0 4px 14px rgba(125, 211, 252, 0.45) !important;
 }
 
 .m-card-badge.rank-3 {
-    background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%) !important;
-    color: #1e293b !important;
-    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45) !important;
+    background: linear-gradient(135deg, #f7fee7 0%, #ecfccb 50%, #d9f99d 100%) !important;
+    color: #3f6212 !important;
+    box-shadow: 0 4px 14px rgba(163, 230, 53, 0.45) !important;
 }
 
 .m-card-badge::before {
@@ -1395,41 +1395,41 @@ body.m-body {
     z-index: 5;
 }
 
-/* 🥇 슈퍼스타 배지 애니메이션 */
+/* 🥇 슈퍼스타 배지 애니메이션 (밝은 노란색) */
 .winner-title-badge.superstar-badge {
-    background: linear-gradient(135deg, #fffbeb 0%, #fef08a 50%, #facc15 100%) !important;
-    color: #854d0e !important;
-    border: 1.2px solid #facc15 !important;
+    background: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%) !important;
+    color: #713f12 !important;
+    border: 1.2px solid #fde047 !important;
     box-shadow: none !important;
 }
 .winner-title-badge.superstar-badge i {
-    color: #b45309 !important;
+    color: #a16207 !important;
     filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
     animation: starPulse 2.5s ease-in-out infinite;
 }
 
-/* 🥈 라이징스타 배지 애니메이션 */
-.winner-title-badge.risingstar-badge {
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
-    color: #1e293b !important;
-    border: 1.2px solid #cbd5e1 !important;
-    box-shadow: none !important;
-}
-.winner-title-badge.risingstar-badge i {
-    color: #475569 !important;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
-    animation: starPulse 2.5s ease-in-out infinite;
-}
-
-/* 🥉 브라이트스타 배지 애니메이션 */
+/* 🥈 브라이트스타 배지 애니메이션 (밝은 하늘색) */
 .winner-title-badge.brightstar-badge {
-    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%) !important;
-    color: #c2410c !important;
-    border: 1.2px solid #fdba74 !important;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
+    color: #0369a1 !important;
+    border: 1.2px solid #7dd3fc !important;
     box-shadow: none !important;
 }
 .winner-title-badge.brightstar-badge i {
-    color: #ea580c !important;
+    color: #0284c7 !important;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    animation: starPulse 2.5s ease-in-out infinite;
+}
+
+/* 🥉 라이징스타 배지 애니메이션 (밝은 연두색) */
+.winner-title-badge.risingstar-badge {
+    background: linear-gradient(135deg, #f7fee7 0%, #ecfccb 50%, #d9f99d 100%) !important;
+    color: #3f6212 !important;
+    border: 1.2px solid #a3e635 !important;
+    box-shadow: none !important;
+}
+.winner-title-badge.risingstar-badge i {
+    color: #65a30d !important;
     filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
     animation: starPulse 2.5s ease-in-out infinite;
 }

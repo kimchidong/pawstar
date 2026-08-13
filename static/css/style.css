@@ -811,44 +811,44 @@ option.opt-closed {
 }
 
 .rank-ribbon.rank-1 {
-    background: linear-gradient(135deg, #fde047 0%, #eab308 50%, #ca8a04 100%) !important;
+    background: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     color: #713f12 !important;
     border: none !important;
     font-weight: 800 !important;
-    box-shadow: 0 4px 14px rgba(202, 138, 4, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 4px 14px rgba(253, 224, 71, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
 }
 .rank-ribbon.rank-1 i {
-    color: #78350f !important;
+    color: #a16207 !important;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 .rank-ribbon.rank-2 {
-    background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #ea580c 100%) !important;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: #431407 !important;
+    color: #0369a1 !important;
     border: none !important;
     font-weight: 800 !important;
-    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 4px 14px rgba(125, 211, 252, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
 }
 .rank-ribbon.rank-2 i {
-    color: #7c2d12 !important;
+    color: #0284c7 !important;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
 .rank-ribbon.rank-3 {
-    background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%) !important;
+    background: linear-gradient(135deg, #f7fee7 0%, #ecfccb 50%, #d9f99d 100%) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: #1e293b !important;
+    color: #3f6212 !important;
     border: none !important;
     font-weight: 800 !important;
-    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 4px 14px rgba(163, 230, 53, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
 }
 .rank-ribbon.rank-3 i {
-    color: #334155 !important;
+    color: #65a30d !important;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
@@ -1829,7 +1829,7 @@ option.opt-closed {
     animation: neonPulseGold 2.5s infinite alternate ease-in-out;
 }
 
-/* 2위 Rising Star - Silver / Cyan Neon Sign */
+/* 2위 Bright Star - Sky Blue Neon Sign */
 .step-rank-sub.silver {
     color: #ffffff;
     font-size: 1.25rem;
@@ -1843,17 +1843,17 @@ option.opt-closed {
     animation: neonPulseSilver 2.8s infinite alternate ease-in-out;
 }
 
-/* 3위 Bright Star - Neon Brown Sign */
+/* 3위 Rising Star - Lime Green Neon Sign */
 .step-rank-sub.bronze {
     color: #ffffff;
     font-size: 1.18rem;
     text-shadow: 
         0 0 5px #ffffff,
-        0 0 12px #fde68a,
-        0 0 24px #f59e0b,
-        0 0 38px #d97706,
-        0 0 55px rgba(217, 119, 6, 0.95),
-        0 0 75px rgba(180, 83, 9, 0.8);
+        0 0 12px #ecfccb,
+        0 0 24px #a3e635,
+        0 0 38px #65a30d,
+        0 0 55px rgba(101, 163, 13, 0.95),
+        0 0 75px rgba(77, 124, 15, 0.8);
     animation: neonPulseBronze 3.1s infinite alternate ease-in-out;
 }
 
@@ -2460,54 +2460,48 @@ option.opt-closed {
     line-height: 1;
 }
 
-/* 🥇 1위 슈퍼스타 (Royal Gold Crystal Glass - 시스루 크리스탈) */
+/* 🥇 1위 슈퍼스타 (밝은 노란색) */
 .winner-title-badge.superstar-badge,
 .super-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(254, 240, 138, 0.38) 0%, rgba(245, 158, 11, 0.42) 50%, rgba(217, 119, 6, 0.45) 100%);
-    color: #451a03;
+    background: linear-gradient(135deg, rgba(254, 249, 195, 0.9) 0%, rgba(254, 240, 138, 0.95) 50%, rgba(253, 224, 71, 0.92) 100%);
+    color: #713f12;
     border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
-                0 2px 10px rgba(245, 158, 11, 0.25),
-                inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 14px rgba(253, 224, 71, 0.45);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95);
 }
 .winner-title-badge.superstar-badge i,
 .super-star .winner-title-badge i {
-    color: #78350f;
+    color: #a16207;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
-/* 🥈 2위 라이징스타 (Platinum Silver Crystal Glass - 시스루 크리스탈) */
-.winner-title-badge.risingstar-badge,
-.rising-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(241, 245, 249, 0.38) 60%, rgba(203, 213, 225, 0.35) 100%);
-    color: #0f172a;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
-                0 2px 10px rgba(148, 163, 184, 0.2),
-                inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
-}
-.winner-title-badge.risingstar-badge i,
-.rising-star .winner-title-badge i {
-    color: #334155;
-    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
-}
-
-/* 🥉 3위 브라이트스타 (Rose Gold Amber Crystal Glass - 시스루 크리스탈) */
+/* 🥈 2위 브라이트스타 (밝은 하늘색) */
 .winner-title-badge.brightstar-badge,
 .bright-star .winner-title-badge {
-    background: linear-gradient(135deg, rgba(255, 237, 213, 0.4) 0%, rgba(251, 146, 60, 0.38) 60%, rgba(234, 88, 12, 0.42) 100%);
-    color: #431407;
+    background: linear-gradient(135deg, rgba(240, 249, 255, 0.9) 0%, rgba(224, 242, 254, 0.95) 50%, rgba(186, 230, 253, 0.92) 100%);
+    color: #0369a1;
     border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 
-                0 2px 10px rgba(234, 88, 12, 0.22),
-                inset 0 1px 2px rgba(255, 255, 255, 0.5);
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95), 0 0 6px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 14px rgba(125, 211, 252, 0.45);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95);
 }
 .winner-title-badge.brightstar-badge i,
 .bright-star .winner-title-badge i {
-    color: #7c2d12;
+    color: #0284c7;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
+}
+
+/* 🥉 3위 라이징스타 (밝은 연두색) */
+.winner-title-badge.risingstar-badge,
+.rising-star .winner-title-badge {
+    background: linear-gradient(135deg, rgba(247, 254, 231, 0.9) 0%, rgba(236, 252, 203, 0.95) 50%, rgba(217, 249, 157, 0.92) 100%);
+    color: #3f6212;
+    border: none;
+    box-shadow: 0 4px 14px rgba(163, 230, 53, 0.45);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.95);
+}
+.winner-title-badge.risingstar-badge i,
+.rising-star .winner-title-badge i {
+    color: #65a30d;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
 }
 
