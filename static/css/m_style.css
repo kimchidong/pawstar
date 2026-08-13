@@ -1706,7 +1706,9 @@ body.m-body {
     transform: none !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    padding-top: 0.18rem !important; /* 글자를 아주 살짝만(약 0.8px~1px) 정밀 하향 */
 }
+
 
 .m-card-badge::before {
     content: '';
