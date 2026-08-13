@@ -148,8 +148,70 @@
 {% set total_cnt = (my_posts_pagination.total_count if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_count is defined) else (my_posts|length)) %}
 {% set award_total_cnt = stats.award_count if (stats and stats.award_count is not none) else (my_awards | map(attribute='awards') | map('length') | sum) %}
 
+<!-- 콘테스트 회차 선택 커스텀 드롭다운 (탭 바 상단 배치) -->
+{% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
+{% set ns = namespace(sel_c=None) %}
+{% if sel_c_id != 'all' %}
+    {% for c in contests %}
+        {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+        {% if c_id == sel_c_id %}
+            {% set ns.sel_c = c %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% set selected_contest_obj = ns.sel_c %}
+
+{% set is_sel_in_prog = False %}
+{% if selected_contest_obj %}
+    {% set c_stat_nm = selected_contest_obj.CONTEST_STAT_NM or selected_contest_obj.status or '' %}
+    {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
+{% endif %}
+
+<div style="padding: 0 0.85rem; margin-top: 0.85rem;">
+    <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
+        <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                {% if sel_c_id == 'all' %}
+                    <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
+                    <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis;">전체 회차 종합 보기</span>
+                {% else %}
+                    {% if is_sel_in_prog %}
+                        <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
+                    {% else %}
+                        <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ selected_contest_obj.year_month if selected_contest_obj and selected_contest_obj.year_month else '2026.08' }}</span>
+                    {% endif %}
+                    <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (selected_contest_obj.THEME_NM or selected_contest_obj.title or selected_contest_obj.CONTEST_NM or selected_contest_obj.name) if selected_contest_obj else '' }}</span>
+                {% endif %}
+            </span>
+            <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem; flex-shrink: 0;"></i>
+        </div>
+        <div class="custom-contest-options">
+            <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
+                <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
+                <span class="option-text" style="font-weight: 800;">전체 회차 종합 보기</span>
+            </div>
+            {% for c in contests %}
+                {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
+                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                    {% set is_sel = (c_id == sel_c_id) %}
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}'">
+                        {% if is_in_prog %}
+                            <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
+                        {% endif %}
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 <!-- 전형적인 모바일 탭 바 -->
-<div class="m-profile-tabs-wrapper">
+<div class="m-profile-tabs-wrapper" style="margin-top: 0.75rem;">
     <div class="m-profile-tabs-header">
         <button type="button" class="m-tab-btn active" id="mTabBtnPosts" onclick="switchMobileProfileTab('posts')">
             <i class="fa-solid fa-paw"></i> 내 펫 출전작
@@ -176,68 +238,6 @@
                     </span>
                 {% endif %}
             </h3>
-        </div>
-
-        <!-- 2. 콘테스트 회차 선택 커스텀 드롭다운 -->
-        {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
-        {% set ns = namespace(sel_c=None) %}
-        {% if sel_c_id != 'all' %}
-            {% for c in contests %}
-                {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                {% if c_id == sel_c_id %}
-                    {% set ns.sel_c = c %}
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-        {% set selected_contest_obj = ns.sel_c %}
-
-        {% set is_sel_in_prog = False %}
-        {% if selected_contest_obj %}
-            {% set c_stat_nm = selected_contest_obj.CONTEST_STAT_NM or selected_contest_obj.status or '' %}
-            {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
-        {% endif %}
-
-        <div style="margin: 0 0 0.5rem 0;">
-            <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="mProfileCustomContestDropdown" style="width: 100%;">
-                <div class="custom-contest-trigger" style="height: 52px; padding: 0 1.2rem; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                        {% if sel_c_id == 'all' %}
-                            <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                            <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis;">전체 회차 종합 보기</span>
-                        {% else %}
-                            {% if is_sel_in_prog %}
-                                <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
-                            {% else %}
-                                <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ selected_contest_obj.year_month if selected_contest_obj and selected_contest_obj.year_month else '2026.08' }}</span>
-                            {% endif %}
-                            <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="round-badge-text">제{{ sel_c_id }}회</span> {{ (selected_contest_obj.THEME_NM or selected_contest_obj.title or selected_contest_obj.CONTEST_NM or selected_contest_obj.name) if selected_contest_obj else '' }}</span>
-                        {% endif %}
-                    </span>
-                    <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem; flex-shrink: 0;"></i>
-                </div>
-                <div class="custom-contest-options">
-                    <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
-                        <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                        <span class="option-text" style="font-weight: 800;">전체 회차 종합 보기</span>
-                    </div>
-                    {% for c in contests %}
-                        {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
-                        {% if '예정' not in c_stat_nm and (c.CONTEST_STAT or c.status) != 'SCHEDULED' %}
-                            {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
-                            {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                            {% set is_sel = (c_id == sel_c_id) %}
-                            <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}'">
-                                {% if is_in_prog %}
-                                    <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
-                                {% else %}
-                                    <span class="status-chip closed" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
-                                {% endif %}
-                                <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c.THEME_NM or c.title }}</span>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
         </div>
     </div>
 
