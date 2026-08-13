@@ -45,9 +45,9 @@
             {% if rk == 1 or cd == 'P001A101' %}
                 {% set _ = ns.super_stars.append(w) %}
             {% elif rk == 2 or cd == 'P001A102' %}
-                {% set _ = ns.rising_stars.append(w) %}
-            {% elif rk == 3 or cd == 'P001A103' %}
                 {% set _ = ns.bright_stars.append(w) %}
+            {% elif rk == 3 or cd == 'P001A103' %}
+                {% set _ = ns.rising_stars.append(w) %}
             {% endif %}
         {% endif %}
     {% endfor %}
@@ -114,31 +114,31 @@
     {% set has_top_winners = (ns.super_stars|length > 0 or ns.rising_stars|length > 0 or ns.bright_stars|length > 0) %}
     {% if has_top_winners %}
     <div class="winners-podium" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; width: 100%; box-sizing: border-box; clear: both;">
-        <!-- 2위 라이징 스타 -->
+        <!-- 2위 브라이트 스타 -->
         <div class="podium-card-wrapper">
-            {% if ns.rising_stars and ns.rising_stars|length > 1 %}
+            {% if ns.bright_stars and ns.bright_stars|length > 1 %}
                 <div class="co-tabs co-tabs-top">
-                    {% for star in ns.rising_stars %}
+                    {% for star in ns.bright_stars %}
                         <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             {{ star.PET_NM or star.pet_name }}
                         </button>
                     {% endfor %}
                 </div>
             {% endif %}
-            <div class="podium-card rising-star {{ 'empty-card' if not ns.rising_stars }}">
-                {% if ns.rising_stars %}
+            <div class="podium-card bright-star {{ 'empty-card' if not ns.bright_stars }}">
+                {% if ns.bright_stars %}
                     <div class="co-winner-wrapper">
-                        {% for star in ns.rising_stars %}
+                        {% for star in ns.bright_stars %}
                             <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }}, true)" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
                                     </div>
-                                    <div class="winner-title-badge">
+                                    <div class="winner-title-badge brightstar-badge">
                                         <i class="fa-solid fa-star"></i>
                                         <span>브라이트스타</span>
-                                        {% if ns.rising_stars|length > 1 %}
-                                            <span class="co-winner-tag">공동 2위 {{ ns.rising_stars|length }}명</span>
+                                        {% if ns.bright_stars|length > 1 %}
+                                            <span class="co-winner-tag">공동 2위 {{ ns.bright_stars|length }}명</span>
                                         {% endif %}
                                     </div>
                                     <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Bright Star">
@@ -340,11 +340,11 @@
 
         </div>
 
-        <!-- 3위 브라이트 스타 -->
+        <!-- 3위 라이징 스타 -->
         <div class="podium-card-wrapper">
-            {% if ns.bright_stars and ns.bright_stars|length > 1 %}
+            {% if ns.rising_stars and ns.rising_stars|length > 1 %}
                 <div class="co-tabs co-tabs-top">
-                    {% for star in ns.bright_stars %}
+                    {% for star in ns.rising_stars %}
                         <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             {{ star.PET_NM or star.pet_name }}
                         </button>
@@ -352,20 +352,20 @@
                 </div>
             {% endif %}
 
-            <div class="podium-card bright-star {{ 'empty-card' if not ns.bright_stars }}">
-                {% if ns.bright_stars %}
+            <div class="podium-card rising-star {{ 'empty-card' if not ns.rising_stars }}">
+                {% if ns.rising_stars %}
                     <div class="co-winner-wrapper">
-                        {% for star in ns.bright_stars %}
+                        {% for star in ns.rising_stars %}
                             <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }}, true)" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
                                     </div>
-                                    <div class="winner-title-badge">
+                                    <div class="winner-title-badge risingstar-badge">
                                         <i class="fa-solid fa-star"></i>
                                         <span>라이징스타</span>
-                                        {% if ns.bright_stars|length > 1 %}
-                                            <span class="co-winner-tag">공동 3위 {{ ns.bright_stars|length }}명</span>
+                                        {% if ns.rising_stars|length > 1 %}
+                                            <span class="co-winner-tag">공동 3위 {{ ns.rising_stars|length }}명</span>
                                         {% endif %}
                                     </div>
                                     <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Rising Star">
