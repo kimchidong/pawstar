@@ -1250,7 +1250,7 @@ function renderMobileFeedGrid(posts) {
                 }
                 awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; ${bgStyle}">${badgeText}</div>`;
             });
-            badgeHtml = `<div class="award-badges-overlay" style="position: absolute; top: 0.4rem; left: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
+            badgeHtml = `<div class="award-badges-overlay" style="position: absolute; top: 0.4rem; right: 0.4rem; left: auto; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
         } else {
             const isPostClosed = p.is_closed || p.closed || p.contest_stat === 'G001C002' || p.CONTEST_STAT === 'G001C002' || p.STATUS_CD === 'G001C002' || p.is_ended || p.IS_ENDED;
             const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;

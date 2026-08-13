@@ -1332,14 +1332,14 @@ body.m-body {
 /* 🏆 명예의 전당 배지 (슈퍼스타, 라이징스타, 브라이트스타, 패밀리스타) 애니메이션 및 크리스탈 광택 효과 */
 .award-badges-overlay {
     position: absolute !important;
-    top: 0.65rem !important;
-    left: 0.65rem !important;
-    right: 0.65rem !important;
+    top: 0.4rem !important;
+    right: 0.4rem !important;
+    left: auto !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.45rem !important;
+    justify-content: flex-end !important;
+    gap: 0.35rem !important;
     z-index: 10 !important;
     pointer-events: none !important;
 }
