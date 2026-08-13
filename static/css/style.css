@@ -1647,33 +1647,35 @@ option.opt-closed {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    border-radius: 0 !important;
     border: none !important;
     box-shadow: 0 16px 36px rgba(109, 40, 217, 0.25);
-    overflow: visible;
+    overflow: hidden;
     width: 100% !important;
     margin: 0 !important;
 }
 
-/* 2위 라이징스타 단상 (좌측 직각) */
+/* 2위 라이징스타 단상 (좌측 상단 모서리 살짝 라운드) */
 .podium-step.step-2 {
     height: 110px;
     background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 50%, #4c1d95 100%);
+    border-radius: 12px 0 0 0 !important;
     z-index: 1;
 }
 
-/* 1위 슈퍼스타 단상 (중간 - 가장 높음 + 직각 + 골드 글로우) */
+/* 1위 슈퍼스타 단상 (좌측 상단 & 우측 상단 모서리 살짝 라운드) */
 .podium-step.step-1 {
     height: 155px;
     background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 45%, #4c1d95 100%);
+    border-radius: 12px 12px 0 0 !important;
     box-shadow: 0 20px 48px rgba(245, 158, 11, 0.35), 0 0 30px rgba(251, 191, 36, 0.45);
     z-index: 3;
 }
 
-/* 3위 브라이트스타 단상 (우측 직각) */
+/* 3위 브라이트스타 단상 (우측 상단 모서리 살짝 라운드) */
 .podium-step.step-3 {
     height: 80px;
     background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 50%, #3b0764 100%);
+    border-radius: 0 12px 0 0 !important;
     z-index: 1;
 }
 
