@@ -1554,21 +1554,19 @@ option.opt-closed {
     transition: transform 0.35s ease;
 }
 
-/* 1위 슈퍼스타 카드를 위로 솟구치게 상단 배치 */
-.podium-card-wrapper:nth-child(2) {
-    transform: translateY(-45px);
+/* 메인 챔피언 TOP 3 시상대 전용 카드 배치 (패밀리 스타 섹션에는 절대 영향 없음) */
+.hall-container > .winners-podium > .podium-card-wrapper:nth-child(2) {
+    transform: translateY(-40px);
     z-index: 5;
 }
 
-/* 2위 라이징스타 카드 */
-.podium-card-wrapper:nth-child(1) {
+.hall-container > .winners-podium > .podium-card-wrapper:nth-child(1) {
     transform: translateY(0);
     z-index: 4;
 }
 
-/* 3위 브라이트스타 카드는 우측 아래 배치 */
-.podium-card-wrapper:nth-child(3) {
-    transform: translateY(15px);
+.hall-container > .winners-podium > .podium-card-wrapper:nth-child(3) {
+    transform: translateY(0);
     z-index: 3;
 }
 
@@ -1780,8 +1778,10 @@ option.opt-closed {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    flex: 1 !important;
+    flex: none !important;
+    height: 230px !important;
     min-height: 230px !important;
+    max-height: 230px !important;
     box-sizing: border-box !important;
     min-width: 0;
     overflow: hidden;

@@ -594,12 +594,12 @@
                             </h4>
                         </div>
 
-                        <!-- 1위, 2위, 3위 가로 3분할 정렬 (수상 등급 상관 없이 카드의 높이 및 요소 크기 동일) -->
-                        <div class="winners-podium" style="grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 0; align-items: stretch; width: 100%; box-sizing: border-box;">
+                        <!-- 1위, 2위, 3위 가로 3분할 정렬 (수상 등급 상관 없이 카드의 높이 및 요소 크기 동일 - 원래 스타일 100% 원복) -->
+                        <div class="family-podium-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 0; align-items: stretch; width: 100%; box-sizing: border-box;">
                             {% for rk in [1, 2, 3] %}
                                 {% set stars = group[rk] %}
-                                <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
-                                    <div class="podium-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" style="min-height: auto; border: 1px solid var(--border-light); transform: none; display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
+                                <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box; transform: none !important;">
+                                    <div class="podium-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" style="min-height: auto; border: 1px solid var(--border-light); transform: none !important; display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
                                         {% if stars %}
                                             <div class="co-winner-wrapper">
                                                 {% for star in stars %}
@@ -666,7 +666,6 @@
                                                                 </div>
                                                             </div>
 
-                                                            <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 (내가 영향을 준 요소 활성화 스타일 적용) -->
                                                             {% set is_mine = is_logged_in and current_user_id and star.ENT_USER_ID and (current_user_id|string == star.ENT_USER_ID|string) %}
                                                             {% set is_view_act = is_logged_in and (not is_mine) and star.actions and star.actions.is_viewed %}
                                                             {% set is_like_act = is_logged_in and star.actions and star.actions.is_liked %}
@@ -690,6 +689,16 @@
                                                                     <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                                                 </div>
                                                             </div>
+
+                                                            {% if stars and stars|length > 1 %}
+                                                                <div class="co-tabs" style="position: relative; margin-top: 0.5rem; padding: 0.1rem 0 0 0; justify-content: center;">
+                                                                    {% for star in stars %}
+                                                                        <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                                                                            {{ star.PET_NM or star.pet_name }}
+                                                                        </button>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 {% endfor %}
@@ -702,15 +711,6 @@
                                         {% endif %}
                                     </div>
 
-                                    {% if stars and stars|length > 1 %}
-                                        <div class="co-tabs" style="padding: 0.75rem 0 0 0; margin: 0; background: transparent;">
-                                            {% for star in stars %}
-                                                <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
-                                                    {{ star.PET_NM or star.pet_name }}
-                                                </button>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>
