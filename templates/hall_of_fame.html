@@ -109,7 +109,9 @@
         }
     </style>
 
-    <div class="winners-podium">
+    {% set has_top_winners = (ns.super_stars|length > 0 or ns.rising_stars|length > 0 or ns.bright_stars|length > 0) %}
+    {% if has_top_winners %}
+    <div class="winners-podium" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; width: 100%; box-sizing: border-box; clear: both;">
         <!-- 2위 라이징 스타 -->
         <div class="podium-card-wrapper">
             <div class="podium-card rising-star {{ 'empty-card' if not ns.rising_stars }}">
@@ -121,6 +123,16 @@
                                     <div class="crown-badge">
                                         <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
                                     </div>
+                                    <div class="winner-title-badge">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>라이징스타</span>
+                                        {% if ns.rising_stars|length > 1 %}
+                                            <span class="co-winner-tag">공동 2위 {{ ns.rising_stars|length }}명</span>
+                                        {% endif %}
+                                    </div>
+                                    <img src="{{ star.IMAGE_PATH or star.image_path }}" class="winner-img" alt="Rising Star">
+                                </div>
+
                                 <div class="podium-body card-body hof-luxury-body">
                                     <!-- 👑 1. [좌측] 프로필 사진 + 닉네임  /  [우측] 동물종류 + 동물애칭 (한 줄 배치) -->
                                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; min-width: 0; gap: 0.5rem; flex-shrink: 0;">
@@ -166,21 +178,26 @@
                                         </div>
                                     </div>
 
-                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 -->
+                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 (내가 영향을 준 요소 활성화 스타일 적용) -->
+                                    {% set is_mine = is_logged_in and current_user_id and star.ENT_USER_ID and (current_user_id|string == star.ENT_USER_ID|string) %}
+                                    {% set is_view_act = is_logged_in and (not is_mine) and star.actions and star.actions.is_viewed %}
+                                    {% set is_like_act = is_logged_in and star.actions and star.actions.is_liked %}
+                                    {% set is_cmt_act = is_logged_in and star.actions and star.actions.is_commented %}
+                                    {% set is_share_act = is_logged_in and star.actions and star.actions.is_shared %}
                                     <div class="hof-actions-bar">
-                                        <div class="hof-action-item" title="조회수">
-                                            <i class="fa-regular fa-eye" style="color: #3b82f6;"></i>
+                                        <div class="hof-action-item btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                                            <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye" style="color: #3b82f6;"></i>
                                             <span class="count">{{ "{:,}".format((star.VW_CNT or star.view_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="좋아요 수">
-                                            <i class="fa-solid fa-heart" style="color: #ef4444;"></i>
+                                        <div class="hof-action-item btn-like {% if is_like_act %}active{% endif %}" title="좋아요 수">
+                                            <i class="fa-{% if is_like_act %}solid{% else %}regular{% endif %} fa-heart" style="color: #ef4444;"></i>
                                             <span class="count">{{ "{:,}".format((star.LIKE_CNT or star.like_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="댓글 수">
-                                            <i class="fa-solid fa-comment" style="color: #8b5cf6;"></i>
+                                        <div class="hof-action-item btn-comment {% if is_cmt_act %}active{% endif %}" title="댓글 수">
+                                            <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>
@@ -274,21 +291,26 @@
                                         </div>
                                     </div>
 
-                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 -->
+                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 (내가 영향을 준 요소 활성화 스타일 적용) -->
+                                    {% set is_mine = is_logged_in and current_user_id and star.ENT_USER_ID and (current_user_id|string == star.ENT_USER_ID|string) %}
+                                    {% set is_view_act = is_logged_in and (not is_mine) and star.actions and star.actions.is_viewed %}
+                                    {% set is_like_act = is_logged_in and star.actions and star.actions.is_liked %}
+                                    {% set is_cmt_act = is_logged_in and star.actions and star.actions.is_commented %}
+                                    {% set is_share_act = is_logged_in and star.actions and star.actions.is_shared %}
                                     <div class="hof-actions-bar">
-                                        <div class="hof-action-item" title="조회수">
-                                            <i class="fa-regular fa-eye" style="color: #3b82f6;"></i>
+                                        <div class="hof-action-item btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                                            <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye" style="color: #3b82f6;"></i>
                                             <span class="count">{{ "{:,}".format((star.VW_CNT or star.view_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="좋아요 수">
-                                            <i class="fa-solid fa-heart" style="color: #ef4444;"></i>
+                                        <div class="hof-action-item btn-like {% if is_like_act %}active{% endif %}" title="좋아요 수">
+                                            <i class="fa-{% if is_like_act %}solid{% else %}regular{% endif %} fa-heart" style="color: #ef4444;"></i>
                                             <span class="count">{{ "{:,}".format((star.LIKE_CNT or star.like_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="댓글 수">
-                                            <i class="fa-solid fa-comment" style="color: #8b5cf6;"></i>
+                                        <div class="hof-action-item btn-comment {% if is_cmt_act %}active{% endif %}" title="댓글 수">
+                                            <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>
@@ -382,21 +404,26 @@
                                         </div>
                                     </div>
 
-                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 -->
+                                    <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 (내가 영향을 준 요소 활성화 스타일 적용) -->
+                                    {% set is_mine = is_logged_in and current_user_id and star.ENT_USER_ID and (current_user_id|string == star.ENT_USER_ID|string) %}
+                                    {% set is_view_act = is_logged_in and (not is_mine) and star.actions and star.actions.is_viewed %}
+                                    {% set is_like_act = is_logged_in and star.actions and star.actions.is_liked %}
+                                    {% set is_cmt_act = is_logged_in and star.actions and star.actions.is_commented %}
+                                    {% set is_share_act = is_logged_in and star.actions and star.actions.is_shared %}
                                     <div class="hof-actions-bar">
-                                        <div class="hof-action-item" title="조회수">
-                                            <i class="fa-regular fa-eye" style="color: #3b82f6;"></i>
+                                        <div class="hof-action-item btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                                            <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye" style="color: #3b82f6;"></i>
                                             <span class="count">{{ "{:,}".format((star.VW_CNT or star.view_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="좋아요 수">
-                                            <i class="fa-solid fa-heart" style="color: #ef4444;"></i>
+                                        <div class="hof-action-item btn-like {% if is_like_act %}active{% endif %}" title="좋아요 수">
+                                            <i class="fa-{% if is_like_act %}solid{% else %}regular{% endif %} fa-heart" style="color: #ef4444;"></i>
                                             <span class="count">{{ "{:,}".format((star.LIKE_CNT or star.like_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="댓글 수">
-                                            <i class="fa-solid fa-comment" style="color: #8b5cf6;"></i>
+                                        <div class="hof-action-item btn-comment {% if is_cmt_act %}active{% endif %}" title="댓글 수">
+                                            <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>
@@ -424,6 +451,13 @@
             {% endif %}
         </div>
     </div>
+    {% else %}
+        <div style="background: #ffffff; border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 2.2rem 1.5rem; text-align: center; color: var(--text-secondary); margin-bottom: 4.5rem; box-shadow: var(--shadow-soft);">
+            <i class="fa-solid fa-trophy" style="font-size: 2.2rem; color: #fbbf24; margin-bottom: 0.65rem; display: block;"></i>
+            <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.35rem;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회 명예의 전당 챔피언 집계 중입니다 🌟</h4>
+            <p style="font-size: 0.92rem; color: var(--text-muted); margin: 0;">콘테스트 종료 후 마감 심사에 따라 종합 TOP 3 수상자가 이곳에 당당히 명예의 전당으로 등재됩니다!</p>
+        </div>
+    {% endif %}
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -537,11 +571,11 @@
                         </div>
 
                         <!-- 1위, 2위, 3위 가로 3분할 정렬 (수상 등급 상관 없이 카드의 높이 및 요소 크기 동일) -->
-                        <div class="winners-podium" style="grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 0; align-items: stretch;">
+                        <div class="winners-podium" style="grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; margin-top: 0; align-items: stretch; width: 100%; box-sizing: border-box;">
                             {% for rk in [1, 2, 3] %}
                                 {% set stars = group[rk] %}
-                                <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%;">
-                                    <div class="podium-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" style="min-height: auto; border: 1px solid var(--border-light); transform: none; display: flex; flex-direction: column; height: 100%;">
+                                <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
+                                    <div class="podium-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" style="min-height: auto; border: 1px solid var(--border-light); transform: none; display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
                                         {% if stars %}
                                             <div class="co-winner-wrapper">
                                                 {% for star in stars %}
@@ -608,21 +642,26 @@
                                                                 </div>
                                                             </div>
 
-                                                            <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 -->
+                                                            <!-- 📊 4. 럭셔리 수치 4분할 버튼 바 (내가 영향을 준 요소 활성화 스타일 적용) -->
+                                                            {% set is_mine = is_logged_in and current_user_id and star.ENT_USER_ID and (current_user_id|string == star.ENT_USER_ID|string) %}
+                                                            {% set is_view_act = is_logged_in and (not is_mine) and star.actions and star.actions.is_viewed %}
+                                                            {% set is_like_act = is_logged_in and star.actions and star.actions.is_liked %}
+                                                            {% set is_cmt_act = is_logged_in and star.actions and star.actions.is_commented %}
+                                                            {% set is_share_act = is_logged_in and star.actions and star.actions.is_shared %}
                                                             <div class="hof-actions-bar">
-                                                                <div class="hof-action-item" title="조회수">
-                                                                    <i class="fa-regular fa-eye" style="color: #3b82f6;"></i>
+                                                                <div class="hof-action-item btn-view {% if is_view_act %}active{% endif %}" title="조회수">
+                                                                    <i class="fa-{% if is_view_act %}solid{% else %}regular{% endif %} fa-eye" style="color: #3b82f6;"></i>
                                                                     <span class="count">{{ "{:,}".format((star.VW_CNT or star.view_count or 0)|int) }}</span>
                                                                 </div>
-                                                                <div class="hof-action-item" title="좋아요 수">
-                                                                    <i class="fa-solid fa-heart" style="color: #ef4444;"></i>
+                                                                <div class="hof-action-item btn-like {% if is_like_act %}active{% endif %}" title="좋아요 수">
+                                                                    <i class="fa-{% if is_like_act %}solid{% else %}regular{% endif %} fa-heart" style="color: #ef4444;"></i>
                                                                     <span class="count">{{ "{:,}".format((star.LIKE_CNT or star.like_count or 0)|int) }}</span>
                                                                 </div>
-                                                                <div class="hof-action-item" title="댓글 수">
-                                                                    <i class="fa-solid fa-comment" style="color: #8b5cf6;"></i>
+                                                                <div class="hof-action-item btn-comment {% if is_cmt_act %}active{% endif %}" title="댓글 수">
+                                                                    <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                                                     <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                                                 </div>
-                                                                <div class="hof-action-item" title="공유 가입 수">
+                                                                <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
                                                                     <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                                                     <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                                                 </div>

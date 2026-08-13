@@ -706,7 +706,8 @@ def hall_of_fame():
     else:
         contest_id = None
 
-    winners = service.get_hall_of_fame(contest_id=contest_id)
+    current_user_id = get_current_user_id()
+    winners = service.get_hall_of_fame(contest_id=contest_id, user_id=current_user_id)
     current_contest = service.get_contest(contest_id) if (contest_id and any((c.get('CONTEST_ROUND') == contest_id or c.get('contest_id') == contest_id) for c in contests)) else (contests[0] if contests else None)
 
     return render_template(
@@ -813,7 +814,8 @@ def m_hall_of_fame():
     else:
         contest_id = None
 
-    winners = service.get_hall_of_fame(contest_id=contest_id)
+    current_user_id = get_current_user_id()
+    winners = service.get_hall_of_fame(contest_id=contest_id, user_id=current_user_id)
     current_contest = service.get_contest(contest_id) if (contest_id and any((c.get('CONTEST_ROUND') == contest_id or c.get('contest_id') == contest_id) for c in contests)) else (contests[0] if contests else None)
 
     return render_template(

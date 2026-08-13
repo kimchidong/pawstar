@@ -108,8 +108,16 @@
                                     <span style="font-size: 0.68rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.08rem 0.4rem; border-radius: 6px;">
                                         ⭐ {{ "{:,}".format(w.SCORE or w.score or 0) }}점
                                     </span>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.08rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                        <span>👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
+                                    {% set is_mine = is_logged_in and current_user_id and w.ENT_USER_ID and (current_user_id|string == w.ENT_USER_ID|string) %}
+                                    {% set is_view_act = is_logged_in and (not is_mine) and w.actions and w.actions.is_viewed %}
+                                    {% set is_like_act = is_logged_in and w.actions and w.actions.is_liked %}
+                                    {% set is_cmt_act = is_logged_in and w.actions and w.actions.is_commented %}
+                                    {% set is_share_act = is_logged_in and w.actions and w.actions.is_shared %}
+                                    <span style="font-size: 0.65rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.08rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                        <span style="{{ 'color: #0284c7; font-weight: 900;' if is_view_act else '' }}">👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · 
+                                        <span style="{{ 'color: #e11d48; font-weight: 900;' if is_like_act else '' }}">❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · 
+                                        <span style="{{ 'color: #7c3aed; font-weight: 900;' if is_cmt_act else '' }}">💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · 
+                                        <span style="display: inline-flex; align-items: center; gap: 0.15rem; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
                                     </span>
                                 </div>
                             </div>
@@ -192,8 +200,16 @@
                                     <span style="font-size: 0.68rem; font-weight: 900; color: #d97706; background: #fffbeb; border: 1px solid #fef3c7; padding: 0.08rem 0.4rem; border-radius: 6px;">
                                         ⭐ {{ "{:,}".format(w.SCORE or w.score or 0) }}점
                                     </span>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.08rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.2rem;">
-                                        <span>👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · <span>❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · <span>💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · <span style="display: inline-flex; align-items: center; gap: 0.15rem;"><i class="fa-solid fa-share-nodes" style="color: #6366f1; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
+                                    {% set is_mine = is_logged_in and current_user_id and w.ENT_USER_ID and (current_user_id|string == w.ENT_USER_ID|string) %}
+                                    {% set is_view_act = is_logged_in and (not is_mine) and w.actions and w.actions.is_viewed %}
+                                    {% set is_like_act = is_logged_in and w.actions and w.actions.is_liked %}
+                                    {% set is_cmt_act = is_logged_in and w.actions and w.actions.is_commented %}
+                                    {% set is_share_act = is_logged_in and w.actions and w.actions.is_shared %}
+                                    <span style="font-size: 0.65rem; font-weight: 700; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.08rem 0.4rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                        <span style="{{ 'color: #0284c7; font-weight: 900;' if is_view_act else '' }}">👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · 
+                                        <span style="{{ 'color: #e11d48; font-weight: 900;' if is_like_act else '' }}">❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · 
+                                        <span style="{{ 'color: #7c3aed; font-weight: 900;' if is_cmt_act else '' }}">💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · 
+                                        <span style="display: inline-flex; align-items: center; gap: 0.15rem; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
                                     </span>
                                 </div>
                             </div>

@@ -1910,7 +1910,8 @@ class PawStarService:
             print("delete_comment error:", e)
             return {'success': False, 'message': str(e)}
 
-    def get_hall_of_fame(self, contest_id=None):
+    def get_hall_of_fame(self, contest_id=None, current_user_id=None, user_id=None):
+        current_user_id = user_id or current_user_id
         conn = self.get_db_connection()
         if not conn:
             return []
@@ -1931,6 +1932,35 @@ class PawStarService:
                 if not contest_id:
                     conn.close()
                     return []
+
+                liked_round_nos = set()
+                commented_round_nos = set()
+                viewed_round_nos = set()
+                shared_round_nos = set()
+                if current_user_id:
+                    cur.execute("""
+                        SELECT ROUND_NO FROM pst_contest_like
+                        WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    liked_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
+
+                    cur.execute("""
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_cmt
+                        WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    commented_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
+
+                    cur.execute("""
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_vw
+                        WHERE CONTEST_ROUND = %s AND VW_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    viewed_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
+
+                    cur.execute("""
+                        SELECT DISTINCT ROUND_NO FROM pst_contest_share
+                        WHERE CONTEST_ROUND = %s AND SHARE_USER_ID = %s
+                    """, (contest_id, current_user_id))
+                    shared_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
 
                 cur.execute("""
                     SELECT 
@@ -1957,6 +1987,7 @@ class PawStarService:
                         r.TITLE,
                         r.CONTS AS content,
                         r.CONTS AS CONTS,
+                        r.ENT_USER_ID,
                         DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
                         COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
                         COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1, '/static/image/paw/default_pet.jpg') AS popup_image_path,
@@ -2031,6 +2062,14 @@ class PawStarService:
                                 'ranking': wa['RANKING']
                             })
                         w['awards'] = w_awards_list
+
+                        is_author = bool(current_user_id and w.get('ENT_USER_ID') and str(current_user_id) == str(w.get('ENT_USER_ID')))
+                        w['actions'] = {
+                            'is_liked': False if is_author else (w_r_no in liked_round_nos),
+                            'is_commented': False if is_author else (w_r_no in commented_round_nos),
+                            'is_viewed': False if is_author else (w_r_no in viewed_round_nos),
+                            'is_shared': False if is_author else (w_r_no in shared_round_nos)
+                        }
 
                 conn.close()
                 return winners

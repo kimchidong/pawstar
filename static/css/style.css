@@ -1532,10 +1532,12 @@ option.opt-closed {
 
 .winners-podium {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1.5rem;
     margin-bottom: 5.5rem;
-    align-items: flex-end;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .podium-card-wrapper {
@@ -1544,6 +1546,9 @@ option.opt-closed {
     flex-direction: column;
     justify-content: flex-end;
     height: 100%;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .co-winner-wrapper {
@@ -1551,6 +1556,8 @@ option.opt-closed {
     grid-template-areas: "winner-card";
     width: 100%;
     height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .co-winner-content {
@@ -1563,6 +1570,8 @@ option.opt-closed {
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .co-tabs {
@@ -1580,84 +1589,79 @@ option.opt-closed {
 .podium-card {
     background: var(--bg-surface);
     border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    border-radius: 20px !important;
     padding: 0;
     text-align: center;
     position: relative;
-    transition: var(--transition);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-shadow: var(--shadow-card);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 465px !important;
+    height: 100% !important;
+    min-height: 520px;
+    width: 100%;
+    min-width: 0;
     box-sizing: border-box !important;
 }
 
-/* 📷 모든 카드의 미디어(사진) 높이: 슈퍼스타 규격과 100% 동일한 310px 지정 */
+/* 📷 모든 카드의 미디어(사진) 높이 */
 .podium-media {
     position: relative;
     width: 100%;
-    height: 310px !important;
+    height: 290px !important;
     overflow: hidden;
     background: #f1f5f9;
     flex-shrink: 0 !important;
+    min-width: 0;
 }
 
 .podium-card.super-star .podium-media {
-    height: 310px !important;
+    height: 290px !important;
 }
 
-/* 📋 사진 아래 부분(podium-body): 모든 카드에서 넉넉한 240px 고정 높이 통일 */
+/* 📋 사진 아래 부분(podium-body): 넉넉하고 유연한 높이 */
 .podium-body {
     padding: 1rem 1rem !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 0.45rem;
-    height: 240px !important;
-    min-height: 240px !important;
-    max-height: 240px !important;
+    flex: 1 !important;
+    min-height: 230px !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
-    margin-top: auto !important;
     background: #ffffff !important;
     border-top: 1px solid #e2e8f0 !important;
-}
-
-/* 🏆 1위 슈퍼스타 카드 / 2위 라이징스타 / 3위 브라이트스타 카드 전체 높이 550px 통일 */
-.podium-card {
-    border-radius: 20px !important;
+    min-width: 0;
     overflow: hidden;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .podium-card:hover {
-    transform: translateY(-8px) scale(1.01) !important;
+    transform: translateY(-6px) scale(1.005) !important;
 }
 
 .podium-card.super-star {
     border: 2px solid #f59e0b !important;
     background: #ffffff;
-    box-shadow: 0 20px 45px rgba(245, 158, 11, 0.32), 0 0 25px rgba(254, 243, 199, 0.6) !important;
+    box-shadow: 0 20px 45px rgba(245, 158, 11, 0.25), 0 0 20px rgba(254, 243, 199, 0.5) !important;
     transform: none;
     z-index: 10;
-    height: 550px !important;
 }
 
 .podium-card.rising-star,
 .podium-card.bright-star {
-    height: 550px !important;
     background: #ffffff;
 }
 
 .podium-card.rising-star {
     border: 2px solid #94a3b8 !important;
-    box-shadow: 0 16px 36px rgba(148, 163, 184, 0.25), 0 0 20px rgba(241, 245, 249, 0.6) !important;
+    box-shadow: 0 16px 36px rgba(148, 163, 184, 0.2), 0 0 20px rgba(241, 245, 249, 0.5) !important;
 }
 
 .podium-card.bright-star {
     border: 2px solid #d97706 !important;
-    box-shadow: 0 16px 36px rgba(217, 119, 6, 0.22), 0 0 20px rgba(254, 243, 199, 0.5) !important;
+    box-shadow: 0 16px 36px rgba(217, 119, 6, 0.18), 0 0 20px rgba(254, 243, 199, 0.4) !important;
 }
 
 /* 📋 명예의 전당 바디(podium-body): 럭셔리 배경 및 타이포그래피 */
@@ -1668,10 +1672,11 @@ option.opt-closed {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    height: 240px !important;
-    min-height: 240px !important;
-    max-height: 240px !important;
+    flex: 1 !important;
+    min-height: 230px !important;
     box-sizing: border-box !important;
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* 슈퍼스타 전용 은은한 골드 글로우 틴트 배경 */
@@ -1795,38 +1800,69 @@ option.opt-closed {
     color: #334155;
 }
 
-/* 🚫 빈 수상자 카드(empty-card)도 사진 미디어(310px)와 아래 body(240px) 높이 완전히 동일 */
+/* 내가 영향을 준/참여한 요소 활성화 파스텔 스타일 (대회 목록과 100% 동일한 비주얼) */
+.hof-action-item.btn-view.active {
+    background: #e0f2fe !important;
+    border-color: #bae6fd !important;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15) !important;
+}
+.hof-action-item.btn-view.active i,
+.hof-action-item.btn-view.active .count {
+    color: #0284c7 !important;
+}
+
+.hof-action-item.btn-like.active {
+    background: #ffe4e6 !important;
+    border-color: #fecdd3 !important;
+    box-shadow: 0 3px 8px rgba(225, 29, 72, 0.15) !important;
+}
+.hof-action-item.btn-like.active i,
+.hof-action-item.btn-like.active .count {
+    color: #e11d48 !important;
+}
+
+.hof-action-item.btn-comment.active {
+    background: #f3e8ff !important;
+    border-color: #e9d5ff !important;
+    box-shadow: 0 3px 8px rgba(124, 58, 237, 0.15) !important;
+}
+.hof-action-item.btn-comment.active i,
+.hof-action-item.btn-comment.active .count {
+    color: #7c3aed !important;
+}
+
+.hof-action-item.btn-share.active {
+    background: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+    box-shadow: 0 3px 8px rgba(21, 128, 61, 0.15) !important;
+}
+.hof-action-item.btn-share.active i,
+.hof-action-item.btn-share.active .count {
+    color: #15803d !important;
+}
+
+/* 🚫 빈 수상자 카드(empty-card) 스타일 */
 .podium-card.empty-card {
-    height: 550px !important;
+    height: 100% !important;
+    min-height: 520px !important;
+    width: 100% !important;
+    min-width: 0 !important;
 }
 .podium-card.empty-card .podium-media {
-    height: 310px !important;
+    height: 290px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
 }
 .podium-card.empty-card .podium-body {
-    height: 240px !important;
-    min-height: 240px !important;
-    max-height: 240px !important;
+    flex: 1 !important;
+    min-height: 230px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: #ffffff !important;
     border-top: 1px solid #e2e8f0 !important;
-}
-
-.podium-card.rising-star {
-    border-color: var(--accent-silver);
-}
-
-.podium-card.bright-star {
-    border-color: var(--accent-bronze);
-}
-
-/* 빈 수상자 카드(empty-card) 높이 비대칭 정의 */
-.podium-card.empty-card .podium-media {
-    height: 150px;
-}
-.podium-card.super-star.empty-card .podium-media {
-    height: 250px;
 }
 
 @keyframes medalShimmerGlow {
