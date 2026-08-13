@@ -1534,10 +1534,116 @@ option.opt-closed {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 1.5rem;
-    margin-bottom: 5.5rem;
+    margin-bottom: 2rem;
     align-items: stretch;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* 🏆 챔피언 TOP 3 럭셔리 3단 시상대 (Podium Stage - 두 번째 이미지 모티브) */
+.podium-stage-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.podium-stage-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    align-items: flex-end;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.podium-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-radius: 18px 18px 24px 24px;
+    box-shadow: 0 16px 36px rgba(109, 40, 217, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    overflow: visible;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.podium-step:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(109, 40, 217, 0.35);
+}
+
+/* 2위 라이징스타 단상 (중간 높이) */
+.podium-step.step-2 {
+    height: 115px;
+    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 50%, #4c1d95 100%);
+    border: 2.5px solid #a78bfa;
+}
+
+/* 1위 슈퍼스타 단상 (가장 높음 + 럭셔리 골드 & 웅장함) */
+.podium-step.step-1 {
+    height: 165px;
+    background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 45%, #4c1d95 100%);
+    border: 3px solid #f59e0b;
+    box-shadow: 0 20px 48px rgba(245, 158, 11, 0.35), 0 0 30px rgba(251, 191, 36, 0.45);
+    z-index: 2;
+}
+
+/* 3위 브라이트스타 단상 (낮은 높이) */
+.podium-step.step-3 {
+    height: 85px;
+    background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 50%, #3b0764 100%);
+    border: 2.5px solid #c084fc;
+}
+
+
+
+
+
+/* 전면 패널 */
+.step-front-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    gap: 0.15rem;
+}
+
+.step-rank-badge {
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+.step-rank-badge.gold {
+    color: #fef08a;
+    font-size: 2.6rem;
+    text-shadow: 0 0 14px rgba(245, 158, 11, 0.85), 0 3px 6px rgba(0,0,0,0.5);
+}
+
+.step-rank-badge.silver {
+    color: #f1f5f9;
+}
+
+.step-rank-badge.bronze {
+    color: #fed7aa;
+}
+
+
+
+.step-rank-sub {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(0, 0, 0, 0.22);
+    padding: 0.12rem 0.6rem;
+    border-radius: 10px;
+    margin-top: 0.15rem;
 }
 
 .podium-card-wrapper {
@@ -2394,6 +2500,12 @@ option.opt-closed {
 /* Responsive */
 @media (max-width: 768px) {
     .winners-podium { grid-template-columns: 1fr; }
+    .podium-step.step-1 { height: 135px; }
+    .podium-step.step-2 { height: 95px; }
+    .podium-step.step-3 { height: 70px; }
+    .step-rank-badge { font-size: 1.6rem; }
+    .step-rank-badge.gold { font-size: 2.1rem; }
+    .step-rank-sub { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
     .podium-card.super-star { transform: none; }
     .contest-hero { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
     .rookie-card { flex-direction: column; text-align: center; }
