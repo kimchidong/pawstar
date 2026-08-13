@@ -1607,16 +1607,16 @@ option.opt-closed {
     height: 310px !important;
 }
 
-/* 📋 사진 아래 부분(podium-body): 모든 카드에서 무조건 155px 고정 높이 100% 통일 */
+/* 📋 사진 아래 부분(podium-body): 모든 카드에서 넉넉한 240px 고정 높이 통일 */
 .podium-body {
-    padding: 0.85rem 0.75rem !important;
+    padding: 1rem 1rem !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start;
-    gap: 0.35rem;
-    height: 155px !important;
-    min-height: 155px !important;
-    max-height: 155px !important;
+    gap: 0.45rem;
+    height: 240px !important;
+    min-height: 240px !important;
+    max-height: 240px !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
     margin-top: auto !important;
@@ -1624,41 +1624,188 @@ option.opt-closed {
     border-top: 1px solid #e2e8f0 !important;
 }
 
-/* 🏆 1위 슈퍼스타 카드 / 2위 라이징스타 / 3위 브라이트스타 카드 전체 높이 465px 통일 */
+/* 🏆 1위 슈퍼스타 카드 / 2위 라이징스타 / 3위 브라이트스타 카드 전체 높이 550px 통일 */
+.podium-card {
+    border-radius: 20px !important;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.podium-card:hover {
+    transform: translateY(-8px) scale(1.01) !important;
+}
+
 .podium-card.super-star {
-    border: 2px solid var(--accent-gold);
+    border: 2px solid #f59e0b !important;
     background: #ffffff;
-    box-shadow: 0 20px 45px rgba(245, 158, 11, 0.32);
+    box-shadow: 0 20px 45px rgba(245, 158, 11, 0.32), 0 0 25px rgba(254, 243, 199, 0.6) !important;
     transform: none;
     z-index: 10;
-    height: 465px !important;
+    height: 550px !important;
 }
 
 .podium-card.rising-star,
 .podium-card.bright-star {
-    height: 465px !important;
+    height: 550px !important;
     background: #ffffff;
 }
 
 .podium-card.rising-star {
-    border-color: var(--accent-silver);
+    border: 2px solid #94a3b8 !important;
+    box-shadow: 0 16px 36px rgba(148, 163, 184, 0.25), 0 0 20px rgba(241, 245, 249, 0.6) !important;
 }
 
 .podium-card.bright-star {
-    border-color: var(--accent-bronze);
+    border: 2px solid #d97706 !important;
+    box-shadow: 0 16px 36px rgba(217, 119, 6, 0.22), 0 0 20px rgba(254, 243, 199, 0.5) !important;
 }
 
-/* 🚫 빈 수상자 카드(empty-card)도 사진 미디어(310px)와 아래 body(155px) 높이 100% 완전히 동일 */
+/* 📋 명예의 전당 바디(podium-body): 럭셔리 배경 및 타이포그래피 */
+.podium-body.hof-luxury-body {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
+    padding: 1rem 1.15rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 240px !important;
+    min-height: 240px !important;
+    max-height: 240px !important;
+    box-sizing: border-box !important;
+}
+
+/* 슈퍼스타 전용 은은한 골드 글로우 틴트 배경 */
+.podium-card.super-star .podium-body.hof-luxury-body {
+    background: linear-gradient(180deg, #ffffff 0%, #fffbeb 60%, #fef3c7 100%) !important;
+    border-top: 1px solid rgba(251, 191, 36, 0.4) !important;
+}
+
+/* 라이징스타 전용 실버-블루 틴트 배경 */
+.podium-card.rising-star .podium-body.hof-luxury-body {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #f1f5f9 100%) !important;
+    border-top: 1px solid rgba(203, 213, 225, 0.5) !important;
+}
+
+/* 브라이트스타 전용 브론즈-오렌지 틴트 배경 */
+.podium-card.bright-star .podium-body.hof-luxury-body {
+    background: linear-gradient(180deg, #ffffff 0%, #fff7ed 60%, #ffedd5 100%) !important;
+    border-top: 1px solid rgba(251, 146, 60, 0.4) !important;
+}
+
+/* 👑 프로필 및 아바타 럭셔리 링 */
+.hof-avatar-ring {
+    padding: 2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.hof-avatar-img {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* 🏷️ 럭셔리 펫 태그 캡슐 */
+.hof-pet-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+/* 📝 자랑글 제목 스페셜 타이포그래피 */
+.hof-post-title {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em;
+    line-height: 1.35 !important;
+    margin: 0.3rem 0 0.4rem 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+/* 🌟 스파클링 총점수 배지 */
+.hof-score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.38) !important;
+    letter-spacing: 0.02em;
+}
+
+/* 📊 럭셔리 수치 4분할 버튼 바 */
+.hof-actions-bar {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.4rem !important;
+    padding-top: 0.55rem !important;
+    border-top: 1px dashed rgba(203, 213, 225, 0.8) !important;
+}
+
+.hof-action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.2rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.hof-action-item:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.hof-action-item i {
+    font-size: 0.9rem;
+    margin-bottom: 0.15rem;
+}
+
+.hof-action-item .count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+/* 🚫 빈 수상자 카드(empty-card)도 사진 미디어(310px)와 아래 body(240px) 높이 완전히 동일 */
 .podium-card.empty-card {
-    height: 465px !important;
+    height: 550px !important;
 }
 .podium-card.empty-card .podium-media {
     height: 310px !important;
 }
 .podium-card.empty-card .podium-body {
-    height: 155px !important;
-    min-height: 155px !important;
-    max-height: 155px !important;
+    height: 240px !important;
+    min-height: 240px !important;
+    max-height: 240px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
