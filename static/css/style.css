@@ -1530,22 +1530,53 @@ option.opt-closed {
     margin-bottom: 0.5rem;
 }
 
+/* 🏆 TOP 3 카드 계단형 오프셋 배치 (스크린샷 3 100% 동일) */
 .winners-podium {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 1.5rem;
-    margin-bottom: 2rem;
-    align-items: stretch;
+    margin-bottom: 0 !important;
+    align-items: flex-end !important;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* 🏆 챔피언 TOP 3 럭셔리 3단 시상대 (Podium Stage - 두 번째 이미지 모티브) */
+.podium-card-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.35s ease;
+}
+
+/* 1위 슈퍼스타 카드를 위로 솟구치게 상단 배치 */
+.podium-card-wrapper:nth-child(2) {
+    transform: translateY(-45px);
+    z-index: 5;
+}
+
+/* 2위 라이징스타 카드 */
+.podium-card-wrapper:nth-child(1) {
+    transform: translateY(0);
+    z-index: 4;
+}
+
+/* 3위 브라이트스타 카드는 우측 아래 배치 */
+.podium-card-wrapper:nth-child(3) {
+    transform: translateY(15px);
+    z-index: 3;
+}
+
+/* 🏆 챔피언 TOP 3 시상대 단상 바디 (스크린샷 3 100% 동일) */
 .podium-stage-wrapper {
     position: relative;
     width: 100%;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
+    margin-top: 0;
+    margin-bottom: 4.5rem;
     padding: 0;
     box-sizing: border-box;
 }
@@ -1553,7 +1584,7 @@ option.opt-closed {
 .podium-stage-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
+    gap: 0 !important;
     align-items: flex-end;
     width: 100%;
     box-sizing: border-box;
@@ -1565,48 +1596,34 @@ option.opt-closed {
     flex-direction: column;
     justify-content: flex-end;
     border-radius: 0 !important;
+    border: none !important;
     box-shadow: 0 16px 36px rgba(109, 40, 217, 0.25);
     overflow: visible;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-top: 1.25rem;
-    width: calc(100% + 1.55rem) !important;
-    margin-left: -0.775rem;
-    margin-right: -0.775rem;
+    width: 100% !important;
+    margin: 0 !important;
 }
 
-
-
-/* 2위 라이징스타 단상 (좌측 - 직각 모서리) */
+/* 2위 라이징스타 단상 (좌측 직각) */
 .podium-step.step-2 {
     height: 110px;
     background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 50%, #4c1d95 100%);
-    border: none !important;
-    border-radius: 0 !important;
     z-index: 1;
 }
 
-/* 1위 슈퍼스타 단상 (중간 - 가장 높음 + 직각 모서리) */
+/* 1위 슈퍼스타 단상 (중간 - 가장 높음 + 직각 + 골드 글로우) */
 .podium-step.step-1 {
     height: 155px;
     background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 45%, #4c1d95 100%);
-    border: none !important;
-    border-radius: 0 !important;
     box-shadow: 0 20px 48px rgba(245, 158, 11, 0.35), 0 0 30px rgba(251, 191, 36, 0.45);
     z-index: 3;
 }
 
-/* 3위 브라이트스타 단상 (우측 - 직각 모서리) */
+/* 3위 브라이트스타 단상 (우측 직각) */
 .podium-step.step-3 {
     height: 80px;
     background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 50%, #3b0764 100%);
-    border: none !important;
-    border-radius: 0 !important;
     z-index: 1;
 }
-
-
-
-
 
 /* 전면 패널 */
 .step-front-panel {
@@ -1640,20 +1657,6 @@ option.opt-closed {
     color: #fed7aa;
 }
 
-
-
-
-
-.podium-card-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 100%;
-    min-width: 0;
-    width: 100%;
-    box-sizing: border-box;
-}
 
 .co-winner-wrapper {
     display: grid;
