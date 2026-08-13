@@ -77,8 +77,8 @@ def seed_database():
         # 5. Badges & User Badges
         badges = [
             (1, '🥇 1위 슈퍼스타', 'trophy-gold', '콘테스트 1위 슈퍼스타'),
-            (2, '🥈 2위 라이징스타', 'trophy-silver', '콘테스트 2위 라이징스타'),
-            (3, '🥉 3위 브라이트스타', 'trophy-bronze', '콘테스트 3위 브라이트스타'),
+            (2, '🥈 2위 브라이트스타', 'trophy-silver', '콘테스트 2위 브라이트스타'),
+            (3, '🥉 3위 라이징스타', 'trophy-bronze', '콘테스트 3위 라이징스타'),
             (4, '⭐ 루키스타 1위', 'star-rookie-1', '급상승 루키스타 1위'),
             (5, '⭐ 루키스타 2위', 'star-rookie-2', '급상승 루키스타 2위'),
             (6, '⭐ 루키스타 3위', 'star-rookie-3', '급상승 루키스타 3위')

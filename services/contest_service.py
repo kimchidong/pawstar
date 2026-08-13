@@ -774,13 +774,22 @@ class PawStarService:
                     if not b_img and a.get('AWARD_CD'):
                         b_img = f"/static/image/badge/{a.get('AWARD_CD')}.png"
                     
+                    aw_cd_val = a.get('AWARD_CD') or ''
+                    aw_nm_val = a.get('AWARD_NM') or a.get('prize_name') or ''
+                    if aw_cd_val == 'P001A101':
+                        aw_nm_val = '슈퍼스타'
+                    elif aw_cd_val == 'P001A102':
+                        aw_nm_val = '브라이트스타'
+                    elif aw_cd_val == 'P001A103':
+                        aw_nm_val = '라이징스타'
+
                     award_item = {
                         'AWARD_CD': a.get('AWARD_CD'),
                         'AWARD_PART': a.get('AWARD_PART'),
-                        'AWARD_NM': a.get('AWARD_NM') or a.get('prize_name'),
+                        'AWARD_NM': aw_nm_val,
                         'RANKING': a.get('RANKING'),
                         'KIND_CD': a.get('KIND_CD') or a.get('round_kind_cd'),
-                        'prize_name': a.get('prize_name'),
+                        'prize_name': aw_nm_val,
                         'badge_img': b_img,
                         'BADGE_IMG_PATH_FILE': b_img
                     }
@@ -813,13 +822,22 @@ class PawStarService:
                     b_img = a.get('badge_img') or a.get('BADGE_IMG_PATH_FILE') or ''
                     if not b_img and a.get('AWARD_CD'):
                         b_img = f"/static/image/badge/{a.get('AWARD_CD')}.png"
+                    aw_cd_val = a.get('AWARD_CD') or ''
+                    aw_nm_val = a.get('AWARD_NM') or a.get('prize_name') or ''
+                    if aw_cd_val == 'P001A101':
+                        aw_nm_val = '슈퍼스타'
+                    elif aw_cd_val == 'P001A102':
+                        aw_nm_val = '브라이트스타'
+                    elif aw_cd_val == 'P001A103':
+                        aw_nm_val = '라이징스타'
+
                     post_awards_map[pk].append({
                         'award_cd': a.get('AWARD_CD'),
                         'AWARD_CD': a.get('AWARD_CD'),
                         'award_part': a.get('AWARD_PART'),
                         'AWARD_PART': a.get('AWARD_PART'),
-                        'award_nm': a.get('AWARD_NM') or a.get('prize_name'),
-                        'AWARD_NM': a.get('AWARD_NM') or a.get('prize_name'),
+                        'award_nm': aw_nm_val,
+                        'AWARD_NM': aw_nm_val,
                         'ranking': a.get('RANKING'),
                         'RANKING': a.get('RANKING'),
                         'badge_img': b_img,
@@ -1280,11 +1298,20 @@ class PawStarService:
                     
                     b_url = b_url.replace('.webp', '.png')
 
+                    aw_cd_val = a_row['AWARD_CD'] or ''
+                    aw_nm_val = a_row['AWARD_NM'] or ''
+                    if aw_cd_val == 'P001A101':
+                        aw_nm_val = '슈퍼스타'
+                    elif aw_cd_val == 'P001A102':
+                        aw_nm_val = '브라이트스타'
+                    elif aw_cd_val == 'P001A103':
+                        aw_nm_val = '라이징스타'
+
                     awards_map[r_no].append({
                         'award_part': a_row['AWARD_PART'],
                         'award_part_nm': '전체부문' if a_row['AWARD_PART'] == 'G002P001' else '품종부문',
                         'award_cd': a_row['AWARD_CD'],
-                        'award_nm': a_row['AWARD_NM'],
+                        'award_nm': aw_nm_val,
                         'badge_img': b_url,
                         'ranking': a_row['RANKING']
                     })
@@ -2100,11 +2127,20 @@ class PawStarService:
 
                             wb_url = wb_url.replace('.webp', '.png')
 
+                            aw_cd_val = wa['AWARD_CD'] or ''
+                            aw_nm_val = wa['AWARD_NM'] or ''
+                            if aw_cd_val == 'P001A101':
+                                aw_nm_val = '슈퍼스타'
+                            elif aw_cd_val == 'P001A102':
+                                aw_nm_val = '브라이트스타'
+                            elif aw_cd_val == 'P001A103':
+                                aw_nm_val = '라이징스타'
+
                             w_awards_list.append({
                                 'award_part': wa['AWARD_PART'],
                                 'award_part_nm': '전체부문' if wa['AWARD_PART'] == 'G002P001' else '품종부문',
                                 'award_cd': wa['AWARD_CD'],
-                                'award_nm': wa['AWARD_NM'],
+                                'award_nm': aw_nm_val,
                                 'badge_img': wb_url,
                                 'ranking': wa['RANKING']
                             })

@@ -261,12 +261,12 @@
                                 {% for aw in aw_list %}
                                     {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                                     {% set award_nm_str = (aw.award_nm or aw.AWARD_NM or '')|string %}
-                                    {% if 'P001A101' in award_cd_str or '슈퍼' in award_nm_str %}
+                                    {% if 'P001A101' in award_cd_str or (not award_cd_str and '슈퍼' in award_nm_str) %}
                                         <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem;">슈퍼스타</div>
-                                    {% elif 'P001A102' in award_cd_str or '라이징' in award_nm_str %}
-                                        <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">라이징스타</div>
-                                    {% elif 'P001A103' in award_cd_str or '브라이트' in award_nm_str %}
+                                    {% elif 'P001A102' in award_cd_str or (not award_cd_str and '브라이트' in award_nm_str) %}
                                         <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;">브라이트스타</div>
+                                    {% elif 'P001A103' in award_cd_str or (not award_cd_str and '라이징' in award_nm_str) %}
+                                        <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(203,213,225,0.9)); color: #0f172a;">라이징스타</div>
                                     {% endif %}
                                 {% endfor %}
                                 {# 2단계: "패밀리스타.." (패밀리 1~3위 등) 그 뒤에 출력 #}
@@ -274,7 +274,7 @@
                                     {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                                     {% set award_nm_str = (aw.award_nm or aw.AWARD_NM or '')|string %}
                                     {% set aw_rank = aw.ranking or aw.RANKING %}
-                                    {% if not ('P001A101' in award_cd_str or '슈퍼' in award_nm_str or 'P001A102' in award_cd_str or '라이징' in award_nm_str or 'P001A103' in award_cd_str or '브라이트' in award_nm_str) %}
+                                    {% if not ('P001A101' in award_cd_str or '슈퍼' in award_nm_str or 'P001A102' in award_cd_str or '브라이트' in award_nm_str or 'P001A103' in award_cd_str or '라이징' in award_nm_str) %}
                                         <div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; background: linear-gradient(135deg, rgba(243,232,255,0.95), rgba(192,132,252,0.9)); color: #3b0764;"><i class="{{ p_chip_icon }}" style="margin-right: 0.25rem;"></i> 패밀리{% if aw_rank %} {{ aw_rank }}위{% endif %}</div>
                                     {% endif %}
                                 {% endfor %}
@@ -449,15 +449,7 @@
                                             {% set badge_icon = 'fa-solid fa-star' %}
                                             {% set icon_color = '#f59e0b' %}
                                             {% set display_title = '슈퍼스타' %}
-                                        {% elif 'P001A102' in b_cd or '라이징' in b_nm %}
-                                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
-                                            {% set badge_color = '#334155' %}
-                                            {% set badge_border = '#cbd5e1' %}
-                                            {% set badge_shadow = '0 2px 6px rgba(100, 116, 139, 0.12)' %}
-                                            {% set badge_icon = 'fa-solid fa-star' %}
-                                            {% set icon_color = '#94a3b8' %}
-                                            {% set display_title = '라이징스타' %}
-                                        {% elif 'P001A103' in b_cd or '브라이트' in b_nm %}
+                                        {% elif 'P001A102' in b_cd or (not b_cd and '브라이트' in b_nm) %}
                                             {% set badge_bg = 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)' %}
                                             {% set badge_color = '#c2410c' %}
                                             {% set badge_border = '#fdba74' %}
@@ -465,6 +457,14 @@
                                             {% set badge_icon = 'fa-solid fa-star' %}
                                             {% set icon_color = '#b45309' %}
                                             {% set display_title = '브라이트스타' %}
+                                        {% elif 'P001A103' in b_cd or (not b_cd and '라이징' in b_nm) %}
+                                            {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' %}
+                                            {% set badge_color = '#334155' %}
+                                            {% set badge_border = '#cbd5e1' %}
+                                            {% set badge_shadow = '0 2px 6px rgba(100, 116, 139, 0.12)' %}
+                                            {% set badge_icon = 'fa-solid fa-star' %}
+                                            {% set icon_color = '#94a3b8' %}
+                                            {% set display_title = '라이징스타' %}
                                         {% else %}
                                             {% set badge_bg = 'linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%)' %}
                                             {% set badge_color = '#6b21a8' %}

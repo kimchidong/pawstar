@@ -872,15 +872,15 @@ body.m-body {
 }
 
 .m-card-badge.rank-2 {
-    background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%) !important;
-    color: #1e293b !important;
-    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45) !important;
-}
-
-.m-card-badge.rank-3 {
     background: linear-gradient(135deg, #ffedd5 0%, #fb923c 50%, #ea580c 100%) !important;
     color: #431407 !important;
     box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4) !important;
+}
+
+.m-card-badge.rank-3 {
+    background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%) !important;
+    color: #1e293b !important;
+    box-shadow: 0 4px 14px rgba(148, 163, 184, 0.45) !important;
 }
 
 .m-card-badge::before {

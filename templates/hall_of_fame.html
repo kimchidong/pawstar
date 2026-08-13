@@ -132,11 +132,11 @@
                             <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }}, true)" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
-                                        <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
+                                        <img src="/static/image/badge/P001A102.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
                                     </div>
                                     <div class="winner-title-badge">
                                         <i class="fa-solid fa-star"></i>
-                                        <span>라이징스타</span>
+                                        <span>브라이트스타</span>
                                         {% if ns.rising_stars|length > 1 %}
                                             <span class="co-winner-tag">공동 2위 {{ ns.rising_stars|length }}명</span>
                                         {% endif %}
@@ -359,11 +359,11 @@
                             <div class="co-winner-content {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}" onclick="openDetailModal({{ star | tojson | forceescape }}, true)" style="cursor: pointer;">
                                 <div class="podium-media">
                                     <div class="crown-badge">
-                                        <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="브라이트스타 메달">
+                                        <img src="/static/image/badge/P001A103.png" style="width: 44px; height: 44px; object-fit: contain;" alt="라이징스타 메달">
                                     </div>
                                     <div class="winner-title-badge">
                                         <i class="fa-solid fa-star"></i>
-                                        <span>브라이트스타</span>
+                                        <span>라이징스타</span>
                                         {% if ns.bright_stars|length > 1 %}
                                             <span class="co-winner-tag">공동 3위 {{ ns.bright_stars|length }}명</span>
                                         {% endif %}
