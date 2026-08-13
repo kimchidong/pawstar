@@ -1564,10 +1564,14 @@ option.opt-closed {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    border-radius: 18px 18px 24px 24px;
-    box-shadow: 0 16px 36px rgba(109, 40, 217, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    border-radius: 0 !important;
+    box-shadow: 0 16px 36px rgba(109, 40, 217, 0.25);
     overflow: visible;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 1.25rem;
+    width: calc(100% + 1.55rem) !important;
+    margin-left: -0.775rem;
+    margin-right: -0.775rem;
 }
 
 .podium-step:hover {
@@ -1575,27 +1579,32 @@ option.opt-closed {
     box-shadow: 0 20px 45px rgba(109, 40, 217, 0.35);
 }
 
-/* 2위 라이징스타 단상 (중간 높이) */
+/* 2위 라이징스타 단상 (좌측 - 직각 모서리) */
 .podium-step.step-2 {
-    height: 115px;
+    height: 110px;
     background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 50%, #4c1d95 100%);
-    border: 2.5px solid #a78bfa;
+    border: none !important;
+    border-radius: 0 !important;
+    z-index: 1;
 }
 
-/* 1위 슈퍼스타 단상 (가장 높음 + 럭셔리 골드 & 웅장함) */
+/* 1위 슈퍼스타 단상 (중간 - 가장 높음 + 직각 모서리) */
 .podium-step.step-1 {
-    height: 165px;
+    height: 155px;
     background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 45%, #4c1d95 100%);
-    border: 3px solid #f59e0b;
+    border: none !important;
+    border-radius: 0 !important;
     box-shadow: 0 20px 48px rgba(245, 158, 11, 0.35), 0 0 30px rgba(251, 191, 36, 0.45);
-    z-index: 2;
+    z-index: 3;
 }
 
-/* 3위 브라이트스타 단상 (낮은 높이) */
+/* 3위 브라이트스타 단상 (우측 - 직각 모서리) */
 .podium-step.step-3 {
-    height: 85px;
+    height: 80px;
     background: linear-gradient(180deg, #6d28d9 0%, #5b21b6 50%, #3b0764 100%);
-    border: 2.5px solid #c084fc;
+    border: none !important;
+    border-radius: 0 !important;
+    z-index: 1;
 }
 
 
@@ -1636,15 +1645,7 @@ option.opt-closed {
 
 
 
-.step-rank-sub {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.95);
-    background: rgba(0, 0, 0, 0.22);
-    padding: 0.12rem 0.6rem;
-    border-radius: 10px;
-    margin-top: 0.15rem;
-}
+
 
 .podium-card-wrapper {
     position: relative;
