@@ -3,7 +3,7 @@
  * Slogan: "반려동물도 스타가 될 수 있다."
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Outfit:wght@400;600;700;800;900&family=Pacifico&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
 
 :root {
     /* Light Mode Primary Palette */
@@ -1694,45 +1694,220 @@ option.opt-closed {
     font-size: 2rem;
     font-weight: 900;
     line-height: 1;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    transition: all 0.3s ease;
 }
 
 .step-rank-badge.gold {
-    color: #fef08a;
-    font-size: 2.6rem;
-    text-shadow: 0 0 14px rgba(245, 158, 11, 0.85), 0 3px 6px rgba(0,0,0,0.5);
+    color: #ffffff;
+    font-size: 2.7rem;
+    text-shadow: 
+        0 0 6px #ffffff,
+        0 0 15px #fef08a,
+        0 0 30px #facc15,
+        0 0 45px #eab308,
+        0 0 65px rgba(250, 204, 21, 1),
+        0 0 90px rgba(234, 179, 8, 0.85);
+    animation: neonBadgePulseGold 2.5s infinite alternate ease-in-out;
 }
 
 .step-rank-badge.silver {
-    color: #f1f5f9;
+    color: #ffffff;
+    font-size: 2.1rem;
+    text-shadow: 
+        0 0 5px #ffffff,
+        0 0 12px #e0f2fe,
+        0 0 24px #38bdf8,
+        0 0 40px #0284c7,
+        0 0 60px rgba(56, 189, 248, 0.9);
+    animation: neonBadgePulseSilver 2.8s infinite alternate ease-in-out;
 }
 
 .step-rank-badge.bronze {
-    color: #fed7aa;
+    color: #ffffff;
+    font-size: 2rem;
+    text-shadow: 
+        0 0 5px #ffffff,
+        0 0 12px #ffedd5,
+        0 0 24px #fb923c,
+        0 0 40px #ea580c,
+        0 0 60px rgba(251, 146, 60, 0.9);
+    animation: neonBadgePulseBronze 3.1s infinite alternate ease-in-out;
+}
+
+@keyframes neonBadgePulseGold {
+    0%, 100% {
+        text-shadow: 
+            0 0 6px #ffffff,
+            0 0 15px #fef08a,
+            0 0 30px #facc15,
+            0 0 45px #eab308,
+            0 0 65px rgba(250, 204, 21, 1),
+            0 0 90px rgba(234, 179, 8, 0.85);
+    }
+    50% {
+        text-shadow: 
+            0 0 10px #ffffff,
+            0 0 20px #ffff00,
+            0 0 38px #fde047,
+            0 0 58px #facc15,
+            0 0 85px rgba(250, 204, 21, 1),
+            0 0 110px rgba(250, 204, 21, 0.95);
+    }
+}
+
+@keyframes neonBadgePulseSilver {
+    0%, 100% {
+        text-shadow: 
+            0 0 5px #ffffff,
+            0 0 12px #e0f2fe,
+            0 0 24px #38bdf8,
+            0 0 40px #0284c7,
+            0 0 60px rgba(56, 189, 248, 0.9);
+    }
+    50% {
+        text-shadow: 
+            0 0 8px #ffffff,
+            0 0 16px #f0f9ff,
+            0 0 32px #7dd3fc,
+            0 0 52px #38bdf8,
+            0 0 75px rgba(56, 189, 248, 1);
+    }
+}
+
+@keyframes neonBadgePulseBronze {
+    0%, 100% {
+        text-shadow: 
+            0 0 5px #ffffff,
+            0 0 12px #ffedd5,
+            0 0 24px #fb923c,
+            0 0 40px #ea580c,
+            0 0 60px rgba(251, 146, 60, 0.9);
+    }
+    50% {
+        text-shadow: 
+            0 0 8px #ffffff,
+            0 0 16px #fff7ed,
+            0 0 32px #fdba74,
+            0 0 52px #fb923c,
+            0 0 75px rgba(251, 146, 60, 1);
+    }
 }
 
 .step-rank-sub {
-    font-size: 0.85rem;
-    font-weight: 800;
-    line-height: 1.1;
-    margin-top: 0.2rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    font-family: 'Pacifico', 'Dancing Script', cursive;
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.15;
+    margin-top: 0.15rem;
     white-space: nowrap;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.8px;
+    position: relative;
+    transition: all 0.3s ease;
 }
 
+/* 1위 Super Star - Gold Neon Sign */
 .step-rank-sub.gold {
-    color: #fef08a;
-    font-size: 0.95rem;
-    text-shadow: 0 0 10px rgba(245, 158, 11, 0.7), 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    font-size: 1.45rem;
+    text-shadow: 
+        0 0 5px #ffffff,
+        0 0 12px #fef08a,
+        0 0 24px #facc15,
+        0 0 38px #eab308,
+        0 0 55px rgba(250, 204, 21, 0.95),
+        0 0 75px rgba(234, 179, 8, 0.8);
+    animation: neonPulseGold 2.5s infinite alternate ease-in-out;
 }
 
+/* 2위 Rising Star - Silver / Cyan Neon Sign */
 .step-rank-sub.silver {
-    color: #f1f5f9;
+    color: #ffffff;
+    font-size: 1.25rem;
+    text-shadow: 
+        0 0 4px #ffffff,
+        0 0 8px #e0f2fe,
+        0 0 16px #38bdf8,
+        0 0 28px #0284c7,
+        0 0 40px #0369a1,
+        0 0 55px rgba(56, 189, 248, 0.85);
+    animation: neonPulseSilver 2.8s infinite alternate ease-in-out;
 }
 
+/* 3위 Bright Star - Bronze / Orange Neon Sign */
 .step-rank-sub.bronze {
-    color: #fed7aa;
+    color: #ffffff;
+    font-size: 1.18rem;
+    text-shadow: 
+        0 0 4px #ffffff,
+        0 0 8px #ffedd5,
+        0 0 16px #fb923c,
+        0 0 28px #ea580c,
+        0 0 40px #c2410c,
+        0 0 55px rgba(251, 146, 60, 0.85);
+    animation: neonPulseBronze 3.1s infinite alternate ease-in-out;
+}
+
+@keyframes neonPulseGold {
+    0%, 100% {
+        text-shadow: 
+            0 0 5px #ffffff,
+            0 0 12px #fef08a,
+            0 0 24px #facc15,
+            0 0 38px #eab308,
+            0 0 55px rgba(250, 204, 21, 0.95),
+            0 0 75px rgba(234, 179, 8, 0.8);
+    }
+    50% {
+        text-shadow: 
+            0 0 8px #ffffff,
+            0 0 16px #ffff00,
+            0 0 30px #fde047,
+            0 0 48px #facc15,
+            0 0 70px rgba(250, 204, 21, 1),
+            0 0 95px rgba(250, 204, 21, 0.9);
+    }
+}
+
+@keyframes neonPulseSilver {
+    0%, 100% {
+        text-shadow: 
+            0 0 4px #ffffff,
+            0 0 8px #e0f2fe,
+            0 0 16px #38bdf8,
+            0 0 28px #0284c7,
+            0 0 40px #0369a1,
+            0 0 55px rgba(56, 189, 248, 0.85);
+    }
+    50% {
+        text-shadow: 
+            0 0 6px #ffffff,
+            0 0 12px #f0f9ff,
+            0 0 22px #7dd3fc,
+            0 0 36px #38bdf8,
+            0 0 50px #0284c7,
+            0 0 70px rgba(56, 189, 248, 0.95);
+    }
+}
+
+@keyframes neonPulseBronze {
+    0%, 100% {
+        text-shadow: 
+            0 0 4px #ffffff,
+            0 0 8px #ffedd5,
+            0 0 16px #fb923c,
+            0 0 28px #ea580c,
+            0 0 40px #c2410c,
+            0 0 55px rgba(251, 146, 60, 0.85);
+    }
+    50% {
+        text-shadow: 
+            0 0 6px #ffffff,
+            0 0 12px #fff7ed,
+            0 0 22px #fdba74,
+            0 0 36px #fb923c,
+            0 0 50px #ea580c,
+            0 0 70px rgba(251, 146, 60, 0.95);
+    }
 }
 
 
@@ -1829,11 +2004,16 @@ option.opt-closed {
 }
 
 .podium-card.super-star {
-    border: 2px solid #f59e0b !important;
+    border: 2.5px solid #facc15 !important;
     background: #ffffff;
-    box-shadow: 0 20px 45px rgba(245, 158, 11, 0.25), 0 0 20px rgba(254, 243, 199, 0.5) !important;
+    box-shadow: 
+        0 0 18px rgba(250, 204, 21, 0.95),
+        0 0 35px rgba(254, 240, 138, 0.75),
+        0 15px 50px rgba(250, 204, 21, 0.45),
+        inset 0 0 18px rgba(254, 240, 138, 0.35) !important;
     transform: none;
     z-index: 10;
+    animation: neonCardGlowGold 3s infinite alternate ease-in-out;
 }
 
 .podium-card.rising-star,
@@ -1842,13 +2022,80 @@ option.opt-closed {
 }
 
 .podium-card.rising-star {
-    border: 2px solid #94a3b8 !important;
-    box-shadow: 0 16px 36px rgba(148, 163, 184, 0.2), 0 0 20px rgba(241, 245, 249, 0.5) !important;
+    border: 2.5px solid #38bdf8 !important;
+    box-shadow: 
+        0 0 16px rgba(56, 189, 248, 0.7),
+        0 0 32px rgba(56, 189, 248, 0.45),
+        0 15px 40px rgba(56, 189, 248, 0.25),
+        inset 0 0 15px rgba(56, 189, 248, 0.2) !important;
+    animation: neonCardGlowSilver 3.2s infinite alternate ease-in-out;
 }
 
 .podium-card.bright-star {
-    border: 2px solid #d97706 !important;
-    box-shadow: 0 16px 36px rgba(217, 119, 6, 0.18), 0 0 20px rgba(254, 243, 199, 0.4) !important;
+    border: 2.5px solid #fb923c !important;
+    box-shadow: 
+        0 0 16px rgba(251, 146, 60, 0.7),
+        0 0 32px rgba(251, 146, 60, 0.45),
+        0 15px 40px rgba(251, 146, 60, 0.25),
+        inset 0 0 15px rgba(251, 146, 60, 0.2) !important;
+    animation: neonCardGlowBronze 3.5s infinite alternate ease-in-out;
+}
+
+@keyframes neonCardGlowGold {
+    0%, 100% {
+        border-color: #facc15 !important;
+        box-shadow: 
+            0 0 18px rgba(250, 204, 21, 0.95),
+            0 0 35px rgba(254, 240, 138, 0.75),
+            0 15px 50px rgba(250, 204, 21, 0.45),
+            inset 0 0 18px rgba(254, 240, 138, 0.35) !important;
+    }
+    50% {
+        border-color: #fde047 !important;
+        box-shadow: 
+            0 0 28px rgba(253, 224, 71, 1),
+            0 0 50px rgba(250, 204, 21, 0.85),
+            0 20px 60px rgba(250, 204, 21, 0.55),
+            inset 0 0 25px rgba(253, 224, 71, 0.5) !important;
+    }
+}
+
+@keyframes neonCardGlowSilver {
+    0%, 100% {
+        border-color: #38bdf8 !important;
+        box-shadow: 
+            0 0 16px rgba(56, 189, 248, 0.7),
+            0 0 32px rgba(56, 189, 248, 0.45),
+            0 15px 40px rgba(56, 189, 248, 0.25),
+            inset 0 0 15px rgba(56, 189, 248, 0.2) !important;
+    }
+    50% {
+        border-color: #7dd3fc !important;
+        box-shadow: 
+            0 0 24px rgba(125, 211, 252, 0.9),
+            0 0 45px rgba(56, 189, 248, 0.65),
+            0 20px 50px rgba(56, 189, 248, 0.35),
+            inset 0 0 22px rgba(125, 211, 252, 0.35) !important;
+    }
+}
+
+@keyframes neonCardGlowBronze {
+    0%, 100% {
+        border-color: #fb923c !important;
+        box-shadow: 
+            0 0 16px rgba(251, 146, 60, 0.7),
+            0 0 32px rgba(251, 146, 60, 0.45),
+            0 15px 40px rgba(251, 146, 60, 0.25),
+            inset 0 0 15px rgba(251, 146, 60, 0.2) !important;
+    }
+    50% {
+        border-color: #fdba74 !important;
+        box-shadow: 
+            0 0 24px rgba(253, 186, 116, 0.9),
+            0 0 45px rgba(251, 146, 60, 0.65),
+            0 20px 50px rgba(251, 146, 60, 0.35),
+            inset 0 0 22px rgba(253, 186, 116, 0.35) !important;
+    }
 }
 
 /* 📋 명예의 전당 바디(podium-body): 럭셔리 배경 및 타이포그래피 */
@@ -2592,7 +2839,10 @@ option.opt-closed {
     .podium-step.step-3 { height: 70px; }
     .step-rank-badge { font-size: 1.6rem; }
     .step-rank-badge.gold { font-size: 2.1rem; }
-    .step-rank-sub { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
+    .step-rank-sub { font-size: 0.95rem; }
+    .step-rank-sub.gold { font-size: 1.15rem; }
+    .step-rank-sub.silver { font-size: 0.95rem; }
+    .step-rank-sub.bronze { font-size: 0.9rem; }
     .podium-card.super-star { transform: none; }
     .contest-hero { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
     .rookie-card { flex-direction: column; text-align: center; }
