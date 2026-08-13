@@ -11,12 +11,13 @@
 
         <!-- 회차 선택 (우측 검색 콤보와 동일한 커스텀 드롭다운 디자인 적용) -->
         <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
-            <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 385px;">
+            <div class="custom-contest-dropdown stat-closed" id="customContestDropdown" style="width: 440px;">
                 <div class="custom-contest-trigger">
-                    <span style="display: inline-flex; align-items: center; gap: 0.55rem;">
-                        <span class="selected-text" style="font-weight: 800;"><span class="round-badge-text">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</span>
+                    <span style="display: inline-flex; align-items: center; gap: 0.55rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                        <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ current_contest.year_month if current_contest and current_contest.year_month else '2026.08' }}</span>
+                        <span class="selected-text" style="font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="round-badge-text">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</span>
                     </span>
-                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    <i class="fa-solid fa-chevron-down arrow-icon" style="flex-shrink: 0; margin-left: 0.5rem;"></i>
                 </div>
                 <div class="custom-contest-options">
                     {% for c in contests %}
@@ -25,6 +26,7 @@
                         {% set cur_id = current_contest.CONTEST_ROUND or current_contest.contest_id %}
                         {% set is_sel = (c_id == cur_id) %}
                         <div class="custom-contest-option opt-closed {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="/hall-of-fame?contest_id={{ c_id }}">
+                            <span class="status-chip closed" style="flex-shrink: 0; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-regular fa-calendar-days"></i> {{ c.year_month or '2026.08' }}</span>
                             <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
                         </div>
                     {% endfor %}
