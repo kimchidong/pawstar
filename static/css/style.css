@@ -2378,12 +2378,12 @@ option.opt-closed {
 .award-badges-overlay {
     position: absolute;
     top: 0.65rem;
-    left: 0.65rem;
     right: 0.65rem;
+    left: auto;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 0.45rem;
     z-index: 10;
     pointer-events: none;
