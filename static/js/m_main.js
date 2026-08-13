@@ -1154,9 +1154,13 @@ async function fetchMobilePostsAjax(params = {}) {
     const newUrl = `/m/?contest_id=${mobileFilterState.contest_id}&sort=${mobileFilterState.sort}&pet_type=${encodeURIComponent(mobileFilterState.pet_type)}&q=${encodeURIComponent(mobileFilterState.q)}`;
     window.history.pushState(mobileFilterState, '', newUrl);
 
+    await loadMobileFeed();
+}
+
+async function loadMobileFeed() {
     const feedGrid = document.querySelector('.m-feed-grid');
     if (feedGrid) {
-        feedGrid.style.opacity = '0.45';
+        feedGrid.style.opacity = '0.5';
         feedGrid.style.transition = 'opacity 0.2s ease';
     }
 
@@ -1199,7 +1203,7 @@ function renderMobileFeedGrid(posts) {
         const pImg = (p.PHT_PATH && p.PHT_FILE1) ? `${p.PHT_PATH}/${p.PHT_FILE1}` : (p.IMAGE_PATH || p.image_path || p.media_url || '');
         const pTitle = p.TITLE || p.title || '';
         const pKindRaw = p.KIND_NM || p.pet_type || '반려동물';
-        const pKindClean = pKindRaw.replace(/[🐕🐈🐹🦜🐾]/g, '').trim();
+        const pKindClean = pKindRaw.replace(/🐕 |🐈 |🐹 |🦜 |🐟 |🐢 |🐴 |🐾 /g, '');
         const pUserNm = p.NK_NM || p.user_nickname || p.USER_NM || p.user_name || '출전자';
         const pAvatar = p.USER_AVATAR || p.user_avatar || p.PROFILE_URL || p.user_profile || '/static/image/profile/default_profile.png';
         const pConts = p.CONTS || p.description || '';
@@ -1217,10 +1221,11 @@ function renderMobileFeedGrid(posts) {
         let chipIcon = 'fa-solid fa-paw';
         if (pKindRaw.includes('강아지') || pKindRaw.includes('개')) chipIcon = 'fa-solid fa-dog';
         else if (pKindRaw.includes('고양이')) chipIcon = 'fa-solid fa-cat';
-        else if (pKindRaw.includes('햄스터') || pKindRaw.includes('소동물') || pKindRaw.includes('토끼')) chipIcon = 'fa-solid fa-otter';
+        else if (pKindRaw.includes('거북이') || pKindRaw.includes('파충류') || pKindRaw.includes('도마뱀')) chipIcon = 'fa-solid fa-frog';
+        else if (pKindRaw.includes('햄스터') || pKindRaw.includes('소동물') || pKindRaw.includes('토끼') || pKindRaw.includes('고슴도치')) chipIcon = 'fa-solid fa-otter';
         else if (pKindRaw.includes('새') || pKindRaw.includes('앵무새') || pKindRaw.includes('조류')) chipIcon = 'fa-solid fa-crow';
         else if (pKindRaw.includes('말') || pKindRaw.includes('큰동물')) chipIcon = 'fa-solid fa-horse';
-        else if (pKindRaw.includes('어류') || pKindRaw.includes('관상어')) chipIcon = 'fa-solid fa-fish';
+        else if (pKindRaw.includes('어류') || pKindRaw.includes('관상어') || pKindRaw.includes('물고기')) chipIcon = 'fa-solid fa-fish';
 
         let badgeHtml = '';
         if (p.awards && p.awards.length > 0) {
@@ -1241,11 +1246,11 @@ function renderMobileFeedGrid(posts) {
                     badgeText = '브라이트스타';
                     bgStyle = 'background: linear-gradient(135deg, rgba(255,237,213,0.95), rgba(251,146,60,0.9)); color: #431407;';
                 } else {
-                    badgeText = `패밀리스타${awRank ? ` ${awRank}위` : ''}`;
+                    badgeText = `<i class="${chipIcon}"></i> 패밀리스타${awRank ? ` ${awRank}위` : ''}`;
                 }
                 awardsHtml += `<div class="m-card-badge" style="position: relative; top: 0; left: 0; padding: 0.15rem 0.42rem; font-size: 0.56rem; ${bgStyle}">${badgeText}</div>`;
             });
-            badgeHtml = `<div style="position: absolute; top: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
+            badgeHtml = `<div style="position: absolute; top: 0.4rem; left: 0.4rem; right: 0.4rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.35rem; z-index: 10; pointer-events: none;">${awardsHtml}</div>`;
         } else {
             const isPostClosed = p.is_closed || p.closed || p.contest_stat === 'G001C002' || p.CONTEST_STAT === 'G001C002' || p.STATUS_CD === 'G001C002' || p.is_ended || p.IS_ENDED;
             const rkCand = p.rank_candidate || p.RANK_CANDIDATE || p.rank || p.ranking;
@@ -1296,7 +1301,7 @@ function renderMobileFeedGrid(posts) {
 
                 <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
                 <div class="m-pet-tag">
-                    <span class="m-pet-kind-text">${pKindRaw}</span>
+                    <span class="m-pet-kind-text" style="display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${chipIcon}" style="color: #e11d48;"></i> ${pKindClean}</span>
                     ${pPetNm ? `<span class="m-pet-name-text">${pPetNm}</span>` : ''}
                 </div>
 

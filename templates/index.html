@@ -180,7 +180,7 @@
                 
                 <!-- 과거 회차 수상작 타이틀 배지 오버레이 (우측 상단 가로 나란히 배치) -->
                 {% if p.awards %}
-                    <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; right: 0.65rem; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; z-index: 10; pointer-events: none;">
+                    <div class="award-badges-overlay" style="position: absolute; top: 0.65rem; left: 0.65rem; right: 0.65rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.4rem; z-index: 10; pointer-events: none;">
                         {% for aw in p.awards %}
                             {% set award_cd_str = (aw.award_cd or aw.AWARD_CD or '')|string %}
                             {% set award_nm_str = aw.award_nm or aw.AWARD_NM or '' %}
