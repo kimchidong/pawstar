@@ -1574,10 +1574,7 @@ option.opt-closed {
     margin-right: -0.775rem;
 }
 
-.podium-step:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 45px rgba(109, 40, 217, 0.35);
-}
+
 
 /* 2위 라이징스타 단상 (좌측 - 직각 모서리) */
 .podium-step.step-2 {
