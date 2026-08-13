@@ -178,7 +178,7 @@
                                     {% set w_clean = w_raw|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
                                     {% set w_fa_icon = 'fa-solid fa-dog' if ('강아지' in w_clean or '개' in w_clean) else ('fa-solid fa-cat' if '고양이' in w_clean else ('fa-solid fa-otter' if ('햄스터' in w_clean or '소동물' in w_clean or '토끼' in w_clean or '고슴도치' in w_clean or '작은동물' in w_clean) else ('fa-solid fa-frog' if ('거북이' in w_clean or '파충류' in w_clean or '도마뱀' in w_clean) else ('fa-solid fa-fish' if ('어류' in w_clean or '관상어' in w_clean or '물고기' in w_clean) else ('fa-solid fa-crow' if ('새' in w_clean or '앵무새' in w_clean or '조류' in w_clean) else ('fa-solid fa-horse' if ('말' in w_clean or '큰동물' in w_clean) else 'fa-solid fa-paw')))))) %}
                                     <span class="winner-title-badge family-badge">
-                                        <i class="{{ w_fa_icon }}"></i> <span style="line-height: 1;">패밀리{{ rk }}위</span>
+                                        <i class="{{ w_fa_icon }}"></i> <span style="line-height: 1;">패밀리 {{ rk }}위</span>
                                     </span>
                                 </div>
                                 <!-- 2줄: 동물종류, 동물애칭 -->
