@@ -114,6 +114,15 @@
     <div class="winners-podium" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; width: 100%; box-sizing: border-box; clear: both;">
         <!-- 2위 라이징 스타 -->
         <div class="podium-card-wrapper">
+            {% if ns.rising_stars and ns.rising_stars|length > 1 %}
+                <div class="co-tabs co-tabs-top">
+                    {% for star in ns.rising_stars %}
+                        <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                            {{ star.PET_NM or star.pet_name }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <div class="podium-card rising-star {{ 'empty-card' if not ns.rising_stars }}">
                 {% if ns.rising_stars %}
                     <div class="co-winner-wrapper">
@@ -213,20 +222,20 @@
                     </div>
                 {% endif %}
             </div>
+        </div>
 
-            {% if ns.rising_stars and ns.rising_stars|length > 1 %}
-                <div class="co-tabs">
-                    {% for star in ns.rising_stars %}
+        <!-- 1위 슈퍼스타 (가운데 우뚝 선 챔피언) -->
+        <div class="podium-card-wrapper">
+            {% if ns.super_stars and ns.super_stars|length > 1 %}
+                <div class="co-tabs co-tabs-top">
+                    {% for star in ns.super_stars %}
                         <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             {{ star.PET_NM or star.pet_name }}
                         </button>
                     {% endfor %}
                 </div>
             {% endif %}
-        </div>
 
-        <!-- 1위 슈퍼스타 (가운데 우뚝 선 챔피언) -->
-        <div class="podium-card-wrapper">
             <div class="podium-card super-star {{ 'empty-card' if not ns.super_stars }}">
                 {% if ns.super_stars %}
                     <div class="co-winner-wrapper">
@@ -327,19 +336,20 @@
                 {% endif %}
             </div>
 
-            {% if ns.super_stars and ns.super_stars|length > 1 %}
-                <div class="co-tabs">
-                    {% for star in ns.super_stars %}
+        </div>
+
+        <!-- 3위 브라이트 스타 -->
+        <div class="podium-card-wrapper">
+            {% if ns.bright_stars and ns.bright_stars|length > 1 %}
+                <div class="co-tabs co-tabs-top">
+                    {% for star in ns.bright_stars %}
                         <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
                             {{ star.PET_NM or star.pet_name }}
                         </button>
                     {% endfor %}
                 </div>
             {% endif %}
-        </div>
 
-        <!-- 3위 브라이트 스타 -->
-        <div class="podium-card-wrapper">
             <div class="podium-card bright-star {{ 'empty-card' if not ns.bright_stars }}">
                 {% if ns.bright_stars %}
                     <div class="co-winner-wrapper">
@@ -440,15 +450,6 @@
                 {% endif %}
             </div>
 
-            {% if ns.bright_stars and ns.bright_stars|length > 1 %}
-                <div class="co-tabs" style="padding: 0.75rem 0 0 0; margin: 0; background: transparent;">
-                    {% for star in ns.bright_stars %}
-                        <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
-                            {{ star.PET_NM or star.pet_name }}
-                        </button>
-                    {% endfor %}
-                </div>
-            {% endif %}
         </div>
     </div>
 
@@ -599,6 +600,16 @@
                             {% for rk in [1, 2, 3] %}
                                 {% set stars = group[rk] %}
                                 <div class="podium-card-wrapper" style="display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box; transform: none !important;">
+                                    {% if stars and stars|length > 1 %}
+                                        <div class="co-tabs co-tabs-top">
+                                            {% for star in stars %}
+                                                <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
+                                                    {{ star.PET_NM or star.pet_name }}
+                                                </button>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
                                     <div class="podium-card {{ 'super-star' if rk == 1 else ('rising-star' if rk == 2 else 'bright-star') }}" style="min-height: auto; border: 1px solid var(--border-light); transform: none !important; display: flex; flex-direction: column; height: 100%; min-width: 0; width: 100%; box-sizing: border-box;">
                                         {% if stars %}
                                             <div class="co-winner-wrapper">
@@ -690,15 +701,6 @@
                                                                 </div>
                                                             </div>
 
-                                                            {% if stars and stars|length > 1 %}
-                                                                <div class="co-tabs" style="position: relative; margin-top: 0.5rem; padding: 0.1rem 0 0 0; justify-content: center;">
-                                                                    {% for star in stars %}
-                                                                        <button class="co-tab-btn {{ 'active' if loop.first }}" data-idx="{{ loop.index0 }}">
-                                                                            {{ star.PET_NM or star.pet_name }}
-                                                                        </button>
-                                                                    {% endfor %}
-                                                                </div>
-                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 {% endfor %}

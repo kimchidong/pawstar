@@ -1546,12 +1546,47 @@ option.opt-closed {
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     height: 100%;
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
     transition: transform 0.35s ease;
+}
+
+/* 🐾 패밀리 스타 전용: 세 카드의 본체 상단 테두리선 100% 완벽 수평 정렬 */
+.family-podium-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 0;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.family-podium-grid .podium-card-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-top: 44px !important;
+    transform: none !important;
+}
+
+.family-podium-grid .co-tabs-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    z-index: 10;
 }
 
 /* 메인 챔피언 TOP 3 시상대 전용 카드 배치 (패밀리 스타 섹션에는 절대 영향 없음) */
@@ -1681,15 +1716,17 @@ option.opt-closed {
 }
 
 .co-tabs {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: relative;
     display: flex;
     justify-content: center;
-    gap: 0.4rem;
-    padding-top: 0.75rem;
-    z-index: 5;
+    gap: 0.45rem;
+    z-index: 10;
+}
+
+.co-tabs-top {
+    margin-bottom: 0.65rem;
+    padding: 0;
+    width: 100%;
 }
 
 .podium-card {
