@@ -1576,6 +1576,13 @@ option.opt-closed {
     transform: none !important;
 }
 
+.family-podium-grid .podium-card {
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+    animation: none !important;
+    transform: none !important;
+}
+
 .family-podium-grid.has-co-tabs .podium-card-wrapper,
 .family-podium-grid:has(.co-tabs-top) .podium-card-wrapper {
     padding-top: 44px !important;
@@ -1726,11 +1733,12 @@ option.opt-closed {
     color: #ffffff;
     font-size: 2rem;
     text-shadow: 
-        0 0 5px #ffffff,
-        0 0 12px #ffedd5,
-        0 0 24px #fb923c,
-        0 0 40px #ea580c,
-        0 0 60px rgba(251, 146, 60, 0.9);
+        0 0 6px #ffffff,
+        0 0 15px #fde68a,
+        0 0 30px #f59e0b,
+        0 0 45px #d97706,
+        0 0 65px rgba(217, 119, 6, 1),
+        0 0 90px rgba(180, 83, 9, 0.85);
     animation: neonBadgePulseBronze 3.1s infinite alternate ease-in-out;
 }
 
@@ -1777,19 +1785,21 @@ option.opt-closed {
 @keyframes neonBadgePulseBronze {
     0%, 100% {
         text-shadow: 
-            0 0 5px #ffffff,
-            0 0 12px #ffedd5,
-            0 0 24px #fb923c,
-            0 0 40px #ea580c,
-            0 0 60px rgba(251, 146, 60, 0.9);
+            0 0 6px #ffffff,
+            0 0 15px #fde68a,
+            0 0 30px #f59e0b,
+            0 0 45px #d97706,
+            0 0 65px rgba(217, 119, 6, 1),
+            0 0 90px rgba(180, 83, 9, 0.85);
     }
     50% {
         text-shadow: 
-            0 0 8px #ffffff,
-            0 0 16px #fff7ed,
-            0 0 32px #fdba74,
-            0 0 52px #fb923c,
-            0 0 75px rgba(251, 146, 60, 1);
+            0 0 10px #ffffff,
+            0 0 20px #fef08a,
+            0 0 38px #fbbf24,
+            0 0 58px #d97706,
+            0 0 85px rgba(217, 119, 6, 1),
+            0 0 110px rgba(180, 83, 9, 0.95);
     }
 }
 
@@ -1833,17 +1843,17 @@ option.opt-closed {
     animation: neonPulseSilver 2.8s infinite alternate ease-in-out;
 }
 
-/* 3위 Bright Star - Bronze / Orange Neon Sign */
+/* 3위 Bright Star - Neon Brown Sign */
 .step-rank-sub.bronze {
     color: #ffffff;
     font-size: 1.18rem;
     text-shadow: 
-        0 0 4px #ffffff,
-        0 0 8px #ffedd5,
-        0 0 16px #fb923c,
-        0 0 28px #ea580c,
-        0 0 40px #c2410c,
-        0 0 55px rgba(251, 146, 60, 0.85);
+        0 0 5px #ffffff,
+        0 0 12px #fde68a,
+        0 0 24px #f59e0b,
+        0 0 38px #d97706,
+        0 0 55px rgba(217, 119, 6, 0.95),
+        0 0 75px rgba(180, 83, 9, 0.8);
     animation: neonPulseBronze 3.1s infinite alternate ease-in-out;
 }
 
@@ -1892,21 +1902,21 @@ option.opt-closed {
 @keyframes neonPulseBronze {
     0%, 100% {
         text-shadow: 
-            0 0 4px #ffffff,
-            0 0 8px #ffedd5,
-            0 0 16px #fb923c,
-            0 0 28px #ea580c,
-            0 0 40px #c2410c,
-            0 0 55px rgba(251, 146, 60, 0.85);
+            0 0 5px #ffffff,
+            0 0 12px #fde68a,
+            0 0 24px #f59e0b,
+            0 0 38px #d97706,
+            0 0 55px rgba(217, 119, 6, 0.95),
+            0 0 75px rgba(180, 83, 9, 0.8);
     }
     50% {
         text-shadow: 
-            0 0 6px #ffffff,
-            0 0 12px #fff7ed,
-            0 0 22px #fdba74,
-            0 0 36px #fb923c,
-            0 0 50px #ea580c,
-            0 0 70px rgba(251, 146, 60, 0.95);
+            0 0 8px #ffffff,
+            0 0 16px #fef08a,
+            0 0 30px #fbbf24,
+            0 0 48px #d97706,
+            0 0 70px rgba(217, 119, 6, 1),
+            0 0 95px rgba(180, 83, 9, 0.9);
     }
 }
 
@@ -2003,7 +2013,7 @@ option.opt-closed {
     transform: none !important;
 }
 
-.podium-card.super-star {
+.winners-podium .podium-card.super-star {
     border: 2.5px solid #facc15 !important;
     background: #ffffff;
     box-shadow: 
@@ -2016,12 +2026,12 @@ option.opt-closed {
     animation: neonCardGlowGold 3s infinite alternate ease-in-out;
 }
 
-.podium-card.rising-star,
-.podium-card.bright-star {
+.winners-podium .podium-card.rising-star,
+.winners-podium .podium-card.bright-star {
     background: #ffffff;
 }
 
-.podium-card.rising-star {
+.winners-podium .podium-card.rising-star {
     border: 2.5px solid #38bdf8 !important;
     box-shadow: 
         0 0 16px rgba(56, 189, 248, 0.7),
@@ -2031,13 +2041,13 @@ option.opt-closed {
     animation: neonCardGlowSilver 3.2s infinite alternate ease-in-out;
 }
 
-.podium-card.bright-star {
-    border: 2.5px solid #fb923c !important;
+.winners-podium .podium-card.bright-star {
+    border: 2.5px solid #d97706 !important;
     box-shadow: 
-        0 0 16px rgba(251, 146, 60, 0.7),
-        0 0 32px rgba(251, 146, 60, 0.45),
-        0 15px 40px rgba(251, 146, 60, 0.25),
-        inset 0 0 15px rgba(251, 146, 60, 0.2) !important;
+        0 0 18px rgba(217, 119, 6, 0.95),
+        0 0 35px rgba(245, 158, 11, 0.75),
+        0 15px 50px rgba(217, 119, 6, 0.45),
+        inset 0 0 18px rgba(245, 158, 11, 0.35) !important;
     animation: neonCardGlowBronze 3.5s infinite alternate ease-in-out;
 }
 
@@ -2081,20 +2091,20 @@ option.opt-closed {
 
 @keyframes neonCardGlowBronze {
     0%, 100% {
-        border-color: #fb923c !important;
+        border-color: #d97706 !important;
         box-shadow: 
-            0 0 16px rgba(251, 146, 60, 0.7),
-            0 0 32px rgba(251, 146, 60, 0.45),
-            0 15px 40px rgba(251, 146, 60, 0.25),
-            inset 0 0 15px rgba(251, 146, 60, 0.2) !important;
+            0 0 18px rgba(217, 119, 6, 0.95),
+            0 0 35px rgba(245, 158, 11, 0.75),
+            0 15px 50px rgba(217, 119, 6, 0.45),
+            inset 0 0 18px rgba(245, 158, 11, 0.35) !important;
     }
     50% {
-        border-color: #fdba74 !important;
+        border-color: #f59e0b !important;
         box-shadow: 
-            0 0 24px rgba(253, 186, 116, 0.9),
-            0 0 45px rgba(251, 146, 60, 0.65),
-            0 20px 50px rgba(251, 146, 60, 0.35),
-            inset 0 0 22px rgba(253, 186, 116, 0.35) !important;
+            0 0 28px rgba(245, 158, 11, 1),
+            0 0 50px rgba(217, 119, 6, 0.85),
+            0 20px 60px rgba(217, 119, 6, 0.55),
+            inset 0 0 25px rgba(245, 158, 11, 0.5) !important;
     }
 }
 
