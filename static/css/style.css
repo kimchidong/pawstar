@@ -1535,6 +1535,7 @@ option.opt-closed {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 1.5rem;
+    margin-top: 5.5rem !important;
     margin-bottom: 0 !important;
     align-items: flex-end !important;
     width: 100%;
