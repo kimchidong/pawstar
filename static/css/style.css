@@ -2910,9 +2910,9 @@ option.opt-closed {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    grid-template-columns: 1.6fr 1fr;
     gap: 3rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 
 .footer-brand .footer-logo-title {

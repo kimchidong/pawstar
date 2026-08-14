@@ -151,12 +151,57 @@ def inject_global_vars():
             'profile_img': '/static/image/profile/default_profile.png'
         }
 
+    footer_prev_stars = []
+    footer_prev_contest = None
+    try:
+        # 실제 수상자가 존재하는 최신 종료 회차의 명예의 전당 데이터 조회 (contest_id=None)
+        all_w = service.get_hall_of_fame(contest_id=None)
+        if isinstance(all_w, list) and len(all_w) > 0:
+            for w in all_w:
+                if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
+                    footer_prev_stars.append(w)
+                if len(footer_prev_stars) >= 3:
+                    break
+            if not footer_prev_stars and len(all_w) > 0:
+                footer_prev_stars = all_w[:3]
+                
+            if footer_prev_stars:
+                prev_c_id = footer_prev_stars[0].get('CONTEST_ROUND') or footer_prev_stars[0].get('contest_id')
+                if prev_c_id:
+                    footer_prev_contest = service.get_contest(prev_c_id)
+
+        # 만약 여전히 비어있다면 회차 전체 목록 순회하며 수상자가 있는 가장 최근 회차 탐색
+        if not footer_prev_stars:
+            contests_list = service.get_contests()
+            for c in (contests_list or []):
+                c_id = c.get('CONTEST_ROUND') or c.get('contest_id')
+                res = service.get_hall_of_fame(contest_id=c_id)
+                if res and isinstance(res, list) and len(res) > 0:
+                    footer_prev_contest = c
+                    for w in res:
+                        if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
+                            footer_prev_stars.append(w)
+                        if len(footer_prev_stars) >= 3:
+                            break
+                    if footer_prev_stars:
+                        break
+
+        if not footer_prev_contest:
+            contests_list = service.get_contests()
+            if contests_list:
+                footer_prev_contest = contests_list[0]
+    except Exception as e:
+        print("footer prev stars error:", e)
+        footer_prev_stars = []
+
     return {
         'contests': service.get_contests(),
         'pet_kinds': service.get_pet_kinds(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
-        'is_logged_in': is_logged_in
+        'is_logged_in': is_logged_in,
+        'footer_prev_stars': footer_prev_stars,
+        'footer_prev_contest': footer_prev_contest
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
