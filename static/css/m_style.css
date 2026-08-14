@@ -1436,33 +1436,21 @@ body.m-body {
 
 /* 🏆 모바일 명예의 전당 1,2,3위 (슈퍼스타, 라이징스타, 브라이트스타) 전용 네온 테두리 스타일 */
 .m-champion-card.super-star {
-    border: 1.5px solid #facc15 !important;
-    box-shadow: 
-        0 0 12px #facc15,
-        0 0 24px #fde047,
-        0 0 40px rgba(250, 204, 21, 0.85),
-        inset 0 0 14px rgba(254, 240, 138, 0.6) !important;
-    animation: mNeonCardGlowGold 2.2s infinite alternate ease-in-out;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 .m-champion-card.bright-star {
-    border: 1.5px solid #38bdf8 !important;
-    box-shadow: 
-        0 0 12px #38bdf8,
-        0 0 24px #7dd3fc,
-        0 0 40px rgba(56, 189, 248, 0.85),
-        inset 0 0 14px rgba(125, 211, 252, 0.6) !important;
-    animation: mNeonCardGlowSilver 2.4s infinite alternate ease-in-out;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 .m-champion-card.rising-star {
-    border: 1.5px solid #a3e635 !important;
-    box-shadow: 
-        0 0 12px #a3e635,
-        0 0 24px #d9f99d,
-        0 0 40px rgba(163, 230, 53, 0.85),
-        inset 0 0 14px rgba(236, 252, 203, 0.6) !important;
-    animation: mNeonCardGlowBronze 2.6s infinite alternate ease-in-out;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 @keyframes mNeonCardGlowGold {

@@ -2014,41 +2014,32 @@ option.opt-closed {
 }
 
 .winners-podium .podium-card.super-star {
-    border: 2px solid #facc15 !important;
+    border: 1.5px solid var(--border-light) !important;
     background: #ffffff;
-    box-shadow: 
-        0 0 10px rgba(250, 204, 21, 0.75),
-        0 0 20px rgba(254, 240, 138, 0.55),
-        0 8px 25px rgba(250, 204, 21, 0.35),
-        inset 0 0 8px rgba(254, 240, 138, 0.3) !important;
+    box-shadow: var(--shadow-soft) !important;
     transform: none;
     z-index: 10;
-    animation: neonCardGlowGold 3s infinite alternate ease-in-out;
+    animation: none !important;
 }
 
 .winners-podium .podium-card.bright-star,
 .winners-podium .podium-card.rising-star {
     background: #ffffff;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 .winners-podium .podium-card.bright-star {
-    border: 2px solid #38bdf8 !important;
-    box-shadow: 
-        0 0 10px rgba(56, 189, 248, 0.75),
-        0 0 20px rgba(224, 242, 254, 0.55),
-        0 8px 25px rgba(56, 189, 248, 0.35),
-        inset 0 0 8px rgba(224, 242, 254, 0.3) !important;
-    animation: neonCardGlowSilver 3.2s infinite alternate ease-in-out;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 .winners-podium .podium-card.rising-star {
-    border: 2px solid #a3e635 !important;
-    box-shadow: 
-        0 0 10px rgba(163, 230, 53, 0.75),
-        0 0 20px rgba(236, 252, 203, 0.55),
-        0 8px 25px rgba(163, 230, 53, 0.35),
-        inset 0 0 8px rgba(236, 252, 203, 0.3) !important;
-    animation: neonCardGlowBronze 3.5s infinite alternate ease-in-out;
+    border: 1.5px solid var(--border-light) !important;
+    box-shadow: var(--shadow-soft) !important;
+    animation: none !important;
 }
 
 @keyframes neonCardGlowGold {
