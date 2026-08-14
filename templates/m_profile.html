@@ -361,46 +361,9 @@
                     <div class="m-card-body">
                         <!-- 1줄째: 프로필사진 + 작성자 닉네임 (전체 보기시 우측 회차 정보 표시) -->
                         <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                            <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; min-width: 0; flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
                                 <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or user.profile_img or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname or user.nickname }}" class="m-author-avatar">
-                                <span class="m-author-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
-                                {% set s_inst = (p.sns_inst or p.SNS_INST or user.sns_inst or user.SNS_INST or '').strip() %}
-                                {% set s_ytb = (p.sns_ytb or p.SNS_YTB or user.sns_ytb or user.SNS_YTB or '').strip() %}
-                                {% set s_fsb = (p.sns_fsb or p.SNS_FSB or user.sns_fsb or user.SNS_FSB or '').strip() %}
-                                {% set s_blg = (p.sns_blg or p.SNS_BLG or user.sns_blg or user.SNS_BLG or '').strip() %}
-                                {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                    <div class="sns-overlap-group" style="margin-left: 0.15rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                        {% set ns_sns = namespace(count=0) %}
-                                        {% if s_inst_link %}
-                                            {% set ns_sns.count = ns_sns.count + 1 %}
-                                            <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                <i class="fa-brands fa-instagram"></i>
-                                            </a>
-                                        {% endif %}
-                                        {% if s_ytb_link %}
-                                            {% set ns_sns.count = ns_sns.count + 1 %}
-                                            <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                <i class="fa-brands fa-youtube"></i>
-                                            </a>
-                                        {% endif %}
-                                        {% if s_fsb_link %}
-                                            {% set ns_sns.count = ns_sns.count + 1 %}
-                                            <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                <i class="fa-brands fa-facebook-f"></i>
-                                            </a>
-                                        {% endif %}
-                                        {% if s_blg_link %}
-                                            {% set ns_sns.count = ns_sns.count + 1 %}
-                                            <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                <i class="fa-solid fa-blog"></i>
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
+                                <span class="m-author-name">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
                             </div>
                             {% if sel_c_id == 'all' or not sel_c_id %}
                                 {% set p_round = p.CONTEST_ROUND or p.contest_id %}
@@ -544,43 +507,6 @@
                                 <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
                                     <img src="{{ user.profile_img or a.PROFILE_URL or a.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
                                     <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ user.nickname or a.NK_NM or a.user_nickname }}</span>
-                                    {% set s_inst = (a.sns_inst or a.SNS_INST or user.sns_inst or user.SNS_INST or '').strip() %}
-                                    {% set s_ytb = (a.sns_ytb or a.SNS_YTB or user.sns_ytb or user.SNS_YTB or '').strip() %}
-                                    {% set s_fsb = (a.sns_fsb or a.SNS_FSB or user.sns_fsb or user.SNS_FSB or '').strip() %}
-                                    {% set s_blg = (a.sns_blg or a.SNS_BLG or user.sns_blg or user.SNS_BLG or '').strip() %}
-                                    {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                    {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                    {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                    {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                    {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                        <div class="sns-overlap-group" style="margin-left: 0.15rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                            {% set ns_sns = namespace(count=0) %}
-                                            {% if s_inst_link %}
-                                                {% set ns_sns.count = ns_sns.count + 1 %}
-                                                <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                    <i class="fa-brands fa-instagram"></i>
-                                                </a>
-                                            {% endif %}
-                                            {% if s_ytb_link %}
-                                                {% set ns_sns.count = ns_sns.count + 1 %}
-                                                <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                    <i class="fa-brands fa-youtube"></i>
-                                                </a>
-                                            {% endif %}
-                                            {% if s_fsb_link %}
-                                                {% set ns_sns.count = ns_sns.count + 1 %}
-                                                <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                    <i class="fa-brands fa-facebook-f"></i>
-                                                </a>
-                                            {% endif %}
-                                            {% if s_blg_link %}
-                                                {% set ns_sns.count = ns_sns.count + 1 %}
-                                                <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
-                                                    <i class="fa-solid fa-blog"></i>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end;">
                                     {% for b in (a.awards or [a]) %}
