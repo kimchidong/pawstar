@@ -348,15 +348,15 @@
             {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
             <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.15rem 1.4rem; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;">
-                {% if sel_c_id == 'all' or not selected_contest_id %}
-                    <!-- 좌측 상단 테두리에 입체적으로 얹히는 회차 배지 (회색 배경 적용) -->
-                    <span style="position: absolute; top: -13px; left: 1.5rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.76rem; padding: 0.2rem 0.7rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); letter-spacing: -0.02em; white-space: nowrap; z-index: 10;">
-                        제 {{ c_id }}회
-                    </span>
-                {% endif %}
-                
-                <!-- 1. 좌측: 3D 메달 아이콘 + 펫 썸네일 (간격 확장) -->
-                <div style="display: flex; align-items: center; gap: 1.75rem; flex-shrink: 0;">
+                <!-- 1. 좌측: 회차 배지 (전체 선택 시 메달 좌측 배치) + 3D 메달 아이콘 + 펫 썸네일 -->
+                <div style="display: flex; align-items: center; gap: 1.25rem; flex-shrink: 0;">
+                    {% if sel_c_id == 'all' or not selected_contest_id %}
+                        <!-- 메달 좌측에 인라인으로 배치되는 회차 배지 -->
+                        <span style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.78rem; padding: 0.25rem 0.7rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); letter-spacing: -0.02em; white-space: nowrap; flex-shrink: 0;">
+                            제 {{ c_id }}회
+                        </span>
+                    {% endif %}
+
                     <!-- 메달 아이콘 스택 -->
                     <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
                         {% for b in (a.awards or [a]) %}
