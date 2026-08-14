@@ -165,30 +165,7 @@
                                             <div style="font-size: 0.9rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; transform: translateY(2px);">
                                                 {{ star.NK_NM or star.user_nickname }}
                                             </div>
-                                            {% set s_inst = (star.sns_inst or star.SNS_INST or '').strip() %}
-                                            {% set s_ytb = (star.sns_ytb or star.SNS_YTB or '').strip() %}
-                                            {% set s_fsb = (star.sns_fsb or star.SNS_FSB or '').strip() %}
-                                            {% set s_blg = (star.sns_blg or star.SNS_BLG or '').strip() %}
-                                            {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                            {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                            {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                            {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                            {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                                <div style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.4rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                    {% if s_inst_link %}
-                                                        <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                    {% endif %}
-                                                    {% if s_ytb_link %}
-                                                        <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 26px; height: 26px; font-size: 0.75rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                    {% endif %}
-                                                    {% if s_fsb_link %}
-                                                        <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                    {% endif %}
-                                                    {% if s_blg_link %}
-                                                        <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
+
                                         </div>
 
                                         <!-- [우측 정렬] 동물종류 + 동물애칭 -->
@@ -302,30 +279,7 @@
                                             <div style="font-size: 0.9rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; transform: translateY(2px);">
                                                 {{ star.NK_NM or star.user_nickname }}
                                             </div>
-                                            {% set s_inst = (star.sns_inst or star.SNS_INST or '').strip() %}
-                                            {% set s_ytb = (star.sns_ytb or star.SNS_YTB or '').strip() %}
-                                            {% set s_fsb = (star.sns_fsb or star.SNS_FSB or '').strip() %}
-                                            {% set s_blg = (star.sns_blg or star.SNS_BLG or '').strip() %}
-                                            {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                            {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                            {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                            {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                            {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                                <div style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.4rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                    {% if s_inst_link %}
-                                                        <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                    {% endif %}
-                                                    {% if s_ytb_link %}
-                                                        <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 26px; height: 26px; font-size: 0.75rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                    {% endif %}
-                                                    {% if s_fsb_link %}
-                                                        <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                    {% endif %}
-                                                    {% if s_blg_link %}
-                                                        <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
+
                                         </div>
 
                                         <!-- [우측 정렬] 동물종류 + 동물애칭 -->
@@ -440,30 +394,7 @@
                                             <div style="font-size: 0.9rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; transform: translateY(2px);">
                                                 {{ star.NK_NM or star.user_nickname }}
                                             </div>
-                                            {% set s_inst = (star.sns_inst or star.SNS_INST or '').strip() %}
-                                            {% set s_ytb = (star.sns_ytb or star.SNS_YTB or '').strip() %}
-                                            {% set s_fsb = (star.sns_fsb or star.SNS_FSB or '').strip() %}
-                                            {% set s_blg = (star.sns_blg or star.SNS_BLG or '').strip() %}
-                                            {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                            {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                            {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                            {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                            {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                                <div style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.4rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                    {% if s_inst_link %}
-                                                        <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                    {% endif %}
-                                                    {% if s_ytb_link %}
-                                                        <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 26px; height: 26px; font-size: 0.75rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                    {% endif %}
-                                                    {% if s_fsb_link %}
-                                                        <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                    {% endif %}
-                                                    {% if s_blg_link %}
-                                                        <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
+
                                         </div>
 
                                         <!-- [우측 정렬] 동물종류 + 동물애칭 -->
@@ -731,30 +662,7 @@
                                                                     <div style="font-size: 0.9rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; transform: translateY(2px);">
                                                                         {{ star.NK_NM or star.user_nickname }}
                                                                     </div>
-                                                                    {% set s_inst = (star.sns_inst or star.SNS_INST or '').strip() %}
-                                                                    {% set s_ytb = (star.sns_ytb or star.SNS_YTB or '').strip() %}
-                                                                    {% set s_fsb = (star.sns_fsb or star.SNS_FSB or '').strip() %}
-                                                                    {% set s_blg = (star.sns_blg or star.SNS_BLG or '').strip() %}
-                                                                    {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
-                                                                    {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
-                                                                    {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
-                                                                    {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
-                                                                    {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
-                                                                        <div style="display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.4rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                                            {% if s_inst_link %}
-                                                                                <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                                            {% endif %}
-                                                                            {% if s_ytb_link %}
-                                                                                <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 26px; height: 26px; font-size: 0.75rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                                            {% endif %}
-                                                                            {% if s_fsb_link %}
-                                                                                <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                                            {% endif %}
-                                                                            {% if s_blg_link %}
-                                                                                <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 26px; height: 26px; font-size: 0.75rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                                            {% endif %}
-                                                                        </div>
-                                                                    {% endif %}
+
                                                                 </div>
 
                                                                 <!-- [우측 정렬] 동물종류 + 동물애칭 -->
