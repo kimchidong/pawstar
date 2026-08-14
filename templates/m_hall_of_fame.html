@@ -74,30 +74,6 @@
                                     <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
                                         <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
                                         <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ w.NK_NM or w.user_nickname }}</span>
-                                        {% set w_inst = (w.sns_inst or w.SNS_INST or '').strip() %}
-                                        {% set w_ytb = (w.sns_ytb or w.SNS_YTB or '').strip() %}
-                                        {% set w_fsb = (w.sns_fsb or w.SNS_FSB or '').strip() %}
-                                        {% set w_blg = (w.sns_blg or w.SNS_BLG or '').strip() %}
-                                        {% set w_inst_link = ('https://' ~ w_inst) if w_inst and not (w_inst.startswith('http://') or w_inst.startswith('https://')) else w_inst %}
-                                        {% set w_ytb_link = ('https://' ~ w_ytb) if w_ytb and not (w_ytb.startswith('http://') or w_ytb.startswith('https://')) else w_ytb %}
-                                        {% set w_fsb_link = ('https://' ~ w_fsb) if w_fsb and not (w_fsb.startswith('http://') or w_fsb.startswith('https://')) else w_fsb %}
-                                        {% set w_blg_link = ('https://' ~ w_blg) if w_blg and not (w_blg.startswith('http://') or w_blg.startswith('https://')) else w_blg %}
-                                        {% if w_inst_link or w_ytb_link or w_fsb_link or w_blg_link %}
-                                            <div style="display: flex; align-items: center; gap: 0.25rem; margin-left: 0.25rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                {% if w_inst_link %}
-                                                    <a href="{{ w_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                {% endif %}
-                                                {% if w_ytb_link %}
-                                                    <a href="{{ w_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 20px; height: 20px; font-size: 0.62rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                {% endif %}
-                                                {% if w_fsb_link %}
-                                                    <a href="{{ w_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                {% endif %}
-                                                {% if w_blg_link %}
-                                                    <a href="{{ w_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
                                     </div>
                                     {% if rk == 1 %}
                                         <span class="winner-title-badge superstar-badge">
@@ -197,30 +173,6 @@
                                     <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0; overflow: hidden; height: 24px;">
                                         <img src="{{ w.PROFILE_URL or w.user_profile or '/static/image/profile/default_profile.png' }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-light); flex-shrink: 0;" alt="집사 프로필">
                                         <span style="font-size: 0.8rem; color: #475569; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{{ w.NK_NM or w.user_nickname }}</span>
-                                        {% set w_inst = (w.sns_inst or w.SNS_INST or '').strip() %}
-                                        {% set w_ytb = (w.sns_ytb or w.SNS_YTB or '').strip() %}
-                                        {% set w_fsb = (w.sns_fsb or w.SNS_FSB or '').strip() %}
-                                        {% set w_blg = (w.sns_blg or w.SNS_BLG or '').strip() %}
-                                        {% set w_inst_link = ('https://' ~ w_inst) if w_inst and not (w_inst.startswith('http://') or w_inst.startswith('https://')) else w_inst %}
-                                        {% set w_ytb_link = ('https://' ~ w_ytb) if w_ytb and not (w_ytb.startswith('http://') or w_ytb.startswith('https://')) else w_ytb %}
-                                        {% set w_fsb_link = ('https://' ~ w_fsb) if w_fsb and not (w_fsb.startswith('http://') or w_fsb.startswith('https://')) else w_fsb %}
-                                        {% set w_blg_link = ('https://' ~ w_blg) if w_blg and not (w_blg.startswith('http://') or w_blg.startswith('https://')) else w_blg %}
-                                        {% if w_inst_link or w_ytb_link or w_fsb_link or w_blg_link %}
-                                            <div style="display: flex; align-items: center; gap: 0.25rem; margin-left: 0.25rem; flex-shrink: 0;" onclick="event.stopPropagation();">
-                                                {% if w_inst_link %}
-                                                    <a href="{{ w_inst_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn instagram" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                                {% endif %}
-                                                {% if w_ytb_link %}
-                                                    <a href="{{ w_ytb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn youtube" style="width: 20px; height: 20px; font-size: 0.62rem;" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                                                {% endif %}
-                                                {% if w_fsb_link %}
-                                                    <a href="{{ w_fsb_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn facebook" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                                {% endif %}
-                                                {% if w_blg_link %}
-                                                    <a href="{{ w_blg_link }}" target="_blank" rel="noopener noreferrer" class="profile-social-btn blog" style="width: 20px; height: 20px; font-size: 0.62rem;" title="Blog"><i class="fa-solid fa-blog"></i></a>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
                                     </div>
                                     {% set w_raw = w.KIND_NM or w.pet_type or w_kind or '' %}
                                     {% set w_clean = w_raw|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
