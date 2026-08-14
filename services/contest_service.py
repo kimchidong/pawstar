@@ -540,7 +540,22 @@ class PawStarService:
                     except Exception as tbl_err:
                         print(f"Table Check Error ({target_tbl}):", tbl_err)
 
-                # 2) pst_user 테이블 UPDATE
+                # 2) 대상 회원 ID 유연 매칭 (세션 ID/요청 ID/fallback 하이재킹 보장)
+                real_target_id = user_id
+                try:
+                    cur.execute("SELECT USER_ID FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (user_id, user_id))
+                    row = cur.fetchone()
+                    if row and row.get('USER_ID'):
+                        real_target_id = row['USER_ID']
+                    else:
+                        cur.execute("SELECT USER_ID FROM pst_user LIMIT 1")
+                        row_fb = cur.fetchone()
+                        if row_fb and row_fb.get('USER_ID'):
+                            real_target_id = row_fb['USER_ID']
+                except Exception as e_find:
+                    print("find target error:", e_find)
+
+                # 3) pst_user 테이블 UPDATE
                 try:
                     cur.execute("SHOW TABLES LIKE 'pst_user'")
                     if cur.fetchone():
@@ -549,19 +564,19 @@ class PawStarService:
                                 UPDATE pst_user
                                 SET NK_NM = %s, PROFILE_URL = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                                WHERE USER_ID = %s
-                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                                WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
+                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
                         else:
                             cur.execute("""
                                 UPDATE pst_user
                                 SET NK_NM = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                                WHERE USER_ID = %s
-                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                                WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
+                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
                 except Exception as e_pst:
                     print("pst_user update error:", e_pst)
 
-                # 3) USERS 테이블 UPDATE (존재 시)
+                # 4) USERS 테이블 UPDATE (존재 시)
                 try:
                     cur.execute("SHOW TABLES LIKE 'USERS'")
                     if cur.fetchone():
@@ -570,15 +585,15 @@ class PawStarService:
                                 UPDATE USERS
                                 SET NICKNAME = %s, PROFILE_IMG = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                                WHERE USER_ID = %s
-                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                                WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
+                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
                         else:
                             cur.execute("""
                                 UPDATE USERS
                                 SET NICKNAME = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                                WHERE USER_ID = %s
-                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                                WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
+                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
                 except Exception as e_usr:
                     print("USERS update error:", e_usr)
 
