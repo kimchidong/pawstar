@@ -28,10 +28,18 @@
                         {% set fsb_link = ('https://' ~ fsb_raw) if fsb_raw and not (fsb_raw.startswith('http://') or fsb_raw.startswith('https://')) else fsb_raw %}
                         {% set blg_link = ('https://' ~ blg_raw) if blg_raw and not (blg_raw.startswith('http://') or blg_raw.startswith('https://')) else blg_raw %}
 
-                        <a href="{{ inst_link if inst_link else 'javascript:void(0)' }}" class="profile-social-btn instagram" title="Instagram" {% if inst_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="alert('등록된 인스타그램 주소가 없습니다. 프로필 수정 팝업에서 주소를 등록해 보세요! 📷'); return false;"{% endif %}><i class="fa-brands fa-instagram"></i></a>
-                        <a href="{{ ytb_link if ytb_link else 'javascript:void(0)' }}" class="profile-social-btn youtube" title="YouTube" {% if ytb_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="alert('등록된 유튜브 주소가 없습니다. 프로필 수정 팝업에서 주소를 등록해 보세요! 📺'); return false;"{% endif %}><i class="fa-brands fa-youtube"></i></a>
-                        <a href="{{ fsb_link if fsb_link else 'javascript:void(0)' }}" class="profile-social-btn facebook" title="Facebook" {% if fsb_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="alert('등록된 페이스북 주소가 없습니다. 프로필 수정 팝업에서 주소를 등록해 보세요! 📘'); return false;"{% endif %}><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="{{ blg_link if blg_link else 'javascript:void(0)' }}" class="profile-social-btn blog" title="Blog" {% if blg_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="alert('등록된 블로그 주소가 없습니다. 프로필 수정 팝업에서 주소를 등록해 보세요! 📝'); return false;"{% endif %}><i class="fa-solid fa-blog"></i></a>
+                        {% if inst_link %}
+                            <a href="{{ inst_link }}" class="profile-social-btn instagram" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+                        {% endif %}
+                        {% if ytb_link %}
+                            <a href="{{ ytb_link }}" class="profile-social-btn youtube" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i></a>
+                        {% endif %}
+                        {% if fsb_link %}
+                            <a href="{{ fsb_link }}" class="profile-social-btn facebook" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f"></i></a>
+                        {% endif %}
+                        {% if blg_link %}
+                            <a href="{{ blg_link }}" class="profile-social-btn blog" title="Blog" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-blog"></i></a>
+                        {% endif %}
                     </div>
                     {% if user.email %}
                         <span class="user-google-chip" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
@@ -488,28 +496,28 @@
 
                 <div class="form-group" style="margin-bottom: 0.85rem;">
                     <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 인스타그램 주소 (SNS_INST)
+                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 인스타그램 주소
                     </label>
                     <input type="text" id="editSnsInst" class="form-control" placeholder="https://www.instagram.com/your_id" value="{{ user.sns_inst or user.SNS_INST or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0.85rem;">
                     <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 유튜브 주소 (SNS_YTB)
+                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 유튜브 주소
                     </label>
                     <input type="text" id="editSnsYtb" class="form-control" placeholder="https://www.youtube.com/@your_channel" value="{{ user.sns_ytb or user.SNS_YTB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0.85rem;">
                     <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 페이스북 주소 (SNS_FSB)
+                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 페이스북 주소
                     </label>
                     <input type="text" id="editSnsFsb" class="form-control" placeholder="https://www.facebook.com/your_id" value="{{ user.sns_fsb or user.SNS_FSB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 블로그 주소 (SNS_BLG)
+                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 블로그 주소
                     </label>
                     <input type="text" id="editSnsBlg" class="form-control" placeholder="https://blog.naver.com/your_id" value="{{ user.sns_blg or user.SNS_BLG or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
                 </div>
