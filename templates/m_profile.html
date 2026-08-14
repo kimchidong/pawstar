@@ -187,7 +187,7 @@
         </div>
         {% set current_tab = request.args.get('tab', 'posts') %}
         <div class="custom-contest-options">
-            <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all&tab={{ current_tab }}'">
+            <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="selectMobileContestEdition('all')">
                 <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
                 <span class="option-text" style="font-weight: 800;">전체 회차 종합 보기</span>
             </div>
@@ -197,7 +197,7 @@
                     {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
                     {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
                     {% set is_sel = (c_id == sel_c_id) %}
-                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}&tab={{ current_tab }}'">
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="selectMobileContestEdition('{{ c_id }}')">
                         {% if is_in_prog %}
                             <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
@@ -214,17 +214,17 @@
 <!-- 전형적인 모바일 탭 바 -->
 <div class="m-profile-tabs-wrapper" style="margin-top: 0.75rem;">
     <div class="m-profile-tabs-header">
-        <button type="button" class="m-tab-btn active" id="mTabBtnPosts" onclick="switchMobileProfileTab('posts')">
+        <button type="button" class="m-tab-btn {{ 'active' if current_tab != 'awards' else '' }}" id="mTabBtnPosts" onclick="switchMobileProfileTab('posts')">
             <i class="fa-solid fa-paw"></i> 내 펫 출전작
         </button>
-        <button type="button" class="m-tab-btn" id="mTabBtnAwards" onclick="switchMobileProfileTab('awards')">
+        <button type="button" class="m-tab-btn {{ 'active' if current_tab == 'awards' else '' }}" id="mTabBtnAwards" onclick="switchMobileProfileTab('awards')">
             <i class="fa-solid fa-trophy"></i> 수상 트로피
         </button>
     </div>
 </div>
 
 <!-- 1. 탭 컨텐츠: 내 펫 출전작 -->
-<div id="mTabContentPosts" class="m-tab-content active">
+<div id="mTabContentPosts" class="m-tab-content {{ 'active' if current_tab != 'awards' else '' }}">
     <div style="padding: 0 0.85rem 0.5rem 0.85rem;">
         {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
         {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
@@ -381,7 +381,7 @@
 </div>
 
 <!-- 2. 탭 컨텐츠: 수상 트로피 -->
-<div id="mTabContentAwards" class="m-tab-content">
+<div id="mTabContentAwards" class="m-tab-content {{ 'active' if current_tab == 'awards' else '' }}">
     <div style="padding: 0 0.85rem; margin: 0.5rem 0 1rem 0;">
         <!-- 수상 트로피 서브 헤더 (총 개수 & 10개 단위 페이지 상태) -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.3rem 0 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
@@ -533,6 +533,12 @@
 </div>
 
 <script>
+function selectMobileContestEdition(cId) {
+    const isAwardsActive = document.getElementById('mTabBtnAwards')?.classList.contains('active');
+    const activeTab = isAwardsActive ? 'awards' : 'posts';
+    window.location.href = `?user_id={{ user.user_id }}&contest_id=${cId}&tab=${activeTab}`;
+}
+
 function switchMobileProfileTab(tabName) {
     const postsTabBtn = document.getElementById('mTabBtnPosts');
     const awardsTabBtn = document.getElementById('mTabBtnAwards');
