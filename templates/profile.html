@@ -16,6 +16,13 @@
                 <div class="profile-user-identity" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
                     <h2 class="profile-user-nickname" id="currentNickname" style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; line-height: 1;">{{ user.nickname }}</h2>
                     <span class="user-role-chip" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
+                    <!-- 소셜 링크 버튼 세트 -->
+                    <div class="profile-social-links">
+                        <a href="#" class="profile-social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="profile-social-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="profile-social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="profile-social-btn" title="Blog"><i class="fa-solid fa-blog"></i></a>
+                    </div>
                     {% if user.email %}
                         <span class="user-google-chip" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
                     {% endif %}
