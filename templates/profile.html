@@ -49,8 +49,68 @@
         </div>
     </div>
     
+    <!-- 콘테스트 회차 선택 드롭다운 (프로필 카드 바로 아래 배치) -->
+    {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
+    {% set ns = namespace(sel_c=none) %}
+    {% for c in contests %}
+        {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+        {% if c_id == sel_c_id %}
+            {% set ns.sel_c = c %}
+        {% endif %}
+    {% endfor %}
+    {% set selected_contest_obj = ns.sel_c %}
+    {% set is_sel_in_prog = False %}
+    {% if selected_contest_obj %}
+        {% set c_stat_nm = selected_contest_obj.CONTEST_STAT_NM or selected_contest_obj.status or '' %}
+        {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
+    {% endif %}
+
+    <div style="margin: 1.5rem 0 1.5rem 0; display: flex; justify-content: center;">
+        <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="customContestDropdown" style="width: 420px;">
+            <div class="custom-contest-trigger" style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: inline-flex; align-items: center; gap: 0.55rem; width: 100%; min-width: 0; overflow: hidden;">
+                    {% if sel_c_id == 'all' or not selected_contest_id %}
+                        <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
+                        <span class="selected-text" style="font-weight: 800; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">전체 회차 종합 보기</span>
+                    {% else %}
+                        {% if is_sel_in_prog %}
+                            <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
+                        {% endif %}
+                        <span class="selected-text" style="font-weight: 800; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                            <span class="round-badge-text">제{{ sel_c_id }}회</span> {{ selected_contest_obj.THEME_NM or selected_contest_obj.title if selected_contest_obj else '' }}
+                        </span>
+                    {% endif %}
+                </span>
+                <i class="fa-solid fa-chevron-down arrow-icon" style="flex-shrink: 0;"></i>
+            </div>
+            <div class="custom-contest-options">
+                <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' or not selected_contest_id }}" data-value="all" data-url="?user_id={{ user.user_id }}&contest_id=all">
+                    <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
+                    <span class="option-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
+                </div>
+                {% for c in contests %}
+                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
+                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
+                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
+                    {% set c_title = c.THEME_NM or c.title %}
+                    {% set is_sel = (c_id == sel_c_id) %}
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
+                        {% if is_in_prog %}
+                            <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
+                        {% else %}
+                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
+                        {% endif %}
+                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
     <!-- 활동 통계 4종 카드 (Stats Grid) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem 0;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 0 0 2rem 0;">
         <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 1rem;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(124, 58, 237, 0.1); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
                 <i class="fa-solid fa-paw"></i>
@@ -102,66 +162,6 @@
             {% set _ = round_map.update({c_id: round_map[c_id] + 1}) %}
         {% endif %}
     {% endfor %}
-
-    {% set sel_c_id = (selected_contest_id|string) if selected_contest_id else 'all' %}
-    {% set ns = namespace(sel_c=none) %}
-    {% for c in contests %}
-        {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-        {% if c_id == sel_c_id %}
-            {% set ns.sel_c = c %}
-        {% endif %}
-    {% endfor %}
-    {% set selected_contest_obj = ns.sel_c %}
-    {% set is_sel_in_prog = False %}
-    {% if selected_contest_obj %}
-        {% set c_stat_nm = selected_contest_obj.CONTEST_STAT_NM or selected_contest_obj.status or '' %}
-        {% set is_sel_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or selected_contest_obj.CONTEST_STAT == 'G001C001') %}
-    {% endif %}
-
-    <!-- 콘테스트 회차 선택 드롭다운 (내 펫 출전 게시물 바로 위 위치) -->
-    <div style="margin: 2rem 0 1rem 0; display: flex; justify-content: center;">
-        <div class="custom-contest-dropdown {{ 'stat-in-progress' if is_sel_in_prog else 'stat-closed' }}" id="customContestDropdown" style="width: 420px;">
-            <div class="custom-contest-trigger" style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="display: inline-flex; align-items: center; gap: 0.55rem; width: 100%; min-width: 0; overflow: hidden;">
-                    {% if sel_c_id == 'all' or not selected_contest_id %}
-                        <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                        <span class="selected-text" style="font-weight: 800; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">전체 회차 종합 보기</span>
-                    {% else %}
-                        {% if is_sel_in_prog %}
-                            <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
-                        {% else %}
-                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
-                        {% endif %}
-                        <span class="selected-text" style="font-weight: 800; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                            <span class="round-badge-text">제{{ sel_c_id }}회</span> {{ selected_contest_obj.THEME_NM or selected_contest_obj.title if selected_contest_obj else '' }}
-                        </span>
-                    {% endif %}
-                </span>
-                <i class="fa-solid fa-chevron-down arrow-icon" style="flex-shrink: 0;"></i>
-            </div>
-            <div class="custom-contest-options">
-                <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' or not selected_contest_id }}" data-value="all" data-url="?user_id={{ user.user_id }}&contest_id=all">
-                    <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
-                    <span class="option-text" style="font-weight: 800;">🏆 전체 회차 종합 보기</span>
-                </div>
-                {% for c in contests %}
-                    {% set c_stat_nm = c.CONTEST_STAT_NM or c.status or '' %}
-                    {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
-                    {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
-                    {% set c_title = c.THEME_NM or c.title %}
-                    {% set is_sel = (c_id == sel_c_id) %}
-                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" data-url="?user_id={{ user.user_id }}&contest_id={{ c_id }}">
-                        {% if is_in_prog %}
-                            <span class="status-chip in-progress" style="flex-shrink: 0;"><i class="fa-solid fa-play"></i> 진행중</span>
-                        {% else %}
-                            <span class="status-chip closed" style="flex-shrink: 0;"><i class="fa-solid fa-lock"></i> 종료</span>
-                        {% endif %}
-                        <span class="option-text"><span class="round-badge-text">제{{ c_id }}회</span> {{ c_title }}</span>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
 
     <div style="display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 1rem 0; flex-wrap: wrap; gap: 0.75rem;">
         <h3 style="font-size: 1.4rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
