@@ -355,8 +355,8 @@
                     </span>
                 {% endif %}
                 
-                <!-- 1. 좌측: 3D 메달 아이콘 + 펫 썸네일 -->
-                <div style="display: flex; align-items: center; gap: 0.9rem; flex-shrink: 0;">
+                <!-- 1. 좌측: 3D 메달 아이콘 + 펫 썸네일 (간격 확장) -->
+                <div style="display: flex; align-items: center; gap: 1.75rem; flex-shrink: 0;">
                     <!-- 메달 아이콘 스택 -->
                     <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
                         {% for b in (a.awards or [a]) %}
@@ -370,8 +370,8 @@
                     <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15); flex-shrink: 0;">
                 </div>
 
-                <!-- 2. 중앙 좌측: 펫 정보 -->
-                <div style="min-width: 0; display: flex; align-items: center; gap: 0.55rem; flex-wrap: nowrap; overflow: hidden; flex-shrink: 0;">
+                <!-- 2. 중앙 좌측: 펫 정보 (썸네일과의 간격 확장) -->
+                <div style="min-width: 0; display: flex; align-items: center; gap: 0.55rem; flex-wrap: nowrap; overflow: hidden; flex-shrink: 0; margin-left: 0.75rem;">
                     {% set a_kind_clean = (a.KIND_NM or a.pet_type or '')|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
                     {% set a_kind_fa_icon = 'fa-solid fa-dog' if ('강아지' in a_kind_clean or '개' in a_kind_clean) else ('fa-solid fa-cat' if '고양이' in a_kind_clean else ('fa-solid fa-otter' if ('햄스터' in a_kind_clean or '소동물' in a_kind_clean or '토끼' in a_kind_clean or '고슴도치' in a_kind_clean or '작은동물' in a_kind_clean) else ('fa-solid fa-frog' if ('거북이' in a_kind_clean or '파충류' in a_kind_clean or '도마뱀' in a_kind_clean) else ('fa-solid fa-fish' if ('어류' in a_kind_clean or '관상어' in a_kind_clean or '물고기' in a_kind_clean) else ('fa-solid fa-crow' if ('새' in a_kind_clean or '앵무새' in a_kind_clean or '조류' in a_kind_clean) else ('fa-solid fa-horse' if ('말' in a_kind_clean or '큰동물' in a_kind_clean) else 'fa-solid fa-paw')))))) %}
                     {% if a_kind_clean %}
