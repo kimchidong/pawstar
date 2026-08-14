@@ -565,10 +565,15 @@
     }
 
     if (googleModal) {
+        let isMouseDownOnBackdrop = false;
+        googleModal.addEventListener('mousedown', function(e) {
+            isMouseDownOnBackdrop = (e.target === googleModal);
+        });
         googleModal.addEventListener('click', function(e) {
-            if (e.target === googleModal) {
+            if (e.target === googleModal && isMouseDownOnBackdrop) {
                 closeGoogleAuthModal();
             }
+            isMouseDownOnBackdrop = false;
         });
     }
 

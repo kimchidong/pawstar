@@ -804,6 +804,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    if (modal) {
+        let isMouseDownOnBackdrop = false;
+        modal.addEventListener('mousedown', function(e) {
+            isMouseDownOnBackdrop = (e.target === modal || e.target.classList.contains('m-modal-backdrop'));
+        });
+        modal.addEventListener('click', function(e) {
+            if ((e.target === modal || e.target.classList.contains('m-modal-backdrop')) && isMouseDownOnBackdrop) {
+                modal.classList.remove('active');
+            }
+            isMouseDownOnBackdrop = false;
+        });
+    }
+
     const mBtnCheckNk = document.getElementById('mBtnCheckNickname');
     const mEditNkInput = document.getElementById('mEditNickname');
     const mNkCheckMsg = document.getElementById('mNicknameCheckMsg');

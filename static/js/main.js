@@ -128,8 +128,13 @@ function initEventHandlers() {
         closeDetailBtn.addEventListener('click', () => closeDetailModal());
     }
     if (detailModal) {
+        let isMouseDownOnBackdrop = false;
+        detailModal.addEventListener('mousedown', (e) => {
+            isMouseDownOnBackdrop = (e.target === detailModal);
+        });
         detailModal.addEventListener('click', (e) => {
-            if (e.target === detailModal) closeDetailModal();
+            if (e.target === detailModal && isMouseDownOnBackdrop) closeDetailModal();
+            isMouseDownOnBackdrop = false;
         });
     }
 
