@@ -197,6 +197,54 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
     
+    // 모바일 작성자 SNS 링크 동적 생성 (저장된 주소가 있는 아이콘들만 나란히 표시)
+    const mSnsContainer = document.getElementById('mDetailAuthorSnsLinks');
+    if (mSnsContainer) {
+        mSnsContainer.innerHTML = '';
+        const rawInst = (postData.SNS_INST || postData.sns_inst || '').trim();
+        const rawYtb = (postData.SNS_YTB || postData.sns_ytb || '').trim();
+        const rawFsb = (postData.SNS_FSB || postData.sns_fsb || '').trim();
+        const rawBlg = (postData.SNS_BLG || postData.sns_blg || '').trim();
+
+        const formatUrl = (url) => {
+            if (!url) return '';
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                return 'https://' + url;
+            }
+            return url;
+        };
+
+        const snsItems = [
+            { type: 'instagram', rawUrl: rawInst, icon: 'fa-brands fa-instagram', title: 'Instagram' },
+            { type: 'youtube', rawUrl: rawYtb, icon: 'fa-brands fa-youtube', title: 'YouTube' },
+            { type: 'facebook', rawUrl: rawFsb, icon: 'fa-brands fa-facebook-f', title: 'Facebook' },
+            { type: 'blog', rawUrl: rawBlg, icon: 'fa-solid fa-blog', title: 'Blog' }
+        ];
+
+        snsItems.forEach(item => {
+            if (item.rawUrl) {
+                const finalUrl = formatUrl(item.rawUrl);
+                const aBtn = document.createElement('a');
+                aBtn.href = finalUrl;
+                aBtn.target = '_blank';
+                aBtn.rel = 'noopener noreferrer';
+                aBtn.className = `profile-social-btn ${item.type}`;
+                aBtn.title = item.title;
+                aBtn.style.width = '32px';
+                aBtn.style.height = '32px';
+                aBtn.style.fontSize = '0.88rem';
+                aBtn.style.display = 'inline-flex';
+                aBtn.style.alignItems = 'center';
+                aBtn.style.justifyContent = 'center';
+                aBtn.style.padding = '0';
+                aBtn.style.lineHeight = '1';
+                aBtn.style.flexShrink = '0';
+                aBtn.innerHTML = `<i class="${item.icon}"></i>`;
+                mSnsContainer.appendChild(aBtn);
+            }
+        });
+    }
+    
     // 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
     const mContestBadge = document.getElementById('mDetailContestBadge');
     if (mContestBadge) {

@@ -867,6 +867,8 @@ class PawStarService:
                         u.NK_NM AS user_nickname, u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
+                        u.SNS_INST, u.SNS_YTB, u.SNS_FSB, u.SNS_BLG,
+                        u.SNS_INST AS sns_inst, u.SNS_YTB AS sns_ytb, u.SNS_FSB AS sns_fsb, u.SNS_BLG AS sns_blg,
                         CONCAT(ca.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id
                     FROM pst_contest_award ca
                     JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
@@ -2238,6 +2240,14 @@ class PawStarService:
                         u.USER_ID,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
+                        u.SNS_INST,
+                        u.SNS_YTB,
+                        u.SNS_FSB,
+                        u.SNS_BLG,
+                        u.SNS_INST AS sns_inst,
+                        u.SNS_YTB AS sns_ytb,
+                        u.SNS_FSB AS sns_fsb,
+                        u.SNS_BLG AS sns_blg,
                         -- 호환용
                         ca.CONTEST_ROUND AS contest_id,
                         ca.ROUND_NO AS round_no,
@@ -2254,7 +2264,11 @@ class PawStarService:
                         COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS image_path,
                         u.USER_ID AS user_id,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
-                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile
+                        COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
+                        u.SNS_INST AS sns_inst,
+                        u.SNS_YTB AS sns_ytb,
+                        u.SNS_FSB AS sns_fsb,
+                        u.SNS_BLG AS sns_blg
                     FROM pst_contest_award ca
                     LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD

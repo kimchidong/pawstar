@@ -2977,9 +2977,6 @@ option.opt-closed {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    color: #475569;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2988,8 +2985,32 @@ option.opt-closed {
     font-size: 0.92rem;
     line-height: 1;
     padding: 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
     transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-social-btn.instagram {
+    background: #fff0f5;
+    color: #e1306c;
+    border: 1.5px solid #fecdd3;
+    box-shadow: 0 2px 6px rgba(225, 48, 108, 0.15);
+}
+.profile-social-btn.youtube {
+    background: #ffeded;
+    color: #ff0000;
+    border: 1.5px solid #fecaca;
+    box-shadow: 0 2px 6px rgba(255, 0, 0, 0.15);
+}
+.profile-social-btn.facebook {
+    background: #eff6ff;
+    color: #1877f2;
+    border: 1.5px solid #bfdbfe;
+    box-shadow: 0 2px 6px rgba(24, 119, 242, 0.15);
+}
+.profile-social-btn.blog {
+    background: #f0fdf4;
+    color: #03cf5d;
+    border: 1.5px solid #bbf7d0;
+    box-shadow: 0 2px 6px rgba(3, 207, 93, 0.15);
 }
 
 .profile-social-btn i {
@@ -3005,31 +3026,38 @@ option.opt-closed {
 }
 
 .profile-social-btn:hover {
-    color: #ffffff;
-    border-color: transparent;
+    transform: translateY(-2px);
 }
 
 /* 1. Instagram: 인스타그램 그라데이션 */
 .profile-social-btn.instagram:hover {
     background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #ffffff;
+    border-color: transparent;
     box-shadow: 0 4px 14px rgba(220, 39, 67, 0.4);
 }
 
 /* 2. YouTube: 유튜브 레드 */
 .profile-social-btn.youtube:hover {
     background: #ff0000;
+    color: #ffffff;
+    border-color: transparent;
     box-shadow: 0 4px 14px rgba(255, 0, 0, 0.4);
 }
 
 /* 3. Facebook: 페이스북 블루 */
 .profile-social-btn.facebook:hover {
     background: #1877f2;
+    color: #ffffff;
+    border-color: transparent;
     box-shadow: 0 4px 14px rgba(24, 119, 242, 0.4);
 }
 
 /* 4. Blog: 블로그 그린 */
 .profile-social-btn.blog:hover {
     background: #03cf5d;
+    color: #ffffff;
+    border-color: transparent;
     box-shadow: 0 4px 14px rgba(3, 207, 93, 0.4);
 }
 
