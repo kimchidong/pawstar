@@ -483,7 +483,7 @@ class PawStarService:
                             SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() 
                             WHERE USER_ID = %s
                         """, (user_id,))
-                        latest_img = user.get('PROFILE_URL') or profile_img
+                        latest_img = user.get('PROFILE_URL')
 
                     conn.commit()
                     user_info = {
@@ -509,7 +509,7 @@ class PawStarService:
                 'profile_img': profile_img
             }
 
-    def update_user_profile(self, user_id, nickname, profile_img="", **kwargs):
+    def update_user_profile(self, user_id, nickname, profile_img="", sns_inst="", sns_ytb="", sns_fsb="", sns_blg="", **kwargs):
         nickname = (nickname or '').strip()
         if not nickname:
             return False, "변경할 닉네임을 입력해주세요.", None
@@ -525,35 +525,58 @@ class PawStarService:
                 return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
 
             with conn.cursor() as cur:
+                # 안전 컬럼 점검 및 추가
+                for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
+                    try:
+                        cur.execute(f"SHOW COLUMNS FROM pst_user LIKE '{col[0]}'")
+                        if not cur.fetchone():
+                            cur.execute(f"ALTER TABLE pst_user ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
+                    except Exception:
+                        pass
+
                 if profile_img:
                     cur.execute("""
                         UPDATE pst_user
-                        SET NK_NM = %s, PROFILE_URL = %s
+                        SET NK_NM = %s, PROFILE_URL = %s,
+                            SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                         WHERE USER_ID = %s
-                    """, (nickname, profile_img, user_id))
+                    """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
                 else:
                     cur.execute("""
                         UPDATE pst_user
-                        SET NK_NM = %s
+                        SET NK_NM = %s,
+                            SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                         WHERE USER_ID = %s
-                    """, (nickname, user_id))
+                    """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
 
                 conn.commit()
 
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL, SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG FROM pst_user WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
                 conn.close()
 
                 final_nk = user.get('NK_NM', nickname) if user else nickname
                 final_img = user.get('PROFILE_URL', profile_img or '/static/image/profile/default_profile.png') if user else (profile_img or '/static/image/profile/default_profile.png')
+                final_inst = user.get('SNS_INST', sns_inst) if user else sns_inst
+                final_ytb = user.get('SNS_YTB', sns_ytb) if user else sns_ytb
+                final_fsb = user.get('SNS_FSB', sns_fsb) if user else sns_fsb
+                final_blg = user.get('SNS_BLG', sns_blg) if user else sns_blg
 
                 updated_user = {
                     'USER_ID': user_id,
                     'NK_NM': final_nk,
                     'PROFILE_URL': final_img,
+                    'SNS_INST': final_inst,
+                    'SNS_YTB': final_ytb,
+                    'SNS_FSB': final_fsb,
+                    'SNS_BLG': final_blg,
                     'user_id': user_id,
                     'nickname': final_nk,
-                    'profile_img': final_img
+                    'profile_img': final_img,
+                    'sns_inst': final_inst,
+                    'sns_ytb': final_ytb,
+                    'sns_fsb': final_fsb,
+                    'sns_blg': final_blg
                 }
                 return True, "프로필 정보가 정상적으로 수정되었습니다.", updated_user
         except Exception as e:
@@ -561,16 +584,7 @@ class PawStarService:
             if conn:
                 try: conn.close()
                 except Exception: pass
-            return False, "프로필 수정 중 오류가 발생했습니다.", None
-            print("update_user_profile error:", e)
-            return {
-                'USER_ID': user_id,
-                'NK_NM': nickname,
-                'PROFILE_URL': profile_img or '/static/image/profile/default_profile.png',
-                'user_id': user_id,
-                'nickname': nickname,
-                'profile_img': profile_img or '/static/image/profile/default_profile.png'
-            }
+            return False, f"프로필 수정 중 오류가 발생했습니다: {str(e)}", None
 
     def delete_user(self, user_id):
         conn = self.get_db_connection()
@@ -591,15 +605,25 @@ class PawStarService:
         conn = self.get_db_connection()
         if not conn:
             return {
-                'user_info': {'USER_ID': user_id, 'NK_NM': '프로필', 'PROFILE_URL': '/static/image/profile/default_profile.png', 'user_id': user_id, 'nickname': '프로필', 'profile_img': '/static/image/profile/default_profile.png'},
+                'user': {'USER_ID': user_id, 'NK_NM': '집사', 'PROFILE_URL': '/static/image/profile/default_profile.png'},
                 'stats': {'my_post_count': 0, 'total_score': 0, 'total_likes': 0, 'award_count': 0},
                 'my_posts': [],
                 'my_awards': []
             }
         try:
             with conn.cursor() as cur:
+                # 안전 컬럼 점검 및 추가
+                for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
+                    try:
+                        cur.execute(f"SHOW COLUMNS FROM pst_user LIKE '{col[0]}'")
+                        if not cur.fetchone():
+                            cur.execute(f"ALTER TABLE pst_user ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
+                    except Exception:
+                        pass
+
                 cur.execute("""
-                    SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT
+                    SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT,
+                           SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG
                     FROM pst_user WHERE USER_ID = %s
                 """, (user_id,))
                 user_info = cur.fetchone()
@@ -862,6 +886,14 @@ class PawStarService:
                         'user_id': user_info['USER_ID'],
                         'nickname': user_info.get('NK_NM', user_id),
                         'profile_img': user_info.get('PROFILE_URL', '/static/image/profile/default_profile.png'),
+                        'sns_inst': user_info.get('sns_inst', ''),
+                        'sns_ytb': user_info.get('sns_ytb', ''),
+                        'sns_fsb': user_info.get('sns_fsb', ''),
+                        'sns_blg': user_info.get('sns_blg', ''),
+                        'SNS_INST': user_info.get('SNS_INST', ''),
+                        'SNS_YTB': user_info.get('SNS_YTB', ''),
+                        'SNS_FSB': user_info.get('SNS_FSB', ''),
+                        'SNS_BLG': user_info.get('SNS_BLG', ''),
                         'join_date': user_info.get('join_date', '-'),
                         'last_login': user_info.get('last_login', '-'),
                         'JOIN_DT': str(user_info.get('JOIN_DT', '')),

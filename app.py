@@ -1060,17 +1060,32 @@ def api_profile_update():
     data = request.json or {}
     nickname = data.get('nickname')
     profile_img = data.get('profile_img')
+    sns_inst = (data.get('sns_inst') or '').strip()
+    sns_ytb = (data.get('sns_ytb') or '').strip()
+    sns_fsb = (data.get('sns_fsb') or '').strip()
+    sns_blg = (data.get('sns_blg') or '').strip()
     
-    success, message, updated_user = service.update_user_profile(user_id=user_id, nickname=nickname, profile_img=profile_img)
+    success, message, updated_user = service.update_user_profile(
+        user_id=user_id,
+        nickname=nickname,
+        profile_img=profile_img,
+        sns_inst=sns_inst,
+        sns_ytb=sns_ytb,
+        sns_fsb=sns_fsb,
+        sns_blg=sns_blg
+    )
     if not success:
         return jsonify({'success': False, 'message': message}), 400
 
     # 세션 내 프로필 정보 갱신
     if updated_user:
-        session['user'] = updated_user
-        session['nickname'] = updated_user.get('NK_NM')
-        if updated_user.get('PROFILE_URL'):
-            session['profile_img'] = updated_user.get('PROFILE_URL')
+        if isinstance(session.get('user'), dict):
+            session['user'].update(updated_user)
+        else:
+            session['user'] = updated_user
+        session['nickname'] = updated_user.get('NK_NM') or updated_user.get('nickname')
+        if updated_user.get('PROFILE_URL') or updated_user.get('profile_img'):
+            session['profile_img'] = updated_user.get('PROFILE_URL') or updated_user.get('profile_img')
 
     return jsonify({'success': True, 'message': message, 'data': updated_user})
 

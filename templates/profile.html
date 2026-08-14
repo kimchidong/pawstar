@@ -18,10 +18,14 @@
                     <span class="user-role-chip" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
                     <!-- 소셜 링크 버튼 세트 -->
                     <div class="profile-social-links">
-                        <a href="#" class="profile-social-btn instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="profile-social-btn youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="profile-social-btn facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="profile-social-btn blog" title="Blog"><i class="fa-solid fa-blog"></i></a>
+                        {% set inst_link = user.sns_inst or user.SNS_INST %}
+                        {% set ytb_link = user.sns_ytb or user.SNS_YTB %}
+                        {% set fsb_link = user.sns_fsb or user.SNS_FSB %}
+                        {% set blg_link = user.sns_blg or user.SNS_BLG %}
+                        <a href="{{ inst_link if inst_link else '#' }}" class="profile-social-btn instagram" title="Instagram" {% if inst_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="if(this.getAttribute('href')==='#'){ alert('등록된 인스타그램 주소가 없습니다. 프로필 수정에서 주소를 입력해보세요!'); return false; }"{% endif %}><i class="fa-brands fa-instagram"></i></a>
+                        <a href="{{ ytb_link if ytb_link else '#' }}" class="profile-social-btn youtube" title="YouTube" {% if ytb_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="if(this.getAttribute('href')==='#'){ alert('등록된 유튜브 주소가 없습니다. 프로필 수정에서 주소를 입력해보세요!'); return false; }"{% endif %}><i class="fa-brands fa-youtube"></i></a>
+                        <a href="{{ fsb_link if fsb_link else '#' }}" class="profile-social-btn facebook" title="Facebook" {% if fsb_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="if(this.getAttribute('href')==='#'){ alert('등록된 페이스북 주소가 없습니다. 프로필 수정에서 주소를 입력해보세요!'); return false; }"{% endif %}><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="{{ blg_link if blg_link else '#' }}" class="profile-social-btn blog" title="Blog" {% if blg_link %}target="_blank" rel="noopener noreferrer"{% else %}onclick="if(this.getAttribute('href')==='#'){ alert('등록된 블로그 주소가 없습니다. 프로필 수정에서 주소를 입력해보세요!'); return false; }"{% endif %}><i class="fa-solid fa-blog"></i></a>
                     </div>
                     {% if user.email %}
                         <span class="user-google-chip" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
@@ -447,23 +451,59 @@
 
 <!-- 프로필 수정 레이어 팝업 모달 (Profile Edit Modal) -->
 <div class="modal-backdrop" id="profileEditModal">
-    <div class="modal-content" style="max-width: 520px;">
-        <div class="modal-header">
-            <h3>✏️ 프로필 정보 수정</h3>
+    <div class="modal-content" style="max-width: 520px; width: 92%; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 1.75rem 2rem;">
+        <div class="modal-header" style="margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: #0f172a; display: flex; align-items: center; gap: 0.5rem; margin: 0;">✏️ 프로필 정보 수정</h3>
             <button type="button" class="btn-close" id="btnCloseProfileModal"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <form id="profileEditForm">
             <!-- 프로필 이미지 (상단 가운데 배치) -->
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.5rem 0 1.25rem 0; text-align: center;">
-                <img id="editProfilePreview" src="{{ user.profile_img }}" alt="프로필 이미지" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 0.5rem;">
-                <input type="hidden" id="editProfileImg" value="{{ user.profile_img }}">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0.25rem 0 1.25rem 0; text-align: center;">
+                <img id="editProfilePreview" src="{{ user.profile_img or user.PROFILE_URL or '/static/image/profile/default_profile.png' }}" alt="프로필 이미지" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 0.5rem;">
+                <input type="hidden" id="editProfileImg" value="{{ user.profile_img or user.PROFILE_URL or '' }}">
             </div>
 
-            <div class="form-group">
-                <label>집사 닉네임</label>
-                <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required>
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-bottom: 0.4rem; display: block;">집사 닉네임</label>
+                <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 1rem; font-size: 0.95rem; font-weight: 700;">
             </div>
-            <button type="submit" class="btn-save-profile" id="btnSaveProfile">
+
+            <!-- SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
+            <div style="border-top: 1.5px dashed #e2e8f0; padding-top: 1.25rem; margin-top: 1.25rem;">
+                <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <i class="fa-solid fa-share-nodes" style="color: #7c3aed;"></i> SNS / 소셜 계정 주소 설정
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.85rem;">
+                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 인스타그램 주소 (SNS_INST)
+                    </label>
+                    <input type="url" id="editSnsInst" class="form-control" placeholder="https://www.instagram.com/your_id" value="{{ user.sns_inst or user.SNS_INST or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.85rem;">
+                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 유튜브 주소 (SNS_YTB)
+                    </label>
+                    <input type="url" id="editSnsYtb" class="form-control" placeholder="https://www.youtube.com/@your_channel" value="{{ user.sns_ytb or user.SNS_YTB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.85rem;">
+                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 페이스북 주소 (SNS_FSB)
+                    </label>
+                    <input type="url" id="editSnsFsb" class="form-control" placeholder="https://www.facebook.com/your_id" value="{{ user.sns_fsb or user.SNS_FSB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 블로그 주소 (SNS_BLG)
+                    </label>
+                    <input type="url" id="editSnsBlg" class="form-control" placeholder="https://blog.naver.com/your_id" value="{{ user.sns_blg or user.SNS_BLG or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save-profile" id="btnSaveProfile" style="width: 100%; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); color: #ffffff; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                 <i class="fa-solid fa-check"></i> 수정사항 저장하기
             </button>
         </form>
@@ -547,6 +587,10 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const nickname = document.getElementById('editNickname').value.trim();
             const profile_img = profileImgInput.value;
+            const sns_inst = (document.getElementById('editSnsInst')?.value || '').trim();
+            const sns_ytb = (document.getElementById('editSnsYtb')?.value || '').trim();
+            const sns_fsb = (document.getElementById('editSnsFsb')?.value || '').trim();
+            const sns_blg = (document.getElementById('editSnsBlg')?.value || '').trim();
 
             fetch('/api/profile/update', {
                 method: 'POST',
@@ -556,7 +600,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     user_id: '{{ user.user_id }}',
                     nickname: nickname,
-                    profile_img: profile_img
+                    profile_img: profile_img,
+                    sns_inst: sns_inst,
+                    sns_ytb: sns_ytb,
+                    sns_fsb: sns_fsb,
+                    sns_blg: sns_blg
                 })
             })
             .then(res => res.json())
