@@ -1694,7 +1694,23 @@ body.m-body {
     transform: none !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding-top: 0.18rem !important; /* 글자를 아주 살짝만(약 0.8px~1px) 정밀 하향 */
+}
+
+/* 🏆 모바일 출전작 팝업 내 배지 (..스타, 패밀리 블럭) - 블럭 크기/위치 고정 & 내부 글자/아이콘 1px 하향 */
+#mDetailRankBadge .m-card-badge,
+#mDetailModal .award-badges-overlay .m-card-badge {
+    padding-top: calc(0.38rem + 1px) !important;
+    padding-bottom: calc(0.38rem - 1px) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+#mDetailRankBadge .m-card-badge i,
+#mDetailRankBadge .m-card-badge .pet-emoji-icon,
+#mDetailModal .award-badges-overlay .m-card-badge i,
+#mDetailModal .award-badges-overlay .m-card-badge .pet-emoji-icon {
+    position: relative;
+    top: -1px;
 }
 
 
