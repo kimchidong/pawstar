@@ -740,10 +740,11 @@ function openDetailModal(post, isHallOfFame = false) {
                 aBtn.rel = 'noopener noreferrer';
                 aBtn.className = `profile-social-btn ${item.type}`;
                 aBtn.title = item.title;
-                aBtn.style.width = '30px';
-                aBtn.style.height = '30px';
-                aBtn.style.fontSize = '0.82rem';
+                aBtn.style.width = '32px';
+                aBtn.style.height = '32px';
+                aBtn.style.fontSize = '0.85rem';
                 aBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.04)';
+                aBtn.style.flexShrink = '0';
                 aBtn.innerHTML = `<i class="${item.icon}"></i>`;
                 snsContainer.appendChild(aBtn);
             }
