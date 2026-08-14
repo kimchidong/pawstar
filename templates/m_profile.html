@@ -185,8 +185,9 @@
             </span>
             <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: 0.5rem; flex-shrink: 0;"></i>
         </div>
+        {% set current_tab = request.args.get('tab', 'posts') %}
         <div class="custom-contest-options">
-            <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all'">
+            <div class="custom-contest-option opt-closed {{ 'selected' if sel_c_id == 'all' }}" data-value="all" onclick="location.href='?user_id={{ user.user_id }}&contest_id=all&tab={{ current_tab }}'">
                 <span class="status-chip all" style="background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border: 1.5px solid #fb923c; color: #c2410c; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-layer-group" style="color: #ea580c;"></i> 전체</span>
                 <span class="option-text" style="font-weight: 800;">전체 회차 종합 보기</span>
             </div>
@@ -196,7 +197,7 @@
                     {% set is_in_prog = ('진행' in c_stat_nm or c_stat_nm == 'IN_PROGRESS' or c.CONTEST_STAT == 'G001C001') %}
                     {% set c_id = (c.CONTEST_ROUND or c.contest_id)|string %}
                     {% set is_sel = (c_id == sel_c_id) %}
-                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}'">
+                    <div class="custom-contest-option {{ 'opt-in-progress' if is_in_prog else 'opt-closed' }} {{ 'selected' if is_sel }}" data-value="{{ c_id }}" onclick="location.href='?user_id={{ user.user_id }}&contest_id={{ c_id }}&tab={{ current_tab }}'">
                         {% if is_in_prog %}
                             <span class="status-chip in-progress"><i class="fa-solid fa-play"></i> 진행중</span>
                         {% else %}
@@ -341,14 +342,13 @@
                 </div>
             {% else %}
                 <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); color: var(--text-muted);">
-                    아직 출전한 자랑 게시물이 없습니다.
+                    {% if sel_c_id != 'all' %}
+                        선택하신 회차에는 출전한 게시물이 없습니다.
+                    {% else %}
+                        아직 출전한 자랑 게시물이 없습니다.
+                    {% endif %}
                 </div>
             {% endfor %}
-
-            <!-- 모바일 회차 필터 결과 없음 메시지 -->
-            <div id="mMyPostsEmptyFilterMsg" style="display: none; grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); color: var(--text-muted);">
-                <p style="font-size: 0.85rem; font-weight: 700;">선택하신 회차에는 출전한 게시물이 없습니다.</p>
-            </div>
     </div>
 
     <!-- 모바일 프로필 내 펫 출전작 전용 10개 단위 페이징 컨트롤러 -->
@@ -516,7 +516,13 @@
                 </div>
             {% else %}
                 <div style="text-align: center; padding: 2.5rem 1rem; background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 16px; color: var(--text-muted);">
-                    <p style="font-size: 0.85rem; font-weight: 700; color: #64748b; margin: 0;">아직 수상 기록이 없습니다.</p>
+                    <p style="font-size: 0.85rem; font-weight: 700; color: #64748b; margin: 0;">
+                        {% if sel_c_id != 'all' %}
+                            선택하신 회차에는 수상 기록이 없습니다.
+                        {% else %}
+                            아직 수상 기록이 없습니다.
+                        {% endif %}
+                    </p>
                 </div>
             {% endfor %}
         </div>
