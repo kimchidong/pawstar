@@ -101,13 +101,23 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.85s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.85s cubic-bezier(0.25, 1, 0.5, 1);
             width: 100%;
         }
         .co-winner-content.active {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
+        }
+        .co-winner-content .winner-img {
+            opacity: 0;
+            transform: scale(1.03);
+            transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: opacity, transform;
+        }
+        .co-winner-content.active .winner-img {
+            opacity: 1;
+            transform: scale(1);
         }
     </style>
 
@@ -533,11 +543,11 @@
             // 첫 번째 셔플 탭 활성화
             activatePosition(0);
 
-            // 2. 10초 간격으로 번갈아가며 자연스러운 페이드 전환 (10000ms Auto Switch)
+            // 2. 5초 간격으로 번갈아가며 아주 부드러운 소프트 페이드 전환 (5000ms Auto Switch)
             let autoTimer = setInterval(() => {
                 let nextPos = (currentPos + 1) % indices.length;
                 activatePosition(nextPos);
-            }, 10000);
+            }, 5000);
 
             // 유저 탭 클릭 시 수동 전환 및 타이머 리셋
             tabs.forEach((tab, origIdx) => {
@@ -551,7 +561,7 @@
                     autoTimer = setInterval(() => {
                         let nextPos = (currentPos + 1) % indices.length;
                         activatePosition(nextPos);
-                    }, 10000);
+                    }, 5000);
                 });
             });
         });
