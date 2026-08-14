@@ -723,7 +723,12 @@ function renderTrophyPagination(page) {
 
             <div class="m-form-group">
                 <label>집사 닉네임</label>
-                <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" required>
+                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                    <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" required style="flex: 1;">
+                    <button type="button" id="mBtnCheckNickname" style="height: 42px; padding: 0 0.85rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border: 1.5px solid #cbd5e1; border-radius: 10px; color: #334155; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-magnifying-glass" style="color: #64748b; font-size: 0.75rem;"></i> 중복 확인
+                    </button>
+                </div>
                 <div id="mNicknameCheckMsg" style="font-size: 0.82rem; margin-top: 0.45rem; font-weight: 700; display: none;"></div>
             </div>
 
@@ -799,11 +804,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                modal.classList.remove('active');
+    const mBtnCheckNk = document.getElementById('mBtnCheckNickname');
+    const mEditNkInput = document.getElementById('mEditNickname');
+    const mNkCheckMsg = document.getElementById('mNicknameCheckMsg');
+
+    if (mBtnCheckNk && mEditNkInput && mNkCheckMsg) {
+        mBtnCheckNk.addEventListener('click', function() {
+            const nickname = mEditNkInput.value.trim();
+            if (!nickname) {
+                mNkCheckMsg.style.display = 'block';
+                mNkCheckMsg.style.color = '#ef4444';
+                mNkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해주세요.';
+                return;
             }
+
+            mBtnCheckNk.disabled = true;
+            mNkCheckMsg.style.display = 'block';
+            mNkCheckMsg.style.color = '#7c3aed';
+            mNkCheckMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 중복 확인 중...';
+
+            fetch(`/api/profile/check_nickname?nickname=${encodeURIComponent(nickname)}&user_id=${encodeURIComponent('{{ user.user_id }}')}`)
+            .then(res => res.json())
+            .then(data => {
+                mBtnCheckNk.disabled = false;
+                if (data.available) {
+                    mNkCheckMsg.style.color = '#10b981';
+                    mNkCheckMsg.innerHTML = '✨ ' + (data.message || '사용 가능한 닉네임입니다.');
+                } else {
+                    mNkCheckMsg.style.color = '#ef4444';
+                    mNkCheckMsg.innerHTML = '❌ ' + (data.message || '이미 사용 중인 닉네임입니다.');
+                }
+            })
+            .catch(err => {
+                mBtnCheckNk.disabled = false;
+                console.error('Check Nickname Error:', err);
+                mNkCheckMsg.style.color = '#ef4444';
+                mNkCheckMsg.textContent = '❌ 중복 확인 중 오류가 발생했습니다.';
+            });
         });
     }
 
