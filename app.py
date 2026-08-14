@@ -154,16 +154,26 @@ def inject_global_vars():
     footer_prev_stars = []
     footer_prev_contest = None
     try:
+        def get_rank_sort_key(item):
+            cd = str(item.get('AWARD_CD') or item.get('award_cd') or '')
+            rk = item.get('RANKING') or item.get('rank_no') or item.get('ranking')
+            if 'P001A101' in cd or rk == 1 or rk == '1':
+                return 1
+            elif 'P001A102' in cd or rk == 2 or rk == '2':
+                return 2
+            elif 'P001A103' in cd or rk == 3 or rk == '3':
+                return 3
+            return 99
+
         # 실제 수상자가 존재하는 최신 종료 회차의 명예의 전당 데이터 조회 (contest_id=None)
         all_w = service.get_hall_of_fame(contest_id=None)
         if isinstance(all_w, list) and len(all_w) > 0:
             for w in all_w:
                 if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
                     footer_prev_stars.append(w)
-                if len(footer_prev_stars) >= 3:
-                    break
-            if not footer_prev_stars and len(all_w) > 0:
-                footer_prev_stars = all_w[:3]
+
+            footer_prev_stars.sort(key=get_rank_sort_key)
+            footer_prev_stars = footer_prev_stars[:3]
                 
             if footer_prev_stars:
                 prev_c_id = footer_prev_stars[0].get('CONTEST_ROUND') or footer_prev_stars[0].get('contest_id')
@@ -181,8 +191,8 @@ def inject_global_vars():
                     for w in res:
                         if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
                             footer_prev_stars.append(w)
-                        if len(footer_prev_stars) >= 3:
-                            break
+                    footer_prev_stars.sort(key=get_rank_sort_key)
+                    footer_prev_stars = footer_prev_stars[:3]
                     if footer_prev_stars:
                         break
 

@@ -105,10 +105,11 @@
                     <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.85rem; padding-top: 0.2rem;">
                         {% if footer_prev_stars %}
                             {% for star in footer_prev_stars %}
-                                {% set rk = star.RANKING or star.rank_no or loop.index %}
+                                {% set aw_cd = (star.AWARD_CD or star.award_cd or '')|string %}
+                                {% set rk = 1 if ('P001A101' in aw_cd or (star.RANKING or star.rank_no) == 1) else (2 if ('P001A102' in aw_cd or (star.RANKING or star.rank_no) == 2) else (3 if ('P001A103' in aw_cd or (star.RANKING or star.rank_no) == 3) else loop.index)) %}
                                 {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
                                 {% set shadow_glow = 'rgba(250, 204, 21, 0.4)' if rk == 1 else ('rgba(56, 189, 248, 0.4)' if rk == 2 else 'rgba(163, 230, 53, 0.4)') %}
-                                {% set badge_file = star.AWARD_CD or ('P001A10' ~ rk) %}
+                                {% set badge_file = 'P001A10' ~ rk %}
                                 {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
                                 
                                 <div class="footer-star-photo-item" onclick="location.href='/hall-of-fame?contest_id={{ footer_prev_contest.CONTEST_ROUND or footer_prev_contest.contest_id if footer_prev_contest else '' }}'" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; cursor: pointer; flex-shrink: 0;">
