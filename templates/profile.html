@@ -332,8 +332,8 @@
 
             <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.15rem 1.4rem; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;">
                 {% if sel_c_id == 'all' or not selected_contest_id %}
-                    <!-- 좌측 상단 테두리에 입체적으로 얹히는 회차 배지 (전체 회차 조회 시에만 출력) -->
-                    <span style="position: absolute; top: -13px; left: 1.5rem; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-weight: 900; font-size: 0.78rem; padding: 0.22rem 0.75rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); letter-spacing: -0.02em; white-space: nowrap; z-index: 10;">
+                    <!-- 좌측 상단 테두리에 입체적으로 얹히는 회차 배지 (회색 배경 적용) -->
+                    <span style="position: absolute; top: -13px; left: 1.5rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.76rem; padding: 0.2rem 0.7rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); letter-spacing: -0.02em; white-space: nowrap; z-index: 10;">
                         제 {{ c_id }}회
                     </span>
                 {% endif %}
@@ -378,8 +378,8 @@
                     </div>
                 </div>
 
-                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (세로 및 가로 중앙 정렬) -->
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; flex-shrink: 0;">
+                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (세로 완벽 중앙 정렬) -->
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-shrink: 0; align-self: center;">
                     {% for b in (a.awards or [a]) %}
                         {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                         {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
@@ -421,7 +421,7 @@
                             {% set display_title = '패밀리 ' ~ b_rk ~ '위' %}
                         {% endif %}
 
-                        <div class="winner-title-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.32rem 0.75rem; border-radius: 20px; font-weight: 900; font-size: 0.8rem; box-shadow: {{ badge_shadow }}; letter-spacing: -0.01em; white-space: nowrap; flex-shrink: 0; position: relative; overflow: hidden;">
+                        <div class="winner-title-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; background: {{ badge_bg }}; color: {{ badge_color }}; border: 1.5px solid {{ badge_border }}; padding: 0.32rem 0.75rem; border-radius: 20px; font-weight: 900; font-size: 0.8rem; box-shadow: {{ badge_shadow }}; letter-spacing: -0.01em; white-space: nowrap; flex-shrink: 0; position: relative; top: 0; right: 0; left: auto; margin: 0; overflow: hidden;">
                             <i class="{{ badge_icon }}" style="color: {{ icon_color }}; font-size: 0.85rem;"></i>
                             <span>{{ display_title }}</span>
                         </div>
