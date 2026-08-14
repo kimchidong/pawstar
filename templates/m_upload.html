@@ -339,6 +339,24 @@ function closeMobilePreviewModal() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const mPrevModal = document.getElementById('mPreviewModalBackdrop');
+    if (mPrevModal) {
+        let isPointerDownOnBackdrop = false;
+        const handlePointerDown = (e) => {
+            isPointerDownOnBackdrop = (e.target === mPrevModal || e.target.classList.contains('m-modal-backdrop'));
+        };
+        mPrevModal.addEventListener('mousedown', handlePointerDown);
+        mPrevModal.addEventListener('touchstart', handlePointerDown, { passive: true });
+        mPrevModal.addEventListener('click', function(e) {
+            if ((e.target === mPrevModal || e.target.classList.contains('m-modal-backdrop')) && isPointerDownOnBackdrop) {
+                closeMobilePreviewModal();
+            }
+            isPointerDownOnBackdrop = false;
+        });
+    }
+});
+
 function switchMobilePreviewTab(tab) {
     const btnList = document.getElementById('mBtnPreviewList');
     const btnModal = document.getElementById('mBtnPreviewModal');

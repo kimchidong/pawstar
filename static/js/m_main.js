@@ -635,6 +635,24 @@ function closeMobileDetailModal() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const mDetailModal = document.getElementById('mDetailModal');
+    if (mDetailModal) {
+        let isPointerDownOnBackdrop = false;
+        const handlePointerDown = (e) => {
+            isPointerDownOnBackdrop = (e.target === mDetailModal || e.target.classList.contains('m-modal-backdrop'));
+        };
+        mDetailModal.addEventListener('mousedown', handlePointerDown);
+        mDetailModal.addEventListener('touchstart', handlePointerDown, { passive: true });
+        mDetailModal.addEventListener('click', function(e) {
+            if ((e.target === mDetailModal || e.target.classList.contains('m-modal-backdrop')) && isPointerDownOnBackdrop) {
+                closeMobileDetailModal();
+            }
+            isPointerDownOnBackdrop = false;
+        });
+    }
+});
+
 function loadMobileComments(postId) {
     fetch(`/api/comments/${postId}`)
         .then(res => res.json())

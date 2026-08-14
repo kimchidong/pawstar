@@ -342,6 +342,25 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        ['mPrivacyModal', 'mTermsModal'].forEach(id => {
+            const m = document.getElementById(id);
+            if (m) {
+                let isPointerDownOnBackdrop = false;
+                const handlePointerDown = (e) => {
+                    isPointerDownOnBackdrop = (e.target === m || e.target.classList.contains('m-modal-backdrop'));
+                };
+                m.addEventListener('mousedown', handlePointerDown);
+                m.addEventListener('touchstart', handlePointerDown, { passive: true });
+                m.addEventListener('click', function(e) {
+                    if ((e.target === m || e.target.classList.contains('m-modal-backdrop')) && isPointerDownOnBackdrop) {
+                        if (id === 'mPrivacyModal') closeMobilePrivacyModal();
+                        if (id === 'mTermsModal') closeMobileTermsModal();
+                    }
+                    isPointerDownOnBackdrop = false;
+                });
+            }
+        });
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('uploaded') === 'true') {
             alert('출전 등록이 완료되었습니다! 🐾🎉');
