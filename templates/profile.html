@@ -471,7 +471,13 @@
 
             <div class="form-group" style="margin-bottom: 1.25rem;">
                 <label style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-bottom: 0.4rem; display: block;">집사 닉네임</label>
-                <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 1rem; font-size: 0.95rem; font-weight: 700;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required style="flex: 1; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 1rem; font-size: 0.95rem; font-weight: 700;">
+                    <button type="button" id="btnCheckNickname" style="height: 44px; padding: 0 1.15rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border: 1.5px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 800; font-size: 0.86rem; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03); flex-shrink: 0; display: flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-solid fa-magnifying-glass" style="color: #64748b; font-size: 0.8rem;"></i> 중복 확인
+                    </button>
+                </div>
+                <div id="nicknameCheckMsg" style="font-size: 0.82rem; margin-top: 0.45rem; font-weight: 700; display: none;"></div>
             </div>
 
             <!-- SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
@@ -527,6 +533,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusText = document.getElementById('uploadStatusText');
     const editForm = document.getElementById('profileEditForm');
     const btnSave = document.getElementById('btnSaveProfile');
+    const btnCheckNk = document.getElementById('btnCheckNickname');
+    const editNkInput = document.getElementById('editNickname');
+    const nkCheckMsg = document.getElementById('nicknameCheckMsg');
+
+    if (btnCheckNk && editNkInput && nkCheckMsg) {
+        btnCheckNk.addEventListener('click', function() {
+            const nickname = editNkInput.value.trim();
+            if (!nickname) {
+                nkCheckMsg.style.display = 'block';
+                nkCheckMsg.style.color = '#ef4444';
+                nkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해주세요.';
+                return;
+            }
+
+            btnCheckNk.disabled = true;
+            nkCheckMsg.style.display = 'block';
+            nkCheckMsg.style.color = '#7c3aed';
+            nkCheckMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 중복 확인 중...';
+
+            fetch(`/api/profile/check_nickname?nickname=${encodeURIComponent(nickname)}&user_id=${encodeURIComponent('{{ user.user_id }}')}`)
+            .then(res => res.json())
+            .then(data => {
+                btnCheckNk.disabled = false;
+                if (data.available) {
+                    nkCheckMsg.style.color = '#10b981';
+                    nkCheckMsg.innerHTML = '✨ ' + (data.message || '사용 가능한 닉네임입니다.');
+                } else {
+                    nkCheckMsg.style.color = '#ef4444';
+                    nkCheckMsg.innerHTML = '❌ ' + (data.message || '이미 사용 중인 닉네임입니다.');
+                }
+            })
+            .catch(err => {
+                btnCheckNk.disabled = false;
+                console.error('Check Nickname Error:', err);
+                nkCheckMsg.style.color = '#ef4444';
+                nkCheckMsg.textContent = '❌ 중복 확인 중 오류가 발생했습니다.';
+            });
+        });
+    }
 
     if (btnOpen && modal) {
         btnOpen.addEventListener('click', function() {

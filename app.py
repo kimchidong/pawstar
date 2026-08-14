@@ -1092,12 +1092,27 @@ def api_profile_update():
 # 4-3. 닉네임 중복 확인 API
 @app.route('/api/profile/check_nickname', methods=['GET', 'POST'])
 def api_check_nickname():
-    user_id = session.get('user_id')
     data = request.args if request.method == 'GET' else (request.json or {})
+    user_id = (data.get('user_id') or session.get('user_id') or request.cookies.get('pst_user_id') or '').strip()
     nickname = (data.get('nickname') or '').strip()
     
     if not nickname:
         return jsonify({'success': False, 'available': False, 'message': '검사할 닉네임을 입력해주세요.'}), 400
+
+    conn = service.get_db_connection()
+    if conn:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT NK_NM FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (user_id, user_id))
+                r = cur.fetchone()
+                if r and r.get('NK_NM') and str(r.get('NK_NM')).strip().lower() == nickname.lower():
+                    conn.close()
+                    return jsonify({'success': True, 'available': True, 'message': '현재 사용 중인 본인의 닉네임입니다.'})
+            conn.close()
+        except Exception:
+            if conn:
+                try: conn.close()
+                except Exception: pass
         
     is_taken = service.is_nickname_taken(nickname, exclude_user_id=user_id)
     if is_taken:

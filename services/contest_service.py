@@ -53,26 +53,40 @@ class PawStarService:
 
     def is_nickname_taken(self, nickname, exclude_user_id=None, conn=None):
         """ DB 내 닉네임 중복 검사 (exclude_user_id 지정 시 본인 제외) """
-        if not nickname or not str(nickname).strip():
+        nk = str(nickname or '').strip()
+        if not nk:
             return False
         
-        # 커서 충돌 방지를 위해 별도의 전용 조회 커넥션 사용
-        check_conn = self.get_db_connection()
+        check_conn = conn or self.get_db_connection()
         if not check_conn:
             return False
         
+        should_close = (conn is None)
         try:
             with check_conn.cursor() as cur:
-                if exclude_user_id:
-                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) AND USER_ID != %s LIMIT 1", (str(nickname).strip(), exclude_user_id))
+                ex_id = str(exclude_user_id or '').strip()
+
+                # 1) pst_user 테이블 검사 (본인 제외)
+                if ex_id:
+                    cur.execute("""
+                        SELECT 1 FROM pst_user 
+                        WHERE LOWER(TRIM(NK_NM)) = LOWER(%s) 
+                          AND LOWER(TRIM(USER_ID)) != LOWER(%s)
+                        LIMIT 1
+                    """, (nk, ex_id))
                 else:
-                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(NK_NM) = LOWER(%s) LIMIT 1", (str(nickname).strip(),))
+                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(TRIM(NK_NM)) = LOWER(%s) LIMIT 1", (nk,))
+                
                 res = cur.fetchone()
-                check_conn.close()
-                return bool(res)
+                if res:
+                    if should_close: check_conn.close()
+                    return True
+
+                if should_close: check_conn.close()
+                return False
         except Exception as e:
             print("is_nickname_taken error:", e)
-            if check_conn:
+            if should_close and check_conn:
                 try: check_conn.close()
                 except Exception: pass
             return False
@@ -519,11 +533,6 @@ class PawStarService:
             return False, "DB 연결에 실패하였습니다.", None
             
         try:
-            # 닉네임 중복 체크 (본인 제외 타 회원 사용 여부)
-            if self.is_nickname_taken(nickname, exclude_user_id=user_id, conn=conn):
-                conn.close()
-                return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
-
             with conn.cursor() as cur:
                 # 1) pst_user 및 USERS 테이블에 SNS 관련 컬럼 자동 안전 점검
                 for target_tbl in ['pst_user', 'USERS']:
@@ -540,22 +549,39 @@ class PawStarService:
                     except Exception as tbl_err:
                         print(f"Table Check Error ({target_tbl}):", tbl_err)
 
-                # 2) 대상 회원 ID 유연 매칭 (세션 ID/요청 ID/fallback 하이재킹 보장)
-                real_target_id = user_id
+                # 2) 현재 수정 대상 회원 정보(기존 닉네임) 정확히 조회
+                real_target_id = str(user_id or '').strip()
+                current_nk = None
                 try:
-                    cur.execute("SELECT USER_ID FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (user_id, user_id))
+                    cur.execute("SELECT USER_ID, NK_NM FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (real_target_id, real_target_id))
                     row = cur.fetchone()
                     if row and row.get('USER_ID'):
                         real_target_id = row['USER_ID']
+                        current_nk = row.get('NK_NM')
                     else:
-                        cur.execute("SELECT USER_ID FROM pst_user LIMIT 1")
-                        row_fb = cur.fetchone()
-                        if row_fb and row_fb.get('USER_ID'):
-                            real_target_id = row_fb['USER_ID']
+                        cur.execute("SHOW TABLES LIKE 'USERS'")
+                        if cur.fetchone():
+                            cur.execute("SELECT USER_ID, NICKNAME FROM USERS WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (real_target_id, real_target_id))
+                            row_u = cur.fetchone()
+                            if row_u and row_u.get('USER_ID'):
+                                real_target_id = row_u['USER_ID']
+                                current_nk = row_u.get('NICKNAME')
                 except Exception as e_find:
                     print("find target error:", e_find)
 
-                # 3) pst_user 테이블 UPDATE
+            # 3) 닉네임 변경 여부 확인 (본인 기존 닉네임 그대로이면 중복 검사 스킵)
+            is_nickname_changed = True
+            if current_nk and str(nickname).strip().lower() == str(current_nk).strip().lower():
+                is_nickname_changed = False
+
+            # 4) 닉네임을 새로 변경하려는 경우에만 타 회원들과의 중복 검사 실행
+            if is_nickname_changed:
+                if self.is_nickname_taken(nickname, exclude_user_id=real_target_id, conn=conn):
+                    conn.close()
+                    return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
+
+            with conn.cursor() as cur:
+                # 5) pst_user 테이블 UPDATE 실행
                 try:
                     cur.execute("SHOW TABLES LIKE 'pst_user'")
                     if cur.fetchone():
@@ -573,10 +599,19 @@ class PawStarService:
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
                             """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
+                        print(f"[pst_user UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
                 except Exception as e_pst:
                     print("pst_user update error:", e_pst)
+                    try:
+                        cur.execute("""
+                            UPDATE pst_user
+                            SET SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                            WHERE USER_ID = %s
+                        """, (sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id))
+                    except Exception as e_pst2:
+                        print("pst_user fallback update error:", e_pst2)
 
-                # 4) USERS 테이블 UPDATE (존재 시)
+                # 6) USERS 테이블 UPDATE 실행 (존재 시)
                 try:
                     cur.execute("SHOW TABLES LIKE 'USERS'")
                     if cur.fetchone():
@@ -594,8 +629,17 @@ class PawStarService:
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
                             """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
+                        print(f"[USERS UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
                 except Exception as e_usr:
                     print("USERS update error:", e_usr)
+                    try:
+                        cur.execute("""
+                            UPDATE USERS
+                            SET SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                            WHERE USER_ID = %s
+                        """, (sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id))
+                    except Exception as e_usr2:
+                        print("USERS fallback update error:", e_usr2)
 
                 conn.commit()
 
