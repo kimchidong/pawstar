@@ -724,6 +724,38 @@ function renderTrophyPagination(page) {
             <div class="m-form-group">
                 <label>집사 닉네임</label>
                 <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" required>
+                <div id="mNicknameCheckMsg" style="font-size: 0.82rem; margin-top: 0.45rem; font-weight: 700; display: none;"></div>
+            </div>
+
+            <!-- SNS 주소 입력 영역 -->
+            <div style="border-top: 1.5px dashed #e2e8f0; padding-top: 0.85rem; margin-top: 0.85rem;">
+                <div style="font-weight: 800; font-size: 0.88rem; color: #0f172a; margin-bottom: 0.65rem;">
+                    SNS / 소셜 계정 주소 설정
+                </div>
+                <div class="m-form-group" style="margin-bottom: 0.55rem;">
+                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.9rem;"></i> 인스타그램 주소 (SNS_INST)
+                    </label>
+                    <input type="text" id="mEditSnsInst" class="m-form-control" placeholder="https://www.instagram.com/your_id" value="{{ user.sns_inst or user.SNS_INST or '' }}">
+                </div>
+                <div class="m-form-group" style="margin-bottom: 0.55rem;">
+                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.9rem;"></i> 유튜브 주소 (SNS_YTB)
+                    </label>
+                    <input type="text" id="mEditSnsYtb" class="m-form-control" placeholder="https://www.youtube.com/@your_channel" value="{{ user.sns_ytb or user.SNS_YTB or '' }}">
+                </div>
+                <div class="m-form-group" style="margin-bottom: 0.55rem;">
+                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.9rem;"></i> 페이스북 주소 (SNS_FSB)
+                    </label>
+                    <input type="text" id="mEditSnsFsb" class="m-form-control" placeholder="https://www.facebook.com/your_id" value="{{ user.sns_fsb or user.SNS_FSB or '' }}">
+                </div>
+                <div class="m-form-group" style="margin-bottom: 0.85rem;">
+                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.9rem;"></i> 블로그 주소 (SNS_BLG)
+                    </label>
+                    <input type="text" id="mEditSnsBlg" class="m-form-control" placeholder="https://blog.naver.com/your_id" value="{{ user.sns_blg or user.SNS_BLG or '' }}">
+                </div>
             </div>
 
             <button type="submit" class="m-btn-submit" id="mBtnSaveProfile">
@@ -814,34 +846,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 모바일 프로필 정보 수정 제출
+    // 모바일 프로필 정보 수정 제출 (닉네임 중복 검사 및 SNS 주소 동시 저장)
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const nickname = document.getElementById('mEditNickname').value.trim();
+            const nickname = (document.getElementById('mEditNickname')?.value || '').trim();
             const profile_img = profileImgInput.value;
+            const sns_inst = (document.getElementById('mEditSnsInst')?.value || '').trim();
+            const sns_ytb = (document.getElementById('mEditSnsYtb')?.value || '').trim();
+            const sns_fsb = (document.getElementById('mEditSnsFsb')?.value || '').trim();
+            const sns_blg = (document.getElementById('mEditSnsBlg')?.value || '').trim();
 
-            fetch('/api/profile/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: '{{ user.user_id }}',
-                    nickname: nickname,
-                    profile_img: profile_img
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('프로필 정보가 수정되었습니다.');
-                    location.reload();
-                } else {
-                    alert('수정 실패: ' + (data.message || '오류 발생'));
+            const mNkCheckMsg = document.getElementById('mNicknameCheckMsg');
+
+            if (!nickname) {
+                if (mNkCheckMsg) {
+                    mNkCheckMsg.style.display = 'block';
+                    mNkCheckMsg.style.color = '#ef4444';
+                    mNkCheckMsg.textContent = '❌ 변경할 닉네임을 입력해주세요.';
                 }
+                document.getElementById('mEditNickname')?.focus();
+                return;
+            }
+
+            if (btnSave) btnSave.disabled = true;
+            if (mNkCheckMsg) {
+                mNkCheckMsg.style.display = 'block';
+                mNkCheckMsg.style.color = '#7c3aed';
+                mNkCheckMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 닉네임 중복 확인 및 저장 중...';
+            }
+
+            fetch(`/api/profile/check_nickname?nickname=${encodeURIComponent(nickname)}&user_id=${encodeURIComponent('{{ user.user_id }}')}`)
+            .then(res => res.json())
+            .then(checkData => {
+                if (!checkData.available) {
+                    if (btnSave) btnSave.disabled = false;
+                    if (mNkCheckMsg) {
+                        mNkCheckMsg.style.display = 'block';
+                        mNkCheckMsg.style.color = '#ef4444';
+                        mNkCheckMsg.innerHTML = '❌ ' + (checkData.message || '이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.');
+                    }
+                    document.getElementById('mEditNickname')?.focus();
+                    return;
+                }
+
+                return fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: '{{ user.user_id }}',
+                        nickname: nickname,
+                        profile_img: profile_img,
+                        sns_inst: sns_inst,
+                        sns_ytb: sns_ytb,
+                        sns_fsb: sns_fsb,
+                        sns_blg: sns_blg
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (btnSave) btnSave.disabled = false;
+                    if (data.success) {
+                        alert('프로필 정보가 수정되었습니다.');
+                        location.reload();
+                    } else {
+                        if (mNkCheckMsg) {
+                            mNkCheckMsg.style.display = 'block';
+                            mNkCheckMsg.style.color = '#ef4444';
+                            mNkCheckMsg.innerHTML = '❌ ' + (data.message || '프로필 수정 실패');
+                        }
+                        document.getElementById('mEditNickname')?.focus();
+                    }
+                });
             })
             .catch(err => {
+                if (btnSave) btnSave.disabled = false;
                 console.error(err);
-                alert('프로필 수정 중 오류가 발생했습니다.');
+                if (mNkCheckMsg) {
+                    mNkCheckMsg.style.display = 'block';
+                    mNkCheckMsg.style.color = '#ef4444';
+                    mNkCheckMsg.textContent = '❌ 프로필 수정 중 오류가 발생했습니다.';
+                }
             });
         });
     }
