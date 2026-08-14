@@ -1054,10 +1054,10 @@ def upload_profile():
 # 4-2. 프로필 수정 API (닉네임 중복 검사 적용)
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
-    user_id = session.get('user_id')
+    data = request.json or {}
+    user_id = session.get('user_id') or data.get('user_id') or 'user1'
     if not user_id:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
-    data = request.json or {}
     nickname = data.get('nickname')
     profile_img = data.get('profile_img')
     sns_inst = (data.get('sns_inst') or '').strip()

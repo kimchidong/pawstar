@@ -525,47 +525,94 @@ class PawStarService:
                 return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
 
             with conn.cursor() as cur:
-                # 안전 컬럼 점검 및 추가
-                for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
+                # 1) pst_user 및 USERS 테이블에 SNS 관련 컬럼 자동 안전 점검
+                for target_tbl in ['pst_user', 'USERS']:
                     try:
-                        cur.execute(f"SHOW COLUMNS FROM pst_user LIKE '{col[0]}'")
-                        if not cur.fetchone():
-                            cur.execute(f"ALTER TABLE pst_user ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
-                    except Exception:
-                        pass
+                        cur.execute(f"SHOW TABLES LIKE '{target_tbl}'")
+                        if cur.fetchone():
+                            for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
+                                try:
+                                    cur.execute(f"SHOW COLUMNS FROM {target_tbl} LIKE '{col[0]}'")
+                                    if not cur.fetchone():
+                                        cur.execute(f"ALTER TABLE {target_tbl} ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
+                                except Exception as col_err:
+                                    print(f"Col Add Error ({target_tbl}.{col[0]}):", col_err)
+                    except Exception as tbl_err:
+                        print(f"Table Check Error ({target_tbl}):", tbl_err)
 
-                if profile_img:
-                    cur.execute("""
-                        UPDATE pst_user
-                        SET NK_NM = %s, PROFILE_URL = %s,
-                            SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                        WHERE USER_ID = %s
-                    """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
-                else:
-                    cur.execute("""
-                        UPDATE pst_user
-                        SET NK_NM = %s,
-                            SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                        WHERE USER_ID = %s
-                    """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                # 2) pst_user 테이블 UPDATE
+                try:
+                    cur.execute("SHOW TABLES LIKE 'pst_user'")
+                    if cur.fetchone():
+                        if profile_img:
+                            cur.execute("""
+                                UPDATE pst_user
+                                SET NK_NM = %s, PROFILE_URL = %s,
+                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                WHERE USER_ID = %s
+                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                        else:
+                            cur.execute("""
+                                UPDATE pst_user
+                                SET NK_NM = %s,
+                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                WHERE USER_ID = %s
+                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                except Exception as e_pst:
+                    print("pst_user update error:", e_pst)
+
+                # 3) USERS 테이블 UPDATE (존재 시)
+                try:
+                    cur.execute("SHOW TABLES LIKE 'USERS'")
+                    if cur.fetchone():
+                        if profile_img:
+                            cur.execute("""
+                                UPDATE USERS
+                                SET NICKNAME = %s, PROFILE_IMG = %s,
+                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                WHERE USER_ID = %s
+                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                        else:
+                            cur.execute("""
+                                UPDATE USERS
+                                SET NICKNAME = %s,
+                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                WHERE USER_ID = %s
+                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, user_id))
+                except Exception as e_usr:
+                    print("USERS update error:", e_usr)
 
                 conn.commit()
 
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL, SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG FROM pst_user WHERE USER_ID = %s", (user_id,))
-                user = cur.fetchone()
+                user = None
+                try:
+                    cur.execute("SELECT * FROM pst_user WHERE USER_ID = %s", (user_id,))
+                    user = cur.fetchone()
+                except Exception:
+                    pass
+
+                if not user:
+                    try:
+                        cur.execute("SELECT * FROM USERS WHERE USER_ID = %s", (user_id,))
+                        user = cur.fetchone()
+                    except Exception:
+                        pass
+
                 conn.close()
 
-                final_nk = user.get('NK_NM', nickname) if user else nickname
-                final_img = user.get('PROFILE_URL', profile_img or '/static/image/profile/default_profile.png') if user else (profile_img or '/static/image/profile/default_profile.png')
-                final_inst = user.get('SNS_INST', sns_inst) if user else sns_inst
-                final_ytb = user.get('SNS_YTB', sns_ytb) if user else sns_ytb
-                final_fsb = user.get('SNS_FSB', sns_fsb) if user else sns_fsb
-                final_blg = user.get('SNS_BLG', sns_blg) if user else sns_blg
+                final_nk = (user.get('NK_NM') or user.get('NICKNAME') or nickname) if user else nickname
+                final_img = (user.get('PROFILE_URL') or user.get('PROFILE_IMG') or profile_img or '/static/image/profile/default_profile.png') if user else (profile_img or '/static/image/profile/default_profile.png')
+                final_inst = (user.get('SNS_INST') or sns_inst) if user else sns_inst
+                final_ytb = (user.get('SNS_YTB') or sns_ytb) if user else sns_ytb
+                final_fsb = (user.get('SNS_FSB') or sns_fsb) if user else sns_fsb
+                final_blg = (user.get('SNS_BLG') or sns_blg) if user else sns_blg
 
                 updated_user = {
                     'USER_ID': user_id,
                     'NK_NM': final_nk,
+                    'NICKNAME': final_nk,
                     'PROFILE_URL': final_img,
+                    'PROFILE_IMG': final_img,
                     'SNS_INST': final_inst,
                     'SNS_YTB': final_ytb,
                     'SNS_FSB': final_fsb,
