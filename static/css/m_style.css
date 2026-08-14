@@ -1904,4 +1904,29 @@ body.m-body {
     box-shadow: 0 4px 14px rgba(3, 207, 93, 0.4) !important;
 }
 
+/* 🌟 모바일 명예의 전당 & 회차 피드 카드 닉네임 우측 겹침(Stacked) 소셜 배지 아이콘 */
+.sns-overlap-group {
+    display: inline-flex;
+    align-items: center;
+}
+
+.sns-overlap-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.58rem;
+    text-decoration: none;
+    position: relative;
+    transform: translateY(1px);
+}
+
+.sns-overlap-item.instagram { background: #fff0f5; color: #e1306c; border: 0.8px solid #fecdd3; }
+.sns-overlap-item.youtube   { background: #fef2f2; color: #ef4444; border: 0.8px solid #fecaca; }
+.sns-overlap-item.facebook  { background: #eff6ff; color: #2563eb; border: 0.8px solid #bfdbfe; }
+.sns-overlap-item.blog      { background: #f0fdf4; color: #16a34a; border: 0.8px solid #bbf7d0; }
+
 

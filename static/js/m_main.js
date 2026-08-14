@@ -1360,6 +1360,47 @@ function renderMobileFeedGrid(posts) {
         const isMine = !!(mCurUserId && pEntUserId && mCurUserId === pEntUserId);
         const isViewActive = !isMine && !!(p.actions && p.actions.is_viewed);
 
+        const rawInst = (p.SNS_INST || p.sns_inst || '').trim();
+        const rawYtb = (p.SNS_YTB || p.sns_ytb || '').trim();
+        const rawFsb = (p.SNS_FSB || p.sns_fsb || '').trim();
+        const rawBlg = (p.SNS_BLG || p.sns_blg || '').trim();
+
+        const formatSnsUrl = (url) => {
+            if (!url) return '';
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                return 'https://' + url;
+            }
+            return url;
+        };
+
+        const instLink = formatSnsUrl(rawInst);
+        const ytbLink = formatSnsUrl(rawYtb);
+        const fsbLink = formatSnsUrl(rawFsb);
+        const blgLink = formatSnsUrl(rawBlg);
+
+        let snsOverlapHtml = '';
+        if (instLink || ytbLink || fsbLink || blgLink) {
+            let count = 0;
+            snsOverlapHtml += `<div class="sns-overlap-group" style="margin-left: 0.25rem; flex-shrink: 0;" onclick="event.stopPropagation();">`;
+            if (instLink) {
+                count++;
+                snsOverlapHtml += `<a href="${instLink}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-instagram"></i></a>`;
+            }
+            if (ytbLink) {
+                count++;
+                snsOverlapHtml += `<a href="${ytbLink}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-youtube"></i></a>`;
+            }
+            if (fsbLink) {
+                count++;
+                snsOverlapHtml += `<a href="${fsbLink}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-facebook-f"></i></a>`;
+            }
+            if (blgLink) {
+                count++;
+                snsOverlapHtml += `<a href="${blgLink}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-solid fa-blog"></i></a>`;
+            }
+            snsOverlapHtml += `</div>`;
+        }
+
         html += `
         <div class="m-feed-card" id="m-post-card-${entUserId || postId}" data-post-id="${postId}" data-ent-user-id="${entUserId}" onclick="openMobileDetailModal(${pPostJsonData})">
             <div class="m-card-thumb">
@@ -1368,10 +1409,11 @@ function renderMobileFeedGrid(posts) {
             </div>
 
             <div class="m-card-body">
-                <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
-                <div class="m-card-author">
+                <!-- 1줄째: 프로필사진 + 작성자 닉네임 + 소셜 겹침 아이콘 -->
+                <div class="m-card-author" style="display: flex; align-items: center; min-width: 0; width: 100%;">
                     <img src="${pAvatar}" alt="${pUserNm}" class="m-author-avatar">
-                    <span class="m-author-name">${pUserNm}</span>
+                    <span class="m-author-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${pUserNm}</span>
+                    ${snsOverlapHtml}
                 </div>
 
                 <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
