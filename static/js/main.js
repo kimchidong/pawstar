@@ -706,6 +706,50 @@ function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
+    // 작성자 SNS 링크 동적 생성 (저장된 주소가 있는 아이콘들만 나란히 표시)
+    const snsContainer = document.getElementById('detailAuthorSnsLinks');
+    if (snsContainer) {
+        snsContainer.innerHTML = '';
+        
+        const rawInst = (post.SNS_INST || post.sns_inst || '').trim();
+        const rawYtb = (post.SNS_YTB || post.sns_ytb || '').trim();
+        const rawFsb = (post.SNS_FSB || post.sns_fsb || '').trim();
+        const rawBlg = (post.SNS_BLG || post.sns_blg || '').trim();
+
+        const formatUrl = (url) => {
+            if (!url) return '';
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                return 'https://' + url;
+            }
+            return url;
+        };
+
+        const snsItems = [
+            { type: 'instagram', rawUrl: rawInst, icon: 'fa-brands fa-instagram', title: 'Instagram' },
+            { type: 'youtube', rawUrl: rawYtb, icon: 'fa-brands fa-youtube', title: 'YouTube' },
+            { type: 'facebook', rawUrl: rawFsb, icon: 'fa-brands fa-facebook-f', title: 'Facebook' },
+            { type: 'blog', rawUrl: rawBlg, icon: 'fa-solid fa-blog', title: 'Blog' }
+        ];
+
+        snsItems.forEach(item => {
+            if (item.rawUrl) {
+                const finalUrl = formatUrl(item.rawUrl);
+                const aBtn = document.createElement('a');
+                aBtn.href = finalUrl;
+                aBtn.target = '_blank';
+                aBtn.rel = 'noopener noreferrer';
+                aBtn.className = `profile-social-btn ${item.type}`;
+                aBtn.title = item.title;
+                aBtn.style.width = '30px';
+                aBtn.style.height = '30px';
+                aBtn.style.fontSize = '0.82rem';
+                aBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.04)';
+                aBtn.innerHTML = `<i class="${item.icon}"></i>`;
+                snsContainer.appendChild(aBtn);
+            }
+        });
+    }
+
     const updateScoreBadgeUI = (scoreVal) => {
         const num = Number(scoreVal || 0);
         const scoreBadge = document.getElementById('detailScoreBadge');
