@@ -348,17 +348,17 @@
             {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
             <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.15rem 1.4rem; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;">
-                <!-- 1. 좌측: 회차 배지 (전체 선택 시 메달 좌측 배치) + 3D 메달 아이콘 + 펫 썸네일 -->
-                <div style="display: flex; align-items: center; gap: 1.25rem; flex-shrink: 0;">
+                <!-- 1. 좌측: 회차 배지 + 3D 메달 아이콘 + 펫 썸네일 (고정 너비 부여로 세로 열 정렬) -->
+                <div style="display: flex; align-items: center; flex-shrink: 0;">
                     {% if sel_c_id == 'all' or not selected_contest_id %}
-                        <!-- 메달 좌측에 인라인으로 배치되는 회차 배지 -->
-                        <span style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.78rem; padding: 0.25rem 0.7rem; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); letter-spacing: -0.02em; white-space: nowrap; flex-shrink: 0;">
+                        <!-- 고정 너비 회차 배지 (세로 정렬 보장) -->
+                        <span style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 0.78rem; padding: 0.25rem 0; width: 76px; min-width: 76px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); letter-spacing: -0.02em; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; margin-right: 1.25rem;">
                             제 {{ c_id }}회
                         </span>
                     {% endif %}
 
-                    <!-- 메달 아이콘 스택 -->
-                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                    <!-- 고정 너비 메달 아이콘 스택 (메달 1개/2개에 관계없이 썸네일 위치 고정 정렬) -->
+                    <div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.35rem; width: 96px; min-width: 96px; flex-shrink: 0; margin-right: 1.25rem;">
                         {% for b in (a.awards or [a]) %}
                             {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                             {% set b_img_src = b.badge_img or b.BADGE_IMG_PATH_FILE or ('/static/image/badge/' ~ b_cd ~ '.png') %}
@@ -366,22 +366,22 @@
                         {% endfor %}
                     </div>
 
-                    <!-- 출전작 썸네일 -->
+                    <!-- 출전작 썸네일 (정확히 정렬) -->
                     <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15); flex-shrink: 0;">
                 </div>
 
-                <!-- 2. 중앙 좌측: 펫 정보 (썸네일과의 간격 확장) -->
-                <div style="min-width: 0; display: flex; align-items: center; gap: 0.55rem; flex-wrap: nowrap; overflow: hidden; flex-shrink: 0; margin-left: 0.75rem;">
+                <!-- 2. 중앙 좌측: 펫 정보 (고정 너비 220px 부여로 스탯 바 시작선 세로 정렬) -->
+                <div style="width: 220px; min-width: 220px; display: flex; align-items: center; gap: 0.55rem; flex-wrap: nowrap; overflow: hidden; flex-shrink: 0; margin-left: 1.25rem;">
                     {% set a_kind_clean = (a.KIND_NM or a.pet_type or '')|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐟 ', '')|replace('🐢 ', '')|replace('🐴 ', '')|replace('🐾 ', '') %}
                     {% set a_kind_fa_icon = 'fa-solid fa-dog' if ('강아지' in a_kind_clean or '개' in a_kind_clean) else ('fa-solid fa-cat' if '고양이' in a_kind_clean else ('fa-solid fa-otter' if ('햄스터' in a_kind_clean or '소동물' in a_kind_clean or '토끼' in a_kind_clean or '고슴도치' in a_kind_clean or '작은동물' in a_kind_clean) else ('fa-solid fa-frog' if ('거북이' in a_kind_clean or '파충류' in a_kind_clean or '도마뱀' in a_kind_clean) else ('fa-solid fa-fish' if ('어류' in a_kind_clean or '관상어' in a_kind_clean or '물고기' in a_kind_clean) else ('fa-solid fa-crow' if ('새' in a_kind_clean or '앵무새' in a_kind_clean or '조류' in a_kind_clean) else ('fa-solid fa-horse' if ('말' in a_kind_clean or '큰동물' in a_kind_clean) else 'fa-solid fa-paw')))))) %}
                     {% if a_kind_clean %}
                         <span style="color: #e11d48; font-weight: 800; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; background: #fff1f2; border: 1px solid #ffe4e6; padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.76rem; flex-shrink: 0;"><i class="{{ a_kind_fa_icon }}"></i> {{ a_kind_clean }}</span>
                     {% endif %}
-                    <span style="color: #334155; font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; display: inline-flex; align-items: center; line-height: 1;">{{ a.post_title or a.pet_name or '자랑스러운 반려동물 출전작' }}</span>
+                    <span style="color: #334155; font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; display: inline-block; line-height: 1;">{{ a.post_title or a.pet_name or '자랑스러운 반려동물 출전작' }}</span>
                 </div>
 
                 <!-- 3. 카드 중앙: 공간 활용 극대화 와이드 마이크로 스탯 & 점수 모듈 -->
-                <div style="flex: 1; min-width: 0; margin: 0 1rem; display: flex; align-items: center;">
+                <div style="flex: 1; min-width: 0; margin: 0 1.5rem 0 1.25rem; display: flex; align-items: center;">
                     <div style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; height: 42px; padding: 0 1.25rem; border-radius: 9999px; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.82rem; font-weight: 700; color: #64748b; white-space: nowrap; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box;">
                         <span style="display: inline-flex; align-items: center; gap: 0.28rem; color: #78350f; font-weight: 900; background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%); border: 1px solid #facc15; padding: 0.22rem 0.7rem; border-radius: 12px; box-shadow: 0 2px 6px rgba(217, 119, 6, 0.18); font-size: 0.82rem; flex-shrink: 0;"><i class="fa-solid fa-star" style="font-size: 0.76rem; color: #d97706;"></i> {{ "{:,}".format(a.score or 0) }}점</span>
                         <div style="display: flex; align-items: center; gap: 1.1rem; flex: 1; justify-content: space-around;">
@@ -396,8 +396,8 @@
                     </div>
                 </div>
 
-                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (높이 42px 통일) -->
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-shrink: 0; align-self: center;">
+                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (체크포인트 4: 스탯 모듈과의 간격 띄움) -->
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-shrink: 0; align-self: center; margin-left: 0.85rem;">
                     {% for b in (a.awards or [a]) %}
                         {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                         {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
