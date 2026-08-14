@@ -7,6 +7,34 @@
     <img src="{{ user.profile_img }}" class="m-profile-avatar" id="mCurrentProfileImg" alt="profile">
     <h2 class="m-profile-name" id="mCurrentNickname">{{ user.nickname }}</h2>
 
+    <!-- 소셜 링크 버튼 세트 (등록된 주소가 있는 경우에만 표시) -->
+    {% set inst_raw = (user.sns_inst or user.SNS_INST or '').strip() %}
+    {% set ytb_raw = (user.sns_ytb or user.SNS_YTB or '').strip() %}
+    {% set fsb_raw = (user.sns_fsb or user.SNS_FSB or '').strip() %}
+    {% set blg_raw = (user.sns_blg or user.SNS_BLG or '').strip() %}
+
+    {% set inst_link = ('https://' ~ inst_raw) if inst_raw and not (inst_raw.startswith('http://') or inst_raw.startswith('https://')) else inst_raw %}
+    {% set ytb_link = ('https://' ~ ytb_raw) if ytb_raw and not (ytb_raw.startswith('http://') or ytb_raw.startswith('https://')) else ytb_raw %}
+    {% set fsb_link = ('https://' ~ fsb_raw) if fsb_raw and not (fsb_raw.startswith('http://') or fsb_raw.startswith('https://')) else fsb_raw %}
+    {% set blg_link = ('https://' ~ blg_raw) if blg_raw and not (blg_raw.startswith('http://') or blg_raw.startswith('https://')) else blg_raw %}
+
+    {% if inst_link or ytb_link or fsb_link or blg_link %}
+        <div class="m-profile-social-links" style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; margin: 0.45rem 0 0.75rem 0;">
+            {% if inst_link %}
+                <a href="{{ inst_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #fff0f5; color: #e1306c; border: 1px solid #fecdd3; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(225, 48, 108, 0.15);"><i class="fa-brands fa-instagram"></i></a>
+            {% endif %}
+            {% if ytb_link %}
+                <a href="{{ ytb_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #ffeded; color: #ff0000; border: 1px solid #fecaca; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(255, 0, 0, 0.15);"><i class="fa-brands fa-youtube"></i></a>
+            {% endif %}
+            {% if fsb_link %}
+                <a href="{{ fsb_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #eff6ff; color: #1877f2; border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(24, 119, 242, 0.15);"><i class="fa-brands fa-facebook-f"></i></a>
+            {% endif %}
+            {% if blg_link %}
+                <a href="{{ blg_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #f0fdf4; color: #03cf5d; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(3, 207, 93, 0.15);"><i class="fa-solid fa-blog"></i></a>
+            {% endif %}
+        </div>
+    {% endif %}
+
 
     <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
         {% if user.email %}
