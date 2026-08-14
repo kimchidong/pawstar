@@ -23,7 +23,7 @@ class TestProfileTemplate(unittest.TestCase):
             )
             
             self.assertIn('진행중', rendered)
-            self.assertIn('제9회', rendered)
+            self.assertIn('제 9회', rendered)
             print("[SUCCESS] Profile template render test with Flask context passed successfully!")
 
 if __name__ == '__main__':
