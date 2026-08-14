@@ -183,9 +183,46 @@
             </div>
             <div class="m-card-body">
                 <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
-                <div class="m-card-author">
+                <div class="m-card-author" style="display: flex; align-items: center; min-width: 0; width: 100%;">
                     <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or p.user_avatar or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname }}" class="m-author-avatar">
-                    <span class="m-author-name">{{ p.NK_NM or p.user_nickname or '익명' }}</span>
+                    <span class="m-author-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">{{ p.NK_NM or p.user_nickname or '익명' }}</span>
+                    {% set s_inst = (p.sns_inst or p.SNS_INST or '').strip() %}
+                    {% set s_ytb = (p.sns_ytb or p.SNS_YTB or '').strip() %}
+                    {% set s_fsb = (p.sns_fsb or p.SNS_FSB or '').strip() %}
+                    {% set s_blg = (p.sns_blg or p.SNS_BLG or '').strip() %}
+                    {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
+                    {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
+                    {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
+                    {% set s_blg_link = ('https://' ~ s_blg) if s_blg and not (s_blg.startswith('http://') or s_blg.startswith('https://')) else s_blg %}
+                    {% if s_inst_link or s_ytb_link or s_fsb_link or s_blg_link %}
+                        <div class="sns-overlap-group" style="margin-left: 0.25rem; flex-shrink: 0;" onclick="event.stopPropagation();">
+                            {% set ns_sns = namespace(count=0) %}
+                            {% if s_inst_link %}
+                                {% set ns_sns.count = ns_sns.count + 1 %}
+                                <a href="{{ s_inst_link }}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </a>
+                            {% endif %}
+                            {% if s_ytb_link %}
+                                {% set ns_sns.count = ns_sns.count + 1 %}
+                                <a href="{{ s_ytb_link }}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
+                                    <i class="fa-brands fa-youtube"></i>
+                                </a>
+                            {% endif %}
+                            {% if s_fsb_link %}
+                                {% set ns_sns.count = ns_sns.count + 1 %}
+                                <a href="{{ s_fsb_link }}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
+                                    <i class="fa-brands fa-facebook-f"></i>
+                                </a>
+                            {% endif %}
+                            {% if s_blg_link %}
+                                {% set ns_sns.count = ns_sns.count + 1 %}
+                                <a href="{{ s_blg_link }}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; {{ 'margin-left: -6px;' if ns_sns.count > 1 else '' }}">
+                                    <i class="fa-solid fa-blog"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
 
                 <!-- 2줄째: 동물아이콘 + 동물유형명 + 동물 닉네임 -->
