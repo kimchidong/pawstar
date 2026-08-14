@@ -2986,15 +2986,36 @@ option.opt-closed {
     text-decoration: none;
     font-size: 0.92rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .profile-social-btn:hover {
-    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
     color: #ffffff;
     border-color: transparent;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+/* 1. Instagram: 인스타그램 그라데이션 */
+.profile-social-btn.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    box-shadow: 0 4px 14px rgba(220, 39, 67, 0.4);
+}
+
+/* 2. YouTube: 유튜브 레드 */
+.profile-social-btn.youtube:hover {
+    background: #ff0000;
+    box-shadow: 0 4px 14px rgba(255, 0, 0, 0.4);
+}
+
+/* 3. Facebook: 페이스북 블루 */
+.profile-social-btn.facebook:hover {
+    background: #1877f2;
+    box-shadow: 0 4px 14px rgba(24, 119, 242, 0.4);
+}
+
+/* 4. Blog: 블로그 그린 */
+.profile-social-btn.blog:hover {
+    background: #03cf5d;
+    box-shadow: 0 4px 14px rgba(3, 207, 93, 0.4);
 }
 
 .footer-col h4 {
