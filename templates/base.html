@@ -91,15 +91,16 @@
 
                 <!-- 2. 직전 회차 명예의 펫 스타 (1, 2, 3위 사진 전용 표시) -->
                 <div class="footer-col footer-prev-stars-col" style="flex: 1; min-width: 0;">
-                    <h4 style="display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.85rem; font-size: 1.05rem;">
-                        <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 800; color: #0f172a;">
-                            <i class="fa-solid fa-trophy" style="color: #eab308;"></i> 직전 회차 펫 스타
+                    <h4 style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; font-size: 1.02rem;">
+                        <span style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+                            <i class="fa-solid fa-trophy" style="color: #eab308; flex-shrink: 0;"></i>
+                            {% if footer_prev_contest %}
+                                <span style="color: #4f46e5; font-weight: 900; margin-right: 0.15rem; flex-shrink: 0;">제{{ footer_prev_contest.CONTEST_ROUND or footer_prev_contest.contest_id }}회</span>
+                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a;">{{ footer_prev_contest.THEME_NM or footer_prev_contest.title or footer_prev_contest.CONTEST_NM or footer_prev_contest.name or '명예의 전당' }} 수상작</span>
+                            {% else %}
+                                <span>직전 회차 펫 스타</span>
+                            {% endif %}
                         </span>
-                        {% if footer_prev_contest %}
-                            <span style="font-size: 0.76rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #475569; padding: 0.15rem 0.55rem; border-radius: 20px; font-weight: 800; border: 1px solid #cbd5e1;">
-                                제{{ footer_prev_contest.CONTEST_ROUND or footer_prev_contest.contest_id }}회
-                            </span>
-                        {% endif %}
                     </h4>
 
                     <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.85rem; padding-top: 0.2rem;">
