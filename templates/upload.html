@@ -426,7 +426,7 @@
 
 
 <!-- 실제 회차 목록 게시물 상세 레이어 팝업(#postDetailModal)과 100% 완벽히 똑같은 미리보기 팝업 모달 -->
-<div class="modal-backdrop" id="previewModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem;" onclick="if(event.target===this) closeDesktopPreviewModal();">
+<div class="modal-backdrop" id="previewModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem;">
     <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; width: 900px !important; min-width: 900px !important; max-width: 900px !important; height: 562px !important; min-height: 562px !important; max-height: 562px !important; padding: 0;">
         <div class="detail-modal-body" style="position: relative; display: grid; grid-template-columns: 1.2fr 1fr; width: 100% !important; height: 562px !important; min-height: 562px !important; max-height: 562px !important; overflow: hidden;">
             
@@ -574,6 +574,22 @@ function closeDesktopPreviewModal() {
         document.body.style.overflow = '';
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const prevModal = document.getElementById('previewModalBackdrop');
+    if (prevModal) {
+        let isMouseDownOnBackdrop = false;
+        prevModal.addEventListener('mousedown', function(e) {
+            isMouseDownOnBackdrop = (e.target === prevModal);
+        });
+        prevModal.addEventListener('click', function(e) {
+            if (e.target === prevModal && isMouseDownOnBackdrop) {
+                closeDesktopPreviewModal();
+            }
+            isMouseDownOnBackdrop = false;
+        });
+    }
+});
 
 function switchPreviewTab(tab) {
     const btnList = document.getElementById('btnPreviewList');
