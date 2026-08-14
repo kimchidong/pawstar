@@ -2983,10 +2983,25 @@ option.opt-closed {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     text-decoration: none;
     font-size: 0.92rem;
+    line-height: 1;
+    padding: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
     transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-social-btn i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    transform: translateY(1px);
 }
 
 .profile-social-btn:hover {
