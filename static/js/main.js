@@ -1865,6 +1865,32 @@ function checkAndAutoOpenPost() {
     }
 }
 
+// 푸터 공동 순위 슬롯 자동 순차 페이드 로테이션 (3.5초 간격 전환)
+function initFooterCoWinnerRotation() {
+    const coWinnerSlots = document.querySelectorAll('.footer-rank-slot-wrapper.is-co-winner-slot');
+    coWinnerSlots.forEach(slot => {
+        const items = slot.querySelectorAll('.footer-star-photo-item');
+        if (items.length <= 1) return;
+        
+        let currentIndex = 0;
+        let timer = setInterval(() => {
+            items[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % items.length;
+            items[currentIndex].classList.add('active');
+        }, 3500);
+
+        slot.addEventListener('mouseenter', () => clearInterval(timer));
+        slot.addEventListener('mouseleave', () => {
+            timer = setInterval(() => {
+                items[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % items.length;
+                items[currentIndex].classList.add('active');
+            }, 3500);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(checkAndAutoOpenPost, 300);
+    initFooterCoWinnerRotation();
 });

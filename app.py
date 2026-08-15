@@ -168,17 +168,32 @@ def inject_global_vars():
         for c in (contests_list or []):
             c_id = c.get('CONTEST_ROUND') or c.get('contest_id')
             res = service.get_hall_of_fame(contest_id=c_id)
-            stars = []
             if res and isinstance(res, list) and len(res) > 0:
+                rank1_list = []
+                rank2_list = []
+                rank3_list = []
                 for w in res:
                     if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
-                        stars.append(w)
-                stars.sort(key=get_rank_sort_key)
-                stars = stars[:3]
-                if stars:
+                        rk = get_rank_sort_key(w)
+                        if rk == 1:
+                            rank1_list.append(w)
+                        elif rk == 2:
+                            rank2_list.append(w)
+                        elif rk == 3:
+                            rank3_list.append(w)
+                
+                rank_slots = []
+                if rank1_list:
+                    rank_slots.append({'rank': 1, 'stars': rank1_list})
+                if rank2_list:
+                    rank_slots.append({'rank': 2, 'stars': rank2_list})
+                if rank3_list:
+                    rank_slots.append({'rank': 3, 'stars': rank3_list})
+
+                if rank_slots:
                     footer_recent_rounds.append({
                         'contest': c,
-                        'stars': stars
+                        'rank_slots': rank_slots
                     })
             if len(footer_recent_rounds) >= 2:
                 break
