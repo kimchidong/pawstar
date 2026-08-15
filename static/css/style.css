@@ -2897,8 +2897,8 @@ option.opt-closed {
 .footer {
     background: #ffffff;
     border-top: 1px solid var(--border-light);
-    margin-top: 5rem;
-    padding: 4rem 2rem 2rem 2rem;
+    margin-top: 4rem;
+    padding: 3rem 2rem 3rem 2rem;
     color: var(--text-secondary);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
 }
@@ -2912,7 +2912,8 @@ option.opt-closed {
     display: grid;
     grid-template-columns: 1.1fr 2.1fr;
     gap: 3rem;
-    margin-bottom: 2.5rem;
+    align-items: center;
+    margin-bottom: 2.2rem;
 }
 
 .footer-brand .footer-logo-title {
