@@ -105,7 +105,7 @@
                                 {% set c_obj = item.contest %}
                                 {% set c_stars = item.stars %}
                                 
-                                <div class="footer-round-card" onclick="location.href='/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}'" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.1rem 1.2rem; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); cursor: pointer; position: relative;">
+                                <div class="footer-round-card" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.1rem 1.2rem; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); position: relative;">
                                     <div style="margin-bottom: 1.45rem; font-size: 0.88rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.45rem;">
                                         <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.76rem; font-weight: 900; flex-shrink: 0; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
                                             제 {{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회
@@ -125,7 +125,7 @@
                                             {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
                                             {% set p_id = star.POST_ID or star.post_id or ((star.CONTEST_ROUND or star.contest_round or c_obj.CONTEST_ROUND or c_obj.contest_id) ~ '_' ~ (star.ENTRY_NO or star.entry_no or star.round_no or star.PET_NO)) %}
                                             
-                                            <div class="footer-star-photo-item" onclick="event.stopPropagation(); openPostById('{{ p_id }}', true);" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; width: 100%; cursor: pointer;">
+                                            <div class="footer-star-photo-item" onclick="openPostById('{{ p_id }}', true);" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; width: 100%; cursor: pointer;">
                                                 <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 96px; border-radius: 18px; object-fit: cover; border: 1px solid {{ border_color }}; box-shadow: none; display: block;" alt="펫 스타 사진">
                                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -9px; left: -9px; width: 33px; height: 33px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
                                             </div>
