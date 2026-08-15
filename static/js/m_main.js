@@ -273,9 +273,12 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
             }
         }
         if (!contestTitle) contestTitle = '포스타 콘테스트';
+        const badgeStyle = isClosedRound 
+            ? 'color: #475569; background: #f1f5f9; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12);' 
+            : 'color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12);';
 
         mContestBadge.innerHTML = `
-            <span style="font-size: 0.75rem; font-weight: 800; color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; padding: 0.22rem 0.65rem; border-radius: 14px; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12); display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+            <span style="font-size: 0.75rem; font-weight: 800; ${badgeStyle} padding: 0.22rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
                 제 ${roundNo}회
             </span>
             <span style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
