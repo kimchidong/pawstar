@@ -89,42 +89,51 @@
 
 
 
-                <!-- 2. 최근 2개 회차 명예의 펫 스타 수상작 (1, 2, 3위 사진 전용 표시) -->
+                <!-- 2. 최근 콘테스트 펫 스타 (최근 2개 회차 1, 2, 3위 사진 전용 표시) -->
                 <div class="footer-col footer-prev-stars-col" style="flex: 2; min-width: 0;">
-                    <div style="display: flex; align-items: flex-start; gap: 2.2rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <h4 style="margin: 0; font-size: 1.08rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.45rem;">
+                            <i class="fa-solid fa-trophy" style="color: #eab308; font-size: 1.15rem;"></i>
+                            <span>최근 콘테스트 펫 스타</span>
+                        </h4>
+                        <span style="font-size: 0.78rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 0.2rem 0.65rem; border-radius: 20px; border: 1px solid #e2e8f0;">TOP 1·2·3위 갤러리</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
                         {% if footer_recent_rounds %}
                             {% for item in footer_recent_rounds %}
                                 {% set c_obj = item.contest %}
                                 {% set c_stars = item.stars %}
                                 
-                                <div class="footer-round-block" style="flex: 1; min-width: 250px;">
-                                    <h4 style="display: block; margin-bottom: 0.85rem; font-size: 1.02rem;">
-                                        <span style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%;">
-                                            <i class="fa-solid fa-trophy" style="color: #eab308; flex-shrink: 0;"></i>
-                                            <span style="color: #4f46e5; font-weight: 900; margin-right: 0.15rem; flex-shrink: 0;">제{{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회</span>
-                                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a;">{{ c_obj.THEME_NM or c_obj.title or c_obj.CONTEST_NM or c_obj.name or '명예의 전당' }}</span>
+                                <div class="footer-round-card" onclick="location.href='/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}'" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.1rem 1.2rem; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); cursor: pointer; position: relative;">
+                                    <div style="margin-bottom: 0.85rem; font-size: 0.88rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.45rem;">
+                                        <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.76rem; font-weight: 900; flex-shrink: 0; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
+                                            제{{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회
                                         </span>
-                                    </h4>
+                                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; font-size: 0.9rem; min-width: 0;">
+                                            {{ c_obj.THEME_NM or c_obj.title or c_obj.CONTEST_NM or c_obj.name or '명예의 전당' }}
+                                        </span>
+                                    </div>
 
-                                    <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.85rem; padding-top: 0.2rem;">
+                                    <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.75rem;">
                                         {% for star in c_stars %}
                                             {% set aw_cd = (star.AWARD_CD or star.award_cd or '')|string %}
                                             {% set rk = 1 if ('P001A101' in aw_cd or (star.RANKING or star.rank_no) == 1) else (2 if ('P001A102' in aw_cd or (star.RANKING or star.rank_no) == 2) else (3 if ('P001A103' in aw_cd or (star.RANKING or star.rank_no) == 3) else loop.index)) %}
                                             {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
-                                            {% set shadow_glow = 'rgba(250, 204, 21, 0.4)' if rk == 1 else ('rgba(56, 189, 248, 0.4)' if rk == 2 else 'rgba(163, 230, 53, 0.4)') %}
+                                            {% set shadow_glow = 'rgba(250, 204, 21, 0.35)' if rk == 1 else ('rgba(56, 189, 248, 0.35)' if rk == 2 else 'rgba(163, 230, 53, 0.35)') %}
                                             {% set badge_file = 'P001A10' ~ rk %}
                                             {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
                                             
-                                            <div class="footer-star-photo-item" onclick="location.href='/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}'" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; cursor: pointer; flex-shrink: 0;">
-                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 78px; height: 78px; border-radius: 18px; object-fit: cover; border: 2.5px solid {{ border_color }}; box-shadow: 0 4px 12px {{ shadow_glow }}; display: block;" alt="펫 스타 사진">
-                                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
+                                            <div class="footer-star-photo-item" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; flex-shrink: 0;">
+                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 74px; height: 74px; border-radius: 16px; object-fit: cover; border: 2px solid {{ border_color }}; box-shadow: 0 4px 10px {{ shadow_glow }}; display: block;" alt="펫 스타 사진">
+                                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -7px; left: -7px; width: 27px; height: 27px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
                                             </div>
                                         {% endfor %}
                                     </div>
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <div style="font-size: 0.82rem; color: #94a3b8; padding: 1rem 0;">
+                            <div style="grid-column: 1 / -1; font-size: 0.85rem; color: #94a3b8; padding: 1rem 0; text-align: center;">
                                 최근 회차 수상 기록 준비 중입니다.
                             </div>
                         {% endif %}

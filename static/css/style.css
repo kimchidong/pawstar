@@ -3104,6 +3104,10 @@ option.opt-closed {
     margin-top: 0.4rem;
 }
 
+.footer-prev-stars-col h4::after {
+    display: none !important;
+}
+
 .footer-links {
     list-style: none;
     display: flex;
