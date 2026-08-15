@@ -1721,6 +1721,28 @@ async function triggerMobileEvent(postId, eventType) {
 }
 window.triggerMobileEvent = triggerMobileEvent;
 
+// 모바일 포스트 ID 기반 상세 팝업 오픈 헬퍼 함수
+function openPostById(postId, isHallOfFame = true) {
+    if (!postId) return;
+    if (window.postsDataStore && window.postsDataStore[postId]) {
+        openMobileDetailModal(window.postsDataStore[postId], isHallOfFame);
+    } else {
+        fetch(`/api/post/detail/${postId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.post) {
+                    openMobileDetailModal(data.post, isHallOfFame);
+                } else if (typeof showToast === 'function') {
+                    showToast('해당 출전작 정보를 불러올 수 없습니다.', 'warning');
+                } else {
+                    alert('해당 출전작 정보를 불러올 수 없습니다.');
+                }
+            })
+            .catch(err => console.error('모바일 출전작 팝업 로드 실패:', err));
+    }
+}
+window.openPostById = openPostById;
+
 // 모바일 푸터 공동 순위 슬롯 자동 순차 페이드 로테이션 (3.5초 간격 전환)
 function initMobileFooterCoWinnerRotation() {
     const coWinnerSlots = document.querySelectorAll('.footer-rank-slot-wrapper.is-co-winner-slot');
