@@ -125,7 +125,7 @@
                                             {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
                                             
                                             <div class="footer-star-photo-item" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; width: 100%;">
-                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 96px; border-radius: 18px; object-fit: cover; border: 2.5px solid {{ border_color }}; box-shadow: 0 4px 12px {{ shadow_glow }}; display: block;" alt="펫 스타 사진">
+                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 96px; border-radius: 18px; object-fit: cover; border: 1px solid {{ border_color }}; box-shadow: none; display: block;" alt="펫 스타 사진">
                                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -9px; left: -9px; width: 33px; height: 33px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
                                             </div>
                                         {% endfor %}
