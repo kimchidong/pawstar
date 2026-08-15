@@ -1831,23 +1831,32 @@ document.addEventListener('keydown', (e) => {
 window.openBadgeZoomModal = openBadgeZoomModal;
 window.closeBadgeZoomModal = closeBadgeZoomModal;
 
+// 게시물 ID 또는 (ROUND_ENTRYNO) 기반 즉시 팝업 모달 오픈 헬퍼 함수
+function openPostById(postId, isHallOfFame = true) {
+    if (!postId) return;
+    if (window.postsDataStore && window.postsDataStore[postId]) {
+        openDetailModal(window.postsDataStore[postId], isHallOfFame);
+    } else {
+        fetch(`/api/post/detail/${postId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.post) {
+                    openDetailModal(data.post, isHallOfFame);
+                } else if (typeof showToast === 'function') {
+                    showToast('해당 출전작 정보를 불러올 수 없습니다.', 'warning');
+                }
+            })
+            .catch(err => console.error('출전작 팝업 로드 실패:', err));
+    }
+}
+window.openPostById = openPostById;
+
 // URL 쿼리 파라미터 open_post 감지 시 자동 팝업 오픈
 function checkAndAutoOpenPost() {
     const urlParams = new URLSearchParams(window.location.search);
     const openPostId = urlParams.get('open_post');
     if (openPostId) {
-        if (window.postsDataStore && window.postsDataStore[openPostId]) {
-            openDetailModal(window.postsDataStore[openPostId]);
-        } else {
-            fetch(`/api/post/detail/${openPostId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.post) {
-                        openDetailModal(data.post);
-                    }
-                })
-                .catch(err => console.error('자동 포스트 팝업 실패:', err));
-        }
+        openPostById(openPostId, true);
         const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
