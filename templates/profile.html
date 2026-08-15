@@ -234,14 +234,15 @@
                     <div class="author-info">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; width: 100%;">
                             <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0; flex: 1;">
-                                <img src="{{ p.PROFILE_URL or p.user_profile or user_info.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
+                                {% set u_obj = user_info if user_info is defined and user_info else (user if user is defined and user else {}) %}
+                                <img src="{{ p.PROFILE_URL or p.user_profile or u_obj.profile_img or u_obj.PROFILE_URL or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
                                 <div class="author-detail" style="min-width: 0; flex: 1;">
                                     <div style="display: flex; align-items: center; gap: 0.35rem; width: 100%;">
-                                        <div class="nickname" style="font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 1;">{{ p.NK_NM or p.user_nickname or user_info.nickname }}</div>
-                                        {% set s_inst = (p.sns_inst or p.SNS_INST or user_info.sns_inst or user_info.SNS_INST or '').strip() %}
-                                        {% set s_ytb = (p.sns_ytb or p.SNS_YTB or user_info.sns_ytb or user_info.SNS_YTB or '').strip() %}
-                                        {% set s_fsb = (p.sns_fsb or p.SNS_FSB or user_info.sns_fsb or user_info.SNS_FSB or '').strip() %}
-                                        {% set s_blg = (p.sns_blg or p.SNS_BLG or user_info.sns_blg or user_info.SNS_BLG or '').strip() %}
+                                        <div class="nickname" style="font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 1;">{{ p.NK_NM or p.user_nickname or u_obj.nickname or u_obj.NK_NM or '' }}</div>
+                                        {% set s_inst = (p.sns_inst or p.SNS_INST or u_obj.sns_inst or u_obj.SNS_INST or '').strip() %}
+                                        {% set s_ytb = (p.sns_ytb or p.SNS_YTB or u_obj.sns_ytb or u_obj.SNS_YTB or '').strip() %}
+                                        {% set s_fsb = (p.sns_fsb or p.SNS_FSB or u_obj.sns_fsb or u_obj.SNS_FSB or '').strip() %}
+                                        {% set s_blg = (p.sns_blg or p.SNS_BLG or u_obj.sns_blg or u_obj.SNS_BLG or '').strip() %}
                                         {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
                                         {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
                                         {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}

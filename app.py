@@ -151,8 +151,7 @@ def inject_global_vars():
             'profile_img': '/static/image/profile/default_profile.png'
         }
 
-    footer_prev_stars = []
-    footer_prev_contest = None
+    footer_recent_rounds = []
     try:
         def get_rank_sort_key(item):
             cd = str(item.get('AWARD_CD') or item.get('award_cd') or '')
@@ -165,44 +164,31 @@ def inject_global_vars():
                 return 3
             return 99
 
-        # 실제 수상자가 존재하는 최신 종료 회차의 명예의 전당 데이터 조회 (contest_id=None)
-        all_w = service.get_hall_of_fame(contest_id=None)
-        if isinstance(all_w, list) and len(all_w) > 0:
-            for w in all_w:
-                if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
-                    footer_prev_stars.append(w)
+        contests_list = service.get_contests()
+        for c in (contests_list or []):
+            c_id = c.get('CONTEST_ROUND') or c.get('contest_id')
+            res = service.get_hall_of_fame(contest_id=c_id)
+            stars = []
+            if res and isinstance(res, list) and len(res) > 0:
+                for w in res:
+                    if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
+                        stars.append(w)
+                stars.sort(key=get_rank_sort_key)
+                stars = stars[:3]
+                if stars:
+                    footer_recent_rounds.append({
+                        'contest': c,
+                        'stars': stars
+                    })
+            if len(footer_recent_rounds) >= 2:
+                break
+        
+        # 가장 최근 회차 순서(회차 내림차순: 제11회 -> 제10회)로 정렬
+        footer_recent_rounds.sort(key=lambda x: int(x['contest'].get('CONTEST_ROUND') or x['contest'].get('contest_id') or 0), reverse=True)
 
-            footer_prev_stars.sort(key=get_rank_sort_key)
-            footer_prev_stars = footer_prev_stars[:3]
-                
-            if footer_prev_stars:
-                prev_c_id = footer_prev_stars[0].get('CONTEST_ROUND') or footer_prev_stars[0].get('contest_id')
-                if prev_c_id:
-                    footer_prev_contest = service.get_contest(prev_c_id)
-
-        # 만약 여전히 비어있다면 회차 전체 목록 순회하며 수상자가 있는 가장 최근 회차 탐색
-        if not footer_prev_stars:
-            contests_list = service.get_contests()
-            for c in (contests_list or []):
-                c_id = c.get('CONTEST_ROUND') or c.get('contest_id')
-                res = service.get_hall_of_fame(contest_id=c_id)
-                if res and isinstance(res, list) and len(res) > 0:
-                    footer_prev_contest = c
-                    for w in res:
-                        if w.get('AWARD_PART') == 'G002P001' or w.get('award_part') == 'G002P001':
-                            footer_prev_stars.append(w)
-                    footer_prev_stars.sort(key=get_rank_sort_key)
-                    footer_prev_stars = footer_prev_stars[:3]
-                    if footer_prev_stars:
-                        break
-
-        if not footer_prev_contest:
-            contests_list = service.get_contests()
-            if contests_list:
-                footer_prev_contest = contests_list[0]
     except Exception as e:
-        print("footer prev stars error:", e)
-        footer_prev_stars = []
+        print("footer recent rounds error:", e)
+        footer_recent_rounds = []
 
     return {
         'contests': service.get_contests(),
@@ -210,8 +196,7 @@ def inject_global_vars():
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
         'is_logged_in': is_logged_in,
-        'footer_prev_stars': footer_prev_stars,
-        'footer_prev_contest': footer_prev_contest
+        'footer_recent_rounds': footer_recent_rounds
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
@@ -778,7 +763,18 @@ def profile():
     if is_mobile_user_agent() and not request.args.get('desktop'):
         return redirect(url_for('m_profile', **request.args))
 
-    user_id = request.args.get('user_id') or session.get('user_id') or 'user1'
+    target_user_id = request.args.get('user_id')
+    current_user_id = session.get('user_id') if not session.get('logged_out') else None
+
+    # 마이프로필 조회 (user_id 쿼리가 없거나 본인 ID 지정인 경우)
+    if not target_user_id or target_user_id == current_user_id:
+        if not current_user_id:
+            # 로그인되어 있지 않으면 로그인 모달이 뜨는 메인 피드로 이동
+            return redirect(url_for('index', open_login='true'))
+        user_id = current_user_id
+    else:
+        user_id = target_user_id
+
     contest_id = request.args.get('contest_id', 'all')
     profile_data = service.get_user_profile(user_id, contest_id=contest_id)
 
@@ -882,7 +878,18 @@ def m_hall_of_fame():
 
 @app.route('/m/profile')
 def m_profile():
-    user_id = request.args.get('user_id') or session.get('user_id') or 'user1'
+    target_user_id = request.args.get('user_id')
+    current_user_id = session.get('user_id') if not session.get('logged_out') else None
+
+    # 마이프로필 조회 (user_id 쿼리가 없거나 본인 ID 지정인 경우)
+    if not target_user_id or target_user_id == current_user_id:
+        if not current_user_id:
+            # 로그인되어 있지 않으면 모바일 메인 피드로 이동하며 로그인 유도
+            return redirect(url_for('m_index', open_login='true'))
+        user_id = current_user_id
+    else:
+        user_id = target_user_id
+
     contest_id = request.args.get('contest_id', 'all')
     page = request.args.get('page', 1, type=int)
     per_page = 10

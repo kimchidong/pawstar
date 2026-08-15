@@ -2910,7 +2910,7 @@ option.opt-closed {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: 1.1fr 2.1fr;
     gap: 3rem;
     margin-bottom: 2.5rem;
 }

@@ -89,38 +89,43 @@
 
 
 
-                <!-- 2. 직전 회차 명예의 펫 스타 (1, 2, 3위 사진 전용 표시) -->
-                <div class="footer-col footer-prev-stars-col" style="flex: 1; min-width: 0;">
-                    <h4 style="display: block; margin-bottom: 0.85rem; font-size: 1.02rem;">
-                        <span style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
-                            <i class="fa-solid fa-trophy" style="color: #eab308; flex-shrink: 0;"></i>
-                            {% if footer_prev_contest %}
-                                <span style="color: #4f46e5; font-weight: 900; margin-right: 0.15rem; flex-shrink: 0;">제{{ footer_prev_contest.CONTEST_ROUND or footer_prev_contest.contest_id }}회</span>
-                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a;">{{ footer_prev_contest.THEME_NM or footer_prev_contest.title or footer_prev_contest.CONTEST_NM or footer_prev_contest.name or '명예의 전당' }} 수상작</span>
-                            {% else %}
-                                <span>직전 회차 펫 스타</span>
-                            {% endif %}
-                        </span>
-                    </h4>
-
-                    <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.85rem; padding-top: 0.2rem;">
-                        {% if footer_prev_stars %}
-                            {% for star in footer_prev_stars %}
-                                {% set aw_cd = (star.AWARD_CD or star.award_cd or '')|string %}
-                                {% set rk = 1 if ('P001A101' in aw_cd or (star.RANKING or star.rank_no) == 1) else (2 if ('P001A102' in aw_cd or (star.RANKING or star.rank_no) == 2) else (3 if ('P001A103' in aw_cd or (star.RANKING or star.rank_no) == 3) else loop.index)) %}
-                                {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
-                                {% set shadow_glow = 'rgba(250, 204, 21, 0.4)' if rk == 1 else ('rgba(56, 189, 248, 0.4)' if rk == 2 else 'rgba(163, 230, 53, 0.4)') %}
-                                {% set badge_file = 'P001A10' ~ rk %}
-                                {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
+                <!-- 2. 최근 2개 회차 명예의 펫 스타 수상작 (1, 2, 3위 사진 전용 표시) -->
+                <div class="footer-col footer-prev-stars-col" style="flex: 2; min-width: 0;">
+                    <div style="display: flex; align-items: flex-start; gap: 2.2rem; flex-wrap: wrap;">
+                        {% if footer_recent_rounds %}
+                            {% for item in footer_recent_rounds %}
+                                {% set c_obj = item.contest %}
+                                {% set c_stars = item.stars %}
                                 
-                                <div class="footer-star-photo-item" onclick="location.href='/hall-of-fame?contest_id={{ footer_prev_contest.CONTEST_ROUND or footer_prev_contest.contest_id if footer_prev_contest else '' }}'" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; cursor: pointer; flex-shrink: 0;">
-                                    <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 82px; height: 82px; border-radius: 18px; object-fit: cover; border: 2.5px solid {{ border_color }}; box-shadow: 0 4px 12px {{ shadow_glow }}; display: block;" alt="펫 스타 사진">
-                                    <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
+                                <div class="footer-round-block" style="flex: 1; min-width: 250px;">
+                                    <h4 style="display: block; margin-bottom: 0.85rem; font-size: 1.02rem;">
+                                        <span style="display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%;">
+                                            <i class="fa-solid fa-trophy" style="color: #eab308; flex-shrink: 0;"></i>
+                                            <span style="color: #4f46e5; font-weight: 900; margin-right: 0.15rem; flex-shrink: 0;">제{{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회</span>
+                                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a;">{{ c_obj.THEME_NM or c_obj.title or c_obj.CONTEST_NM or c_obj.name or '명예의 전당' }}</span>
+                                        </span>
+                                    </h4>
+
+                                    <div class="footer-stars-photos" style="display: flex; align-items: center; gap: 0.85rem; padding-top: 0.2rem;">
+                                        {% for star in c_stars %}
+                                            {% set aw_cd = (star.AWARD_CD or star.award_cd or '')|string %}
+                                            {% set rk = 1 if ('P001A101' in aw_cd or (star.RANKING or star.rank_no) == 1) else (2 if ('P001A102' in aw_cd or (star.RANKING or star.rank_no) == 2) else (3 if ('P001A103' in aw_cd or (star.RANKING or star.rank_no) == 3) else loop.index)) %}
+                                            {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
+                                            {% set shadow_glow = 'rgba(250, 204, 21, 0.4)' if rk == 1 else ('rgba(56, 189, 248, 0.4)' if rk == 2 else 'rgba(163, 230, 53, 0.4)') %}
+                                            {% set badge_file = 'P001A10' ~ rk %}
+                                            {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
+                                            
+                                            <div class="footer-star-photo-item" onclick="location.href='/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}'" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: relative; cursor: pointer; flex-shrink: 0;">
+                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 78px; height: 78px; border-radius: 18px; object-fit: cover; border: 2.5px solid {{ border_color }}; box-shadow: 0 4px 12px {{ shadow_glow }}; display: block;" alt="펫 스타 사진">
+                                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             {% endfor %}
                         {% else %}
                             <div style="font-size: 0.82rem; color: #94a3b8; padding: 1rem 0;">
-                                직전 회차 수상 기록 준비 중입니다.
+                                최근 회차 수상 기록 준비 중입니다.
                             </div>
                         {% endif %}
                     </div>
@@ -138,6 +143,7 @@
                     <a href="#" onclick="openPrivacyPolicyModal(); return false;" style="font-weight: 800; color: #475569; text-decoration: none;">개인정보처리방침</a>
                     <a href="#" onclick="openTermsNoticeModal(); return false;" style="font-weight: 800; color: #475569;">이용약관</a>
                 </div>
+            </div>
             </div>
         </div>
     </footer>
@@ -1243,6 +1249,28 @@
             modal.style.display = 'none';
         }, 300);
     }
+    function openSitemapModal() {
+        const modal = document.getElementById('sitemapModal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            const card = modal.firstElementChild;
+            if (card) card.style.transform = 'scale(1)';
+        }, 10);
+    }
+    function closeSitemapModal() {
+        const modal = document.getElementById('sitemapModal');
+        if (!modal) return;
+        modal.style.opacity = '0';
+        const card = modal.firstElementChild;
+        if (card) card.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+    window.openSitemapModal = openSitemapModal;
+    window.closeSitemapModal = closeSitemapModal;
     window.openPrivacyPolicyModal = openPrivacyPolicyModal;
     window.closePrivacyPolicyModal = closePrivacyPolicyModal;
     window.openTermsNoticeModal = openTermsNoticeModal;
@@ -1254,6 +1282,15 @@
             alert('출전 등록이 완료되었습니다! 🐾🎉');
             const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]uploaded=true/, '').replace(/^&/, '?');
             window.history.replaceState({}, document.title, cleanUrl || '/');
+        }
+        if (urlParams.get('open_login') === 'true') {
+            const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]open_login=true/, '').replace(/^&/, '?');
+            window.history.replaceState({}, document.title, cleanUrl || '/');
+            setTimeout(() => {
+                if (typeof openGoogleLoginModal === 'function') {
+                    openGoogleLoginModal();
+                }
+            }, 100);
         }
     });
     </script>

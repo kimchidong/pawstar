@@ -370,6 +370,17 @@
             const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]uploaded=true/, '').replace(/^&/, '?');
             window.history.replaceState({}, document.title, cleanUrl || '/m');
         }
+        if (urlParams.get('open_login') === 'true') {
+            const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]open_login=true/, '').replace(/^&/, '?');
+            window.history.replaceState({}, document.title, cleanUrl || '/m');
+            setTimeout(() => {
+                if (typeof openGoogleLoginModal === 'function') {
+                    openGoogleLoginModal();
+                } else if (typeof openMobileAuthModal === 'function') {
+                    openMobileAuthModal();
+                }
+            }, 100);
+        }
     });
     </script>
 </body>
