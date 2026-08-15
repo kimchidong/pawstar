@@ -1038,6 +1038,20 @@ body.m-body {
     font-weight: 500 !important;
 }
 
+/* 모바일 푸터 최근 콘테스트 펫 스타 슬롯 롤링 페이드 */
+.footer-rank-slot-wrapper .footer-star-photo-item {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.footer-rank-slot-wrapper .footer-star-photo-item.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
 /* 4개의 액션 수치 알약 버튼 (2열 그리드 반응형) */
 .m-card-actions {
     display: grid !important;

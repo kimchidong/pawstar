@@ -47,8 +47,62 @@
     <!-- 메인 컨텐츠 영역 -->
     <main>
         {% block content %}{% endblock %}
+        <!-- 모바일 푸터 2개 회차 최근 콘테스트 펫 스타 수상작 (TOP 1·2·3위 갤러리) -->
+        <div class="m-footer-recent-stars" style="padding: 1.25rem 1rem 1rem 1rem; background: #ffffff; border-top: 1px solid #e2e8f0; margin-top: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-solid fa-trophy" style="color: #eab308; font-size: 1.05rem;"></i>
+                    <span>최근 콘테스트 펫 스타</span>
+                </h4>
+                <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 0.18rem 0.55rem; border-radius: 16px; border: 1px solid #e2e8f0;">TOP 1·2·3위 갤러리</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                {% if footer_recent_rounds %}
+                    {% for item in footer_recent_rounds %}
+                        {% set c_obj = item.contest %}
+                        {% set c_slots = item.rank_slots %}
+                        
+                        <div class="footer-round-card" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.85rem 0.9rem; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); position: relative;">
+                            <div style="margin-bottom: 0.85rem; font-size: 0.82rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.4rem;">
+                                <span style="color: #475569; background: #f1f5f9; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12); padding: 0.15rem 0.5rem; border-radius: 12px; font-size: 0.74rem; font-weight: 900; flex-shrink: 0;">
+                                    제 {{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회
+                                </span>
+                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; font-size: 0.84rem; min-width: 0;">
+                                    {{ c_obj.THEME_NM or c_obj.title or c_obj.CONTEST_NM or c_obj.name or '명예의 전당' }}
+                                </span>
+                            </div>
+
+                            <div class="footer-stars-photos" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; width: 100%;">
+                                {% for slot in c_slots %}
+                                    {% set rk = slot.rank %}
+                                    {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
+                                    {% set badge_file = 'P001A10' ~ rk %}
+                                    {% set rk_title = '슈퍼스타 1위' if rk == 1 else ('브라이트스타 2위' if rk == 2 else '라이징스타 3위') %}
+
+                                    <div class="footer-rank-slot-wrapper {% if slot.stars|length > 1 %}is-co-winner-slot{% endif %}" style="position: relative; width: 100%; height: 84px;">
+                                        {% for star in slot.stars %}
+                                            {% set p_id = star.POST_ID or star.post_id or ((star.CONTEST_ROUND or star.contest_round or c_obj.CONTEST_ROUND or c_obj.contest_id) ~ '_' ~ (star.ENTRY_NO or star.entry_no or star.round_no or star.PET_NO)) %}
+                                            <div class="footer-star-photo-item {% if loop.first %}active{% endif %}" onclick="openPostById('{{ p_id }}', true);" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+                                                <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 84px; border-radius: 16px; object-fit: cover; border: 1px solid {{ border_color }}; box-shadow: none; display: block;" alt="펫 스타 사진">
+                                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="font-size: 0.8rem; color: #94a3b8; padding: 0.75rem 0; text-align: center;">
+                        최근 회차 수상 기록 준비 중입니다.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- 모바일 약관 및 개인정보 처리 안내 푸터 링크 바 (슬림 여백 최적화) -->
-        <div style="padding: 1rem 1rem 1.2rem 1rem; text-align: center; background: #f8fafc; border-top: 1px solid #e2e8f0; margin-top: 1rem;">
+        <div style="padding: 1rem 1rem 1.2rem 1rem; text-align: center; background: #f8fafc; border-top: 1px solid #e2e8f0;">
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.5rem; flex-wrap: wrap;">
                 <a href="/m/privacy" onclick="openMobilePrivacyModal(); return false;" style="color: #475569; text-decoration: none;">
                     개인정보처리방침
