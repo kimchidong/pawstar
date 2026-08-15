@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('🎉 펫 자랑 게시물이 정상 출전되었습니다!');
+                    alert('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾');
                     location.reload();
                 } else {
                     alert('출전 실패: ' + (data.message || '오류 발생'));

@@ -1012,7 +1012,7 @@ def upload_page():
             return redirect('/upload')
 
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
-        flash('출전 등록이 완료되었습니다! 🐾🎉', 'success')
+        flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/?uploaded=true')
 
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
@@ -1061,7 +1061,7 @@ def m_upload_page():
             return redirect('/m/upload')
 
         service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
-        flash('출전 등록이 완료되었습니다! 🐾🎉', 'success')
+        flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/m?uploaded=true')
 
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1

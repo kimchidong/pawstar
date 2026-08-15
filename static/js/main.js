@@ -174,7 +174,7 @@ function initEventHandlers() {
                 });
                 const res = await response.json();
                 if (res.success) {
-                    showToast('🎉 자랑 게시물이 성공적으로 등록되었습니다!');
+                    showToast('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾');
                     modalBackdrop.classList.remove('show');
                     setTimeout(() => location.reload(), 1000);
                 } else {
