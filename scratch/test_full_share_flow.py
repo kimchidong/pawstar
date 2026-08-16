@@ -1,7 +1,7 @@
 import sys
 import pymysql
 from app import app
-from config import db_config
+from config.web import DB_CONFIG
 from services.contest_service import PawStarService
 
 def test_e2e_existing_user_share_login_flow():

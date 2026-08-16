@@ -10,7 +10,12 @@ import io
 import random
 import pymysql
 from datetime import datetime, timedelta
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 # Windows 콘솔 인코딩 대응
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -78,7 +83,7 @@ def generate_samples():
         "힐링 제대로 하고 갑니다~ 1등 응원해요 👑"
     ]
 
-    conn = pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     try:
         with conn.cursor() as cur:
             # 3. 현재 진행 중인 콘테스트 ID 조회

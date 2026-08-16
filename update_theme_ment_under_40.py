@@ -7,7 +7,12 @@ THEME_MENT 문구를 공백/이모티콘 포함 엄격히 40자 이내로 정돈
 import sys
 import io
 import pymysql
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -81,7 +86,7 @@ def update_theme_under_40():
         }
     ]
 
-    conn = pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     if not conn:
         print("❌ DB 연결 실패!")
         return

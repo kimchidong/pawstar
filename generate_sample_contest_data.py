@@ -12,7 +12,12 @@ import io
 import random
 import pymysql
 from datetime import datetime, timedelta
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 from services.contest_service import hash_google_id
 
 # Windows 콘솔 인코딩 출력 설정
@@ -21,7 +26,7 @@ if sys.platform == 'win32':
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 def get_db_connection():
-    return pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
 
 def run_seed():
     print("=" * 65)

@@ -8,7 +8,12 @@ pst_contest 회차들의 THEME_CD 외래키 연결을 정상 원복합니다.
 import sys
 import io
 import pymysql
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -19,7 +24,7 @@ def restore_theme():
     print("🐾 PST_THEME 테이블 및 회차 테마 데이터 원복 시작")
     print("==================================================")
 
-    conn = pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     if not conn:
         print("❌ DB 연결 실패!")
         return

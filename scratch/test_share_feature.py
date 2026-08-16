@@ -1,6 +1,6 @@
 import pymysql
 import uuid
-from config import db_config
+from config.web import DB_CONFIG
 from services.contest_service import PawStarService
 
 def test_share():

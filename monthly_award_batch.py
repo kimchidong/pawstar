@@ -28,11 +28,16 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 def get_db_connection():
     try:
-        return pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+        return pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     except Exception as e:
         print(f"[{datetime.datetime.now()}] DB 연결 실패: {e}")
         return None

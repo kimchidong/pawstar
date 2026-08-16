@@ -7,7 +7,12 @@ PST_THEME 테이블 THEME_NM 및 THEME_MENT 컬럼 업데이트 스크립트 (up
 import sys
 import io
 import pymysql
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -81,7 +86,7 @@ def update_theme_ment():
         }
     ]
 
-    conn = pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     if not conn:
         print("❌ DB 연결 실패!")
         return

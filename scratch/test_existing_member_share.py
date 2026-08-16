@@ -1,6 +1,6 @@
 import sys
 import pymysql
-from config import db_config
+from config.web import DB_CONFIG
 from services.contest_service import PawStarService
 
 def test_existing_member_share_referral():

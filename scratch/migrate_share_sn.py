@@ -1,9 +1,9 @@
 import pymysql
 import uuid
-from config import db_config
+from config.web import DB_CONFIG
 
 def migrate():
-    conn = pymysql.connect(**db_config, cursorclass=pymysql.cursors.DictCursor)
+    conn = pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     with conn.cursor() as cur:
         cur.execute("SELECT CONTEST_ROUND, ROUND_NO, SHARE_SN FROM pst_contest_round;")
         rows = cur.fetchall()

@@ -3,13 +3,18 @@ import random
 import hashlib
 import os
 from datetime import datetime, timedelta
-from config import db_config
+import importlib
+try:
+    config_web = importlib.import_module("config.web")
+    DB_CONFIG = config_web.DB_CONFIG
+except Exception:
+    from config.web import DB_CONFIG
 
 def hash_id(raw_id):
     return hashlib.sha256(str(raw_id).encode('utf-8')).hexdigest()
 
 def seed_database():
-    conn = pymysql.connect(**db_config)
+    conn = pymysql.connect(**DB_CONFIG)
     cur = conn.cursor()
 
     try:
