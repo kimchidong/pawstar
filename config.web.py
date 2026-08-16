@@ -14,6 +14,9 @@ if APP_ENV == "prd":
         "database": "DB_PST",
         "charset": "utf8mb4"
     }
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID_PRD", os.getenv("GOOGLE_CLIENT_ID", ""))
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET_PRD", os.getenv("GOOGLE_CLIENT_SECRET", ""))
+    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI_PRD", os.getenv("GOOGLE_REDIRECT_URI", "http://pawstar.kr/auth/google/callback"))
 else:
     LOG_DIR = "log/web"
     DB_CONFIG = {
@@ -24,3 +27,23 @@ else:
         "database": "DB_PST",
         "charset": "utf8mb4"
     }
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8003/auth/google/callback")
+
+
+def get_google_config():
+    """
+    현재 APP_ENV 및 환경 변수에 맞는 Google OAuth 설정 정보(client_id, client_secret, redirect_uri)를 반환합니다.
+    """
+    current_env = os.getenv("APP_ENV", "local")
+    if current_env == "prd":
+        client_id = os.environ.get('GOOGLE_CLIENT_ID_PRD', os.environ.get('GOOGLE_CLIENT_ID', ''))
+        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET_PRD', os.environ.get('GOOGLE_CLIENT_SECRET', ''))
+        redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI_PRD', os.environ.get('GOOGLE_REDIRECT_URI', 'http://pawstar.kr/auth/google/callback'))
+    else:
+        client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
+        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+        redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8003/auth/google/callback')
+
+    return client_id, client_secret, redirect_uri

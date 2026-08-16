@@ -430,14 +430,31 @@ except ImportError:
 
 load_env_file()
 
+import importlib.util
+
+def _get_config_web():
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(curr_dir, 'config.web.py'),
+        os.path.join(os.getcwd(), 'config.web.py')
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            spec = importlib.util.spec_from_file_location("config_web", path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+    raise ImportError("config.web.py 파일을 찾을 수 없습니다.")
+
 def get_google_config():
     load_env_file()
-    client_id = os.environ.get('GOOGLE_CLIENT_ID', '253326907225-2d7t3ics5u6ua4l9bo8hojseuq3u8pqk.apps.googleusercontent.com')
-    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '')
-    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:8003/auth/google/callback')
-    return client_id, client_secret, redirect_uri
+    config_web = _get_config_web()
+    return config_web.get_google_config()
 
 GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI = get_google_config()
+
+
+
 
 @app.route('/auth/google')
 def auth_google_redirect():
