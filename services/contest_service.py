@@ -505,7 +505,7 @@ class PawStarService:
 
         conn = self.get_db_connection()
         if not conn:
-            nickname = name or self.generate_unique_nickname()
+            nickname = self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
                 'NK_NM': nickname,
@@ -532,12 +532,8 @@ class PawStarService:
                 user = cur.fetchone()
 
                 if not user:
-                    # 구글 이름(name)을 닉네임으로 우선 사용 (중복 시 무작위 고유 닉네임)
-                    base_name = (name or (email.split('@')[0] if email else '집사')).strip()
-                    if base_name and not self.is_nickname_taken(base_name):
-                        nickname = base_name
-                    else:
-                        nickname = self.generate_unique_nickname()
+                    # 처음 가입 시 구글 닉네임(name) 대신 항상 무작위 고유 닉네임 생성
+                    nickname = self.generate_unique_nickname(conn)
 
                     try:
                         cur.execute(f"""
@@ -563,7 +559,7 @@ class PawStarService:
                         'is_new_user': True
                     }
                 else:
-                    nickname = user.get('NK_NM') or name or '집사'
+                    nickname = user.get('NK_NM') or self.generate_unique_nickname(conn)
                     if picture and picture.strip() and picture != '/static/image/profile/default_profile.png':
                         cur.execute(f"""
                             UPDATE {tbl} 
@@ -596,7 +592,7 @@ class PawStarService:
             print("[google_login_or_register ERROR]", e)
             import traceback
             traceback.print_exc()
-            fallback_nk = name or self.generate_unique_nickname()
+            fallback_nk = self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
                 'NK_NM': fallback_nk,
