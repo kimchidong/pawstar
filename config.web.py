@@ -16,7 +16,7 @@ if APP_ENV == "prd":
     }
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID_PRD", os.getenv("GOOGLE_CLIENT_ID", ""))
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET_PRD", os.getenv("GOOGLE_CLIENT_SECRET", ""))
-    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI_PRD", os.getenv("GOOGLE_REDIRECT_URI", "http://pawstar.kr/auth/google/callback"))
+    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI_PRD", os.getenv("GOOGLE_REDIRECT_URI", "https://pawstar.co.kr/auth/google/callback"))
 else:
     LOG_DIR = "log/web"
     DB_CONFIG = {
@@ -40,7 +40,7 @@ def get_google_config():
     if current_env == "prd":
         client_id = os.environ.get('GOOGLE_CLIENT_ID_PRD', os.environ.get('GOOGLE_CLIENT_ID', ''))
         client_secret = os.environ.get('GOOGLE_CLIENT_SECRET_PRD', os.environ.get('GOOGLE_CLIENT_SECRET', ''))
-        redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI_PRD', os.environ.get('GOOGLE_REDIRECT_URI', 'http://pawstar.kr/auth/google/callback'))
+        redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI_PRD', os.environ.get('GOOGLE_REDIRECT_URI', 'https://pawstar.co.kr/auth/google/callback'))
     else:
         client_id = os.environ.get('GOOGLE_CLIENT_ID', '')
         client_secret = os.environ.get('GOOGLE_CLIENT_SECRET', '')
