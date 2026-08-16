@@ -519,15 +519,6 @@ class PawStarService:
             with conn.cursor() as cur:
                 tbl = self._get_user_table_name(cur)
 
-                # 사용자 테이블에 EMAIL 컬럼이 없는 경우 동적 추가
-                try:
-                    cur.execute(f"SHOW COLUMNS FROM {tbl} LIKE 'EMAIL'")
-                    if not cur.fetchone():
-                        cur.execute(f"ALTER TABLE {tbl} ADD COLUMN EMAIL VARCHAR(150) DEFAULT ''")
-                        conn.commit()
-                except Exception as col_e:
-                    print(f"[{tbl} EMAIL column check/add warning]", col_e)
-
                 cur.execute(f"SELECT USER_ID, NK_NM, PROFILE_URL FROM {tbl} WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
 
@@ -535,17 +526,10 @@ class PawStarService:
                     # 처음 가입 시 구글 닉네임(name) 대신 항상 무작위 고유 닉네임 생성
                     nickname = self.generate_unique_nickname(conn)
 
-                    try:
-                        cur.execute(f"""
-                            INSERT INTO {tbl} (USER_ID, NK_NM, PROFILE_URL, EMAIL, LGN_CNT, LGN_DT, JOIN_DT)
-                            VALUES (%s, %s, %s, %s, 1, NOW(), NOW())
-                        """, (user_id, nickname, profile_img, email or ''))
-                    except Exception as ins_e:
-                        print(f"[{tbl} INSERT EMAIL fallback]", ins_e)
-                        cur.execute(f"""
-                            INSERT INTO {tbl} (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
-                            VALUES (%s, %s, %s, 1, NOW(), NOW())
-                        """, (user_id, nickname, profile_img))
+                    cur.execute(f"""
+                        INSERT INTO {tbl} (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                        VALUES (%s, %s, %s, 1, NOW(), NOW())
+                    """, (user_id, nickname, profile_img))
 
                     conn.commit()
                     print(f"[Google Register SUCCESS] Saved {tbl} (USER_ID={user_id}, NK_NM={nickname})")
