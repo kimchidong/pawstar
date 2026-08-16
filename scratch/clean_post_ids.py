@@ -57,7 +57,7 @@ def clean_and_consolidate():
             cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID LIKE 'limit_test_user_99_%';")
             cur.execute("""
                 INSERT IGNORE INTO pst_contest_round (CONTEST_ROUND, ENT_USER_ID, TITLE, CONTS, SCORE, VW_CNT, LIKE_CNT, CMT_CNT, PHT_PATH, PHT_FILE1)
-                VALUES (1, 'limit_test_user_99', '테스트 반려동물', '테스트 게시물입니다.', 20, 10, 2, 1, '/static/image/paw/', 'sample.jpg');
+                VALUES (1, 'limit_test_user_99', '테스트 반려동물', '테스트 게시물입니다.', 20, 10, 2, 1, '/static/image/contest/', 'sample.jpg');
             """)
 
             cur.execute("SET FOREIGN_KEY_CHECKS = 1;")

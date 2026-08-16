@@ -5,7 +5,7 @@ logs/
 
 # User uploaded profile pictures
 static/image/profile/
-static/image/paw/
+static/image/contest/
 static/image/temp/
 
 # Environment variables & secrets

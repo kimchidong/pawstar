@@ -1293,16 +1293,16 @@ def get_post_liked_status(post_id):
 
 def process_paw_images_dual(src_file_or_path, contest_id, post_id):
     """
-    1. 저장 폴더 : /static/image/paw/yyyy/mm/
-    2. 목록용 전체경로 (PHT_FILE_PATH1) : /static/image/paw/yyyy/mm/[CONTEST_ID]_[UUID]_1.webp
-    3. 팝업용 전체경로 (PHT_FILE_PATH2) : /static/image/paw/yyyy/mm/[CONTEST_ID]_[UUID]_2.webp
+    1. 저장 폴더 : /static/image/contest/yyyy/mm/
+    2. 목록용 전체경로 (PHT_FILE_PATH1) : /static/image/contest/yyyy/mm/[CONTEST_ID]_[UUID]_1.webp
+    3. 팝업용 전체경로 (PHT_FILE_PATH2) : /static/image/contest/yyyy/mm/[CONTEST_ID]_[UUID]_2.webp
     """
     now = datetime.datetime.now()
     yyyy = now.strftime('%Y')
     mm = now.strftime('%m')
     
-    file_dir = f"/static/image/paw/{yyyy}/{mm}/"
-    perm_dir = os.path.join(PERM_PAW_BASE_DIR, yyyy, mm)
+    file_dir = f"/static/image/contest/{yyyy}/{mm}/"
+    perm_dir = os.path.join(PERM_CONTEST_BASE_DIR, yyyy, mm)
     os.makedirs(perm_dir, exist_ok=True)
 
     file_uuid = uuid.uuid4().hex[:12]
@@ -1317,12 +1317,12 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
 
     if hasattr(src_file_or_path, 'save'):
         temp_filename = f"temp_{uuid.uuid4().hex[:10]}.tmp"
-        temp_filepath = os.path.join(TEMP_PAW_DIR, temp_filename)
+        temp_filepath = os.path.join(TEMP_CONTEST_DIR, temp_filename)
         src_file_or_path.save(temp_filepath)
         src_img_path = temp_filepath
     elif isinstance(src_file_or_path, str):
         fname = os.path.basename(src_file_or_path)
-        temp_filepath = os.path.join(TEMP_PAW_DIR, fname)
+        temp_filepath = os.path.join(TEMP_CONTEST_DIR, fname)
         if os.path.exists(temp_filepath):
             src_img_path = temp_filepath
         elif os.path.exists(src_file_or_path):
@@ -1496,15 +1496,15 @@ def delete_comment_api(post_id):
 
 from PIL import Image
 
-TEMP_PAW_DIR = os.path.join(app.root_path, 'static', 'image', 'temp', 'paw')
-PERM_PAW_BASE_DIR = os.path.join(app.root_path, 'static', 'image', 'paw')
+TEMP_CONTEST_DIR = os.path.join(app.root_path, 'static', 'image', 'temp', 'contest')
+PERM_CONTEST_BASE_DIR = os.path.join(app.root_path, 'static', 'image', 'contest')
 
-os.makedirs(TEMP_PAW_DIR, exist_ok=True)
-os.makedirs(PERM_PAW_BASE_DIR, exist_ok=True)
+os.makedirs(TEMP_CONTEST_DIR, exist_ok=True)
+os.makedirs(PERM_CONTEST_BASE_DIR, exist_ok=True)
 
 @app.route('/api/post/upload-temp', methods=['POST'])
 def upload_temp_image():
-    """ 출전 신청 페이지에서 파일 선택 시 일단 임시 폴더(static/image/temp/paw/)에 임시 저장 """
+    """ 출전 신청 페이지에서 파일 선택 시 일단 임시 폴더(static/image/temp/contest/)에 임시 저장 """
     try:
         file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
         if not file or not file.filename:
@@ -1515,10 +1515,10 @@ def upload_temp_image():
             ext = '.jpg'
         
         temp_filename = f"temp_{uuid.uuid4().hex[:10]}{ext}"
-        temp_filepath = os.path.join(TEMP_PAW_DIR, temp_filename)
+        temp_filepath = os.path.join(TEMP_CONTEST_DIR, temp_filename)
         file.save(temp_filepath)
 
-        temp_url = f"/static/image/temp/paw/{temp_filename}"
+        temp_url = f"/static/image/temp/contest/{temp_filename}"
         return jsonify({
             'success': True,
             'temp_url': temp_url,

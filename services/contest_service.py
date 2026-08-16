@@ -7,12 +7,26 @@ import pymysql
 import uuid
 import hashlib
 import random
-import importlib
-try:
-    config_web = importlib.import_module("config.web")
-    DB_CONFIG = config_web.DB_CONFIG
-except Exception:
-    from config.web import DB_CONFIG
+import os
+import importlib.util
+
+def _get_config_web():
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(curr_dir, 'config.web.py'),
+        os.path.join(curr_dir, '..', 'config.web.py'),
+        os.path.join(os.getcwd(), 'config.web.py')
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            spec = importlib.util.spec_from_file_location("config_web", path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+    raise ImportError("config.web.py 파일을 찾을 수 없습니다.")
+
+config_web = _get_config_web()
+DB_CONFIG = config_web.DB_CONFIG
 
 def hash_google_id(google_id):
     """
@@ -1210,7 +1224,7 @@ class PawStarService:
             return False
 
     def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path1="", file_path2="", **kwargs):
-        path1 = file_path1 or media_url or "/static/image/paw/default_pet.jpg"
+        path1 = file_path1 or media_url or "/static/image/contest/default_pet.jpg"
         path2 = file_path2 or path1
 
         res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, path1, path2)
@@ -2248,8 +2262,8 @@ class PawStarService:
                         r.CONTS AS CONTS,
                         r.ENT_USER_ID,
                         DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
-                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS IMAGE_PATH,
-                        COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1, '/static/image/paw/default_pet.jpg') AS popup_image_path,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/contest/default_pet.jpg') AS IMAGE_PATH,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1, '/static/image/contest/default_pet.jpg') AS popup_image_path,
                         u.USER_ID,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
@@ -2274,7 +2288,7 @@ class PawStarService:
                         r.PET_NM AS pet_name,
                         COALESCE(k.KIND_NM, '반려동물') AS pet_type,
                         r.TITLE AS title,
-                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/paw/default_pet.jpg') AS image_path,
+                        COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/contest/default_pet.jpg') AS image_path,
                         u.USER_ID AS user_id,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,

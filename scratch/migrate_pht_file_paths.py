@@ -12,13 +12,13 @@ def migrate_full_file_paths():
         with conn.cursor() as cur:
             cur.execute("""
                 UPDATE pst_contest_round
-                SET PHT_FILE_PATH1 = CONCAT('/static/image/paw/2026/08/', PHT_FILE_PATH1)
+                SET PHT_FILE_PATH1 = CONCAT('/static/image/contest/2026/08/', PHT_FILE_PATH1)
                 WHERE PHT_FILE_PATH1 NOT LIKE '/%';
             """)
 
             cur.execute("""
                 UPDATE pst_contest_round
-                SET PHT_FILE_PATH2 = CONCAT('/static/image/paw/2026/08/', PHT_FILE_PATH2)
+                SET PHT_FILE_PATH2 = CONCAT('/static/image/contest/2026/08/', PHT_FILE_PATH2)
                 WHERE PHT_FILE_PATH2 NOT LIKE '/%';
             """)
 

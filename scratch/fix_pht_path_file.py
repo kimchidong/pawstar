@@ -13,7 +13,7 @@ def fix_db_pht_paths():
             # 1. PHT_PATH가 1-1.webp 처럼 파일명으로 저장된 건들을 규격 경로로 교정
             cur.execute("""
                 UPDATE pst_contest_round
-                SET PHT_PATH = '/static/image/paw/2026/08/',
+                SET PHT_PATH = '/static/image/contest/2026/08/',
                     PHT_FILE1 = '1-1_1.webp',
                     PHT_FILE2 = '1-1_2.webp'
                 WHERE PHT_PATH NOT LIKE '/%' OR PHT_PATH LIKE '%.webp%' OR PHT_PATH LIKE '%.jpg%';

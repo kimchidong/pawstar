@@ -8,12 +8,26 @@ pst_contest 회차들의 THEME_CD 외래키 연결을 정상 원복합니다.
 import sys
 import io
 import pymysql
-import importlib
-try:
-    config_web = importlib.import_module("config.web")
-    DB_CONFIG = config_web.DB_CONFIG
-except Exception:
-    from config.web import DB_CONFIG
+import os
+import importlib.util
+
+def _get_config_web():
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(curr_dir, 'config.web.py'),
+        os.path.join(curr_dir, '..', 'config.web.py'),
+        os.path.join(os.getcwd(), 'config.web.py')
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            spec = importlib.util.spec_from_file_location("config_web", path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+    raise ImportError("config.web.py 파일을 찾을 수 없습니다.")
+
+config_web = _get_config_web()
+DB_CONFIG = config_web.DB_CONFIG
 
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
