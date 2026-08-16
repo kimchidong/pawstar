@@ -74,7 +74,7 @@ def run_seed():
             cur.execute("SET NAMES utf8mb4;")
             cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
 
-            # 1. 샘플 사용자 (pst_user) 시딩
+            # 1. 샘플 사용자 (PST_USER) 시딩
             users_list = [
                 ('user_poppie', '뽀삐아빠', '/static/image/profile/default_profile.png', '골든리트리버 뽀삐와 살고 있어요 🦮'),
                 ('user_navi', '냥냥집사', '/static/image/profile/default_profile.png', '귀여운 아비시니안 나비의 하루 🐈'),
@@ -96,31 +96,31 @@ def run_seed():
             for u_item in users_list:
                 u_id, nk, p_img = u_item[0], u_item[1], u_item[2]
                 cur.execute("""
-                    INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                    INSERT INTO PST_USER (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                     VALUES (%s, %s, %s, 1, NOW(), NOW())
                     ON DUPLICATE KEY UPDATE NK_NM=%s, PROFILE_URL=%s
                 """, (u_id, nk, p_img, nk, p_img))
 
-            print("✅ 사용자(pst_user) 시딩 완료!")
+            print("✅ 사용자(PST_USER) 시딩 완료!")
 
-            # 2. 테마 (pst_theme)는 원본 12종 표준 테마 유지 (T001~T012)
-            # 3. 콘테스트 회차 (pst_contest) 시딩 (지난 회차 2개 + 진행 중 회차 1개)
+            # 2. 테마 (PST_THEME)는 원본 12종 표준 테마 유지 (T001~T012)
+            # 3. 콘테스트 회차 (PST_CONTEST) 시딩 (지난 회차 2개 + 진행 중 회차 1개)
             contests = [
                 (1, 'T006', '2026-06-01 00:00:00', '2026-06-30 23:59:59', 'G001C002'), # 지난 회차 1 (청량 힐링)
                 (2, 'T007', '2026-07-01 00:00:00', '2026-07-31 23:59:59', 'G001C002'), # 지난 회차 2 (썸머 파라다이스)
                 (3, 'T008', '2026-08-01 00:00:00', '2026-08-31 23:59:59', 'G001C001'), # 현재 진행 회차 3 (한여름 밤의 바캉스)
             ]
-            cur.execute("DELETE FROM pst_contest WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST WHERE CONTEST_ROUND IN (1, 2, 3);")
             for c_round, t_cd, st_dt, ed_dt, stat in contests:
                 cur.execute("""
-                    INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
+                    INSERT INTO PST_CONTEST (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (c_round, t_cd, st_dt, ed_dt, stat))
 
-            print("✅ 콘테스트 회차(pst_contest) 시딩 완료! (1회차: T006, 2회차: T007, 3회차: T008)")
+            print("✅ 콘테스트 회차(PST_CONTEST) 시딩 완료! (1회차: T006, 2회차: T007, 3회차: T008)")
 
-            # 4. 품종 정보 (pst_pet_kind) 확보
-            cur.execute("SELECT KIND_CD, KIND_NM FROM pst_pet_kind;")
+            # 4. 품종 정보 (PST_PET_KIND) 확보
+            cur.execute("SELECT KIND_CD, KIND_NM FROM PST_PET_KIND;")
             pet_kinds_rows = cur.fetchall()
             kind_map = {row['KIND_NM']: row['KIND_CD'] for row in pet_kinds_rows}
             kind_list = list(kind_map.keys()) if kind_map else ['🐕 강아지', '🐈 고양이', '🐹 햄스터', '🦜 앵무새', '🐇 토끼', '🐴 말/큰동물', '🐷 돼지/피그']
@@ -163,11 +163,11 @@ def run_seed():
             ]
 
             # 5. 기존 참가 데이터 & 하위 테이블 정리
-            cur.execute("DELETE FROM pst_contest_award WHERE CONTEST_ROUND IN (1, 2, 3);")
-            cur.execute("DELETE FROM pst_contest_cmt WHERE CONTEST_ROUND IN (1, 2, 3);")
-            cur.execute("DELETE FROM pst_contest_like WHERE CONTEST_ROUND IN (1, 2, 3);")
-            cur.execute("DELETE FROM pst_contest_vw WHERE CONTEST_ROUND IN (1, 2, 3);")
-            cur.execute("DELETE FROM pst_contest_round WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST_AWARD WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST_CMT WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST_VW WHERE CONTEST_ROUND IN (1, 2, 3);")
+            cur.execute("DELETE FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND IN (1, 2, 3);")
 
             cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
@@ -226,39 +226,39 @@ def run_seed():
 
                     score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10)
 
-                    # pst_contest_round INSERT
+                    # PST_CONTEST_ROUND INSERT
                     cur.execute("""
-                        INSERT INTO pst_contest_round (
+                        INSERT INTO PST_CONTEST_ROUND (
                             CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS,
                             PHT_FILE_PATH1, PHT_FILE_PATH2, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, ENT_DT
                         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """, (c_round, round_no, user_id, kind_cd, pet_name, title, conts, file_path, file_path, vw_cnt, like_cnt, cmt_cnt, score, base_dt))
 
-                    # 하위 조회수 레코드 (pst_contest_vw)
+                    # 하위 조회수 레코드 (PST_CONTEST_VW)
                     vw_users = random.sample(users_list, min(vw_cnt, len(users_list)))
                     for v_i, v_user in enumerate(vw_users):
                         v_dt = base_dt + timedelta(minutes=v_i * 3)
                         cur.execute("""
-                            INSERT IGNORE INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
+                            INSERT IGNORE INTO PST_CONTEST_VW (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
                             VALUES (%s, %s, %s, %s)
                         """, (c_round, round_no, v_user[0], v_dt))
 
-                    # 하위 좋아요 레코드 (pst_contest_like)
+                    # 하위 좋아요 레코드 (PST_CONTEST_LIKE)
                     like_users = random.sample(users_list, min(like_cnt, len(users_list)))
                     for l_i, l_user in enumerate(like_users):
                         l_dt = base_dt + timedelta(minutes=l_i * 7 + 2)
                         cur.execute("""
-                            INSERT IGNORE INTO pst_contest_like (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID, LIKE_DT)
+                            INSERT IGNORE INTO PST_CONTEST_LIKE (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID, LIKE_DT)
                             VALUES (%s, %s, %s, %s)
                         """, (c_round, round_no, l_user[0], l_dt))
 
-                    # 하위 댓글 레코드 (pst_contest_cmt)
+                    # 하위 댓글 레코드 (PST_CONTEST_CMT)
                     cmt_users = random.sample(users_list, min(cmt_cnt, len(users_list)))
                     for c_i, c_user in enumerate(cmt_users):
                         c_text = random.choice(sample_comments)
                         c_dt = base_dt + timedelta(minutes=c_i * 15 + 5)
                         cur.execute("""
-                            INSERT IGNORE INTO pst_contest_cmt (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT, CMD_DT)
+                            INSERT IGNORE INTO PST_CONTEST_CMT (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT, CMD_DT)
                             VALUES (%s, %s, %s, %s, %s)
                         """, (c_round, round_no, c_user[0], c_text, c_dt))
 
@@ -266,13 +266,13 @@ def run_seed():
 
                 print(f"  └ 회차 #{c_round} 포스트 20개 및 관련 좋아요/댓글/조회수 시딩 완료!")
 
-            # 7. 지난 회차(회차 1, 2)에 대해 명예의 전당 (pst_contest_award) 및 순위 집계 자동 부여
-            print("\n🏆 지난 회차 (제1회, 제2회) 명예의 전당 수상작(pst_contest_award) 자동 집계 생성...")
+            # 7. 지난 회차(회차 1, 2)에 대해 명예의 전당 (PST_CONTEST_AWARD) 및 순위 집계 자동 부여
+            print("\n🏆 지난 회차 (제1회, 제2회) 명예의 전당 수상작(PST_CONTEST_AWARD) 자동 집계 생성...")
             for c_round in [1, 2]:
                 # 전체 순위 정렬
                 cur.execute("""
                     SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
-                    FROM pst_contest_round
+                    FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s
                     ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC
                 """, (c_round,))
@@ -284,18 +284,18 @@ def run_seed():
                     if len(ranked_posts) >= rk:
                         winner = ranked_posts[rk - 1]
                         cur.execute("""
-                            INSERT INTO pst_contest_award (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                            INSERT INTO PST_CONTEST_AWARD (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
                             VALUES (%s, 'G002P001', %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """, (c_round, award_cd, winner['ROUND_NO'], winner['ENT_USER_ID'], winner['KIND_CD'], winner['VW_CNT'], winner['LIKE_CNT'], winner['CMT_CNT'], winner['SCORE'], rk))
                         
                         # total ranking update
                         cur.execute("""
-                            UPDATE pst_contest_round SET TOTAL_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                            UPDATE PST_CONTEST_ROUND SET TOTAL_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                         """, (rk, c_round, winner['ROUND_NO']))
 
                 # 2) 품종별 1, 2, 3위 (AWARD_PART: 'G002P002')
                 cur.execute("""
-                    SELECT DISTINCT KIND_CD FROM pst_contest_round WHERE CONTEST_ROUND = %s
+                    SELECT DISTINCT KIND_CD FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s
                 """, (c_round,))
                 kinds = cur.fetchall()
 
@@ -303,7 +303,7 @@ def run_seed():
                     k_code = k_item['KIND_CD']
                     cur.execute("""
                         SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
-                        FROM pst_contest_round
+                        FROM PST_CONTEST_ROUND
                         WHERE CONTEST_ROUND = %s AND KIND_CD = %s
                         ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC
                     """, (c_round, k_code))
@@ -314,18 +314,18 @@ def run_seed():
                         if len(k_ranked) >= rk:
                             k_winner = k_ranked[rk - 1]
                             cur.execute("""
-                                INSERT INTO pst_contest_award (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                                INSERT INTO PST_CONTEST_AWARD (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
                                 VALUES (%s, 'G002P002', %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             """, (c_round, award_cd, k_winner['ROUND_NO'], k_winner['ENT_USER_ID'], k_winner['KIND_CD'], k_winner['VW_CNT'], k_winner['LIKE_CNT'], k_winner['CMT_CNT'], k_winner['SCORE'], rk))
 
                             # kind ranking update
                             cur.execute("""
-                                UPDATE pst_contest_round SET KIND_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                                UPDATE PST_CONTEST_ROUND SET KIND_RANKING = %s WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                             """, (rk, c_round, k_winner['ROUND_NO']))
             # 8. 샘플 시딩 전용 더미 사용자 실수상 데이터 5개 보장 (실제 구글 계정과 매칭 방지)
             target_user = 'sample_dummy_target_user'
             cur.execute("""
-                INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                INSERT INTO PST_USER (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                 VALUES (%s, '시딩더미유저', '/static/image/profile/default_profile.png', 1, NOW(), NOW())
                 ON DUPLICATE KEY UPDATE LGN_CNT = LGN_CNT + 1, LGN_DT = NOW()
             """, (target_user,))
@@ -339,21 +339,21 @@ def run_seed():
 
             user_round_no = {}
             for c_round, title, img_path, vw, lk, cmt, score in posts_info:
-                cur.execute("SELECT ROUND_NO FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s LIMIT 1", (c_round, target_user))
+                cur.execute("SELECT ROUND_NO FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s LIMIT 1", (c_round, target_user))
                 row = cur.fetchone()
                 if row:
                     r_no = row['ROUND_NO']
                 else:
-                    cur.execute("SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_no FROM pst_contest_round WHERE CONTEST_ROUND = %s", (c_round,))
+                    cur.execute("SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_no FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s", (c_round,))
                     r_no = cur.fetchone()['next_no']
                     cur.execute("""
-                        INSERT INTO pst_contest_round (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, ENT_DT)
+                        INSERT INTO PST_CONTEST_ROUND (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, ENT_DT)
                         VALUES (%s, %s, %s, 'K001', '몽실이', %s, '우리 소중한 아이의 활기찬 일상입니다.', %s, '', %s, %s, %s, %s, NOW())
                     """, (c_round, r_no, target_user, title, img_path, vw, lk, cmt, score))
                 user_round_no[c_round] = r_no
 
-            # 5개 수상 실데이터 보장 (pst_contest_award)
-            cur.execute("DELETE FROM pst_contest_award WHERE ENT_USER_ID = %s", (target_user,))
+            # 5개 수상 실데이터 보장 (PST_CONTEST_AWARD)
+            cur.execute("DELETE FROM PST_CONTEST_AWARD WHERE ENT_USER_ID = %s", (target_user,))
             awards_to_insert = [
                 (1, 'G002P001', 'P001A101', user_round_no[1], 'K001', 1520, 840, 92, 12500, 1), # 1) 제1회 전체1위(슈퍼스타)
                 (1, 'G002P002', 'P002A901', user_round_no[1], 'K001', 1520, 840, 92, 12500, 1), # 2) 제1회 패밀리1위
@@ -364,7 +364,7 @@ def run_seed():
 
             for c_round, part, award_cd, r_no, kind, vw, lk, cmt, score, rk in awards_to_insert:
                 cur.execute("""
-                    INSERT INTO pst_contest_award (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
+                    INSERT INTO PST_CONTEST_AWARD (CONTEST_ROUND, AWARD_PART, AWARD_CD, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (c_round, part, award_cd, r_no, target_user, kind, vw, lk, cmt, score, rk))
 

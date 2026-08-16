@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-PST_THEME 테이블 원복 스크립트 (restore_pst_theme.py)
-pst_theme 테이블을 1월부터 12월까지의 정규 표준 12종 테마 데이터로 복원하고,
-pst_contest 회차들의 THEME_CD 외래키 연결을 정상 원복합니다.
+PST_THEME 테이블 원복 스크립트 (restore_PST_THEME.py)
+PST_THEME 테이블을 1월부터 12월까지의 정규 표준 12종 테마 데이터로 복원하고,
+PST_CONTEST 회차들의 THEME_CD 외래키 연결을 정상 원복합니다.
 """
 
 import sys
@@ -48,8 +48,8 @@ def restore_theme():
             cur.execute("SET NAMES utf8mb4;")
             cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
 
-            # 1. pst_theme 테이블 전체 초기화 및 12개 월별 표준 테마 재시딩
-            cur.execute("TRUNCATE TABLE pst_theme;")
+            # 1. PST_THEME 테이블 전체 초기화 및 12개 월별 표준 테마 재시딩
+            cur.execute("TRUNCATE TABLE PST_THEME;")
 
             original_themes = [
                 ('T001', 1, '새해 맞이', '복을 부르는 천사 같은 아이들의 건강하고 맑은 복덩이 순간 🌅', '/static/image/banner/T001.png'),
@@ -68,22 +68,22 @@ def restore_theme():
 
             for t_cd, mnth, t_nm, t_ment, t_banner in original_themes:
                 cur.execute("""
-                    INSERT INTO pst_theme (THEME_CD, MNTH, THEME_NM, THEME_MENT, BANNER_IMG_FILE_PATH)
+                    INSERT INTO PST_THEME (THEME_CD, MNTH, THEME_NM, THEME_MENT, BANNER_IMG_FILE_PATH)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (t_cd, mnth, t_nm, t_ment, t_banner))
 
             print("✅ PST_THEME 테이블 12종 정규 테마(T001~T012) 원복 완료!")
 
-            # 2. pst_contest 회차별 THEME_CD 연결 원복
+            # 2. PST_CONTEST 회차별 THEME_CD 연결 원복
             # 회차 1 -> T006 (6월 청량 힐링), 회차 2 -> T007 (7월 썸머 파라다이스), 회차 3 -> T008 (8월 한여름 밤의 바캉스)
-            cur.execute("UPDATE pst_contest SET THEME_CD = 'T006' WHERE CONTEST_ROUND = 1;")
-            cur.execute("UPDATE pst_contest SET THEME_CD = 'T007' WHERE CONTEST_ROUND = 2;")
-            cur.execute("UPDATE pst_contest SET THEME_CD = 'T008' WHERE CONTEST_ROUND = 3;")
+            cur.execute("UPDATE PST_CONTEST SET THEME_CD = 'T006' WHERE CONTEST_ROUND = 1;")
+            cur.execute("UPDATE PST_CONTEST SET THEME_CD = 'T007' WHERE CONTEST_ROUND = 2;")
+            cur.execute("UPDATE PST_CONTEST SET THEME_CD = 'T008' WHERE CONTEST_ROUND = 3;")
 
             cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
             conn.commit()
 
-            print("✅ pst_contest 회차별 테마 연결 (회차 1: T006, 회차 2: T007, 회차 3: T008) 원복 완료!")
+            print("✅ PST_CONTEST 회차별 테마 연결 (회차 1: T006, 회차 2: T007, 회차 3: T008) 원복 완료!")
             print("==================================================")
 
     except Exception as e:

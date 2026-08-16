@@ -85,20 +85,22 @@ class PawStarService:
         
         try:
             with check_conn.cursor() as cur:
-                # 1) pst_user 테이블 검사 (본인 제외)
+                tbl = self._get_user_table_name(cur)
+                # 1) 사용자 테이블 검사 (본인 제외)
                 if ex_id:
-                    cur.execute("""
-                        SELECT 1 FROM pst_user 
+                    cur.execute(f"""
+                        SELECT 1 FROM {tbl} 
                         WHERE LOWER(TRIM(NK_NM)) = LOWER(%s) 
                           AND LOWER(TRIM(USER_ID)) != LOWER(%s)
                         LIMIT 1
                     """, (nk, ex_id))
                 else:
-                    cur.execute("SELECT 1 FROM pst_user WHERE LOWER(TRIM(NK_NM)) = LOWER(%s) LIMIT 1", (nk,))
+                    cur.execute(f"SELECT 1 FROM {tbl} WHERE LOWER(TRIM(NK_NM)) = LOWER(%s) LIMIT 1", (nk,))
                 
                 if cur.fetchone():
                     check_conn.close()
                     return True
+
 
                 # 2) USERS 테이블 검사 (존재 시, 본인 제외)
                 try:
@@ -176,6 +178,23 @@ class PawStarService:
             print("DB Connection Error:", e)
             return None
 
+    def _get_user_table_name(self, cur):
+        """ 리눅스/운영 DB(PST_USER)와 로컬 DB(PST_USER) 간 테이블명 대소문자 차이 자동 호환 감지 """
+        try:
+            cur.execute("SHOW TABLES LIKE 'PST_USER'")
+            if cur.fetchone():
+                return 'PST_USER'
+            cur.execute("SHOW TABLES LIKE 'PST_USER'")
+            if cur.fetchone():
+                return 'PST_USER'
+            cur.execute("SHOW TABLES LIKE 'USERS'")
+            if cur.fetchone():
+                return 'USERS'
+        except Exception:
+            pass
+        return 'PST_USER'
+
+
     def _attach_d_day(self, contest):
         if not contest:
             return contest
@@ -250,7 +269,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT COUNT(*) AS cnt FROM pst_contest_round
+                    SELECT COUNT(*) AS cnt FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
                 """, (contest_id, base_user_id))
                 r = cur.fetchone()
@@ -266,7 +285,7 @@ class PawStarService:
             return 1
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) + 1 AS next_id FROM pst_contest_round")
+                cur.execute("SELECT COUNT(*) + 1 AS next_id FROM PST_CONTEST_ROUND")
                 r = cur.fetchone()
                 conn.close()
         except Exception:
@@ -286,7 +305,7 @@ class PawStarService:
             return []
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT KIND_CD, KIND_NM, KIND_CLASS FROM pst_pet_kind ORDER BY KIND_CD ASC")
+                cur.execute("SELECT KIND_CD, KIND_NM, KIND_CLASS FROM PST_PET_KIND ORDER BY KIND_CD ASC")
                 rows = cur.fetchall()
                 conn.close()
                 for k in rows:
@@ -323,9 +342,9 @@ class PawStarService:
                         c.ED_DT AS end_date,
                         cd.CD_NM AS status,
                         t.BANNER_IMG_FILE_PATH AS banner_img
-                    FROM pst_contest c
-                    JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-                    JOIN pst_cd cd ON c.CONTEST_STAT = cd.CD
+                    FROM PST_CONTEST c
+                    JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
+                    JOIN PST_CD cd ON c.CONTEST_STAT = cd.CD
                     ORDER BY c.CONTEST_ROUND DESC
                 """)
                 rows = cur.fetchall()
@@ -360,9 +379,9 @@ class PawStarService:
                         c.ST_DT AS start_date,
                         c.ED_DT AS end_date,
                         cd.CD_NM AS status
-                    FROM pst_contest c
-                    JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-                    JOIN pst_cd cd ON c.CONTEST_STAT = cd.CD
+                    FROM PST_CONTEST c
+                    JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
+                    JOIN PST_CD cd ON c.CONTEST_STAT = cd.CD
                     WHERE c.CONTEST_STAT = 'G001C002'
                     ORDER BY c.CONTEST_ROUND DESC
                 """)
@@ -416,7 +435,7 @@ class PawStarService:
             return False
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT 1 FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("SELECT 1 FROM PST_USER WHERE USER_ID = %s", (user_id,))
                 result = cur.fetchone()
                 conn.close()
                 return bool(result)
@@ -433,7 +452,7 @@ class PawStarService:
             return False, "DB 연결 실패"
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM PST_USER WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
                 conn.close()
                 if user:
@@ -453,7 +472,7 @@ class PawStarService:
             profile_url = profile_img or '/static/image/profile/default_profile.png'
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                    INSERT INTO PST_USER (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
                     VALUES (%s, %s, %s, 1, NOW(), NOW())
                     ON DUPLICATE KEY UPDATE 
                         NK_NM = VALUES(NK_NM),
@@ -463,7 +482,7 @@ class PawStarService:
                 """, (user_id, nickname, profile_url))
                 conn.commit()
 
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM PST_USER WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
                 conn.close()
 
@@ -486,7 +505,7 @@ class PawStarService:
 
         conn = self.get_db_connection()
         if not conn:
-            nickname = self.generate_unique_nickname()
+            nickname = name or self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
                 'NK_NM': nickname,
@@ -498,17 +517,42 @@ class PawStarService:
 
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT USER_ID, NK_NM, PROFILE_URL FROM pst_user WHERE USER_ID = %s", (user_id,))
+                tbl = self._get_user_table_name(cur)
+
+                # 사용자 테이블에 EMAIL 컬럼이 없는 경우 동적 추가
+                try:
+                    cur.execute(f"SHOW COLUMNS FROM {tbl} LIKE 'EMAIL'")
+                    if not cur.fetchone():
+                        cur.execute(f"ALTER TABLE {tbl} ADD COLUMN EMAIL VARCHAR(150) DEFAULT ''")
+                        conn.commit()
+                except Exception as col_e:
+                    print(f"[{tbl} EMAIL column check/add warning]", col_e)
+
+                cur.execute(f"SELECT USER_ID, NK_NM, PROFILE_URL FROM {tbl} WHERE USER_ID = %s", (user_id,))
                 user = cur.fetchone()
 
                 if not user:
-                    # 회원가입 시 절대 중복 불가능한 무작위 고유 닉네임 생성
-                    nickname = self.generate_unique_nickname()
-                    cur.execute("""
-                        INSERT INTO pst_user (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
-                        VALUES (%s, %s, %s, 1, NOW(), NOW())
-                    """, (user_id, nickname, profile_img))
+                    # 구글 이름(name)을 닉네임으로 우선 사용 (중복 시 무작위 고유 닉네임)
+                    base_name = (name or (email.split('@')[0] if email else '집사')).strip()
+                    if base_name and not self.is_nickname_taken(base_name):
+                        nickname = base_name
+                    else:
+                        nickname = self.generate_unique_nickname()
+
+                    try:
+                        cur.execute(f"""
+                            INSERT INTO {tbl} (USER_ID, NK_NM, PROFILE_URL, EMAIL, LGN_CNT, LGN_DT, JOIN_DT)
+                            VALUES (%s, %s, %s, %s, 1, NOW(), NOW())
+                        """, (user_id, nickname, profile_img, email or ''))
+                    except Exception as ins_e:
+                        print(f"[{tbl} INSERT EMAIL fallback]", ins_e)
+                        cur.execute(f"""
+                            INSERT INTO {tbl} (USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT)
+                            VALUES (%s, %s, %s, 1, NOW(), NOW())
+                        """, (user_id, nickname, profile_img))
+
                     conn.commit()
+                    print(f"[Google Register SUCCESS] Saved {tbl} (USER_ID={user_id}, NK_NM={nickname})")
                     user_info = {
                         'USER_ID': user_id,
                         'NK_NM': nickname,
@@ -519,22 +563,21 @@ class PawStarService:
                         'is_new_user': True
                     }
                 else:
-                    nickname = user.get('NK_NM')
-                    # 로그인 성공 시 전달받은 최신 프로필 이미지가 유효하면 DB 및 반환 객체에 최신 프로필 이미지 항상 갱신 저장
+                    nickname = user.get('NK_NM') or name or '집사'
                     if picture and picture.strip() and picture != '/static/image/profile/default_profile.png':
-                        cur.execute("""
-                            UPDATE pst_user 
+                        cur.execute(f"""
+                            UPDATE {tbl} 
                             SET PROFILE_URL = %s, LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() 
                             WHERE USER_ID = %s
                         """, (picture.strip(), user_id))
                         latest_img = picture.strip()
                     else:
-                        cur.execute("""
-                            UPDATE pst_user 
+                        cur.execute(f"""
+                            UPDATE {tbl} 
                             SET LGN_CNT = LGN_CNT + 1, LGN_DT = NOW() 
                             WHERE USER_ID = %s
                         """, (user_id,))
-                        latest_img = user.get('PROFILE_URL')
+                        latest_img = user.get('PROFILE_URL') or profile_img
 
                     conn.commit()
                     user_info = {
@@ -548,9 +591,12 @@ class PawStarService:
 
                 conn.close()
                 return user_info
+
         except Exception as e:
-            print("google_login_or_register error:", e)
-            fallback_nk = self.generate_unique_nickname()
+            print("[google_login_or_register ERROR]", e)
+            import traceback
+            traceback.print_exc()
+            fallback_nk = name or self.generate_unique_nickname()
             return {
                 'USER_ID': user_id,
                 'NK_NM': fallback_nk,
@@ -559,6 +605,7 @@ class PawStarService:
                 'nickname': fallback_nk,
                 'profile_img': profile_img
             }
+
 
     def update_user_profile(self, user_id, nickname, profile_img="", sns_inst="", sns_ytb="", sns_fsb="", sns_blg="", **kwargs):
         nickname = (nickname or '').strip()
@@ -571,8 +618,8 @@ class PawStarService:
             
         try:
             with conn.cursor() as cur:
-                # 1) pst_user 및 USERS 테이블에 SNS 관련 컬럼 자동 안전 점검
-                for target_tbl in ['pst_user', 'USERS']:
+                # 1) PST_USER 및 USERS 테이블에 SNS 관련 컬럼 자동 안전 점검
+                for target_tbl in ['PST_USER', 'USERS']:
                     try:
                         cur.execute(f"SHOW TABLES LIKE '{target_tbl}'")
                         if cur.fetchone():
@@ -590,7 +637,7 @@ class PawStarService:
                 real_target_id = str(user_id or '').strip()
                 current_nk = None
                 try:
-                    cur.execute("SELECT USER_ID, NK_NM FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (real_target_id, real_target_id))
+                    cur.execute("SELECT USER_ID, NK_NM FROM PST_USER WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (real_target_id, real_target_id))
                     row = cur.fetchone()
                     if row and row.get('USER_ID'):
                         real_target_id = row['USER_ID']
@@ -618,35 +665,35 @@ class PawStarService:
                     return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
 
             with conn.cursor() as cur:
-                # 5) pst_user 테이블 UPDATE 실행
+                # 5) PST_USER 테이블 UPDATE 실행
                 try:
-                    cur.execute("SHOW TABLES LIKE 'pst_user'")
+                    cur.execute("SHOW TABLES LIKE 'PST_USER'")
                     if cur.fetchone():
                         if profile_img:
                             cur.execute("""
-                                UPDATE pst_user
+                                UPDATE PST_USER
                                 SET NK_NM = %s, PROFILE_URL = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
                             """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
                         else:
                             cur.execute("""
-                                UPDATE pst_user
+                                UPDATE PST_USER
                                 SET NK_NM = %s,
                                     SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
                             """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
-                        print(f"[pst_user UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
+                        print(f"[PST_USER UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
                 except Exception as e_pst:
-                    print("pst_user update error:", e_pst)
+                    print("PST_USER update error:", e_pst)
                     try:
                         cur.execute("""
-                            UPDATE pst_user
+                            UPDATE PST_USER
                             SET SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
                             WHERE USER_ID = %s
                         """, (sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id))
                     except Exception as e_pst2:
-                        print("pst_user fallback update error:", e_pst2)
+                        print("PST_USER fallback update error:", e_pst2)
 
                 # 6) USERS 테이블 UPDATE 실행 (존재 시)
                 try:
@@ -682,7 +729,7 @@ class PawStarService:
 
                 user = None
                 try:
-                    cur.execute("SELECT * FROM pst_user WHERE USER_ID = %s", (user_id,))
+                    cur.execute("SELECT * FROM PST_USER WHERE USER_ID = %s", (user_id,))
                     user = cur.fetchone()
                 except Exception:
                     pass
@@ -735,8 +782,8 @@ class PawStarService:
             return False
         try:
             with conn.cursor() as cur:
-                cur.execute("DELETE FROM pst_contest_round WHERE ENT_USER_ID = %s", (user_id,))
-                cur.execute("DELETE FROM pst_user WHERE USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM PST_USER WHERE USER_ID = %s", (user_id,))
                 conn.commit()
                 conn.close()
                 return True
@@ -758,16 +805,16 @@ class PawStarService:
                 # 안전 컬럼 점검 및 추가
                 for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
                     try:
-                        cur.execute(f"SHOW COLUMNS FROM pst_user LIKE '{col[0]}'")
+                        cur.execute(f"SHOW COLUMNS FROM PST_USER LIKE '{col[0]}'")
                         if not cur.fetchone():
-                            cur.execute(f"ALTER TABLE pst_user ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
+                            cur.execute(f"ALTER TABLE PST_USER ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
                     except Exception:
                         pass
 
                 cur.execute("""
                     SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT,
                            SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG
-                    FROM pst_user WHERE USER_ID = %s
+                    FROM PST_USER WHERE USER_ID = %s
                 """, (user_id,))
                 user_info = cur.fetchone()
 
@@ -842,9 +889,9 @@ class PawStarService:
                         COALESCE(r.SHARE_CNT, 0) AS share_count,
                         r.SHARE_SN AS share_sn,
                         r.SCORE AS score
-                    FROM pst_contest_round r
-                    JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
-                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                    FROM PST_CONTEST_ROUND r
+                    JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
                     WHERE r.ENT_USER_ID = %s
                 """
                 params = [user_id]
@@ -889,13 +936,13 @@ class PawStarService:
                         u.SNS_INST, u.SNS_YTB, u.SNS_FSB, u.SNS_BLG,
                         u.SNS_INST AS sns_inst, u.SNS_YTB AS sns_ytb, u.SNS_FSB AS sns_fsb, u.SNS_BLG AS sns_blg,
                         CONCAT(ca.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id
-                    FROM pst_contest_award ca
-                    JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
-                    LEFT JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
-                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
-                    LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
-                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+                    FROM PST_CONTEST_AWARD ca
+                    JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
+                    LEFT JOIN PST_CONTEST_ROUND r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                    LEFT JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
+                    LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
                     WHERE ca.ENT_USER_ID = %s
                 """
                 award_params = [user_id]
@@ -1095,7 +1142,7 @@ class PawStarService:
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_round_no 
-                    FROM pst_contest_round 
+                    FROM PST_CONTEST_ROUND 
                     WHERE CONTEST_ROUND = %s
                 """, (contest_id,))
                 row_r = cur.fetchone()
@@ -1103,7 +1150,7 @@ class PawStarService:
 
                 share_sn = f"S-{uuid.uuid4()}"
                 cur.execute("""
-                    INSERT INTO pst_contest_round 
+                    INSERT INTO PST_CONTEST_ROUND 
                     (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, SHARE_SN, SHARE_CNT)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
                 """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2, share_sn))
@@ -1122,7 +1169,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT SHARE_SN FROM pst_contest_round
+                    SELECT SHARE_SN FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (contest_id, round_no))
                 row = cur.fetchone()
@@ -1131,7 +1178,7 @@ class PawStarService:
                     if not sn.startswith('S-'):
                         sn = f"S-{sn}"
                         cur.execute("""
-                            UPDATE pst_contest_round
+                            UPDATE PST_CONTEST_ROUND
                             SET SHARE_SN = %s
                             WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                         """, (sn, contest_id, round_no))
@@ -1141,7 +1188,7 @@ class PawStarService:
 
                 new_sn = f"S-{uuid.uuid4()}"
                 cur.execute("""
-                    UPDATE pst_contest_round
+                    UPDATE PST_CONTEST_ROUND
                     SET SHARE_SN = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (new_sn, contest_id, round_no))
@@ -1165,7 +1212,7 @@ class PawStarService:
                 # 1. 해당 회차가 현재 진행 중인지 확인 (종료된 과거 회차는 반영 불가)
                 cur.execute("""
                     SELECT c.CONTEST_STAT
-                    FROM pst_contest c
+                    FROM PST_CONTEST c
                     WHERE c.CONTEST_ROUND = %s
                 """, (contest_id,))
                 contest_row = cur.fetchone()
@@ -1184,7 +1231,7 @@ class PawStarService:
                 # 2. 게시물(SHARE_SN) 및 작성자 정보 확인
                 cur.execute("""
                     SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
-                    FROM pst_contest_round
+                    FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_SN = %s
                 """, (contest_id, round_no, share_sn))
                 row = cur.fetchone()
@@ -1202,7 +1249,7 @@ class PawStarService:
                 # 3. 공유 유입 이력 기록 (중복 유입 방지)
                 if user_id:
                     affected = cur.execute("""
-                        INSERT IGNORE INTO pst_contest_share (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
+                        INSERT IGNORE INTO PST_CONTEST_SHARE (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
                         VALUES (%s, %s, %s)
                     """, (contest_id, round_no, user_id))
                     if affected == 0:
@@ -1270,19 +1317,19 @@ class PawStarService:
                 if contest_round and round_no:
                     cur.execute("""
                         SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
-                        FROM pst_contest_round 
+                        FROM PST_CONTEST_ROUND 
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                     """, (contest_round, round_no))
                 elif contest_round and ent_user_id:
                     cur.execute("""
                         SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
-                        FROM pst_contest_round 
+                        FROM PST_CONTEST_ROUND 
                         WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
                     """, (contest_round, ent_user_id))
                 else:
                     cur.execute("""
                         SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
-                        FROM pst_contest_round 
+                        FROM PST_CONTEST_ROUND 
                         WHERE ENT_USER_ID = %s
                     """, (ent_user_id,))
                 
@@ -1302,7 +1349,7 @@ class PawStarService:
 
                 # 3. 회차 마감 여부 검증 (종료된 회차는 삭제 불가)
                 cur.execute("""
-                    SELECT CONTEST_STAT FROM pst_contest WHERE CONTEST_ROUND = %s
+                    SELECT CONTEST_STAT FROM PST_CONTEST WHERE CONTEST_ROUND = %s
                 """, (c_round,))
                 c_info = cur.fetchone()
                 if c_info and c_info.get('CONTEST_STAT') == 'G001C002':
@@ -1310,10 +1357,10 @@ class PawStarService:
                     return {'success': False, 'message': '이미 마감(종료)된 회차의 출전물은 포기(삭제)할 수 없습니다.'}
 
                 # 4. 관련 하위 레코드 및 출전물 삭제
-                cur.execute("DELETE FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
-                cur.execute("DELETE FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
-                cur.execute("DELETE FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
-                cur.execute("DELETE FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM PST_CONTEST_CMT WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM PST_CONTEST_VW WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                cur.execute("DELETE FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
 
                 conn.commit()
                 conn.close()
@@ -1385,20 +1432,20 @@ class PawStarService:
                     r.PHT_FILE_PATH1 AS list_file_name,
                     r.PHT_FILE_PATH1 AS image_path,
                     COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
-                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
-                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
-                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
+                    (SELECT COUNT(*) FROM PST_CONTEST_VW v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
+                    (SELECT COUNT(*) FROM PST_CONTEST_LIKE l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
+                    (SELECT COUNT(*) FROM PST_CONTEST_CMT c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
                     COALESCE(r.SHARE_CNT, 0) AS share_count,
                     r.SHARE_SN AS share_sn,
-                    ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
-                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                    ((SELECT COUNT(*) FROM PST_CONTEST_VW v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
+                     (SELECT COUNT(*) FROM PST_CONTEST_LIKE l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
+                     (SELECT COUNT(*) FROM PST_CONTEST_CMT c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
                      COALESCE(r.SHARE_CNT, 0) * 10) AS score,
                     r.ENT_DT AS created_at
-                FROM pst_contest_round r
-                LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
-                JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
-                LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+                FROM PST_CONTEST_ROUND r
+                LEFT JOIN PST_CONTEST c ON r.CONTEST_ROUND = c.CONTEST_ROUND
+                JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
+                LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
                 WHERE r.CONTEST_ROUND = %s
             """
             params = [contest_id]
@@ -1428,28 +1475,28 @@ class PawStarService:
                 shared_round_nos = set()
                 if current_user_id:
                     cur.execute("""
-                        SELECT ROUND_NO FROM pst_contest_like
+                        SELECT ROUND_NO FROM PST_CONTEST_LIKE
                         WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
                     """, (contest_id, current_user_id))
                     liked_rows = cur.fetchall()
                     liked_round_nos = {r['ROUND_NO'] for r in liked_rows}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_cmt
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_CMT
                         WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
                     """, (contest_id, current_user_id))
                     commented_rows = cur.fetchall()
                     commented_round_nos = {r['ROUND_NO'] for r in commented_rows}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_vw
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_VW
                         WHERE CONTEST_ROUND = %s AND VW_USER_ID = %s
                     """, (contest_id, current_user_id))
                     viewed_rows = cur.fetchall()
                     viewed_round_nos = {r['ROUND_NO'] for r in viewed_rows}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_share
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_SHARE
                         WHERE CONTEST_ROUND = %s AND SHARE_USER_ID = %s
                     """, (contest_id, current_user_id))
                     shared_rows = cur.fetchall()
@@ -1465,8 +1512,8 @@ class PawStarService:
                         COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
                         a.BADGE_IMG_PATH_FILE,
                         ca.RANKING
-                    FROM pst_contest_award ca
-                    LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                    FROM PST_CONTEST_AWARD ca
+                    LEFT JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                 """, (contest_id,))
@@ -1656,21 +1703,21 @@ class PawStarService:
                         r.PHT_FILE_PATH1 AS list_file_name,
                         r.PHT_FILE_PATH1 AS image_path,
                         COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1) AS popup_image_path,
-                        (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
-                        (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
-                        (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
+                        (SELECT COUNT(*) FROM PST_CONTEST_VW v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS view_count,
+                        (SELECT COUNT(*) FROM PST_CONTEST_LIKE l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS like_count,
+                        (SELECT COUNT(*) FROM PST_CONTEST_CMT c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS comment_count,
                         COALESCE(r.SHARE_CNT, 0) AS share_count,
                         r.SHARE_SN AS share_sn,
-                        ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
-                         (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                         (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                        ((SELECT COUNT(*) FROM PST_CONTEST_VW v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
+                         (SELECT COUNT(*) FROM PST_CONTEST_LIKE l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
+                         (SELECT COUNT(*) FROM PST_CONTEST_CMT c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
                          COALESCE(r.SHARE_CNT, 0) * 10) AS score,
                         r.ENT_DT AS created_at
-                    FROM pst_contest_round r
-                    JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
-                    LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
-                    LEFT JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
-                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
+                    FROM PST_CONTEST_ROUND r
+                    JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
+                    LEFT JOIN PST_CONTEST c ON r.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
                     WHERE r.CONTEST_ROUND = %s AND (r.ROUND_NO = %s OR r.ENT_USER_ID = %s)
                     ORDER BY r.ENT_DT DESC
                     LIMIT 1
@@ -1710,8 +1757,8 @@ class PawStarService:
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         c.CMT AS content,
                         c.CMD_DT AS created_at
-                    FROM pst_contest_cmt c
-                    JOIN pst_user u ON c.CMT_USER_ID = u.USER_ID
+                    FROM PST_CONTEST_CMT c
+                    JOIN PST_USER u ON c.CMT_USER_ID = u.USER_ID
                     WHERE c.CONTEST_ROUND = %s AND c.ROUND_NO = %s
                     ORDER BY c.CMD_DT ASC
                 """, (contest_id, round_no))
@@ -1727,25 +1774,25 @@ class PawStarService:
                 is_shared = False
                 if current_user_id:
                     cur.execute("""
-                        SELECT 1 FROM pst_contest_like
+                        SELECT 1 FROM PST_CONTEST_LIKE
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
                     """, (contest_id, round_no, current_user_id))
                     is_liked = bool(cur.fetchone())
 
                     cur.execute("""
-                        SELECT 1 FROM pst_contest_cmt
+                        SELECT 1 FROM PST_CONTEST_CMT
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND CMT_USER_ID = %s
                     """, (contest_id, round_no, current_user_id))
                     is_commented = bool(cur.fetchone())
 
                     cur.execute("""
-                        SELECT 1 FROM pst_contest_vw
+                        SELECT 1 FROM PST_CONTEST_VW
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                     """, (contest_id, round_no, current_user_id))
                     is_viewed = bool(cur.fetchone())
 
                     cur.execute("""
-                        SELECT 1 FROM pst_contest_share
+                        SELECT 1 FROM PST_CONTEST_SHARE
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_USER_ID = %s
                     """, (contest_id, round_no, current_user_id))
                     is_shared = bool(cur.fetchone())
@@ -1787,26 +1834,26 @@ class PawStarService:
     def sync_and_get_post_stats(self, cur, contest_id, round_no, share_cnt_override=None):
         """
         4가지 평가 요소(조회/좋아요/댓글/공유) 이벤트 발생 시 공통 적용:
-        1. 하위 테이블 및 pst_contest_round에서 실제 4요소 개수 DB 재조회
+        1. 하위 테이블 및 PST_CONTEST_ROUND에서 실제 4요소 개수 DB 재조회
         2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10, SHARE: 10)
-        3. DB pst_contest_round 테이블에 4요소 카운트 및 SCORE 반영 UPDATE
+        3. DB PST_CONTEST_ROUND 테이블에 4요소 카운트 및 SCORE 반영 UPDATE
         4. DB에서 최종 4요소 및 SCORE를 반환
         """
         # 1. DB에서 하위 테이블 개수 재조회
-        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_vw WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_VW WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         vw_tbl_cnt = cur.fetchone()['cnt']
 
-        cur.execute("SELECT COALESCE(VW_CNT, 0) AS r_vw, COALESCE(SHARE_CNT, 0) AS r_share FROM pst_contest_round WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        cur.execute("SELECT COALESCE(VW_CNT, 0) AS r_vw, COALESCE(SHARE_CNT, 0) AS r_share FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         r_row = cur.fetchone()
         r_vw = r_row['r_vw'] if r_row else 0
         
         # 조회수: 테이블 레코드 수와 round 누적값 중 더 큰 값을 적용 (최소 누적 수치 보장)
         vw_cnt = max(vw_tbl_cnt, r_vw)
 
-        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_like WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         like_cnt = cur.fetchone()['cnt']
 
-        cur.execute("SELECT COUNT(*) AS cnt FROM pst_contest_cmt WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_CMT WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         cmt_cnt = cur.fetchone()['cnt']
 
         if share_cnt_override is not None:
@@ -1817,9 +1864,9 @@ class PawStarService:
         # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 10점)
         calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 10)
 
-        # 3. DB pst_contest_round 최신화 UPDATE
+        # 3. DB PST_CONTEST_ROUND 최신화 UPDATE
         cur.execute("""
-            UPDATE pst_contest_round
+            UPDATE PST_CONTEST_ROUND
             SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
             WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
         """, (vw_cnt, like_cnt, cmt_cnt, share_cnt, calc_score, contest_id, round_no))
@@ -1842,7 +1889,7 @@ class PawStarService:
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT CONTEST_STAT
-                    FROM pst_contest
+                    FROM PST_CONTEST
                     WHERE CONTEST_ROUND = %s
                     LIMIT 1
                 """, (contest_id,))
@@ -1869,7 +1916,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -1902,7 +1949,7 @@ class PawStarService:
 
                 # 1. 이미 동일 유저/IP가 해당 출전글을 열람한 기록이 있는지 검증
                 cur.execute("""
-                    SELECT 1 FROM pst_contest_vw
+                    SELECT 1 FROM PST_CONTEST_VW
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                 """, (contest_id, round_no, vw_user))
                 already_viewed = bool(cur.fetchone())
@@ -1910,19 +1957,19 @@ class PawStarService:
                 if not already_viewed:
                     # 최초 조회인 경우에만 누적 조회수(VW_CNT) 1 가산 및 이력 신규 추가
                     cur.execute("""
-                        UPDATE pst_contest_round
+                        UPDATE PST_CONTEST_ROUND
                         SET VW_CNT = COALESCE(VW_CNT, 0) + 1
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                     """, (contest_id, round_no))
 
                     cur.execute("""
-                        INSERT INTO pst_contest_vw (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
+                        INSERT INTO PST_CONTEST_VW (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
                         VALUES (%s, %s, %s, NOW())
                     """, (contest_id, round_no, vw_user))
                 else:
                     # 이미 읽은 게시물인 경우 조회 일시만 최신화 (조회수 가산 없음)
                     cur.execute("""
-                        UPDATE pst_contest_vw
+                        UPDATE PST_CONTEST_VW
                         SET VW_DT = NOW()
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
                     """, (contest_id, round_no, vw_user))
@@ -1959,7 +2006,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -1980,7 +2027,7 @@ class PawStarService:
                     }
 
                 cur.execute("""
-                    SELECT 1 FROM pst_contest_like
+                    SELECT 1 FROM PST_CONTEST_LIKE
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
                 """, (contest_id, round_no, like_user_id))
                 exists = cur.fetchone()
@@ -1988,13 +2035,13 @@ class PawStarService:
                 # 1. DB에 먼저 저장 (추가 또는 삭제)
                 if exists:
                     cur.execute("""
-                        DELETE FROM pst_contest_like
+                        DELETE FROM PST_CONTEST_LIKE
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND LIKE_USER_ID = %s
                     """, (contest_id, round_no, like_user_id))
                     is_liked = False
                 else:
                     cur.execute("""
-                        INSERT INTO pst_contest_like (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID)
+                        INSERT INTO PST_CONTEST_LIKE (CONTEST_ROUND, ROUND_NO, LIKE_USER_ID)
                         VALUES (%s, %s, %s)
                     """, (contest_id, round_no, like_user_id))
                     is_liked = True
@@ -2049,7 +2096,7 @@ class PawStarService:
                 try:
                     with conn.cursor() as cur:
                         cur.execute("""
-                            SELECT ROUND_NO FROM pst_contest_round
+                            SELECT ROUND_NO FROM PST_CONTEST_ROUND
                             WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                             ORDER BY ENT_DT DESC LIMIT 1
                         """, (contest_id, target_id, target_id))
@@ -2093,7 +2140,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO, ENT_USER_ID FROM pst_contest_round
+                    SELECT ROUND_NO, ENT_USER_ID FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -2115,7 +2162,7 @@ class PawStarService:
 
                 # 1. DB에 댓글 먼저 저장
                 cur.execute("""
-                    INSERT INTO pst_contest_cmt (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT)
+                    INSERT INTO PST_CONTEST_CMT (CONTEST_ROUND, ROUND_NO, CMT_USER_ID, CMT)
                     VALUES (%s, %s, %s, %s)
                 """, (contest_id, round_no, cmt_user_id, comment_text))
 
@@ -2150,7 +2197,7 @@ class PawStarService:
         try:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT ROUND_NO FROM pst_contest_round
+                    SELECT ROUND_NO FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND (ROUND_NO = %s OR ENT_USER_ID = %s)
                     ORDER BY ENT_DT DESC LIMIT 1
                 """, (contest_id, target_id, target_id))
@@ -2162,7 +2209,7 @@ class PawStarService:
 
                 # 댓글 삭제
                 cur.execute("""
-                    DELETE FROM pst_contest_cmt
+                    DELETE FROM PST_CONTEST_CMT
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND CMT_USER_ID = %s
                 """, (contest_id, round_no, cmt_user_id))
 
@@ -2193,8 +2240,8 @@ class PawStarService:
                 if not contest_id:
                     cur.execute("""
                         SELECT ca.CONTEST_ROUND 
-                        FROM pst_contest_award ca
-                        JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                        FROM PST_CONTEST_AWARD ca
+                        JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                         WHERE c.CONTEST_STAT = 'G001C002'
                         ORDER BY ca.CONTEST_ROUND DESC 
                         LIMIT 1
@@ -2212,25 +2259,25 @@ class PawStarService:
                 shared_round_nos = set()
                 if current_user_id:
                     cur.execute("""
-                        SELECT ROUND_NO FROM pst_contest_like
+                        SELECT ROUND_NO FROM PST_CONTEST_LIKE
                         WHERE CONTEST_ROUND = %s AND LIKE_USER_ID = %s
                     """, (contest_id, current_user_id))
                     liked_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_cmt
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_CMT
                         WHERE CONTEST_ROUND = %s AND CMT_USER_ID = %s
                     """, (contest_id, current_user_id))
                     commented_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_vw
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_VW
                         WHERE CONTEST_ROUND = %s AND VW_USER_ID = %s
                     """, (contest_id, current_user_id))
                     viewed_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
 
                     cur.execute("""
-                        SELECT DISTINCT ROUND_NO FROM pst_contest_share
+                        SELECT DISTINCT ROUND_NO FROM PST_CONTEST_SHARE
                         WHERE CONTEST_ROUND = %s AND SHARE_USER_ID = %s
                     """, (contest_id, current_user_id))
                     shared_round_nos = {r['ROUND_NO'] for r in cur.fetchall()}
@@ -2296,13 +2343,13 @@ class PawStarService:
                         u.SNS_YTB AS sns_ytb,
                         u.SNS_FSB AS sns_fsb,
                         u.SNS_BLG AS sns_blg
-                    FROM pst_contest_award ca
-                    LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
-                    LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-                    LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-                    LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
-                    LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
-                    LEFT JOIN pst_pet_kind k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
+                    FROM PST_CONTEST_AWARD ca
+                    LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+                    LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
+                    LEFT JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
+                    LEFT JOIN PST_CONTEST_ROUND r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+                    LEFT JOIN PST_USER u ON ca.ENT_USER_ID = u.USER_ID
+                    LEFT JOIN PST_PET_KIND k ON COALESCE(ca.KIND_CD, r.KIND_CD) = k.KIND_CD
                     WHERE ca.CONTEST_ROUND = %s
                     ORDER BY ca.AWARD_PART ASC, COALESCE(ca.KIND_CD, r.KIND_CD) ASC, ca.RANKING ASC
                 """, (contest_id,))
@@ -2319,8 +2366,8 @@ class PawStarService:
                                 COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
                                 a.BADGE_IMG_PATH_FILE,
                                 ca.RANKING
-                            FROM pst_contest_award ca
-                            LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
+                            FROM PST_CONTEST_AWARD ca
+                            LEFT JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
                             WHERE ca.CONTEST_ROUND = %s AND ca.ROUND_NO = %s
                             ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                         """, (w_c_id, w_r_no))

@@ -26,11 +26,11 @@
             r.SHARE_CNT AS SHARE_COUNT,
             r.SHARE_SN,
             r.ENT_DT AS CREATED_AT
-        FROM pst_contest_round r
-        JOIN pst_user u ON r.ENT_USER_ID = u.USER_ID
-        JOIN pst_contest c ON r.CONTEST_ROUND = c.CONTEST_ROUND
-        JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-        LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+        FROM PST_CONTEST_ROUND r
+        JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
+        JOIN PST_CONTEST c ON r.CONTEST_ROUND = c.CONTEST_ROUND
+        JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
+        LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
         WHERE r.CONTEST_ROUND = #{contestId}
         ORDER BY r.SCORE DESC, r.SHARE_CNT DESC, r.CMT_CNT DESC, r.LIKE_CNT DESC, r.VW_CNT DESC, r.ENT_DT DESC
     </select>
@@ -56,20 +56,20 @@
             u.USER_ID,
             u.NK_NM AS NICKNAME,
             u.PROFILE_URL AS PROFILE_IMG
-        FROM pst_contest_award ca
-        LEFT JOIN pst_contest c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
-        LEFT JOIN pst_theme t ON c.THEME_CD = t.THEME_CD
-        LEFT JOIN pst_award a ON ca.AWARD_CD = a.AWARD_CD
-        LEFT JOIN pst_contest_round r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
-        LEFT JOIN pst_user u ON ca.ENT_USER_ID = u.USER_ID
-        LEFT JOIN pst_pet_kind k ON r.KIND_CD = k.KIND_CD
+        FROM PST_CONTEST_AWARD ca
+        LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
+        LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
+        LEFT JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
+        LEFT JOIN PST_CONTEST_ROUND r ON ca.CONTEST_ROUND = r.CONTEST_ROUND AND ca.ROUND_NO = r.ROUND_NO
+        LEFT JOIN PST_USER u ON ca.ENT_USER_ID = u.USER_ID
+        LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
         WHERE ca.CONTEST_ROUND = #{contestId}
         ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
     </select>
 
     <!-- 4. 실시간 게시물 점수 갱신 SQL -->
     <update id="incrementPostScore">
-        UPDATE pst_contest_round
+        UPDATE PST_CONTEST_ROUND
         SET 
             SCORE = SCORE + #{scoreDelta},
             VW_CNT = VW_CNT + #{viewDelta},

@@ -543,10 +543,13 @@ def auth_google_callback():
         session['next_url'] = saved_next_url
 
         msg = f"{user_info['nickname']}님, Google 계정({email}) 인증으로 로그인되었습니다!"
-        return render_template('google_callback.html', success=True, message=msg, user=user_info, target_url=saved_next_url)
+        resp = make_response(render_template('google_callback.html', success=True, message=msg, user=user_info, target_url=saved_next_url))
+        resp.set_cookie('pst_user_id', user_info['user_id'], max_age=365*24*3600)
+        return resp
     except Exception as err:
         print(f"[Google OAuth Exception] {err}")
         return render_template('google_callback.html', error=str(err), target_url=next_url)
+
 
 @app.route('/api/auth/google', methods=['POST'])
 def api_auth_google():
@@ -1197,7 +1200,7 @@ def api_check_nickname():
     if conn:
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT NK_NM FROM pst_user WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (user_id, user_id))
+                cur.execute("SELECT NK_NM FROM PST_USER WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)", (user_id, user_id))
                 r = cur.fetchone()
                 if r and r.get('NK_NM') and str(r.get('NK_NM')).strip().lower() == nickname.lower():
                     conn.close()
