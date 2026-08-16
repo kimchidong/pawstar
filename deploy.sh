@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APP_DIR="/svc/app/toolmong"
+APP_DIR="/svc/app/pawstar"
 
 cd $APP_DIR
 

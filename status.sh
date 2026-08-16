@@ -3,8 +3,8 @@
 PID=$(pgrep -f "python3 app.py")
 
 if [ -z "$PID" ]; then
-    echo "ToolMong is NOT running."
+    echo "PawStar is NOT running."
 else
-    echo "ToolMong is running."
+    echo "PawStar is running."
     ps -fp $PID
 fi

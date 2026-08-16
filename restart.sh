@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Restarting ToolMong..."
+echo "Restarting PawStar..."
 
 # 기존 프로세스 중지
 ./stop.sh
@@ -11,4 +11,4 @@ sleep 1
 # 새로운 프로세스 시작
 ./start.sh
 
-echo "ToolMong restart complete."
+echo "PawStar restart complete."
