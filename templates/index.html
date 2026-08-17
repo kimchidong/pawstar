@@ -227,7 +227,7 @@
                         <img src="{{ p.PROFILE_URL or p.user_profile or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 50% !important; object-fit: cover; flex-shrink: 0;" alt="profile">
                         <div class="author-detail" style="min-width: 0; flex: 1; overflow: hidden;">
                             <div style="display: flex; align-items: center; gap: 0.35rem; width: 100%;">
-                                <div class="nickname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 1;">{{ p.NK_NM or p.user_nickname }}</div>
+                                <div class="nickname" style="font-weight: 800; color: #0f172a; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 1;">{{ p.NK_NM or p.user_nickname }}</div>
                                 {% set s_inst = (p.sns_inst or p.SNS_INST or '').strip() %}
                                 {% set s_ytb = (p.sns_ytb or p.SNS_YTB or '').strip() %}
                                 {% set s_fsb = (p.sns_fsb or p.SNS_FSB or '').strip() %}
