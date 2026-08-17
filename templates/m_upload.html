@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     const cid = (data.post ? (data.post.CONTEST_ROUND || data.post.contest_id) : '13') || '13';
                     alert('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾');
-                    location.href = '/m/?contest_id=' + cid + '&uploaded=true';
+                    location.href = '/m/?contest_id=' + cid;
                 } else {
                     alert('출전 신청 실패: ' + data.message);
                 }
