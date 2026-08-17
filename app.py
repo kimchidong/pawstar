@@ -1237,7 +1237,11 @@ def api_profile_update():
     user_id = (data.get('user_id') or session.get('user_id') or request.cookies.get('pst_user_id') or 'user1').strip()
     if not user_id:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
-    nickname = data.get('nickname')
+    nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
+    if not nickname:
+        return jsonify({'success': False, 'message': '🐶 집사 닉네임을 입력해 주세요.'}), 400
+    if len(nickname) > 10:
+        return jsonify({'success': False, 'message': '🐶 집사 닉네임은 10자 이내로 입력해 주세요.'}), 400
     profile_img = data.get('profile_img')
     sns_inst = (data.get('sns_inst') or '').strip()
     sns_ytb = (data.get('sns_ytb') or '').strip()
@@ -1273,10 +1277,12 @@ def api_profile_update():
 def api_check_nickname():
     data = request.args if request.method == 'GET' else (request.json or {})
     user_id = (data.get('user_id') or session.get('user_id') or request.cookies.get('pst_user_id') or '').strip()
-    nickname = (data.get('nickname') or '').strip()
+    nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
     
     if not nickname:
-        return jsonify({'success': False, 'available': False, 'message': '검사할 닉네임을 입력해주세요.'}), 400
+        return jsonify({'success': False, 'available': False, 'message': '검사할 닉네임을 입력해 주세요.'}), 400
+    if len(nickname) > 10:
+        return jsonify({'success': False, 'available': False, 'message': '🐶 집사 닉네임은 10자 이내로 입력해 주세요.'}), 400
 
     conn = service.get_db_connection()
     if conn:

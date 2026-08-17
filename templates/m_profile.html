@@ -761,9 +761,12 @@ function renderTrophyPagination(page) {
             </div>
 
             <div class="m-form-group">
-                <label>집사 닉네임</label>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                    <label style="margin-bottom: 0;">집사 닉네임</label>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #64748b;"><span id="mEditNicknameCharCount" style="color: #7c3aed;">0</span>/10</span>
+                </div>
                 <div style="display: flex; gap: 0.4rem; align-items: center;">
-                    <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" required style="flex: 1;">
+                    <input type="text" id="mEditNickname" class="m-form-control" value="{{ user.nickname }}" maxlength="10" required style="flex: 1;">
                     <button type="button" id="mBtnCheckNickname" style="height: 42px; padding: 0 0.85rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border: 1.5px solid #cbd5e1; border-radius: 10px; color: #334155; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem;">
                         <i class="fa-solid fa-magnifying-glass" style="color: #64748b; font-size: 0.75rem;"></i> 중복 확인
                     </button>
@@ -831,13 +834,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const mEditNkInput = document.getElementById('mEditNickname');
     const mNkCheckMsg = document.getElementById('mNicknameCheckMsg');
 
+    function updateMProfileNicknameCharCount() {
+        if (mEditNkInput) {
+            const countEl = document.getElementById('mEditNicknameCharCount');
+            if (countEl) countEl.textContent = mEditNkInput.value.replace(/\r\n/g, '\n').length;
+        }
+    }
+
+    if (mEditNkInput) {
+        mEditNkInput.addEventListener('input', updateMProfileNicknameCharCount);
+        updateMProfileNicknameCharCount();
+    }
+
     if (mBtnCheckNk && mEditNkInput && mNkCheckMsg) {
         mBtnCheckNk.addEventListener('click', function() {
             const nickname = mEditNkInput.value.trim();
             if (!nickname) {
                 mNkCheckMsg.style.display = 'block';
                 mNkCheckMsg.style.color = '#ef4444';
-                mNkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해주세요.';
+                mNkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해 주세요.';
+                return;
+            }
+            if (nickname.length > 10) {
+                mNkCheckMsg.style.display = 'block';
+                mNkCheckMsg.style.color = '#ef4444';
+                mNkCheckMsg.textContent = '❌ 집사 닉네임은 10자 이내로 입력해 주세요.';
                 return;
             }
 
@@ -923,7 +944,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (mNkCheckMsg) {
                     mNkCheckMsg.style.display = 'block';
                     mNkCheckMsg.style.color = '#ef4444';
-                    mNkCheckMsg.textContent = '❌ 변경할 닉네임을 입력해주세요.';
+                    mNkCheckMsg.textContent = '❌ 변경할 닉네임을 입력해 주세요.';
+                }
+                document.getElementById('mEditNickname')?.focus();
+                return;
+            }
+            if (nickname.length > 10) {
+                if (mNkCheckMsg) {
+                    mNkCheckMsg.style.display = 'block';
+                    mNkCheckMsg.style.color = '#ef4444';
+                    mNkCheckMsg.textContent = '❌ 집사 닉네임은 10자 이내로 입력해 주세요.';
                 }
                 document.getElementById('mEditNickname')?.focus();
                 return;

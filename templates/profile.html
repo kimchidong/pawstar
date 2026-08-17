@@ -494,9 +494,12 @@
             </div>
 
             <div class="form-group" style="margin-bottom: 1.25rem;">
-                <label style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-bottom: 0.4rem; display: block;">집사 닉네임</label>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <label style="font-weight: 800; font-size: 0.9rem; color: #1e293b; margin-bottom: 0;">집사 닉네임</label>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;"><span id="editNicknameCharCount" style="color: #7c3aed;">0</span>/10</span>
+                </div>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" required style="flex: 1; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 1rem; font-size: 0.95rem; font-weight: 700;">
+                    <input type="text" id="editNickname" class="form-control" value="{{ user.nickname }}" maxlength="10" required style="flex: 1; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 1rem; font-size: 0.95rem; font-weight: 700;">
                     <button type="button" id="btnCheckNickname" style="height: 44px; padding: 0 1.15rem; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border: 1.5px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 800; font-size: 0.86rem; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03); flex-shrink: 0; display: flex; align-items: center; gap: 0.35rem;">
                         <i class="fa-solid fa-magnifying-glass" style="color: #64748b; font-size: 0.8rem;"></i> 중복 확인
                     </button>
@@ -528,13 +531,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const editNkInput = document.getElementById('editNickname');
     const nkCheckMsg = document.getElementById('nicknameCheckMsg');
 
+    function updateProfileNicknameCharCount() {
+        if (editNkInput) {
+            const countEl = document.getElementById('editNicknameCharCount');
+            if (countEl) countEl.textContent = editNkInput.value.replace(/\r\n/g, '\n').length;
+        }
+    }
+
+    if (editNkInput) {
+        editNkInput.addEventListener('input', updateProfileNicknameCharCount);
+        updateProfileNicknameCharCount();
+    }
+
     if (btnCheckNk && editNkInput && nkCheckMsg) {
         btnCheckNk.addEventListener('click', function() {
             const nickname = editNkInput.value.trim();
             if (!nickname) {
                 nkCheckMsg.style.display = 'block';
                 nkCheckMsg.style.color = '#ef4444';
-                nkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해주세요.';
+                nkCheckMsg.textContent = '❌ 검사할 닉네임을 입력해 주세요.';
+                return;
+            }
+            if (nickname.length > 10) {
+                nkCheckMsg.style.display = 'block';
+                nkCheckMsg.style.color = '#ef4444';
+                nkCheckMsg.textContent = '❌ 집사 닉네임은 10자 이내로 입력해 주세요.';
                 return;
             }
 
@@ -663,7 +684,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (nkCheckMsg) {
                     nkCheckMsg.style.display = 'block';
                     nkCheckMsg.style.color = '#ef4444';
-                    nkCheckMsg.textContent = '❌ 변경할 닉네임을 입력해주세요.';
+                    nkCheckMsg.textContent = '❌ 변경할 닉네임을 입력해 주세요.';
+                }
+                document.getElementById('editNickname')?.focus();
+                return;
+            }
+            if (nickname.length > 10) {
+                if (nkCheckMsg) {
+                    nkCheckMsg.style.display = 'block';
+                    nkCheckMsg.style.color = '#ef4444';
+                    nkCheckMsg.textContent = '❌ 집사 닉네임은 10자 이내로 입력해 주세요.';
                 }
                 document.getElementById('editNickname')?.focus();
                 return;
