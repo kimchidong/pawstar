@@ -672,9 +672,9 @@ function openDetailModal(post, isHallOfFame = false) {
         else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
 
         const petNm = post.PET_NM || post.pet_name || '';
-        const kindHtml = `<span style="background: #ffe4e6; color: #e11d48; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 5px rgba(225, 29, 72, 0.08);"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+        const kindHtml = `<span style="background: #ffe4e6; color: #e11d48; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; box-shadow: 0 2px 5px rgba(225, 29, 72, 0.08); flex-shrink: 0;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
         if (petNm) {
-            petTagEl.innerHTML = `${kindHtml}<span style="background: #f3e8ff; color: #7c3aed; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; margin-left: 0.3rem; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 2px 5px rgba(124, 58, 237, 0.08);">${petNm}</span>`;
+            petTagEl.innerHTML = `${kindHtml}<span style="background: #f3e8ff; color: #7c3aed; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.74rem; font-weight: 700; margin-left: 0.3rem; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 2px 5px rgba(124, 58, 237, 0.08); max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1;" title="${escapeHtml(petNm)}"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; display: inline-block; max-width: 100%;">${escapeHtml(petNm)}</span></span>`;
         } else {
             petTagEl.innerHTML = kindHtml;
         }

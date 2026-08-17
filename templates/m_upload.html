@@ -323,7 +323,7 @@
                             <div id="mPreviewAuthorNickname" style="font-size: 0.88rem; font-weight: 800; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ current_user.nickname or '집사 닉네임' }}</div>
                             <div id="mPreviewModalSnsGroup" style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; margin-left: auto;"></div>
                         </div>
-                        <div id="mPreviewModalPetTag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
+                        <div id="mPreviewModalPetTag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: nowrap; overflow: hidden; max-width: 100%;">
                             <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
                         </div>
                     </div>
@@ -568,11 +568,11 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (cleanKind.includes('앵무새') || cleanKind.includes('새') || cleanKind.includes('조류')) faIcon = 'fa-solid fa-crow';
         else if (cleanKind.includes('말') || cleanKind.includes('큰동물')) faIcon = 'fa-solid fa-horse';
 
-        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
+        const kindHtml = `<span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;"><i class="${faIcon}"></i> ${cleanKind}</span>`;
 
         let petTagHTML = '';
         if (petName) {
-            petTagHTML = `${kindHtml}<span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap;">${petName}</span>`;
+            petTagHTML = `${kindHtml}<span style="color: #6d28d9; font-weight: 700; margin-left: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; display: inline-block; vertical-align: middle;" title="${petName}">${petName}</span>`;
         } else {
             petTagHTML = kindHtml;
         }
