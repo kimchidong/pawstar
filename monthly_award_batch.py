@@ -81,17 +81,23 @@ def run_monthly_award_batch():
             current_contest = cur.fetchone()
 
             if not current_contest:
-                print(f"[{now}] 진행 중인 회차가 없어 회차 #1 자동 생성을 진행합니다.")
+                print(f"[{now}] 기존 진행 중인 회차가 없으므로 집계/마감 처리를 스킵하고 제1회 콘테스트를 생성합니다.")
+                current_month = now.month
+                target_theme_cd = f'T{current_month:03d}'
+                cur.execute("SELECT THEME_CD FROM PST_THEME WHERE THEME_CD = %s", (target_theme_cd,))
+                theme_row = cur.fetchone()
+                if not theme_row:
+                    target_theme_cd = 'T001'
+
                 cur.execute("""
                     INSERT INTO PST_CONTEST (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
-                    VALUES (1, 'T001', NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
-                """)
+                    VALUES (1, %s, NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
+                    ON DUPLICATE KEY UPDATE THEME_CD = VALUES(THEME_CD), ED_DT = VALUES(ED_DT), CONTEST_STAT = 'G001C001'
+                """, (target_theme_cd,))
                 conn.commit()
-                cur.execute("""
-                    SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
-                    FROM PST_CONTEST WHERE CONTEST_ROUND = 1
-                """)
-                current_contest = cur.fetchone()
+                print(f"[{now}] 제1회 콘테스트(테마: {target_theme_cd}) 오픈 생성이 완료되었습니다.")
+                conn.close()
+                return
 
             round_id = current_contest['CONTEST_ROUND']
             print(f"[{now}] 대상 콘테스트 회차: 제{round_id}회")
