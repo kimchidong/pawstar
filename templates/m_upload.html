@@ -557,13 +557,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const descText = content || '소개글 미리보기';
         const currentFormattedDate = getFormattedNowDateTime();
 
-        // 모바일 실시간 글자수 카운터 갱신
-        const titleLen = inputTitle ? inputTitle.value.length : 0;
-        const contentLen = textareaContent ? textareaContent.value.length : 0;
-        const instLen = (document.getElementById('mUploadSnsInst')?.value || '').length;
-        const ytbLen = (document.getElementById('mUploadSnsYtb')?.value || '').length;
-        const fsbLen = (document.getElementById('mUploadSnsFsb')?.value || '').length;
-        const blgLen = (document.getElementById('mUploadSnsBlg')?.value || '').length;
+        // 모바일 실시간 글자수 카운터 갱신 (엔터/줄바꿈 CRLF -> LF 정규화)
+        const titleLen = inputTitle ? inputTitle.value.replace(/\r\n/g, '\n').length : 0;
+        const contentLen = textareaContent ? textareaContent.value.replace(/\r\n/g, '\n').length : 0;
+        const instLen = (document.getElementById('mUploadSnsInst')?.value || '').replace(/\r\n/g, '\n').length;
+        const ytbLen = (document.getElementById('mUploadSnsYtb')?.value || '').replace(/\r\n/g, '\n').length;
+        const fsbLen = (document.getElementById('mUploadSnsFsb')?.value || '').replace(/\r\n/g, '\n').length;
+        const blgLen = (document.getElementById('mUploadSnsBlg')?.value || '').replace(/\r\n/g, '\n').length;
 
         const mElTitleCount = document.getElementById('mUploadTitleCharCount');
         const mElContentCount = document.getElementById('mUploadContentCharCount');

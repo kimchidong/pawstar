@@ -1017,8 +1017,8 @@ def upload_page():
         user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
         pet_name = (request.form.get('pet_name') or '').strip()
         pet_type = (request.form.get('pet_type') or '').strip()
-        title = (request.form.get('title') or '').strip()
-        content = (request.form.get('content') or '').strip()
+        title = (request.form.get('title') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
+        content = (request.form.get('content') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
         sns_inst = (request.form.get('sns_inst') or '').strip()
         sns_ytb = (request.form.get('sns_ytb') or '').strip()
         sns_fsb = (request.form.get('sns_fsb') or '').strip()
@@ -1629,8 +1629,8 @@ def create_post():
         default_cid = (curr_contest.get('CONTEST_ROUND') or curr_contest.get('contest_id') or 13) if curr_contest else 13
 
         if request.content_type and 'multipart/form-data' in request.content_type:
-            title = request.form.get('title', '').strip()
-            content = request.form.get('content', '').strip()
+            title = request.form.get('title', '').strip().replace('\r\n', '\n').replace('\r', '\n')
+            content = request.form.get('content', '').strip().replace('\r\n', '\n').replace('\r', '\n')
             pet_name = request.form.get('pet_name', '강아지').strip()
             pet_type = request.form.get('pet_type', '🐕 강아지').strip()
             cid_raw = request.form.get('contest_id')
@@ -1649,8 +1649,8 @@ def create_post():
             user_id = session.get('user_id') or data.get('user_id', 'user1')
             pet_name = data.get('pet_name', '강아지')
             pet_type = data.get('pet_type', '🐕 강아지')
-            title = data.get('title', '')
-            content = data.get('content', '')
+            title = (data.get('title') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
+            content = (data.get('content') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
             temp_filename = data.get('temp_filename') or data.get('temp_url')
             file = None
             sns_inst = (data.get('sns_inst') or '').strip()
