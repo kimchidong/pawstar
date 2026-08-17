@@ -1024,6 +1024,11 @@ def upload_page():
         sns_fsb = (request.form.get('sns_fsb') or '').strip()
         sns_blg = (request.form.get('sns_blg') or '').strip()
         
+        my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
+        if my_entry_count >= 5:
+            flash('🚫 한 회차당 최대 5회까지만 출전 가능합니다. 현재 회차의 남은 출전 횟수가 0회입니다.', 'danger')
+            return redirect('/upload')
+
         # 1. 동물 종류
         if not pet_type:
             flash('🐾 반려동물 종류를 선택해 주세요.', 'danger')
@@ -1663,6 +1668,10 @@ def create_post():
             sns_blg = (data.get('sns_blg') or '').strip()
 
         next_post_id = service.get_next_post_id()
+
+        my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
+        if my_entry_count >= 5:
+            return jsonify({'success': False, 'message': '🚫 한 회차당 최대 5회까지만 출전 가능합니다. 현재 회차의 남은 출전 횟수가 0회입니다.'}), 400
 
         if not pet_type:
             return jsonify({'success': False, 'message': '🐾 반려동물 종류를 선택해 주세요.'}), 400

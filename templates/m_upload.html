@@ -255,6 +255,23 @@
     </div>
 </div>
 
+<!-- 출전 가능 횟수 초과 안내 커스텀 팝업 레이어 모달 (모바일) -->
+<div class="m-modal-backdrop" id="mLimitExceededModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 999999; justify-content: center; align-items: center; padding: 1.25rem;">
+    <div style="background: #ffffff; border-radius: 24px; padding: 2rem 1.5rem; max-width: 360px; width: 92%; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1.5px solid #cbd5e1;">
+        <div style="width: 60px; height: 60px; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.1rem auto; color: #ef4444; font-size: 2rem; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);">
+            <i class="fa-solid fa-ban"></i>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 900; color: #0f172a; margin-bottom: 0.65rem;">출전 가능 횟수 초과</h3>
+        <p style="font-size: 0.9rem; color: #475569; line-height: 1.55; margin-bottom: 1.5rem; word-break: keep-all;">
+            한 회차당 최대 5회까지만 출전 가능합니다.<br>
+            현재 회차의 남은 출전 횟수가 <strong style="color: #ef4444; font-weight: 900;">0회</strong>이므로 더 이상 출전하실 수 없습니다.
+        </p>
+        <button type="button" onclick="closeMLimitExceededModal()" style="width: 100%; padding: 0.8rem 1.25rem; border-radius: 14px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #ffffff; border: none; font-weight: 800; font-size: 0.92rem; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);">
+            확인
+        </button>
+    </div>
+</div>
+
 <!-- 실제 모바일 상세 팝업과 100% 동일한 팝업 모달 오버레이 -->
 <div class="m-modal-backdrop" id="mPreviewModalBackdrop" style="display: none; z-index: 999999;">
     <div class="m-modal-sheet" style="position: relative; max-height: 92vh; padding: 1.1rem 0 0 0; border-top-left-radius: 30px; border-top-right-radius: 30px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 -10px 40px rgba(244, 114, 182, 0.2); overflow: hidden !important;">
@@ -760,10 +777,79 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('change', () => { element.classList.remove('input-invalid-shake'); }, { once: true });
     }
 
+    const M_REMAINING_ENTRY_COUNT = {{ remaining_entry_count if remaining_entry_count is not none else 5 }};
+
+    function showMLimitExceededModal() {
+        const modal = document.getElementById('mLimitExceededModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    window.closeMLimitExceededModal = function() {
+        const modal = document.getElementById('mLimitExceededModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    };
+
+    function disableMUploadFormIfLimitExceeded() {
+        if (M_REMAINING_ENTRY_COUNT <= 0) {
+            const form = document.getElementById('mPostUploadForm') || document.querySelector('form');
+            if (form) {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(el => {
+                    el.disabled = true;
+                    el.style.backgroundColor = '#f1f5f9';
+                    el.style.color = '#94a3b8';
+                    el.style.cursor = 'not-allowed';
+                });
+
+                const customDropdown = document.getElementById('mUploadPetTypeDropdown');
+                if (customDropdown) {
+                    customDropdown.style.pointerEvents = 'none';
+                    customDropdown.style.opacity = '0.6';
+                    customDropdown.style.cursor = 'not-allowed';
+                    const trigger = customDropdown.querySelector('.custom-pet-trigger');
+                    if (trigger) trigger.style.background = '#f1f5f9';
+                }
+
+                const dropzone = document.getElementById('mCustomFileDropzone');
+                if (dropzone) {
+                    dropzone.style.pointerEvents = 'none';
+                    dropzone.style.opacity = '0.6';
+                    dropzone.style.background = '#f1f5f9';
+                    dropzone.style.cursor = 'not-allowed';
+                }
+
+                const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('.m-btn-submit');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.background = '#cbd5e1';
+                    submitBtn.style.color = '#64748b';
+                    submitBtn.style.border = 'none';
+                    submitBtn.style.boxShadow = 'none';
+                    submitBtn.style.cursor = 'not-allowed';
+                    submitBtn.innerHTML = '<i class="fa-solid fa-ban"></i> 출전 가능 횟수 초과 (0회 남음)';
+                }
+            }
+            setTimeout(showMLimitExceededModal, 150);
+        }
+    }
+
+    disableMUploadFormIfLimitExceeded();
+
     const mUploadForm = document.getElementById('mPostUploadForm') || document.querySelector('form');
     if (mUploadForm) {
         mUploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            if (M_REMAINING_ENTRY_COUNT <= 0) {
+                showMLimitExceededModal();
+                return;
+            }
 
             const petName = inputPetName ? inputPetName.value.trim() : '';
             const petType = selectPetType ? selectPetType.value.trim() : '';
