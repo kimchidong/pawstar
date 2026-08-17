@@ -135,10 +135,13 @@
                         </div>
 
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                                🐶 이름
-                            </label>
-                            <input type="text" name="pet_name" id="uploadPetName" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0;">
+                                    🐶 이름
+                                </label>
+                                <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;"><span id="uploadPetNameCharCount" style="color: #7c3aed;">0</span>/20</span>
+                            </div>
+                            <input type="text" name="pet_name" id="uploadPetName" class="form-control" maxlength="20" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                         </div>
                     </div>
 
@@ -683,6 +686,7 @@ function updatePreview() {
     const textareaContent = document.querySelector('textarea[name="content"]');
 
     // 실시간 글자수 카운터 갱신 (엔터/줄바꿈 CRLF -> LF 정규화)
+    const petNameLen = inputPetName ? inputPetName.value.replace(/\r\n/g, '\n').length : 0;
     const titleLen = inputTitle ? inputTitle.value.replace(/\r\n/g, '\n').length : 0;
     const contentLen = textareaContent ? textareaContent.value.replace(/\r\n/g, '\n').length : 0;
     const instLen = (document.getElementById('uploadSnsInst')?.value || '').replace(/\r\n/g, '\n').length;
@@ -690,6 +694,7 @@ function updatePreview() {
     const fsbLen = (document.getElementById('uploadSnsFsb')?.value || '').replace(/\r\n/g, '\n').length;
     const blgLen = (document.getElementById('uploadSnsBlg')?.value || '').replace(/\r\n/g, '\n').length;
 
+    const elPetNameCount = document.getElementById('uploadPetNameCharCount');
     const elTitleCount = document.getElementById('uploadTitleCharCount');
     const elContentCount = document.getElementById('uploadContentCharCount');
     const elInstCount = document.getElementById('uploadSnsInstCharCount');
@@ -697,6 +702,7 @@ function updatePreview() {
     const elFsbCount = document.getElementById('uploadSnsFsbCharCount');
     const elBlgCount = document.getElementById('uploadSnsBlgCharCount');
 
+    if (elPetNameCount) elPetNameCount.textContent = petNameLen;
     if (elTitleCount) elTitleCount.textContent = titleLen;
     if (elContentCount) elContentCount.textContent = contentLen;
     if (elInstCount) elInstCount.textContent = instLen;
@@ -1014,6 +1020,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // 2. 이름 입력 체크
             if (!petName) {
                 alert('🐶 아이의 이름을 입력해 주세요.');
+                if (petNameEl) petNameEl.focus();
+                return false;
+            }
+            if (petName.length > 20) {
+                alert('🐶 아이의 이름은 20자 이내로 입력해 주세요.');
                 if (petNameEl) petNameEl.focus();
                 return false;
             }

@@ -32,8 +32,11 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                 <div class="m-form-group">
-                    <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐶 아이 이름</label>
-                    <input type="text" name="pet_name" class="m-form-control" required style="width: 100%; padding: 0.75rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                        <label style="font-weight: 800; font-size: 0.85rem; margin-bottom: 0;">🐶 아이 이름</label>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: #64748b;"><span id="mUploadPetNameCharCount" style="color: #7c3aed;">0</span>/20</span>
+                    </div>
+                    <input type="text" name="pet_name" class="m-form-control" maxlength="20" required style="width: 100%; padding: 0.75rem;">
                 </div>
                 <div class="m-form-group" style="position: relative;">
                     <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">🐾 동물 종류</label>
@@ -558,6 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentFormattedDate = getFormattedNowDateTime();
 
         // 모바일 실시간 글자수 카운터 갱신 (엔터/줄바꿈 CRLF -> LF 정규화)
+        const petNameLen = inputPetName ? inputPetName.value.replace(/\r\n/g, '\n').length : 0;
         const titleLen = inputTitle ? inputTitle.value.replace(/\r\n/g, '\n').length : 0;
         const contentLen = textareaContent ? textareaContent.value.replace(/\r\n/g, '\n').length : 0;
         const instLen = (document.getElementById('mUploadSnsInst')?.value || '').replace(/\r\n/g, '\n').length;
@@ -565,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fsbLen = (document.getElementById('mUploadSnsFsb')?.value || '').replace(/\r\n/g, '\n').length;
         const blgLen = (document.getElementById('mUploadSnsBlg')?.value || '').replace(/\r\n/g, '\n').length;
 
+        const mElPetNameCount = document.getElementById('mUploadPetNameCharCount');
         const mElTitleCount = document.getElementById('mUploadTitleCharCount');
         const mElContentCount = document.getElementById('mUploadContentCharCount');
         const mElInstCount = document.getElementById('mUploadSnsInstCharCount');
@@ -572,6 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const mElFsbCount = document.getElementById('mUploadSnsFsbCharCount');
         const mElBlgCount = document.getElementById('mUploadSnsBlgCharCount');
 
+        if (mElPetNameCount) mElPetNameCount.textContent = petNameLen;
         if (mElTitleCount) mElTitleCount.textContent = titleLen;
         if (mElContentCount) mElContentCount.textContent = contentLen;
         if (mElInstCount) mElInstCount.textContent = instLen;
@@ -775,6 +781,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // 2. 이름 입력 체크
             if (!petName) {
                 showCustomToast('🐶 아이 이름을 입력해 주세요!', 'fa-dog');
+                highlightInvalidField(inputPetName);
+                return;
+            }
+            if (petName.length > 20) {
+                showCustomToast('🐶 아이 이름은 20자 이내로 입력해 주세요!', 'fa-dog');
                 highlightInvalidField(inputPetName);
                 return;
             }

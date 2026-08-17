@@ -1032,6 +1032,9 @@ def upload_page():
         if not pet_name:
             flash('🐶 반려동물 이름을 입력해 주세요.', 'danger')
             return redirect('/upload')
+        if len(pet_name) > 20:
+            flash('🐶 반려동물 이름은 20자 이내로 입력해 주세요.', 'danger')
+            return redirect('/upload')
         # 3. 자랑 제목
         if not title:
             flash('✨ 자랑 제목을 입력해 주세요.', 'danger')
@@ -1664,6 +1667,8 @@ def create_post():
             return jsonify({'success': False, 'message': '🐾 반려동물 종류를 선택해 주세요.'}), 400
         if not pet_name:
             return jsonify({'success': False, 'message': '🐶 반려동물 이름을 입력해 주세요.'}), 400
+        if len(pet_name) > 20:
+            return jsonify({'success': False, 'message': '🐶 반려동물 이름은 20자 이내로 입력해 주세요.'}), 400
         if not title:
             return jsonify({'success': False, 'message': '✨ 자랑 제목을 입력해 주세요.'}), 400
         if len(title) > 80:
