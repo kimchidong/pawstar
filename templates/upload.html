@@ -66,7 +66,7 @@
 
         <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data" novalidate>
 
-            <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}">
+            <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id or 13 }}">
 
 
 
@@ -916,16 +916,18 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// PC 출전 등록 폼 필수 입력 항목 유효성 검증
+// PC 출전 등록 폼 필수 입력 항목 유효성 검증 및 AJAX 출전 처리
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('postUploadForm');
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
-            const petNameEl = document.getElementById('uploadPetName');
-            const petTypeEl = document.getElementById('hiddenUploadPetType');
-            const titleEl = document.getElementById('uploadTitle');
+            e.preventDefault();
+
+            const petNameEl = document.getElementById('uploadPetName') || document.querySelector('input[name="pet_name"]');
+            const petTypeEl = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect') || document.querySelector('select[name="pet_type"]');
+            const titleEl = document.getElementById('uploadTitle') || document.querySelector('input[name="title"]');
             const contentEl = document.querySelector('textarea[name="content"]');
-            const mediaFileEl = document.getElementById('uploadMediaFile');
+            const mediaFileEl = document.getElementById('uploadMediaFile') || document.querySelector('input[type="file"][name="media_file"]');
 
             const petName = petNameEl ? petNameEl.value.trim() : '';
             const petType = petTypeEl ? petTypeEl.value.trim() : '';
@@ -934,14 +936,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const hasFile = mediaFileEl && mediaFileEl.files && mediaFileEl.files.length > 0;
 
             if (!petName) {
-                e.preventDefault();
                 alert('🐶 아이의 이름을 입력해주세요.');
                 if (petNameEl) petNameEl.focus();
                 return false;
             }
 
             if (!petType) {
-                e.preventDefault();
                 alert('🐾 아이의 동물 종류를 선택해주세요.');
                 const dropdown = document.getElementById('uploadPetTypeDropdown');
                 if (dropdown) window.toggleUploadPetDropdown(dropdown.querySelector('.custom-pet-trigger'));
@@ -949,26 +949,60 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!title) {
-                e.preventDefault();
                 alert('✨ 자랑 제목을 입력해주세요.');
                 if (titleEl) titleEl.focus();
                 return false;
             }
 
             if (!content) {
-                e.preventDefault();
                 alert('📝 자랑 내용 및 소개글을 입력해주세요.');
                 if (contentEl) contentEl.focus();
                 return false;
             }
 
             if (!hasFile) {
-                e.preventDefault();
                 alert('🖼️ 출전 사진 파일(이미지)을 반드시 첨부해주세요.');
                 const dropzone = document.getElementById('pcCustomFileDropzone');
                 if (dropzone) dropzone.click();
                 return false;
             }
+
+            const submitBtn = uploadForm.querySelector('button[type="submit"]');
+            let origHtml = '';
+            if (submitBtn) {
+                origHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 출전 등록 처리 중...';
+            }
+
+            const formData = new FormData(uploadForm);
+
+            fetch('/api/post/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const cid = (data.post ? (data.post.CONTEST_ROUND || data.post.contest_id) : '13') || '13';
+                    alert('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾');
+                    location.href = '/?contest_id=' + cid + '&uploaded=true';
+                } else {
+                    alert('⚠️ 출전 신청 실패: ' + (data.message || '다시 시도해 주세요.'));
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = origHtml;
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('PC 출전 등록 실패:', err);
+                alert('⚠️ 출전 사진 등록 중 오류가 발생했습니다. 다시 시도해 주세요.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = origHtml;
+                }
+            });
         });
     }
 });

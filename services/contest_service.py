@@ -1104,10 +1104,12 @@ class PawStarService:
                 'message': f'해당 회차에는 회원 1인당 최대 5회까지만 출전이 가능합니다. (현재 {entry_cnt}/5회 출전 완료)'
             }
 
-        actual_ent_user_id = user_id
+        actual_ent_user_id = str(user_id or 'user1').strip()
+        if not actual_ent_user_id:
+            actual_ent_user_id = 'user1'
 
-        if not self.is_user_exists(user_id):
-            self.register_user(user_id, user_id)
+        if not self.is_user_exists(actual_ent_user_id):
+            self.register_user(actual_ent_user_id, actual_ent_user_id)
 
         if kind_cd and not kind_cd.startswith('K'):
             kinds = self.get_pet_kinds()

@@ -1002,18 +1002,19 @@ def save_uploaded_media(file):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
-    user_id = session.get('user_id')
-    if not user_id:
-        if request.method == 'POST' or request.is_json:
-            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
-        return redirect('/auth/google?next=/upload')
+    user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
     
     if request.method == 'POST':
-        contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
-        user_id = session.get('user_id')
+        raw_cid = request.form.get('contest_id')
+        if raw_cid and str(raw_cid).isdigit():
+            contest_id = int(raw_cid)
+        else:
+            contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 13) if current_contest else 13
+
+        user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
         pet_name = (request.form.get('pet_name') or '').strip()
         pet_type = (request.form.get('pet_type') or '').strip()
         title = (request.form.get('title') or '').strip()
@@ -1055,7 +1056,7 @@ def upload_page():
             return redirect('/upload')
 
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
-        return redirect('/?uploaded=true')
+        return redirect(f'/?contest_id={contest_id}&uploaded=true')
 
     contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
@@ -1073,18 +1074,19 @@ def upload_page():
 
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
-    user_id = session.get('user_id')
-    if not user_id:
-        if request.method == 'POST' or request.is_json:
-            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
-        return redirect('/auth/google?next=/m/upload')
+    user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
 
     if request.method == 'POST':
-        contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
-        user_id = session.get('user_id') or 'user1'
+        raw_cid = request.form.get('contest_id')
+        if raw_cid and str(raw_cid).isdigit():
+            contest_id = int(raw_cid)
+        else:
+            contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 13) if current_contest else 13
+
+        user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
         pet_name = (request.form.get('pet_name') or '').strip()
         pet_type = (request.form.get('pet_type') or '').strip()
         title = (request.form.get('title') or '').strip()
@@ -1126,7 +1128,7 @@ def m_upload_page():
             return redirect('/m/upload')
 
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
-        return redirect('/m?uploaded=true')
+        return redirect(f'/m/?contest_id={contest_id}&uploaded=true')
 
     contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
@@ -1596,12 +1598,16 @@ def upload_temp_image():
 def create_post():
     """ 신규 자랑 게시물 등록 API (목록용/팝업용 2개 WebP 생성 & 3개 컬럼 DB 저장) """
     try:
+        curr_contest = service.get_current_contest()
+        default_cid = (curr_contest.get('CONTEST_ROUND') or curr_contest.get('contest_id') or 13) if curr_contest else 13
+
         if request.content_type and 'multipart/form-data' in request.content_type:
             title = request.form.get('title', '').strip()
             content = request.form.get('content', '').strip()
             pet_name = request.form.get('pet_name', '강아지').strip()
             pet_type = request.form.get('pet_type', '🐕 강아지').strip()
-            contest_id = int(request.form.get('contest_id', 3))
+            cid_raw = request.form.get('contest_id')
+            contest_id = int(cid_raw) if (cid_raw and str(cid_raw).isdigit()) else default_cid
             user_id = session.get('user_id') or request.form.get('user_id', 'user1')
             temp_filename = request.form.get('temp_filename') or request.form.get('temp_url')
             file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
@@ -1611,7 +1617,8 @@ def create_post():
             sns_blg = (request.form.get('sns_blg') or '').strip()
         else:
             data = request.get_json() or {}
-            contest_id = int(data.get('contest_id', 3))
+            cid_raw = data.get('contest_id')
+            contest_id = int(cid_raw) if (cid_raw and str(cid_raw).isdigit()) else default_cid
             user_id = session.get('user_id') or data.get('user_id', 'user1')
             pet_name = data.get('pet_name', '강아지')
             pet_type = data.get('pet_type', '🐕 강아지')

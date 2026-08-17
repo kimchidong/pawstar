@@ -28,7 +28,7 @@
     <!-- 출전 폼 카드 -->
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-soft);">
         <form method="POST" action="/m/upload" enctype="multipart/form-data" novalidate>
-            <input type="hidden" name="contest_id" value="{{ current_contest.contest_id }}">
+            <input type="hidden" name="contest_id" value="{{ current_contest.CONTEST_ROUND or current_contest.contest_id or 13 }}">
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
                 <div class="m-form-group">
@@ -766,8 +766,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+                    const cid = (data.post ? (data.post.CONTEST_ROUND || data.post.contest_id) : '13') || '13';
                     alert('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾');
-                    location.href = '/m/';
+                    location.href = '/m/?contest_id=' + cid + '&uploaded=true';
                 } else {
                     alert('출전 신청 실패: ' + data.message);
                 }
