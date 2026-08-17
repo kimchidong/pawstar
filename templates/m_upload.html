@@ -233,9 +233,15 @@
                 </div>
             </div>
 
-            <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); width: 100%; padding: 0.9rem; font-weight: 900; font-size: 1rem; border-radius: var(--radius-md);">
-                <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료
-            </button>
+            {% if remaining_entry_count is not none and remaining_entry_count <= 0 %}
+                <button type="submit" class="m-btn-submit" disabled style="background: #cbd5e1 !important; color: #475569 !important; width: 100%; padding: 0.82rem 1rem; font-weight: 800; font-size: 0.95rem; border-radius: 30px; border: none !important; box-shadow: none !important; cursor: not-allowed !important; display: flex; align-items: center; justify-content: center; gap: 0.55rem;">
+                    <i class="fa-solid fa-ban" style="font-size: 1.05rem; color: #475569;"></i> 출전 가능 횟수 초과 (0회 남음)
+                </button>
+            {% else %}
+                <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); width: 100%; padding: 0.9rem; font-weight: 900; font-size: 1rem; border-radius: var(--radius-md);">
+                    <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료
+                </button>
+            {% endif %}
 
             <!-- 출전 제한 안내 하단 팁 카드 (모바일) -->
             <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 0.5rem;">
@@ -827,12 +833,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('.m-btn-submit');
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.style.background = '#cbd5e1';
-                    submitBtn.style.color = '#64748b';
-                    submitBtn.style.border = 'none';
-                    submitBtn.style.boxShadow = 'none';
-                    submitBtn.style.cursor = 'not-allowed';
-                    submitBtn.innerHTML = '<i class="fa-solid fa-ban"></i> 출전 가능 횟수 초과 (0회 남음)';
+                    submitBtn.style.setProperty('background', '#cbd5e1', 'important');
+                    submitBtn.style.setProperty('color', '#475569', 'important');
+                    submitBtn.style.setProperty('border-radius', '30px', 'important');
+                    submitBtn.style.setProperty('border', 'none', 'important');
+                    submitBtn.style.setProperty('box-shadow', 'none', 'important');
+                    submitBtn.style.setProperty('cursor', 'not-allowed', 'important');
+                    submitBtn.style.padding = '0.82rem 1rem';
+                    submitBtn.style.fontSize = '0.95rem';
+                    submitBtn.style.fontWeight = '800';
+                    submitBtn.style.display = 'flex';
+                    submitBtn.style.alignItems = 'center';
+                    submitBtn.style.justifyContent = 'center';
+                    submitBtn.style.gap = '0.55rem';
+                    submitBtn.innerHTML = '<i class="fa-solid fa-ban" style="font-size: 1.05rem; color: #475569;"></i> 출전 가능 횟수 초과 (0회 남음)';
                 }
             }
             setTimeout(showMLimitExceededModal, 150);

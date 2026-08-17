@@ -391,9 +391,15 @@
             <!-- 하단 제출 버튼 영역 -->
             <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light);">
                 <a href="/" style="padding: 0.85rem 2rem; border-radius: 30px; background: #f1f5f9; color: var(--text-secondary); text-decoration: none; font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">취소</a>
-                <button type="submit" style="padding: 0.85rem 2.5rem; border-radius: 30px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); color: #ffffff; border: none; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35); transition: var(--transition); display: inline-flex; align-items: center; gap: 0.6rem;">
-                    <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료하기
-                </button>
+                {% if remaining_entry_count is not none and remaining_entry_count <= 0 %}
+                    <button type="submit" disabled style="padding: 0.85rem 2.5rem; border-radius: 30px; background: #cbd5e1 !important; color: #475569 !important; border: none !important; font-weight: 800; font-size: 1rem; cursor: not-allowed !important; box-shadow: none !important; display: inline-flex; align-items: center; gap: 0.6rem;">
+                        <i class="fa-solid fa-ban" style="font-size: 1.1rem; color: #475569;"></i> 출전 가능 횟수 초과 (0회 남음)
+                    </button>
+                {% else %}
+                    <button type="submit" style="padding: 0.85rem 2.5rem; border-radius: 30px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%); color: #ffffff; border: none; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35); transition: var(--transition); display: inline-flex; align-items: center; gap: 0.6rem;">
+                        <i class="fa-solid fa-paper-plane"></i> 콘테스트 출전 완료하기
+                    </button>
+                {% endif %}
             </div>
             <!-- 출전 제한 안내 하단 팁 카드 -->
             <div style="margin-top: 1.5rem; padding: 1rem 1.4rem; background: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
@@ -1057,12 +1063,19 @@ function disableUploadFormIfLimitExceeded() {
             const submitBtn = uploadForm.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.style.background = '#cbd5e1';
-                submitBtn.style.color = '#64748b';
-                submitBtn.style.border = 'none';
-                submitBtn.style.boxShadow = 'none';
-                submitBtn.style.cursor = 'not-allowed';
-                submitBtn.innerHTML = '<i class="fa-solid fa-ban"></i> 출전 가능 횟수 초과 (0회 남음)';
+                submitBtn.style.setProperty('background', '#cbd5e1', 'important');
+                submitBtn.style.setProperty('color', '#475569', 'important');
+                submitBtn.style.setProperty('border-radius', '30px', 'important');
+                submitBtn.style.setProperty('border', 'none', 'important');
+                submitBtn.style.setProperty('box-shadow', 'none', 'important');
+                submitBtn.style.setProperty('cursor', 'not-allowed', 'important');
+                submitBtn.style.padding = '0.85rem 2.5rem';
+                submitBtn.style.fontSize = '1rem';
+                submitBtn.style.fontWeight = '800';
+                submitBtn.style.display = 'inline-flex';
+                submitBtn.style.alignItems = 'center';
+                submitBtn.style.gap = '0.6rem';
+                submitBtn.innerHTML = '<i class="fa-solid fa-ban" style="font-size: 1.1rem; color: #475569;"></i> 출전 가능 횟수 초과 (0회 남음)';
             }
         }
         setTimeout(showLimitExceededModal, 150);
