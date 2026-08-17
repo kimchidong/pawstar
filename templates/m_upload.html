@@ -801,50 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // 4. 인스타그램 주소 (선택 입력, 입력 시 200자 이내)
-            const mSnsInstEl = document.getElementById('mUploadSnsInst');
-            const mSnsInst = mSnsInstEl ? mSnsInstEl.value.trim() : '';
-            if (mSnsInst && mSnsInst.length > 200) {
-                showCustomToast('🔗 인스타그램 주소는 200자 이내로 입력해 주세요!', 'fa-link');
-                highlightInvalidField(mSnsInstEl);
-                return;
-            }
-
-            // 5. 유튜브 주소 (선택 입력, 입력 시 200자 이내)
-            const mSnsYtbEl = document.getElementById('mUploadSnsYtb');
-            const mSnsYtb = mSnsYtbEl ? mSnsYtbEl.value.trim() : '';
-            if (mSnsYtb && mSnsYtb.length > 200) {
-                showCustomToast('🔗 유튜브 주소는 200자 이내로 입력해 주세요!', 'fa-link');
-                highlightInvalidField(mSnsYtbEl);
-                return;
-            }
-
-            // 6. 페이스북 주소 (선택 입력, 입력 시 200자 이내)
-            const mSnsFsbEl = document.getElementById('mUploadSnsFsb');
-            const mSnsFsb = mSnsFsbEl ? mSnsFsbEl.value.trim() : '';
-            if (mSnsFsb && mSnsFsb.length > 200) {
-                showCustomToast('🔗 페이스북 주소는 200자 이내로 입력해 주세요!', 'fa-link');
-                highlightInvalidField(mSnsFsbEl);
-                return;
-            }
-
-            // 7. 블로그 주소 (선택 입력, 입력 시 200자 이내)
-            const mSnsBlgEl = document.getElementById('mUploadSnsBlg');
-            const mSnsBlg = mSnsBlgEl ? mSnsBlgEl.value.trim() : '';
-            if (mSnsBlg && mSnsBlg.length > 200) {
-                showCustomToast('🔗 블로그 주소는 200자 이내로 입력해 주세요!', 'fa-link');
-                highlightInvalidField(mSnsBlgEl);
-                return;
-            }
-
-            // 8. 출전 사진 파일 첨부
-            if (!mCurrentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
-                showCustomToast('🖼️ 출전시킬 펫 이미지 파일을 첨부해 주세요!', 'fa-image');
-                highlightInvalidField(fileInput);
-                return;
-            }
-
-            // 9. 자랑 내용 및 소개글 입력 체크
+            // 4. 자랑 내용 및 소개글 입력 체크
             if (!content) {
                 showCustomToast('📝 자랑 내용 및 소개글을 입력해 주세요!', 'fa-align-left');
                 highlightInvalidField(textareaContent);
@@ -853,6 +810,49 @@ document.addEventListener('DOMContentLoaded', function() {
             if (content.length > 100) {
                 showCustomToast('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요!', 'fa-align-left');
                 highlightInvalidField(textareaContent);
+                return;
+            }
+
+            // 5. 출전 사진 파일 첨부
+            if (!mCurrentTempFilename && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
+                showCustomToast('🖼️ 출전시킬 펫 이미지 파일을 첨부해 주세요!', 'fa-image');
+                highlightInvalidField(fileInput);
+                return;
+            }
+
+            // 6. 인스타그램 주소 (선택 입력, 입력 시 200자 이내)
+            const mSnsInstEl = document.getElementById('mUploadSnsInst');
+            const mSnsInst = mSnsInstEl ? mSnsInstEl.value.trim() : '';
+            if (mSnsInst && mSnsInst.length > 200) {
+                showCustomToast('🔗 인스타그램 주소는 200자 이내로 입력해 주세요!', 'fa-link');
+                highlightInvalidField(mSnsInstEl);
+                return;
+            }
+
+            // 7. 유튜브 주소 (선택 입력, 입력 시 200자 이내)
+            const mSnsYtbEl = document.getElementById('mUploadSnsYtb');
+            const mSnsYtb = mSnsYtbEl ? mSnsYtbEl.value.trim() : '';
+            if (mSnsYtb && mSnsYtb.length > 200) {
+                showCustomToast('🔗 유튜브 주소는 200자 이내로 입력해 주세요!', 'fa-link');
+                highlightInvalidField(mSnsYtbEl);
+                return;
+            }
+
+            // 8. 페이스북 주소 (선택 입력, 입력 시 200자 이내)
+            const mSnsFsbEl = document.getElementById('mUploadSnsFsb');
+            const mSnsFsb = mSnsFsbEl ? mSnsFsbEl.value.trim() : '';
+            if (mSnsFsb && mSnsFsb.length > 200) {
+                showCustomToast('🔗 페이스북 주소는 200자 이내로 입력해 주세요!', 'fa-link');
+                highlightInvalidField(mSnsFsbEl);
+                return;
+            }
+
+            // 9. 블로그 주소 (선택 입력, 입력 시 200자 이내)
+            const mSnsBlgEl = document.getElementById('mUploadSnsBlg');
+            const mSnsBlg = mSnsBlgEl ? mSnsBlgEl.value.trim() : '';
+            if (mSnsBlg && mSnsBlg.length > 200) {
+                showCustomToast('🔗 블로그 주소는 200자 이내로 입력해 주세요!', 'fa-link');
+                highlightInvalidField(mSnsBlgEl);
                 return;
             }
 

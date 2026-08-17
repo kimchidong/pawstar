@@ -1041,51 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
-            // 4. 인스타그램 주소 (선택 입력, 입력 시 200자 이내)
-            const snsInstEl = document.getElementById('uploadSnsInst');
-            const snsInst = snsInstEl ? snsInstEl.value.trim() : '';
-            if (snsInst && snsInst.length > 200) {
-                alert('🔗 인스타그램 주소는 200자 이내로 입력해 주세요.');
-                if (snsInstEl) snsInstEl.focus();
-                return false;
-            }
-
-            // 5. 유튜브 주소 (선택 입력, 입력 시 200자 이내)
-            const snsYtbEl = document.getElementById('uploadSnsYtb');
-            const snsYtb = snsYtbEl ? snsYtbEl.value.trim() : '';
-            if (snsYtb && snsYtb.length > 200) {
-                alert('🔗 유튜브 주소는 200자 이내로 입력해 주세요.');
-                if (snsYtbEl) snsYtbEl.focus();
-                return false;
-            }
-
-            // 6. 페이스북 주소 (선택 입력, 입력 시 200자 이내)
-            const snsFsbEl = document.getElementById('uploadSnsFsb');
-            const snsFsb = snsFsbEl ? snsFsbEl.value.trim() : '';
-            if (snsFsb && snsFsb.length > 200) {
-                alert('🔗 페이스북 주소는 200자 이내로 입력해 주세요.');
-                if (snsFsbEl) snsFsbEl.focus();
-                return false;
-            }
-
-            // 7. 블로그 주소 (선택 입력, 입력 시 200자 이내)
-            const snsBlgEl = document.getElementById('uploadSnsBlg');
-            const snsBlg = snsBlgEl ? snsBlgEl.value.trim() : '';
-            if (snsBlg && snsBlg.length > 200) {
-                alert('🔗 블로그 주소는 200자 이내로 입력해 주세요.');
-                if (snsBlgEl) snsBlgEl.focus();
-                return false;
-            }
-
-            // 8. 출전 사진 파일 첨부
-            if (!hasFile) {
-                alert('🖼️ 출전 사진 파일(이미지)을 첨부해 주세요.');
-                const dropzone = document.getElementById('pcCustomFileDropzone');
-                if (dropzone) dropzone.click();
-                return false;
-            }
-
-            // 9. 자랑 내용 및 소개글 입력 체크
+            // 4. 자랑 내용 및 소개글 입력 체크
             if (!content) {
                 alert('📝 자랑 내용 및 소개글을 입력해 주세요.');
                 if (contentEl) contentEl.focus();
@@ -1094,6 +1050,50 @@ document.addEventListener('DOMContentLoaded', function() {
             if (content.length > 100) {
                 alert('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요.');
                 if (contentEl) contentEl.focus();
+                return false;
+            }
+
+            // 5. 출전 사진 파일 첨부 체크
+            if (!hasFile) {
+                alert('🖼️ 출전 사진 파일(이미지)을 첨부해 주세요.');
+                const dropzone = document.getElementById('pcCustomFileDropzone');
+                if (dropzone) dropzone.click();
+                return false;
+            }
+
+            // 6. 인스타그램 주소 (선택 입력, 입력 시 200자 이내)
+            const snsInstEl = document.getElementById('uploadSnsInst');
+            const snsInst = snsInstEl ? snsInstEl.value.trim() : '';
+            if (snsInst && snsInst.length > 200) {
+                alert('🔗 인스타그램 주소는 200자 이내로 입력해 주세요.');
+                if (snsInstEl) snsInstEl.focus();
+                return false;
+            }
+
+            // 7. 유튜브 주소 (선택 입력, 입력 시 200자 이내)
+            const snsYtbEl = document.getElementById('uploadSnsYtb');
+            const snsYtb = snsYtbEl ? snsYtbEl.value.trim() : '';
+            if (snsYtb && snsYtb.length > 200) {
+                alert('🔗 유튜브 주소는 200자 이내로 입력해 주세요.');
+                if (snsYtbEl) snsYtbEl.focus();
+                return false;
+            }
+
+            // 8. 페이스북 주소 (선택 입력, 입력 시 200자 이내)
+            const snsFsbEl = document.getElementById('uploadSnsFsb');
+            const snsFsb = snsFsbEl ? snsFsbEl.value.trim() : '';
+            if (snsFsb && snsFsb.length > 200) {
+                alert('🔗 페이스북 주소는 200자 이내로 입력해 주세요.');
+                if (snsFsbEl) snsFsbEl.focus();
+                return false;
+            }
+
+            // 9. 블로그 주소 (선택 입력, 입력 시 200자 이내)
+            const snsBlgEl = document.getElementById('uploadSnsBlg');
+            const snsBlg = snsBlgEl ? snsBlgEl.value.trim() : '';
+            if (snsBlg && snsBlg.length > 200) {
+                alert('🔗 블로그 주소는 200자 이내로 입력해 주세요.');
+                if (snsBlgEl) snsBlgEl.focus();
                 return false;
             }
 
