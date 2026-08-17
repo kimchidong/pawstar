@@ -90,9 +90,9 @@
 
 
             <!-- 상단: 2열 입력 폼 영역 -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
-                <!-- 좌측 폼 컨트롤 그룹 (이름, 동물 종류, 자랑 제목, SNS 계정 설정) -->
-                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem; align-items: stretch;">
+                <!-- 좌측 폼 컨트롤 그룹 (동물 종류, 이름, 자랑 제목, 자랑 내용 및 소개글) -->
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; height: 100%;">
 
                     <!-- 1. 동물 종류 & 이름 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -156,7 +156,50 @@
                         <input type="text" name="title" id="uploadTitle" class="form-control" maxlength="80" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                     </div>
 
-                    <!-- 3. SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
+                    <!-- 3. 자랑 내용 및 소개글 (좌측 하단 배치 - 우측 끝선과 높이 1:1 자동 맞춤) -->
+                    <div class="form-group" style="flex: 1; display: flex; flex-direction: column; margin-bottom: 0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0;">
+                                📝 자랑 내용 및 소개글
+                            </label>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;"><span id="uploadContentCharCount" style="color: #7c3aed;">0</span>/100</span>
+                        </div>
+                        <textarea name="content" class="form-control" maxlength="100" required style="width: 100%; flex: 1; height: 100%; min-height: 120px; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-family: inherit; resize: none; line-height: 1.55; box-sizing: border-box;"></textarea>
+                    </div>
+
+                </div>
+
+                <!-- 우측 폼 컨트롤 그룹 (출전 사진 파일 첨부, SNS 계정 주소 설정) -->
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; height: 100%;">
+
+                    <!-- 1. 출전 사진 파일 첨부 -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            🖼️ 출전 사진 파일 첨부
+                        </label>
+                        <!-- 숨겨진 정식 file input -->
+                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
+
+                        <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
+                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: #ffffff; border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                            <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 100%; height: 100%;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <span style="font-weight: 800; font-size: 0.88rem; color: #1e293b; margin-top: 0.1rem;">📸 예쁜 아이 사진 선택하기</span>
+                                <span style="font-size: 0.76rem; color: #64748b;">클릭하여 컴퓨터에서 사진 업로드 (JPG, PNG, WEBP)</span>
+                            </div>
+                            <div id="pcCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.85rem 1.1rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); width: 100%; box-sizing: border-box;">
+                                <div style="display: flex; align-items: center; gap: 0.65rem; overflow: hidden; text-align: left;">
+                                    <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.3rem; flex-shrink: 0;"></i>
+                                    <span id="pcCustomFileName" style="font-weight: 800; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
+                                </div>
+                                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. SNS 주소 입력 영역 (우측 하단 배치) -->
                     <div style="border-top: 1px dashed var(--border-light); padding-top: 1.25rem; margin-top: 0.25rem;">
                         <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
                             🔗 SNS / 소셜 계정 주소 설정 <span style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted);">(선택 입력)</span>
@@ -203,49 +246,6 @@
                                 <input type="text" name="sns_blg" id="uploadSnsBlg" class="form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 0.75rem; font-size: 0.84rem;">
                             </div>
                         </div>
-                    </div>
-
-                </div>
-
-                <!-- 우측 폼 컨트롤 그룹 (출전 사진 파일 첨부, 자랑 내용 및 소개글) -->
-                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-
-                    <!-- 1. 출전 사진 파일 첨부 -->
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                            🖼️ 출전 사진 파일 첨부
-                        </label>
-                        <!-- 숨겨진 정식 file input -->
-                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
-
-                        <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
-                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: #ffffff; border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-                            <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 100%; height: 100%;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
-                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.2rem;"></i>
-                                </div>
-                                <span style="font-weight: 800; font-size: 0.88rem; color: #1e293b; margin-top: 0.1rem;">📸 예쁜 아이 사진 선택하기</span>
-                                <span style="font-size: 0.76rem; color: #64748b;">클릭하여 컴퓨터에서 사진 업로드 (JPG, PNG, WEBP)</span>
-                            </div>
-                            <div id="pcCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.85rem 1.1rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); width: 100%; box-sizing: border-box;">
-                                <div style="display: flex; align-items: center; gap: 0.65rem; overflow: hidden; text-align: left;">
-                                    <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.3rem; flex-shrink: 0;"></i>
-                                    <span id="pcCustomFileName" style="font-weight: 800; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
-                                </div>
-                                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. 자랑 내용 및 소개글 -->
-                    <div class="form-group" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0;">
-                                📝 자랑 내용 및 소개글
-                            </label>
-                            <span style="font-size: 0.8rem; font-weight: 700; color: #64748b;"><span id="uploadContentCharCount" style="color: #7c3aed;">0</span>/100</span>
-                        </div>
-                        <textarea name="content" class="form-control" maxlength="100" required style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 160px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
                     </div>
 
                 </div>
