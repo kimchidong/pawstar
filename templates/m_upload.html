@@ -169,6 +169,7 @@
                                     <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
                                         <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="m-author-avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
                                         <span class="m-author-name">{{ current_user.nickname or '집사 닉네임' }}</span>
+                                        <div id="mPreviewCardSnsGroup" style="display: inline-flex; align-items: center;"></div>
                                     </div>
                                     <span class="m-round-info-badge" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
                                         제{{ current_contest.CONTEST_ROUND or '8' }}회
@@ -272,8 +273,11 @@
             <div style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);">
                 <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%;">
                     <img id="mPreviewAuthorImg" src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ffffff; box-shadow: 0 4px 10px rgba(244, 114, 182, 0.2); flex-shrink: 0;" alt="profile">
-                    <div style="min-width: 0; flex: 1;">
-                        <div id="mPreviewAuthorNickname" style="font-size: 0.88rem; font-weight: 700; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin-bottom: 0.2rem;">{{ current_user.nickname or '집사 닉네임' }}</div>
+                    <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.2rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
+                            <div id="mPreviewAuthorNickname" style="font-size: 0.88rem; font-weight: 800; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ current_user.nickname or '집사 닉네임' }}</div>
+                            <div id="mPreviewModalSnsGroup" style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; margin-left: auto;"></div>
+                        </div>
                         <div id="mPreviewModalPetTag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
                             <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
                         </div>
@@ -436,10 +440,80 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
     }
 
+    function formatSnsLink(val) {
+        if (!val) return '';
+        let v = val.trim();
+        if (!v) return '';
+        if (!v.startsWith('http://') && !v.startsWith('https://')) {
+            v = 'https://' + v;
+        }
+        return v;
+    }
+
+    function buildSnsHtml(inst, ytb, fsb, blg) {
+        const instLink = formatSnsLink(inst);
+        const ytbLink = formatSnsLink(ytb);
+        const fsbLink = formatSnsLink(fsb);
+        const blgLink = formatSnsLink(blg);
+
+        let html = '';
+        let count = 0;
+
+        if (instLink) {
+            count++;
+            html += `<a href="${instLink}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-instagram"></i></a>`;
+        }
+        if (ytbLink) {
+            count++;
+            html += `<a href="${ytbLink}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-youtube"></i></a>`;
+        }
+        if (fsbLink) {
+            count++;
+            html += `<a href="${fsbLink}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-facebook-f"></i></a>`;
+        }
+        if (blgLink) {
+            count++;
+            html += `<a href="${blgLink}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-solid fa-blog"></i></a>`;
+        }
+
+        if (count > 0) {
+            return `<div class="sns-overlap-group" style="margin-left: 0.15rem; flex-shrink: 0; display: inline-flex; align-items: center;" onclick="event.stopPropagation();">${html}</div>`;
+        }
+        return '';
+    }
+
+    function buildModalSnsHtml(inst, ytb, fsb, blg) {
+        const instLink = formatSnsLink(inst);
+        const ytbLink = formatSnsLink(ytb);
+        const fsbLink = formatSnsLink(fsb);
+        const blgLink = formatSnsLink(blg);
+
+        const snsItems = [
+            { type: 'instagram', link: instLink, icon: 'fa-brands fa-instagram', title: 'Instagram' },
+            { type: 'youtube', link: ytbLink, icon: 'fa-brands fa-youtube', title: 'YouTube' },
+            { type: 'facebook', link: fsbLink, icon: 'fa-brands fa-facebook-f', title: 'Facebook' },
+            { type: 'blog', link: blgLink, icon: 'fa-solid fa-blog', title: 'Blog' }
+        ];
+
+        let html = '';
+        snsItems.forEach(item => {
+            if (item.link) {
+                html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer" title="${item.title}" class="profile-social-btn ${item.type}" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; padding: 0; line-height: 1; flex-shrink: 0;"><i class="${item.icon}"></i></a>`;
+            }
+        });
+
+        return html;
+    }
+
     function updateMobilePreview() {
         const petName = inputPetName ? inputPetName.value.trim() : '';
         let petTypeRaw = (selectPetType && selectPetType.selectedIndex >= 0 && selectPetType.value !== '') ? selectPetType.value : '미선택';
         const cleanKind = petTypeRaw.replace(/[🐕🐈🐹🦜🐇🦔🦎🐠🦦🐾🐶🐱🐰🐟🐢🐴🐷☎️]/g, '').trim() || '미선택';
+
+        const snsInst = (document.getElementById('mUploadSnsInst')?.value || '').trim();
+        const snsYtb = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
+        const snsFsb = (document.getElementById('mUploadSnsFsb')?.value || '').trim();
+        const snsBlg = (document.getElementById('mUploadSnsBlg')?.value || '').trim();
         
         let faIcon = 'fa-solid fa-paw';
         if (cleanKind.includes('강아지') || cleanKind.includes('개')) faIcon = 'fa-solid fa-dog';
@@ -472,6 +546,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const mPreviewModalDesc = document.getElementById('mPreviewModalDesc');
         const mPreviewModalDate = document.getElementById('mPreviewModalDate');
 
+        const cardSnsHTML = buildSnsHtml(snsInst, snsYtb, snsFsb, snsBlg);
+        const modalSnsHTML = buildModalSnsHtml(snsInst, snsYtb, snsFsb, snsBlg);
+
+        const mPreviewCardSnsGroup = document.getElementById('mPreviewCardSnsGroup');
+        const mPreviewModalSnsGroup = document.getElementById('mPreviewModalSnsGroup');
+
+        if (mPreviewCardSnsGroup) mPreviewCardSnsGroup.innerHTML = cardSnsHTML;
+        if (mPreviewModalSnsGroup) mPreviewModalSnsGroup.innerHTML = modalSnsHTML;
+
         if (mPreviewCardPetTag) mPreviewCardPetTag.innerHTML = petTagHTML;
         if (mPreviewModalPetTag) mPreviewModalPetTag.innerHTML = petTagHTML;
         if (mPreviewCardTitle) mPreviewCardTitle.textContent = titleText;
@@ -484,6 +567,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectPetType) selectPetType.addEventListener('change', updateMobilePreview);
     if (inputTitle) inputTitle.addEventListener('input', updateMobilePreview);
     if (textareaContent) textareaContent.addEventListener('input', updateMobilePreview);
+
+    ['mUploadSnsInst', 'mUploadSnsYtb', 'mUploadSnsFsb', 'mUploadSnsBlg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateMobilePreview);
+    });
 
     // 커스텀 동물 종류 드롭다운 전역 토글 & 옵션 선택 함수
     window.toggleMUploadPetDropdown = function(triggerEl, e) {

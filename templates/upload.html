@@ -369,7 +369,10 @@
 
                                         <div class="author-detail">
 
-                                            <div class="nickname">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                            <div class="nickname" style="display: flex; align-items: center; gap: 0.35rem;">
+                                                <span id="previewCardAuthorName">{{ current_user.nickname or '집사 닉네임' }}</span>
+                                                <div id="previewCardSnsGroup" style="display: inline-flex; align-items: center;"></div>
+                                            </div>
 
                                             <div class="pet-tag" id="previewCardPetTag" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">
 
@@ -492,10 +495,15 @@
 
                     <!-- 아기자기한 작성자 프로필 카드 (원본 팝업과 1:1 동일) -->
                     <div style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);">
-                        <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; width: 100%;">
                             <img id="previewAuthorImg" src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="author-img" style="width: 50px !important; height: 50px !important; min-width: 50px !important; min-height: 50px !important; border-radius: 50% !important; object-fit: cover !important; border: 2.5px solid #ffffff !important; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.22) !important; flex-shrink: 0 !important;" alt="profile">
-                            <div style="min-width: 0; flex: 1;">
-                                <div id="previewAuthorNickname" class="nickname" style="font-size: 0.76rem; font-weight: 700; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin-bottom: 0.2rem;">{{ current_user.nickname or '집사 닉네임' }}</div>
+                            <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;">
+                                <!-- 닉네임 수평 라인 (닉네임 + 우측 정렬 SNS 링크 세트) -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
+                                    <div id="previewAuthorNickname" class="nickname" style="font-size: 0.88rem; font-weight: 800; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ current_user.nickname or '집사 닉네임' }}</div>
+                                    <!-- 출전작 팝업 닉네임 수평선 우측 정렬 소셜 아이콘 영역 (100% 동일 독립 버튼 스타일) -->
+                                    <div id="previewModalSnsGroup" style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; margin-left: auto;"></div>
+                                </div>
                                 <div id="previewModalPetTag" class="pet-tag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
                                     <span style="color: #e11d48; font-weight: 800; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-paw"></i> 미선택</span>
                                 </div>
@@ -655,11 +663,81 @@ function getFormattedNowDateTime() {
     return `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
 }
 
+function formatSnsLink(val) {
+    if (!val) return '';
+    let v = val.trim();
+    if (!v) return '';
+    if (!v.startsWith('http://') && !v.startsWith('https://')) {
+        v = 'https://' + v;
+    }
+    return v;
+}
+
+function buildSnsHtml(inst, ytb, fsb, blg) {
+    const instLink = formatSnsLink(inst);
+    const ytbLink = formatSnsLink(ytb);
+    const fsbLink = formatSnsLink(fsb);
+    const blgLink = formatSnsLink(blg);
+
+    let html = '';
+    let count = 0;
+
+    if (instLink) {
+        count++;
+        html += `<a href="${instLink}" target="_blank" rel="noopener noreferrer" title="Instagram" class="sns-overlap-item instagram" style="z-index: 4; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-instagram"></i></a>`;
+    }
+    if (ytbLink) {
+        count++;
+        html += `<a href="${ytbLink}" target="_blank" rel="noopener noreferrer" title="YouTube" class="sns-overlap-item youtube" style="z-index: 3; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-youtube"></i></a>`;
+    }
+    if (fsbLink) {
+        count++;
+        html += `<a href="${fsbLink}" target="_blank" rel="noopener noreferrer" title="Facebook" class="sns-overlap-item facebook" style="z-index: 2; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-brands fa-facebook-f"></i></a>`;
+    }
+    if (blgLink) {
+        count++;
+        html += `<a href="${blgLink}" target="_blank" rel="noopener noreferrer" title="Blog" class="sns-overlap-item blog" style="z-index: 1; ${count > 1 ? 'margin-left: -6px;' : ''}"><i class="fa-solid fa-blog"></i></a>`;
+    }
+
+    if (count > 0) {
+        return `<div class="sns-overlap-group" style="margin-left: 0.15rem; flex-shrink: 0; display: inline-flex; align-items: center;" onclick="event.stopPropagation();">${html}</div>`;
+    }
+    return '';
+}
+
+function buildModalSnsHtml(inst, ytb, fsb, blg) {
+    const instLink = formatSnsLink(inst);
+    const ytbLink = formatSnsLink(ytb);
+    const fsbLink = formatSnsLink(fsb);
+    const blgLink = formatSnsLink(blg);
+
+    const snsItems = [
+        { type: 'instagram', link: instLink, icon: 'fa-brands fa-instagram', title: 'Instagram' },
+        { type: 'youtube', link: ytbLink, icon: 'fa-brands fa-youtube', title: 'YouTube' },
+        { type: 'facebook', link: fsbLink, icon: 'fa-brands fa-facebook-f', title: 'Facebook' },
+        { type: 'blog', link: blgLink, icon: 'fa-solid fa-blog', title: 'Blog' }
+    ];
+
+    let html = '';
+    snsItems.forEach(item => {
+        if (item.link) {
+            html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer" title="${item.title}" class="profile-social-btn ${item.type}" style="width: 32px; height: 32px; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; padding: 0; line-height: 1; flex-shrink: 0;"><i class="${item.icon}"></i></a>`;
+        }
+    });
+
+    return html;
+}
+
 function updatePreview() {
     const inputPetName = document.getElementById('uploadPetName') || document.querySelector('input[name="pet_name"]');
     const selectPetType = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect') || document.querySelector('select[name="pet_type"]');
     const inputTitle = document.getElementById('uploadTitle') || document.querySelector('input[name="title"]');
     const textareaContent = document.querySelector('textarea[name="content"]');
+
+    const snsInst = (document.getElementById('uploadSnsInst')?.value || '').trim();
+    const snsYtb = (document.getElementById('uploadSnsYtb')?.value || '').trim();
+    const snsFsb = (document.getElementById('uploadSnsFsb')?.value || '').trim();
+    const snsBlg = (document.getElementById('uploadSnsBlg')?.value || '').trim();
 
     const petName = inputPetName ? inputPetName.value.trim() : '';
     const petTypeVal = selectPetType ? selectPetType.value : '';
@@ -698,6 +776,15 @@ function updatePreview() {
     const previewCardDate = document.getElementById('previewCardDate');
     const previewModalDate = document.getElementById('previewModalDate');
 
+    const cardSnsHTML = buildSnsHtml(snsInst, snsYtb, snsFsb, snsBlg);
+    const modalSnsHTML = buildModalSnsHtml(snsInst, snsYtb, snsFsb, snsBlg);
+
+    const previewCardSnsGroup = document.getElementById('previewCardSnsGroup');
+    const previewModalSnsGroup = document.getElementById('previewModalSnsGroup');
+
+    if (previewCardSnsGroup) previewCardSnsGroup.innerHTML = cardSnsHTML;
+    if (previewModalSnsGroup) previewModalSnsGroup.innerHTML = modalSnsHTML;
+
     if (previewCardPetTag) previewCardPetTag.innerHTML = petTagHTML;
     if (previewModalPetTag) previewModalPetTag.innerHTML = petTagHTML;
     if (previewCardTitle) previewCardTitle.textContent = titleText;
@@ -719,6 +806,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectPetType) selectPetType.addEventListener('change', updatePreview);
     if (inputTitle) inputTitle.addEventListener('input', updatePreview);
     if (textareaContent) textareaContent.addEventListener('input', updatePreview);
+
+    ['uploadSnsInst', 'uploadSnsYtb', 'uploadSnsFsb', 'uploadSnsBlg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updatePreview);
+    });
 
     // 첨부한 예쁜 아이 사진을 미리보기 팝업 이미지(#previewModalImg) & 카드 이미지(#previewCardImg)에 100% 실시간 동기화!
     if (mediaFileInput) {
@@ -820,6 +912,63 @@ document.addEventListener('click', function(e) {
             d.classList.remove('open');
             const box = d.querySelector('.custom-pet-options');
             if (box) box.style.display = 'none';
+        });
+    }
+});
+
+// PC 출전 등록 폼 필수 입력 항목 유효성 검증
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('postUploadForm');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            const petNameEl = document.getElementById('uploadPetName');
+            const petTypeEl = document.getElementById('hiddenUploadPetType');
+            const titleEl = document.getElementById('uploadTitle');
+            const contentEl = document.querySelector('textarea[name="content"]');
+            const mediaFileEl = document.getElementById('uploadMediaFile');
+
+            const petName = petNameEl ? petNameEl.value.trim() : '';
+            const petType = petTypeEl ? petTypeEl.value.trim() : '';
+            const title = titleEl ? titleEl.value.trim() : '';
+            const content = contentEl ? contentEl.value.trim() : '';
+            const hasFile = mediaFileEl && mediaFileEl.files && mediaFileEl.files.length > 0;
+
+            if (!petName) {
+                e.preventDefault();
+                alert('🐶 아이의 이름을 입력해주세요.');
+                if (petNameEl) petNameEl.focus();
+                return false;
+            }
+
+            if (!petType) {
+                e.preventDefault();
+                alert('🐾 아이의 동물 종류를 선택해주세요.');
+                const dropdown = document.getElementById('uploadPetTypeDropdown');
+                if (dropdown) window.toggleUploadPetDropdown(dropdown.querySelector('.custom-pet-trigger'));
+                return false;
+            }
+
+            if (!title) {
+                e.preventDefault();
+                alert('✨ 자랑 제목을 입력해주세요.');
+                if (titleEl) titleEl.focus();
+                return false;
+            }
+
+            if (!content) {
+                e.preventDefault();
+                alert('📝 자랑 내용 및 소개글을 입력해주세요.');
+                if (contentEl) contentEl.focus();
+                return false;
+            }
+
+            if (!hasFile) {
+                e.preventDefault();
+                alert('🖼️ 출전 사진 파일(이미지)을 반드시 첨부해주세요.');
+                const dropzone = document.getElementById('pcCustomFileDropzone');
+                if (dropzone) dropzone.click();
+                return false;
+            }
         });
     }
 });

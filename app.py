@@ -1012,34 +1012,52 @@ def upload_page():
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
     
     if request.method == 'POST':
-        contest_id = current_contest['contest_id'] if current_contest else 1
+        contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
         user_id = session.get('user_id')
-        pet_name = request.form.get('pet_name', '우리 아이')
-        pet_type = request.form.get('pet_type', '🐕 강아지')
-        title = request.form.get('title', '')
-        content = request.form.get('content', '')
+        pet_name = (request.form.get('pet_name') or '').strip()
+        pet_type = (request.form.get('pet_type') or '').strip()
+        title = (request.form.get('title') or '').strip()
+        content = (request.form.get('content') or '').strip()
         sns_inst = (request.form.get('sns_inst') or '').strip()
         sns_ytb = (request.form.get('sns_ytb') or '').strip()
         sns_fsb = (request.form.get('sns_fsb') or '').strip()
         sns_blg = (request.form.get('sns_blg') or '').strip()
         
-        media_url = ''
-        if 'media_file' in request.files and request.files['media_file'].filename != '':
-            uploaded_url = save_uploaded_media(request.files['media_file'])
-            if uploaded_url:
-                media_url = uploaded_url
-
-        if not media_url:
-            media_url = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80'
-
+        if not pet_name:
+            flash('🐶 반려동물 이름을 입력해주세요.', 'danger')
+            return redirect('/upload')
+        if not pet_type:
+            flash('🐾 반려동물 종류를 선택해주세요.', 'danger')
+            return redirect('/upload')
         if not title:
+            flash('✨ 자랑 제목을 입력해주세요.', 'danger')
+            return redirect('/upload')
+        if not content:
+            flash('📝 자랑 내용 및 소개글을 입력해주세요.', 'danger')
             return redirect('/upload')
 
-        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url, sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg)
+        file = request.files.get('media_file')
+        if not file or file.filename == '':
+            flash('🖼️ 출전 사진 파일 첨부가 필요합니다. 사진을 선택해주세요.', 'danger')
+            return redirect('/upload')
+
+        next_post_id = service.get_next_post_id()
+        full_path1, full_path2 = process_paw_images_dual(file, contest_id, next_post_id)
+
+        res = service.create_post(
+            contest_id, user_id, pet_name, pet_type, title, content, 
+            file_path1=full_path1, file_path2=full_path2, force_post_id=next_post_id,
+            sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg
+        )
+
+        if isinstance(res, dict) and not res.get('success'):
+            flash(f"⚠️ {res.get('message', '출전 등록에 실패했습니다.')}", 'danger')
+            return redirect('/upload')
+
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/?uploaded=true')
 
-    contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
+    contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
     my_entry_count = service.get_user_contest_entry_count(contest_id, user_id)
     remaining_entry_count = max(0, 5 - my_entry_count)
     now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -1065,30 +1083,48 @@ def m_upload_page():
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
 
     if request.method == 'POST':
-        contest_id = current_contest.get('CONTEST_ROUND', 1) if current_contest else 1
+        contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 1) if current_contest else 1
         user_id = session.get('user_id') or 'user1'
-        pet_name = request.form.get('pet_name', '우리 아이')
-        pet_type = request.form.get('pet_type', '🐕 강아지')
-        title = request.form.get('title', '')
-        content = request.form.get('content', '')
+        pet_name = (request.form.get('pet_name') or '').strip()
+        pet_type = (request.form.get('pet_type') or '').strip()
+        title = (request.form.get('title') or '').strip()
+        content = (request.form.get('content') or '').strip()
         sns_inst = (request.form.get('sns_inst') or '').strip()
         sns_ytb = (request.form.get('sns_ytb') or '').strip()
         sns_fsb = (request.form.get('sns_fsb') or '').strip()
         sns_blg = (request.form.get('sns_blg') or '').strip()
-        
-        media_url = ''
-        if 'media_file' in request.files and request.files['media_file'].filename != '':
-            uploaded_url = save_uploaded_media(request.files['media_file'])
-            if uploaded_url:
-                media_url = uploaded_url
 
-        if not media_url:
-            media_url = 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80'
-
+        if not pet_name:
+            flash('🐶 반려동물 이름을 입력해주세요.', 'danger')
+            return redirect('/m/upload')
+        if not pet_type:
+            flash('🐾 반려동물 종류를 선택해주세요.', 'danger')
+            return redirect('/m/upload')
         if not title:
+            flash('✨ 자랑 제목을 입력해주세요.', 'danger')
+            return redirect('/m/upload')
+        if not content:
+            flash('📝 자랑 내용 및 소개글을 입력해주세요.', 'danger')
             return redirect('/m/upload')
 
-        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url, sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg)
+        file = request.files.get('media_file')
+        if not file or file.filename == '':
+            flash('🖼️ 출전 사진 파일 첨부가 필요합니다. 사진을 선택해주세요.', 'danger')
+            return redirect('/m/upload')
+
+        next_post_id = service.get_next_post_id()
+        full_path1, full_path2 = process_paw_images_dual(file, contest_id, next_post_id)
+
+        res = service.create_post(
+            contest_id, user_id, pet_name, pet_type, title, content, 
+            file_path1=full_path1, file_path2=full_path2, force_post_id=next_post_id,
+            sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg
+        )
+
+        if isinstance(res, dict) and not res.get('success'):
+            flash(f"⚠️ {res.get('message', '출전 등록에 실패했습니다.')}", 'danger')
+            return redirect('/m/upload')
+
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/m?uploaded=true')
 
