@@ -1024,22 +1024,43 @@ def upload_page():
         sns_fsb = (request.form.get('sns_fsb') or '').strip()
         sns_blg = (request.form.get('sns_blg') or '').strip()
         
-        if not pet_name:
-            flash('🐶 반려동물 이름을 입력해주세요.', 'danger')
-            return redirect('/upload')
+        # 1. 동물 종류
         if not pet_type:
-            flash('🐾 반려동물 종류를 선택해주세요.', 'danger')
+            flash('🐾 반려동물 종류를 선택해 주세요.', 'danger')
             return redirect('/upload')
+        # 2. 이름
+        if not pet_name:
+            flash('🐶 반려동물 이름을 입력해 주세요.', 'danger')
+            return redirect('/upload')
+        # 3. 자랑 제목
         if not title:
-            flash('✨ 자랑 제목을 입력해주세요.', 'danger')
+            flash('✨ 자랑 제목을 입력해 주세요.', 'danger')
             return redirect('/upload')
-        if not content:
-            flash('📝 자랑 내용 및 소개글을 입력해주세요.', 'danger')
+        # 4. 인스타그램 주소
+        if sns_inst and len(sns_inst) > 200:
+            flash('🔗 인스타그램 주소는 200자 이내로 입력해 주세요.', 'danger')
+            return redirect('/upload')
+        # 5. 유튜브 주소
+        if sns_ytb and len(sns_ytb) > 200:
+            flash('🔗 유튜브 주소는 200자 이내로 입력해 주세요.', 'danger')
+            return redirect('/upload')
+        # 6. 페이스북 주소
+        if sns_fsb and len(sns_fsb) > 200:
+            flash('🔗 페이스북 주소는 200자 이내로 입력해 주세요.', 'danger')
+            return redirect('/upload')
+        # 7. 블로그 주소
+        if sns_blg and len(sns_blg) > 200:
+            flash('🔗 블로그 주소는 200자 이내로 입력해 주세요.', 'danger')
             return redirect('/upload')
 
         file = request.files.get('media_file')
+        # 8. 출전 사진 파일 첨부
         if not file or file.filename == '':
-            flash('🖼️ 출전 사진 파일 첨부가 필요합니다. 사진을 선택해주세요.', 'danger')
+            flash('🖼️ 출전 사진 파일 첨부가 필요합니다. 사진을 선택해 주세요.', 'danger')
+            return redirect('/upload')
+        # 9. 자랑 내용 및 소개글
+        if not content:
+            flash('📝 자랑 내용 및 소개글을 입력해 주세요.', 'danger')
             return redirect('/upload')
 
         next_post_id = service.get_next_post_id()
@@ -1633,18 +1654,26 @@ def create_post():
 
         next_post_id = service.get_next_post_id()
 
-        if not pet_name:
-            return jsonify({'success': False, 'message': '반려동물 이름을 입력해주세요.'}), 400
         if not pet_type:
-            return jsonify({'success': False, 'message': '반려동물 종류를 선택해주세요.'}), 400
+            return jsonify({'success': False, 'message': '🐾 반려동물 종류를 선택해 주세요.'}), 400
+        if not pet_name:
+            return jsonify({'success': False, 'message': '🐶 반려동물 이름을 입력해 주세요.'}), 400
         if not title:
-            return jsonify({'success': False, 'message': '자랑 제목을 입력해주세요.'}), 400
-        if not content:
-            return jsonify({'success': False, 'message': '자랑 내용 및 소개글을 입력해주세요.'}), 400
+            return jsonify({'success': False, 'message': '✨ 자랑 제목을 입력해 주세요.'}), 400
+        if sns_inst and len(sns_inst) > 200:
+            return jsonify({'success': False, 'message': '🔗 인스타그램 주소는 200자 이내로 입력해 주세요.'}), 400
+        if sns_ytb and len(sns_ytb) > 200:
+            return jsonify({'success': False, 'message': '🔗 유튜브 주소는 200자 이내로 입력해 주세요.'}), 400
+        if sns_fsb and len(sns_fsb) > 200:
+            return jsonify({'success': False, 'message': '🔗 페이스북 주소는 200자 이내로 입력해 주세요.'}), 400
+        if sns_blg and len(sns_blg) > 200:
+            return jsonify({'success': False, 'message': '🔗 블로그 주소는 200자 이내로 입력해 주세요.'}), 400
 
         src_target = temp_filename or file
         if not src_target:
-            return jsonify({'success': False, 'message': '출전시킬 반려동물 사진 이미지 파일을 반드시 첨부해주세요.'}), 400
+            return jsonify({'success': False, 'message': '🖼️ 출전 사진 파일(이미지)을 첨부해 주세요.'}), 400
+        if not content:
+            return jsonify({'success': False, 'message': '📝 자랑 내용 및 소개글을 입력해 주세요.'}), 400
 
         full_path1, full_path2 = process_paw_images_dual(src_target, contest_id, next_post_id)
 
