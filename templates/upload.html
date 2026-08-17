@@ -704,6 +704,39 @@ function updatePreview() {
     if (previewModalDesc) previewModalDesc.textContent = descText;
     if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
     if (previewModalDate) previewModalDate.textContent = '⏰ ' + currentFormattedDate;
+
+    updateAllFieldStyles();
+}
+
+function updateFieldFilledStyle(el, targetBox = null) {
+    if (!el) return;
+    const target = targetBox || el;
+    const val = el.value ? el.value.trim() : '';
+    if (val !== '') {
+        target.style.borderColor = 'var(--accent-purple)';
+        target.style.background = '#f5f3ff';
+    } else {
+        target.style.borderColor = 'var(--border-light)';
+        target.style.background = 'var(--bg-primary)';
+    }
+}
+
+function updateAllFieldStyles() {
+    const inputPetName = document.getElementById('uploadPetName') || document.querySelector('input[name="pet_name"]');
+    const selectPetType = document.getElementById('hiddenUploadPetType') || document.getElementById('uploadPetTypeSelect') || document.querySelector('select[name="pet_type"]');
+    const petTypeTrigger = document.querySelector('#uploadPetTypeDropdown .custom-pet-trigger');
+    const inputTitle = document.getElementById('uploadTitle') || document.querySelector('input[name="title"]');
+    const textareaContent = document.querySelector('textarea[name="content"]');
+
+    updateFieldFilledStyle(inputPetName);
+    updateFieldFilledStyle(selectPetType, petTypeTrigger);
+    updateFieldFilledStyle(inputTitle);
+    updateFieldFilledStyle(textareaContent);
+
+    ['uploadSnsInst', 'uploadSnsYtb', 'uploadSnsFsb', 'uploadSnsBlg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) updateFieldFilledStyle(el);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -713,14 +746,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const textareaContent = document.querySelector('textarea[name="content"]');
     const mediaFileInput = document.getElementById('uploadMediaFile');
 
-    if (inputPetName) inputPetName.addEventListener('input', updatePreview);
-    if (selectPetType) selectPetType.addEventListener('change', updatePreview);
-    if (inputTitle) inputTitle.addEventListener('input', updatePreview);
-    if (textareaContent) textareaContent.addEventListener('input', updatePreview);
+    updateAllFieldStyles();
+
+    if (inputPetName) {
+        ['input', 'change', 'blur'].forEach(ev => inputPetName.addEventListener(ev, updatePreview));
+    }
+    if (selectPetType) {
+        ['change', 'blur'].forEach(ev => selectPetType.addEventListener(ev, updatePreview));
+    }
+    if (inputTitle) {
+        ['input', 'change', 'blur'].forEach(ev => inputTitle.addEventListener(ev, updatePreview));
+    }
+    if (textareaContent) {
+        ['input', 'change', 'blur'].forEach(ev => textareaContent.addEventListener(ev, updatePreview));
+    }
 
     ['uploadSnsInst', 'uploadSnsYtb', 'uploadSnsFsb', 'uploadSnsBlg'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updatePreview);
+        if (el) {
+            ['input', 'change', 'blur'].forEach(ev => el.addEventListener(ev, updatePreview));
+        }
     });
 
     // 첨부한 예쁜 아이 사진을 미리보기 팝업 이미지(#previewModalImg) & 카드 이미지(#previewCardImg)에 100% 실시간 동기화!
