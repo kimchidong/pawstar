@@ -834,8 +834,8 @@ class PawStarService:
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        u.SNS_INST, u.SNS_YTB, u.SNS_FSB, u.SNS_BLG,
-                        u.SNS_INST AS sns_inst, u.SNS_YTB AS sns_ytb, u.SNS_FSB AS sns_fsb, u.SNS_BLG AS sns_blg,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST, COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB, COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB, COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst, COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb, COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb, COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
                         k.KIND_NM,
                         k.KIND_CLASS,
                         r.PET_NM,
@@ -913,8 +913,8 @@ class PawStarService:
                         u.NK_NM AS user_nickname, u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        u.SNS_INST, u.SNS_YTB, u.SNS_FSB, u.SNS_BLG,
-                        u.SNS_INST AS sns_inst, u.SNS_YTB AS sns_ytb, u.SNS_FSB AS sns_fsb, u.SNS_BLG AS sns_blg,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST, COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB, COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB, COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst, COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb, COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb, COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
                         CONCAT(ca.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id
                     FROM PST_CONTEST_AWARD ca
                     JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
@@ -1092,7 +1092,7 @@ class PawStarService:
                 'my_awards': []
             }
 
-    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, file_path1, file_path2=""):
+    def create_contest_entry(self, contest_id, user_id, kind_cd, pet_name, title, content, file_path1, file_path2="", sns_inst="", sns_ytb="", sns_fsb="", sns_blg="", **kwargs):
         conn = self.get_db_connection()
         if not conn:
             return {'success': False, 'message': 'DB 연결 실패'}
@@ -1120,6 +1120,15 @@ class PawStarService:
 
         try:
             with conn.cursor() as cur:
+                # PST_CONTEST_ROUND 안전 컬럼 점검 및 추가
+                for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
+                    try:
+                        cur.execute(f"SHOW COLUMNS FROM PST_CONTEST_ROUND LIKE '{col[0]}'")
+                        if not cur.fetchone():
+                            cur.execute(f"ALTER TABLE PST_CONTEST_ROUND ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
+                    except Exception:
+                        pass
+
                 cur.execute("""
                     SELECT COALESCE(MAX(ROUND_NO), 0) + 1 AS next_round_no 
                     FROM PST_CONTEST_ROUND 
@@ -1131,9 +1140,9 @@ class PawStarService:
                 share_sn = f"S-{uuid.uuid4()}"
                 cur.execute("""
                     INSERT INTO PST_CONTEST_ROUND 
-                    (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, SHARE_SN, SHARE_CNT)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)
-                """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2, share_sn))
+                    (CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, PET_NM, TITLE, CONTS, PHT_FILE_PATH1, PHT_FILE_PATH2, SHARE_SN, SHARE_CNT, SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)
+                """, (contest_id, next_round_no, actual_ent_user_id, kind_cd, pet_name, title, content, file_path1, file_path2, share_sn, sns_inst or '', sns_ytb or '', sns_fsb or '', sns_blg or ''))
                 conn.commit()
                 conn.close()
                 return {'success': True, 'ent_user_id': actual_ent_user_id, 'round_no': next_round_no, 'share_sn': share_sn}
@@ -1250,11 +1259,16 @@ class PawStarService:
                 conn.close()
             return False
 
-    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path1="", file_path2="", **kwargs):
+    def create_post(self, contest_id, user_id, pet_name, pet_type, title, content, media_url="", file_path1="", file_path2="", sns_inst="", sns_ytb="", sns_fsb="", sns_blg="", **kwargs):
         path1 = file_path1 or media_url or "/static/image/contest/default_pet.jpg"
         path2 = file_path2 or path1
 
-        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, path1, path2)
+        inst = sns_inst or kwargs.get('sns_inst', '')
+        ytb = sns_ytb or kwargs.get('sns_ytb', '')
+        fsb = sns_fsb or kwargs.get('sns_fsb', '')
+        blg = sns_blg or kwargs.get('sns_blg', '')
+
+        res = self.create_contest_entry(contest_id, user_id, pet_type, pet_name, title, content, path1, path2, sns_inst=inst, sns_ytb=ytb, sns_fsb=fsb, sns_blg=blg)
         if not res.get('success'):
             return res
 
@@ -1373,14 +1387,14 @@ class PawStarService:
                     r.ENT_USER_ID AS USER_ID,
                     u.NK_NM,
                     COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                    u.SNS_INST,
-                    u.SNS_YTB,
-                    u.SNS_FSB,
-                    u.SNS_BLG,
-                    u.SNS_INST AS sns_inst,
-                    u.SNS_YTB AS sns_ytb,
-                    u.SNS_FSB AS sns_fsb,
-                    u.SNS_BLG AS sns_blg,
+                    COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
+                    COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
+                    COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
+                    COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
+                    COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
+                    COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
+                    COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
+                    COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
                     k.KIND_NM,
                     k.KIND_CLASS,
                     r.PET_NM,
@@ -1645,14 +1659,14 @@ class PawStarService:
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        u.SNS_INST,
-                        u.SNS_YTB,
-                        u.SNS_FSB,
-                        u.SNS_BLG,
-                        u.SNS_INST AS sns_inst,
-                        u.SNS_YTB AS sns_ytb,
-                        u.SNS_FSB AS sns_fsb,
-                        u.SNS_BLG AS sns_blg,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
+                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
+                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
+                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
+                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
+                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
+                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
                         k.KIND_NM,
                         k.KIND_CLASS,
                         r.PET_NM,
@@ -2294,14 +2308,14 @@ class PawStarService:
                         u.USER_ID,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        u.SNS_INST,
-                        u.SNS_YTB,
-                        u.SNS_FSB,
-                        u.SNS_BLG,
-                        u.SNS_INST AS sns_inst,
-                        u.SNS_YTB AS sns_ytb,
-                        u.SNS_FSB AS sns_fsb,
-                        u.SNS_BLG AS sns_blg,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
+                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
+                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
+                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
+                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
+                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
+                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
                         -- 호환용
                         ca.CONTEST_ROUND AS contest_id,
                         ca.ROUND_NO AS round_no,
@@ -2319,10 +2333,10 @@ class PawStarService:
                         u.USER_ID AS user_id,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
-                        u.SNS_INST AS sns_inst,
-                        u.SNS_YTB AS sns_ytb,
-                        u.SNS_FSB AS sns_fsb,
-                        u.SNS_BLG AS sns_blg
+                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
+                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
+                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
+                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg
                     FROM PST_CONTEST_AWARD ca
                     LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD

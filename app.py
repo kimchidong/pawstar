@@ -1018,6 +1018,10 @@ def upload_page():
         pet_type = request.form.get('pet_type', '🐕 강아지')
         title = request.form.get('title', '')
         content = request.form.get('content', '')
+        sns_inst = (request.form.get('sns_inst') or '').strip()
+        sns_ytb = (request.form.get('sns_ytb') or '').strip()
+        sns_fsb = (request.form.get('sns_fsb') or '').strip()
+        sns_blg = (request.form.get('sns_blg') or '').strip()
         
         media_url = ''
         if 'media_file' in request.files and request.files['media_file'].filename != '':
@@ -1031,7 +1035,7 @@ def upload_page():
         if not title:
             return redirect('/upload')
 
-        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
+        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url, sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg)
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/?uploaded=true')
 
@@ -1067,6 +1071,10 @@ def m_upload_page():
         pet_type = request.form.get('pet_type', '🐕 강아지')
         title = request.form.get('title', '')
         content = request.form.get('content', '')
+        sns_inst = (request.form.get('sns_inst') or '').strip()
+        sns_ytb = (request.form.get('sns_ytb') or '').strip()
+        sns_fsb = (request.form.get('sns_fsb') or '').strip()
+        sns_blg = (request.form.get('sns_blg') or '').strip()
         
         media_url = ''
         if 'media_file' in request.files and request.files['media_file'].filename != '':
@@ -1080,7 +1088,7 @@ def m_upload_page():
         if not title:
             return redirect('/m/upload')
 
-        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url)
+        service.create_post(contest_id, user_id, pet_name, pet_type, title, content, media_url, sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg)
         flash('🎉 출전 등록이 성공적으로 완료되었습니다! 🐾', 'success')
         return redirect('/m?uploaded=true')
 
@@ -1561,6 +1569,10 @@ def create_post():
             user_id = session.get('user_id') or request.form.get('user_id', 'user1')
             temp_filename = request.form.get('temp_filename') or request.form.get('temp_url')
             file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
+            sns_inst = (request.form.get('sns_inst') or '').strip()
+            sns_ytb = (request.form.get('sns_ytb') or '').strip()
+            sns_fsb = (request.form.get('sns_fsb') or '').strip()
+            sns_blg = (request.form.get('sns_blg') or '').strip()
         else:
             data = request.get_json() or {}
             contest_id = int(data.get('contest_id', 3))
@@ -1571,6 +1583,10 @@ def create_post():
             content = data.get('content', '')
             temp_filename = data.get('temp_filename') or data.get('temp_url')
             file = None
+            sns_inst = (data.get('sns_inst') or '').strip()
+            sns_ytb = (data.get('sns_ytb') or '').strip()
+            sns_fsb = (data.get('sns_fsb') or '').strip()
+            sns_blg = (data.get('sns_blg') or '').strip()
 
         next_post_id = service.get_next_post_id()
 
@@ -1591,7 +1607,8 @@ def create_post():
 
         new_post = service.create_post(
             contest_id, user_id, pet_name, pet_type, title, content, 
-            file_path1=full_path1, file_path2=full_path2, force_post_id=next_post_id
+            file_path1=full_path1, file_path2=full_path2, force_post_id=next_post_id,
+            sns_inst=sns_inst, sns_ytb=sns_ytb, sns_fsb=sns_fsb, sns_blg=sns_blg
         )
         if isinstance(new_post, dict) and not new_post.get('success'):
             return jsonify({'success': False, 'message': new_post.get('message', '출전 등록에 실패했습니다.')}), 400
