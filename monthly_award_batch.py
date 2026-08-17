@@ -141,7 +141,7 @@ def run_monthly_award_batch():
                     UPDATE PST_CONTEST_ROUND
                     SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (real_vw, real_like, real_cmt, real_share, round_id, p['ROUND_NO']))
+                """, (real_vw, real_like, real_cmt, real_share, calc_score, round_id, p['ROUND_NO']))
 
             # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT -> SHARE_CNT)
             cur.execute("""
