@@ -62,6 +62,25 @@
 
 
 
+    <style>
+        #postUploadForm .form-control,
+        #postUploadForm .custom-pet-trigger,
+        #postUploadForm textarea.form-control,
+        #postUploadForm #pcCustomFileDropzone {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+        }
+
+        #postUploadForm input:-webkit-autofill,
+        #postUploadForm input:-webkit-autofill:hover, 
+        #postUploadForm input:-webkit-autofill:focus,
+        #postUploadForm input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+            -webkit-text-fill-color: var(--text-primary, #0f172a) !important;
+            background-color: #ffffff !important;
+        }
+    </style>
+
     <div style="background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-soft);">
 
         <form method="POST" action="/upload" id="postUploadForm" enctype="multipart/form-data" novalidate>
@@ -94,7 +113,7 @@
 
                             <!-- 검색 블럭과 100% 동일한 단색 FontAwesome 아이콘 커스텀 셀렉트 드롭다운 -->
                             <div class="custom-pet-dropdown" id="uploadPetTypeDropdown" style="width: 100%; height: 48px;">
-                                <div class="custom-pet-trigger" onclick="toggleUploadPetDropdown(this, event)" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 0 0.9rem; cursor: pointer;">
+                                <div class="custom-pet-trigger" onclick="toggleUploadPetDropdown(this, event)" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: #ffffff; display: flex; align-items: center; justify-content: space-between; padding: 0 0.9rem; cursor: pointer;">
                                     <span style="display: inline-flex; align-items: center; gap: 0.6rem; line-height: 1; pointer-events: none;">
                                         <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon" style="width: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: #475569;"></i>
                                         <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted); line-height: 1;">종류 선택</span>
@@ -182,7 +201,7 @@
                         <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
 
                         <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
-                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: #ffffff; border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
                             <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 100%; height: 100%;">
                                 <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
                                     <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.2rem;"></i>
@@ -714,10 +733,12 @@ function updateFieldFilledStyle(el, targetBox = null) {
     const val = el.value ? el.value.trim() : '';
     if (val !== '') {
         target.style.borderColor = 'var(--accent-purple)';
-        target.style.background = '#f5f3ff';
+        target.style.backgroundColor = '#ffffff';
+        target.style.background = '#ffffff';
     } else {
         target.style.borderColor = 'var(--border-light)';
-        target.style.background = 'var(--bg-primary)';
+        target.style.backgroundColor = '#ffffff';
+        target.style.background = '#ffffff';
     }
 }
 
@@ -784,7 +805,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (fileNameEl) fileNameEl.textContent = file.name;
                 if (dropzone) {
                     dropzone.style.borderColor = 'var(--accent-purple)';
-                    dropzone.style.background = '#f5f3ff';
+                    dropzone.style.backgroundColor = '#ffffff';
+                    dropzone.style.background = '#ffffff';
                 }
 
                 const reader = new FileReader();
@@ -807,7 +829,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopPropagation();
                 pcDropzone.style.borderColor = 'var(--accent-purple)';
-                pcDropzone.style.background = '#f5f3ff';
+                pcDropzone.style.backgroundColor = '#ffffff';
+                pcDropzone.style.background = '#ffffff';
             }, false);
         });
 
@@ -818,7 +841,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const file = mediaFileInput && mediaFileInput.files && mediaFileInput.files[0];
                 if (!file) {
                     pcDropzone.style.borderColor = 'var(--border-light)';
-                    pcDropzone.style.background = 'var(--bg-primary)';
+                    pcDropzone.style.backgroundColor = '#ffffff';
+                    pcDropzone.style.background = '#ffffff';
                 }
             }, false);
         });
