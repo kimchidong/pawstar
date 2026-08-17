@@ -306,10 +306,9 @@
                 </div>
             </div>
 
-            <!-- 게시글 제목 -->
             <div style="margin-bottom: 0.85rem; padding: 0 0.15rem;">
-                <h3 id="mPreviewModalTitle" style="font-size: 1.05rem; font-weight: normal !important; color: #1e293b; line-height: 1.45; margin: 0; word-break: break-all; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>💖</span> <span style="flex: 1;">자랑 제목 미리보기</span>
+                <h3 id="mPreviewModalTitle" style="font-size: 1.05rem; font-weight: normal !important; color: #1e293b; line-height: 1.45; margin: 0; word-break: break-all;">
+                    자랑 제목 미리보기
                 </h3>
             </div>
             
@@ -604,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mPreviewCardPetTag) mPreviewCardPetTag.innerHTML = petTagHTML;
         if (mPreviewModalPetTag) mPreviewModalPetTag.innerHTML = petTagHTML;
         if (mPreviewCardTitle) mPreviewCardTitle.textContent = titleText;
-        if (mPreviewModalTitle) mPreviewModalTitle.innerHTML = `<span>💖</span> <span style="flex: 1;">${titleText}</span>`;
+        if (mPreviewModalTitle) mPreviewModalTitle.textContent = titleText;
         if (mPreviewModalDesc) mPreviewModalDesc.textContent = descText;
         if (mPreviewModalDate) mPreviewModalDate.textContent = '⏰ ' + currentFormattedDate;
     }
