@@ -817,6 +817,20 @@ document.addEventListener('DOMContentLoaded', function() {
         mediaFileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                // PC 커스텀 파일 첨부 드롭존 UI 상태 업데이트 (모바일과 100% 동일한 연보라 보더 박스 & 선택 상태)
+                const emptyState = document.getElementById('pcCustomFileEmptyState');
+                const selectedState = document.getElementById('pcCustomFileSelectedState');
+                const fileNameEl = document.getElementById('pcCustomFileName');
+                const dropzone = document.getElementById('pcCustomFileDropzone');
+
+                if (emptyState) emptyState.style.display = 'none';
+                if (selectedState) selectedState.style.display = 'flex';
+                if (fileNameEl) fileNameEl.textContent = file.name;
+                if (dropzone) {
+                    dropzone.style.borderColor = 'var(--accent-purple)';
+                    dropzone.style.background = '#f5f3ff';
+                }
+
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     const imgSrc = evt.target.result;
@@ -828,6 +842,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.readAsDataURL(file);
             }
         });
+    }
+
+    const pcDropzone = document.getElementById('pcCustomFileDropzone');
+    if (pcDropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            pcDropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                pcDropzone.style.borderColor = 'var(--accent-purple)';
+                pcDropzone.style.background = '#f5f3ff';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            pcDropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const file = mediaFileInput && mediaFileInput.files && mediaFileInput.files[0];
+                if (!file) {
+                    pcDropzone.style.borderColor = 'var(--border-light)';
+                    pcDropzone.style.background = 'var(--bg-primary)';
+                }
+            }, false);
+        });
+
+        pcDropzone.addEventListener('drop', function(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0 && mediaFileInput) {
+                mediaFileInput.files = files;
+                const event = new Event('change', { bubbles: true });
+                mediaFileInput.dispatchEvent(event);
+            }
+        }, false);
     }
 
     updatePreview();
