@@ -75,15 +75,8 @@
                 <!-- 좌측 폼 컨트롤 그룹 (이름, 동물 종류, 자랑 제목, SNS 계정 설정) -->
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-                    <!-- 1. 이름 & 동물 종류 -->
+                    <!-- 1. 동물 종류 & 이름 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-                                🐶 이름
-                            </label>
-                            <input type="text" name="pet_name" id="uploadPetName" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
-                        </div>
-
                         <div class="form-group" style="margin-bottom: 0;">
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
                                 🐾 동물 종류
@@ -120,6 +113,13 @@
                                     {% endfor %}
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                                🐶 이름
+                            </label>
+                            <input type="text" name="pet_name" id="uploadPetName" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
                         </div>
                     </div>
 
