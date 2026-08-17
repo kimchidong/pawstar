@@ -73,13 +73,19 @@
             </div>
 
             <div class="m-form-group" style="margin-bottom: 1rem;">
-                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">✨ 자랑 제목</label>
-                <input type="text" name="title" class="m-form-control" required style="width: 100%; padding: 0.75rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                    <label style="font-weight: 800; font-size: 0.85rem; margin-bottom: 0;">✨ 자랑 제목</label>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #64748b;"><span id="mUploadTitleCharCount" style="color: #7c3aed;">0</span>/80</span>
+                </div>
+                <input type="text" name="title" class="m-form-control" maxlength="80" required style="width: 100%; padding: 0.75rem;">
             </div>
 
             <div class="m-form-group" style="margin-bottom: 1rem;">
-                <label style="font-weight: 800; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">📝 소개글</label>
-                <textarea name="content" class="m-form-control" rows="3" required style="width: 100%; padding: 0.75rem; font-family: inherit;"></textarea>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                    <label style="font-weight: 800; font-size: 0.85rem; margin-bottom: 0;">📝 소개글</label>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #64748b;"><span id="mUploadContentCharCount" style="color: #7c3aed;">0</span>/100</span>
+                </div>
+                <textarea name="content" class="m-form-control" rows="3" maxlength="100" required style="width: 100%; padding: 0.75rem; font-family: inherit;"></textarea>
             </div>
 
             <!-- SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
@@ -89,31 +95,43 @@
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
-                    <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 인스타그램 주소
-                    </label>
-                    <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0; display: flex; align-items: center; gap: 0.35rem;">
+                            <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 인스타그램 주소
+                        </label>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsInstCharCount" style="color: #7c3aed;">0</span>/200</span>
+                    </div>
+                    <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
-                    <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 유튜브 주소
-                    </label>
-                    <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0; display: flex; align-items: center; gap: 0.35rem;">
+                            <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 유튜브 주소
+                        </label>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsYtbCharCount" style="color: #7c3aed;">0</span>/200</span>
+                    </div>
+                    <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
-                    <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 페이스북 주소
-                    </label>
-                    <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0; display: flex; align-items: center; gap: 0.35rem;">
+                            <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 페이스북 주소
+                        </label>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsFsbCharCount" style="color: #7c3aed;">0</span>/200</span>
+                    </div>
+                    <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
-                    <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 블로그 주소
-                    </label>
-                    <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <label style="font-weight: 700; font-size: 0.78rem; color: #475569; margin-bottom: 0; display: flex; align-items: center; gap: 0.35rem;">
+                            <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.88rem; width: 1.1rem; text-align: center;"></i> 블로그 주소
+                        </label>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsBlgCharCount" style="color: #7c3aed;">0</span>/200</span>
+                    </div>
+                    <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
                 </div>
             </div>
 
@@ -539,6 +557,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const descText = content || '소개글 미리보기';
         const currentFormattedDate = getFormattedNowDateTime();
 
+        // 모바일 실시간 글자수 카운터 갱신
+        const titleLen = inputTitle ? inputTitle.value.length : 0;
+        const contentLen = textareaContent ? textareaContent.value.length : 0;
+        const instLen = (document.getElementById('mUploadSnsInst')?.value || '').length;
+        const ytbLen = (document.getElementById('mUploadSnsYtb')?.value || '').length;
+        const fsbLen = (document.getElementById('mUploadSnsFsb')?.value || '').length;
+        const blgLen = (document.getElementById('mUploadSnsBlg')?.value || '').length;
+
+        const mElTitleCount = document.getElementById('mUploadTitleCharCount');
+        const mElContentCount = document.getElementById('mUploadContentCharCount');
+        const mElInstCount = document.getElementById('mUploadSnsInstCharCount');
+        const mElYtbCount = document.getElementById('mUploadSnsYtbCharCount');
+        const mElFsbCount = document.getElementById('mUploadSnsFsbCharCount');
+        const mElBlgCount = document.getElementById('mUploadSnsBlgCharCount');
+
+        if (mElTitleCount) mElTitleCount.textContent = titleLen;
+        if (mElContentCount) mElContentCount.textContent = contentLen;
+        if (mElInstCount) mElInstCount.textContent = instLen;
+        if (mElYtbCount) mElYtbCount.textContent = ytbLen;
+        if (mElFsbCount) mElFsbCount.textContent = fsbLen;
+        if (mElBlgCount) mElBlgCount.textContent = blgLen;
+
         const mPreviewCardPetTag = document.getElementById('mPreviewCardPetTag');
         const mPreviewModalPetTag = document.getElementById('mPreviewModalPetTag');
         const mPreviewCardTitle = document.getElementById('mPreviewCardTitle');
@@ -745,6 +785,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 highlightInvalidField(inputTitle);
                 return;
             }
+            if (title.length > 80) {
+                showCustomToast('✨ 자랑 제목은 80자 이내로 입력해 주세요!', 'fa-pen-nib');
+                highlightInvalidField(inputTitle);
+                return;
+            }
 
             // 4. 인스타그램 주소 (선택 입력, 입력 시 200자 이내)
             const mSnsInstEl = document.getElementById('mUploadSnsInst');
@@ -792,6 +837,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // 9. 자랑 내용 및 소개글 입력 체크
             if (!content) {
                 showCustomToast('📝 자랑 내용 및 소개글을 입력해 주세요!', 'fa-align-left');
+                highlightInvalidField(textareaContent);
+                return;
+            }
+            if (content.length > 100) {
+                showCustomToast('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요!', 'fa-align-left');
                 highlightInvalidField(textareaContent);
                 return;
             }

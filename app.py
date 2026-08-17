@@ -1036,6 +1036,9 @@ def upload_page():
         if not title:
             flash('✨ 자랑 제목을 입력해 주세요.', 'danger')
             return redirect('/upload')
+        if len(title) > 80:
+            flash('✨ 자랑 제목은 80자 이내로 입력해 주세요.', 'danger')
+            return redirect('/upload')
         # 4. 인스타그램 주소
         if sns_inst and len(sns_inst) > 200:
             flash('🔗 인스타그램 주소는 200자 이내로 입력해 주세요.', 'danger')
@@ -1061,6 +1064,9 @@ def upload_page():
         # 9. 자랑 내용 및 소개글
         if not content:
             flash('📝 자랑 내용 및 소개글을 입력해 주세요.', 'danger')
+            return redirect('/upload')
+        if len(content) > 100:
+            flash('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요.', 'danger')
             return redirect('/upload')
 
         next_post_id = service.get_next_post_id()
@@ -1660,6 +1666,8 @@ def create_post():
             return jsonify({'success': False, 'message': '🐶 반려동물 이름을 입력해 주세요.'}), 400
         if not title:
             return jsonify({'success': False, 'message': '✨ 자랑 제목을 입력해 주세요.'}), 400
+        if len(title) > 80:
+            return jsonify({'success': False, 'message': '✨ 자랑 제목은 80자 이내로 입력해 주세요.'}), 400
         if sns_inst and len(sns_inst) > 200:
             return jsonify({'success': False, 'message': '🔗 인스타그램 주소는 200자 이내로 입력해 주세요.'}), 400
         if sns_ytb and len(sns_ytb) > 200:
@@ -1674,6 +1682,8 @@ def create_post():
             return jsonify({'success': False, 'message': '🖼️ 출전 사진 파일(이미지)을 첨부해 주세요.'}), 400
         if not content:
             return jsonify({'success': False, 'message': '📝 자랑 내용 및 소개글을 입력해 주세요.'}), 400
+        if len(content) > 100:
+            return jsonify({'success': False, 'message': '📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요.'}), 400
 
         full_path1, full_path2 = process_paw_images_dual(src_target, contest_id, next_post_id)
 
