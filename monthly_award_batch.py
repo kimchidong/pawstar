@@ -8,14 +8,14 @@ Paw Star 매월 1일 대회 당선 및 회차 생성 배치 스크립트
 0 0 1 * * /usr/bin/python3 /path/to/pawstar/monthly_award_batch.py >> /path/to/pawstar/batch.log 2>&1
 
 [업무 처리 내용]
-1. 현재 진행 중(G001C001) 회차 조회
+1. 현재 진행 중(G001C001) 회차 조회 (PST_CONTEST)
 2. 해당 회차 참가자 전원의 점수(SCORE) 계산
-3. 전체 순위(TOTAL_RANKING) 및 품종별 순위(KIND_RANKING) 산출 및 pst_contest_round 저장 (PRC_DT 동결)
-4. 수상자 레코드(pst_contest_award) INSERT
+3. 전체 순위(TOTAL_RANKING) 및 품종별 순위(KIND_RANKING) 산출 및 PST_CONTEST_ROUND 저장 (PRC_DT 동결)
+4. 수상자 레코드(PST_CONTEST_AWARD) INSERT
    - 전체 1~3위 (G002P001: P001A101, P001A102, P001A103)
    - 품종별 1~3위 (G002P002: P002A901, P002A902, P002A903)
 5. 진행 중 회차 상태 종료(G001C002) 처리
-6. 다음 월 테마(pst_theme)를 기반으로 새 회차(G001C001) 자동 생성
+6. 다음 월 테마(PST_THEME)를 기반으로 새 회차(G001C001) 자동 생성
 """
 
 import sys
@@ -73,7 +73,7 @@ def run_monthly_award_batch():
             # 1. 진행 중인 회차 조회 (G001C001)
             cur.execute("""
                 SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
-                FROM pst_contest
+                FROM PST_CONTEST
                 WHERE CONTEST_STAT = 'G001C001'
                 ORDER BY CONTEST_ROUND DESC
                 LIMIT 1
@@ -83,13 +83,13 @@ def run_monthly_award_batch():
             if not current_contest:
                 print(f"[{now}] 진행 중인 회차가 없어 회차 #1 자동 생성을 진행합니다.")
                 cur.execute("""
-                    INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
+                    INSERT INTO PST_CONTEST (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
                     VALUES (1, 'T001', NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
                 """)
                 conn.commit()
                 cur.execute("""
                     SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
-                    FROM pst_contest WHERE CONTEST_ROUND = 1
+                    FROM PST_CONTEST WHERE CONTEST_ROUND = 1
                 """)
                 current_contest = cur.fetchone()
 
@@ -99,27 +99,27 @@ def run_monthly_award_batch():
             # 2. 해당 회차 모든 참가물의 실시간 DB 이력(조회/좋아요/댓글/공유) 재집계 및 점수(SCORE) 산출
             cur.execute("""
                 SELECT 
-                    r.CONTEST_ROUND, 
-                    r.ROUND_NO, 
-                    r.ENT_USER_ID, 
-                    r.KIND_CD,
-                    r.SHARE_CNT,
-                    (SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) AS REAL_VW_CNT,
-                    (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) AS REAL_LIKE_CNT,
-                    (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) AS REAL_CMT_CNT,
+                    R.CONTEST_ROUND, 
+                    R.ROUND_NO, 
+                    R.ENT_USER_ID, 
+                    R.KIND_CD,
+                    R.SHARE_CNT,
+                    (SELECT COUNT(*) FROM PST_CONTEST_VW V WHERE V.CONTEST_ROUND = R.CONTEST_ROUND AND V.ROUND_NO = R.ROUND_NO) AS REAL_VW_CNT,
+                    (SELECT COUNT(*) FROM PST_CONTEST_LIKE L WHERE L.CONTEST_ROUND = R.CONTEST_ROUND AND L.ROUND_NO = R.ROUND_NO) AS REAL_LIKE_CNT,
+                    (SELECT COUNT(*) FROM PST_CONTEST_CMT C WHERE C.CONTEST_ROUND = R.CONTEST_ROUND AND C.ROUND_NO = R.ROUND_NO) AS REAL_CMT_CNT,
                     GREATEST(
-                        COALESCE((SELECT COUNT(*) FROM pst_contest_share s WHERE s.CONTEST_ROUND = r.CONTEST_ROUND AND s.ROUND_NO = r.ROUND_NO), 0),
-                        COALESCE(r.SHARE_CNT, 0)
+                        COALESCE((SELECT COUNT(*) FROM PST_CONTEST_SHARE S WHERE S.CONTEST_ROUND = R.CONTEST_ROUND AND S.ROUND_NO = R.ROUND_NO), 0),
+                        COALESCE(R.SHARE_CNT, 0)
                     ) AS REAL_SHARE_CNT,
-                    ((SELECT COUNT(*) FROM pst_contest_vw v WHERE v.CONTEST_ROUND = r.CONTEST_ROUND AND v.ROUND_NO = r.ROUND_NO) * 1 +
-                     (SELECT COUNT(*) FROM pst_contest_like l WHERE l.CONTEST_ROUND = r.CONTEST_ROUND AND l.ROUND_NO = r.ROUND_NO) * 5 +
-                     (SELECT COUNT(*) FROM pst_contest_cmt c WHERE c.CONTEST_ROUND = r.CONTEST_ROUND AND c.ROUND_NO = r.ROUND_NO) * 10 +
+                    ((SELECT COUNT(*) FROM PST_CONTEST_VW V WHERE V.CONTEST_ROUND = R.CONTEST_ROUND AND V.ROUND_NO = R.ROUND_NO) * 1 +
+                     (SELECT COUNT(*) FROM PST_CONTEST_LIKE L WHERE L.CONTEST_ROUND = R.CONTEST_ROUND AND L.ROUND_NO = R.ROUND_NO) * 5 +
+                     (SELECT COUNT(*) FROM PST_CONTEST_CMT C WHERE C.CONTEST_ROUND = R.CONTEST_ROUND AND C.ROUND_NO = R.ROUND_NO) * 10 +
                      GREATEST(
-                         COALESCE((SELECT COUNT(*) FROM pst_contest_share s WHERE s.CONTEST_ROUND = r.CONTEST_ROUND AND s.ROUND_NO = r.ROUND_NO), 0),
-                         COALESCE(r.SHARE_CNT, 0)
+                         COALESCE((SELECT COUNT(*) FROM PST_CONTEST_SHARE S WHERE S.CONTEST_ROUND = R.CONTEST_ROUND AND S.ROUND_NO = R.ROUND_NO), 0),
+                         COALESCE(R.SHARE_CNT, 0)
                      ) * 10) AS CALC_SCORE
-                FROM pst_contest_round r
-                WHERE r.CONTEST_ROUND = %s
+                FROM PST_CONTEST_ROUND R
+                WHERE R.CONTEST_ROUND = %s
             """, (round_id,))
             participants = cur.fetchall()
 
@@ -132,15 +132,15 @@ def run_monthly_award_batch():
                 real_cmt = p['REAL_CMT_CNT']
                 real_share = p['REAL_SHARE_CNT']
                 cur.execute("""
-                    UPDATE pst_contest_round
+                    UPDATE PST_CONTEST_ROUND
                     SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                """, (real_vw, real_like, real_cmt, real_share, calc_score, round_id, p['ROUND_NO']))
+                """, (real_vw, real_like, real_cmt, real_share, round_id, p['ROUND_NO']))
 
             # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT -> SHARE_CNT)
             cur.execute("""
                 SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SHARE_CNT, SCORE
-                FROM pst_contest_round
+                FROM PST_CONTEST_ROUND
                 WHERE CONTEST_ROUND = %s
                 ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, SHARE_CNT DESC, ENT_DT ASC
             """, (round_id,))
@@ -160,14 +160,14 @@ def run_monthly_award_batch():
                 total_sorted_with_rank.append(item)
 
                 cur.execute("""
-                    UPDATE pst_contest_round
+                    UPDATE PST_CONTEST_ROUND
                     SET TOTAL_RANKING = %s, PRC_DT = NOW()
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (current_rank, round_id, item['ROUND_NO']))
 
             # 4. 품종별 순위(KIND_RANKING) 산출 & 저장
             cur.execute("""
-                SELECT DISTINCT KIND_CD FROM pst_contest_round WHERE CONTEST_ROUND = %s AND KIND_CD IS NOT NULL
+                SELECT DISTINCT KIND_CD FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND KIND_CD IS NOT NULL
             """, (round_id,))
             kind_rows = cur.fetchall()
 
@@ -177,7 +177,7 @@ def run_monthly_award_batch():
                 k_cd = k_row['KIND_CD']
                 cur.execute("""
                     SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE
-                    FROM pst_contest_round
+                    FROM PST_CONTEST_ROUND
                     WHERE CONTEST_ROUND = %s AND KIND_CD = %s
                     ORDER BY SCORE DESC, CMT_CNT DESC, LIKE_CNT DESC, VW_CNT DESC, ENT_DT ASC
                 """, (round_id, k_cd))
@@ -197,14 +197,14 @@ def run_monthly_award_batch():
                     k_list.append(k_item)
 
                     cur.execute("""
-                        UPDATE pst_contest_round
+                        UPDATE PST_CONTEST_ROUND
                         SET KIND_RANKING = %s
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                     """, (k_rank, round_id, k_item['ROUND_NO']))
 
                 kind_sorted_with_rank_dict[k_cd] = k_list
 
-            # 5. 당선자 레코드 (pst_contest_award) INSERT (KIND_CD 저장 포함 및 rank <= 3 인 모든 동률 포함)
+            # 5. 당선자 레코드 (PST_CONTEST_AWARD) INSERT (KIND_CD 저장 포함 및 rank <= 3 인 모든 동률 포함)
             award_codes_overall = {1: 'P001A101', 2: 'P001A102', 3: 'P001A103'}
             top_overall = [item for item in total_sorted_with_rank if item['rank'] <= 3]
 
@@ -212,7 +212,7 @@ def run_monthly_award_batch():
                 r_val = item['rank']
                 award_cd = award_codes_overall.get(r_val, 'P001A103')
                 cur.execute("""
-                    INSERT INTO pst_contest_award
+                    INSERT INTO PST_CONTEST_AWARD
                     (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
                     VALUES (%s, %s, 'G002P001', %s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY UPDATE 
@@ -232,7 +232,7 @@ def run_monthly_award_batch():
                     r_val = item['rank']
                     award_cd = award_codes_kind.get(r_val, 'P002A903')
                     cur.execute("""
-                        INSERT INTO pst_contest_award
+                        INSERT INTO PST_CONTEST_AWARD
                         (CONTEST_ROUND, ROUND_NO, AWARD_PART, AWARD_CD, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SCORE, RANKING)
                         VALUES (%s, %s, 'G002P002', %s, %s, %s, %s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE 
@@ -247,7 +247,7 @@ def run_monthly_award_batch():
 
             # 6. 현재 회차 종료 (G001C002) 처리
             cur.execute("""
-                UPDATE pst_contest
+                UPDATE PST_CONTEST
                 SET CONTEST_STAT = 'G001C002'
                 WHERE CONTEST_ROUND = %s
             """, (round_id,))
@@ -258,13 +258,13 @@ def run_monthly_award_batch():
             target_theme_cd = f'T{current_month:03d}'
 
             # DB에 해당 테마가 존재하는지 확인
-            cur.execute("SELECT THEME_CD FROM pst_theme WHERE THEME_CD = %s", (target_theme_cd,))
+            cur.execute("SELECT THEME_CD FROM PST_THEME WHERE THEME_CD = %s", (target_theme_cd,))
             theme_row = cur.fetchone()
             if not theme_row:
                 target_theme_cd = 'T001'
 
             cur.execute("""
-                INSERT INTO pst_contest (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
+                INSERT INTO PST_CONTEST (CONTEST_ROUND, THEME_CD, ST_DT, ED_DT, CONTEST_STAT)
                 VALUES (%s, %s, NOW(), CONCAT(LAST_DAY(NOW()), ' 23:59:59'), 'G001C001')
                 ON DUPLICATE KEY UPDATE THEME_CD = VALUES(THEME_CD), ED_DT = VALUES(ED_DT), CONTEST_STAT = 'G001C001'
             """, (next_round, target_theme_cd))
