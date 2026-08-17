@@ -598,22 +598,7 @@ class PawStarService:
             
         try:
             with conn.cursor() as cur:
-                # 1) PST_USER 및 USERS 테이블에 SNS 관련 컬럼 자동 안전 점검
-                for target_tbl in ['PST_USER', 'USERS']:
-                    try:
-                        cur.execute(f"SHOW TABLES LIKE '{target_tbl}'")
-                        if cur.fetchone():
-                            for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
-                                try:
-                                    cur.execute(f"SHOW COLUMNS FROM {target_tbl} LIKE '{col[0]}'")
-                                    if not cur.fetchone():
-                                        cur.execute(f"ALTER TABLE {target_tbl} ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
-                                except Exception as col_err:
-                                    print(f"Col Add Error ({target_tbl}.{col[0]}):", col_err)
-                    except Exception as tbl_err:
-                        print(f"Table Check Error ({target_tbl}):", tbl_err)
-
-                # 2) 현재 수정 대상 회원 정보(기존 닉네임) 정확히 조회
+                # 1) 현재 수정 대상 회원 정보(기존 닉네임) 정확히 조회
                 real_target_id = str(user_id or '').strip()
                 current_nk = None
                 try:
@@ -633,77 +618,57 @@ class PawStarService:
                 except Exception as e_find:
                     print("find target error:", e_find)
 
-            # 3) 닉네임 변경 여부 확인 (본인 기존 닉네임 그대로이면 중복 검사 스킵)
+            # 2) 닉네임 변경 여부 확인 (본인 기존 닉네임 그대로이면 중복 검사 스킵)
             is_nickname_changed = True
             if current_nk and str(nickname).strip().lower() == str(current_nk).strip().lower():
                 is_nickname_changed = False
 
-            # 4) 닉네임을 새로 변경하려는 경우에만 타 회원들과의 중복 검사 실행
+            # 3) 닉네임을 새로 변경하려는 경우에만 타 회원들과의 중복 검사 실행
             if is_nickname_changed:
                 if self.is_nickname_taken(nickname, exclude_user_id=real_target_id):
                     conn.close()
                     return False, "이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.", None
 
             with conn.cursor() as cur:
-                # 5) PST_USER 테이블 UPDATE 실행
+                # 4) PST_USER 테이블 UPDATE 실행 (닉네임 및 프로필 이미지만)
                 try:
                     cur.execute("SHOW TABLES LIKE 'PST_USER'")
                     if cur.fetchone():
                         if profile_img:
                             cur.execute("""
                                 UPDATE PST_USER
-                                SET NK_NM = %s, PROFILE_URL = %s,
-                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                SET NK_NM = %s, PROFILE_URL = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
-                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
+                            """, (nickname, profile_img, real_target_id, real_target_id))
                         else:
                             cur.execute("""
                                 UPDATE PST_USER
-                                SET NK_NM = %s,
-                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                SET NK_NM = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
-                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
-                        print(f"[PST_USER UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
+                            """, (nickname, real_target_id, real_target_id))
+                        print(f"[PST_USER UPDATE SUCCESS] Target: {real_target_id}")
                 except Exception as e_pst:
                     print("PST_USER update error:", e_pst)
-                    try:
-                        cur.execute("""
-                            UPDATE PST_USER
-                            SET SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                            WHERE USER_ID = %s
-                        """, (sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id))
-                    except Exception as e_pst2:
-                        print("PST_USER fallback update error:", e_pst2)
 
-                # 6) USERS 테이블 UPDATE 실행 (존재 시)
+                # 5) USERS 테이블 UPDATE 실행 (존재 시)
                 try:
                     cur.execute("SHOW TABLES LIKE 'USERS'")
                     if cur.fetchone():
                         if profile_img:
                             cur.execute("""
                                 UPDATE USERS
-                                SET NICKNAME = %s, PROFILE_IMG = %s,
-                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                SET NICKNAME = %s, PROFILE_IMG = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
-                            """, (nickname, profile_img, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
+                            """, (nickname, profile_img, real_target_id, real_target_id))
                         else:
                             cur.execute("""
                                 UPDATE USERS
-                                SET NICKNAME = %s,
-                                    SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
+                                SET NICKNAME = %s
                                 WHERE USER_ID = %s OR LOWER(USER_ID) = LOWER(%s)
-                            """, (nickname, sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id, real_target_id))
-                        print(f"[USERS UPDATE SUCCESS] Target: {real_target_id}, INST: {sns_inst}, YTB: {sns_ytb}, FSB: {sns_fsb}, BLG: {sns_blg}")
+                            """, (nickname, real_target_id, real_target_id))
+                        print(f"[USERS UPDATE SUCCESS] Target: {real_target_id}")
                 except Exception as e_usr:
                     print("USERS update error:", e_usr)
-                    try:
-                        cur.execute("""
-                            UPDATE USERS
-                            SET SNS_INST = %s, SNS_YTB = %s, SNS_FSB = %s, SNS_BLG = %s
-                            WHERE USER_ID = %s
-                        """, (sns_inst, sns_ytb, sns_fsb, sns_blg, real_target_id))
-                    except Exception as e_usr2:
-                        print("USERS fallback update error:", e_usr2)
 
                 conn.commit()
 
@@ -782,18 +747,8 @@ class PawStarService:
             }
         try:
             with conn.cursor() as cur:
-                # 안전 컬럼 점검 및 추가
-                for col in [('SNS_INST', 'VARCHAR(200)'), ('SNS_YTB', 'VARCHAR(200)'), ('SNS_FSB', 'VARCHAR(200)'), ('SNS_BLG', 'VARCHAR(200)')]:
-                    try:
-                        cur.execute(f"SHOW COLUMNS FROM PST_USER LIKE '{col[0]}'")
-                        if not cur.fetchone():
-                            cur.execute(f"ALTER TABLE PST_USER ADD COLUMN {col[0]} {col[1]} DEFAULT ''")
-                    except Exception:
-                        pass
-
                 cur.execute("""
-                    SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT,
-                           SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG
+                    SELECT USER_ID, NK_NM, PROFILE_URL, LGN_CNT, LGN_DT, JOIN_DT
                     FROM PST_USER WHERE USER_ID = %s
                 """, (user_id,))
                 user_info = cur.fetchone()
@@ -834,8 +789,8 @@ class PawStarService:
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST, COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB, COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB, COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst, COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb, COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb, COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
+                        COALESCE(r.SNS_INST, '') AS SNS_INST, COALESCE(r.SNS_YTB, '') AS SNS_YTB, COALESCE(r.SNS_FSB, '') AS SNS_FSB, COALESCE(r.SNS_BLG, '') AS SNS_BLG,
+                        COALESCE(r.SNS_INST, '') AS sns_inst, COALESCE(r.SNS_YTB, '') AS sns_ytb, COALESCE(r.SNS_FSB, '') AS sns_fsb, COALESCE(r.SNS_BLG, '') AS sns_blg,
                         k.KIND_NM,
                         k.KIND_CLASS,
                         r.PET_NM,
@@ -913,8 +868,8 @@ class PawStarService:
                         u.NK_NM AS user_nickname, u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST, COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB, COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB, COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst, COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb, COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb, COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
+                        COALESCE(r.SNS_INST, '') AS SNS_INST, COALESCE(r.SNS_YTB, '') AS SNS_YTB, COALESCE(r.SNS_FSB, '') AS SNS_FSB, COALESCE(r.SNS_BLG, '') AS SNS_BLG,
+                        COALESCE(r.SNS_INST, '') AS sns_inst, COALESCE(r.SNS_YTB, '') AS sns_ytb, COALESCE(r.SNS_FSB, '') AS sns_fsb, COALESCE(r.SNS_BLG, '') AS sns_blg,
                         CONCAT(ca.CONTEST_ROUND, '_', r.ENT_USER_ID) AS post_id
                     FROM PST_CONTEST_AWARD ca
                     JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
@@ -1389,14 +1344,14 @@ class PawStarService:
                     r.ENT_USER_ID AS USER_ID,
                     u.NK_NM,
                     COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                    COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
-                    COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
-                    COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
-                    COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
-                    COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
-                    COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
-                    COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
-                    COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
+                    COALESCE(r.SNS_INST, '') AS SNS_INST,
+                    COALESCE(r.SNS_YTB, '') AS SNS_YTB,
+                    COALESCE(r.SNS_FSB, '') AS SNS_FSB,
+                    COALESCE(r.SNS_BLG, '') AS SNS_BLG,
+                    COALESCE(r.SNS_INST, '') AS sns_inst,
+                    COALESCE(r.SNS_YTB, '') AS sns_ytb,
+                    COALESCE(r.SNS_FSB, '') AS sns_fsb,
+                    COALESCE(r.SNS_BLG, '') AS sns_blg,
                     k.KIND_NM,
                     k.KIND_CLASS,
                     r.PET_NM,
@@ -1661,14 +1616,14 @@ class PawStarService:
                         r.ENT_USER_ID AS USER_ID,
                         u.NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
-                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
-                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
-                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
-                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
-                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
-                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
+                        COALESCE(r.SNS_INST, '') AS SNS_INST,
+                        COALESCE(r.SNS_YTB, '') AS SNS_YTB,
+                        COALESCE(r.SNS_FSB, '') AS SNS_FSB,
+                        COALESCE(r.SNS_BLG, '') AS SNS_BLG,
+                        COALESCE(r.SNS_INST, '') AS sns_inst,
+                        COALESCE(r.SNS_YTB, '') AS sns_ytb,
+                        COALESCE(r.SNS_FSB, '') AS sns_fsb,
+                        COALESCE(r.SNS_BLG, '') AS sns_blg,
                         k.KIND_NM,
                         k.KIND_CLASS,
                         r.PET_NM,
@@ -2310,14 +2265,14 @@ class PawStarService:
                         u.USER_ID,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS NK_NM,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS PROFILE_URL,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS SNS_INST,
-                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS SNS_YTB,
-                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS SNS_FSB,
-                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS SNS_BLG,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
-                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
-                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
-                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg,
+                        COALESCE(r.SNS_INST, '') AS SNS_INST,
+                        COALESCE(r.SNS_YTB, '') AS SNS_YTB,
+                        COALESCE(r.SNS_FSB, '') AS SNS_FSB,
+                        COALESCE(r.SNS_BLG, '') AS SNS_BLG,
+                        COALESCE(r.SNS_INST, '') AS sns_inst,
+                        COALESCE(r.SNS_YTB, '') AS sns_ytb,
+                        COALESCE(r.SNS_FSB, '') AS sns_fsb,
+                        COALESCE(r.SNS_BLG, '') AS sns_blg,
                         -- 호환용
                         ca.CONTEST_ROUND AS contest_id,
                         ca.ROUND_NO AS round_no,
@@ -2335,10 +2290,10 @@ class PawStarService:
                         u.USER_ID AS user_id,
                         COALESCE(u.NK_NM, ca.ENT_USER_ID) AS user_nickname,
                         COALESCE(u.PROFILE_URL, '/static/image/profile/default_profile.png') AS user_profile,
-                        COALESCE(r.SNS_INST, u.SNS_INST) AS sns_inst,
-                        COALESCE(r.SNS_YTB, u.SNS_YTB) AS sns_ytb,
-                        COALESCE(r.SNS_FSB, u.SNS_FSB) AS sns_fsb,
-                        COALESCE(r.SNS_BLG, u.SNS_BLG) AS sns_blg
+                        COALESCE(r.SNS_INST, '') AS sns_inst,
+                        COALESCE(r.SNS_YTB, '') AS sns_ytb,
+                        COALESCE(r.SNS_FSB, '') AS sns_fsb,
+                        COALESCE(r.SNS_BLG, '') AS sns_blg
                     FROM PST_CONTEST_AWARD ca
                     LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD

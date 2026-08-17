@@ -7,33 +7,7 @@
     <img src="{{ user.profile_img }}" class="m-profile-avatar" id="mCurrentProfileImg" alt="profile">
     <h2 class="m-profile-name" id="mCurrentNickname">{{ user.nickname }}</h2>
 
-    <!-- 소셜 링크 버튼 세트 (등록된 주소가 있는 경우에만 표시) -->
-    {% set inst_raw = (user.sns_inst or user.SNS_INST or '').strip() %}
-    {% set ytb_raw = (user.sns_ytb or user.SNS_YTB or '').strip() %}
-    {% set fsb_raw = (user.sns_fsb or user.SNS_FSB or '').strip() %}
-    {% set blg_raw = (user.sns_blg or user.SNS_BLG or '').strip() %}
 
-    {% set inst_link = ('https://' ~ inst_raw) if inst_raw and not (inst_raw.startswith('http://') or inst_raw.startswith('https://')) else inst_raw %}
-    {% set ytb_link = ('https://' ~ ytb_raw) if ytb_raw and not (ytb_raw.startswith('http://') or ytb_raw.startswith('https://')) else ytb_raw %}
-    {% set fsb_link = ('https://' ~ fsb_raw) if fsb_raw and not (fsb_raw.startswith('http://') or fsb_raw.startswith('https://')) else fsb_raw %}
-    {% set blg_link = ('https://' ~ blg_raw) if blg_raw and not (blg_raw.startswith('http://') or blg_raw.startswith('https://')) else blg_raw %}
-
-    {% if inst_link or ytb_link or fsb_link or blg_link %}
-        <div class="m-profile-social-links" style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; margin: 0.45rem 0 0.75rem 0;">
-            {% if inst_link %}
-                <a href="{{ inst_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #fff0f5; color: #e1306c; border: 1px solid #fecdd3; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(225, 48, 108, 0.15);"><i class="fa-brands fa-instagram"></i></a>
-            {% endif %}
-            {% if ytb_link %}
-                <a href="{{ ytb_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #ffeded; color: #ff0000; border: 1px solid #fecaca; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(255, 0, 0, 0.15);"><i class="fa-brands fa-youtube"></i></a>
-            {% endif %}
-            {% if fsb_link %}
-                <a href="{{ fsb_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #eff6ff; color: #1877f2; border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(24, 119, 242, 0.15);"><i class="fa-brands fa-facebook-f"></i></a>
-            {% endif %}
-            {% if blg_link %}
-                <a href="{{ blg_link }}" target="_blank" rel="noopener noreferrer" style="width: 34px; height: 34px; border-radius: 50%; background: #f0fdf4; color: #03cf5d; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; text-decoration: none; box-shadow: 0 2px 6px rgba(3, 207, 93, 0.15);"><i class="fa-solid fa-blog"></i></a>
-            {% endif %}
-        </div>
-    {% endif %}
 
 
     <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
@@ -364,10 +338,10 @@
                             <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; min-width: 0; flex: 1;">
                                 <img src="{{ p.PROFILE_URL or p.user_profile or p.USER_AVATAR or user.profile_img or '/static/image/profile/default_profile.png' }}" alt="{{ p.NK_NM or p.user_nickname or user.nickname }}" class="m-author-avatar">
                                 <span class="m-author-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">{{ p.NK_NM or p.user_nickname or user.nickname }}</span>
-                                {% set s_inst = (p.sns_inst or p.SNS_INST or user.sns_inst or user.SNS_INST or '').strip() %}
-                                {% set s_ytb = (p.sns_ytb or p.SNS_YTB or user.sns_ytb or user.SNS_YTB or '').strip() %}
-                                {% set s_fsb = (p.sns_fsb or p.SNS_FSB or user.sns_fsb or user.SNS_FSB or '').strip() %}
-                                {% set s_blg = (p.sns_blg or p.SNS_BLG or user.sns_blg or user.SNS_BLG or '').strip() %}
+                                {% set s_inst = (p.sns_inst or p.SNS_INST or '').strip() %}
+                                {% set s_ytb = (p.sns_ytb or p.SNS_YTB or '').strip() %}
+                                {% set s_fsb = (p.sns_fsb or p.SNS_FSB or '').strip() %}
+                                {% set s_blg = (p.sns_blg or p.SNS_BLG or '').strip() %}
                                 {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
                                 {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
                                 {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
@@ -797,36 +771,7 @@ function renderTrophyPagination(page) {
                 <div id="mNicknameCheckMsg" style="font-size: 0.82rem; margin-top: 0.45rem; font-weight: 700; display: none;"></div>
             </div>
 
-            <!-- SNS 주소 입력 영역 -->
-            <div style="border-top: 1.5px dashed #e2e8f0; padding-top: 0.85rem; margin-top: 0.85rem;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #0f172a; margin-bottom: 0.65rem;">
-                    SNS / 소셜 계정 주소 설정
-                </div>
-                <div class="m-form-group" style="margin-bottom: 0.55rem;">
-                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
-                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.9rem;"></i> 인스타그램 주소
-                    </label>
-                    <input type="text" id="mEditSnsInst" class="m-form-control" placeholder="https://www.instagram.com/your_id" value="{{ user.sns_inst or user.SNS_INST or '' }}">
-                </div>
-                <div class="m-form-group" style="margin-bottom: 0.55rem;">
-                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
-                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.9rem;"></i> 유튜브 주소
-                    </label>
-                    <input type="text" id="mEditSnsYtb" class="m-form-control" placeholder="https://www.youtube.com/@your_channel" value="{{ user.sns_ytb or user.SNS_YTB or '' }}">
-                </div>
-                <div class="m-form-group" style="margin-bottom: 0.55rem;">
-                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
-                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.9rem;"></i> 페이스북 주소
-                    </label>
-                    <input type="text" id="mEditSnsFsb" class="m-form-control" placeholder="https://www.facebook.com/your_id" value="{{ user.sns_fsb or user.SNS_FSB or '' }}">
-                </div>
-                <div class="m-form-group" style="margin-bottom: 0.85rem;">
-                    <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;">
-                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.9rem;"></i> 블로그 주소
-                    </label>
-                    <input type="text" id="mEditSnsBlg" class="m-form-control" placeholder="https://blog.naver.com/your_id" value="{{ user.sns_blg or user.SNS_BLG or '' }}">
-                </div>
-            </div>
+
 
             <button type="submit" class="m-btn-submit" id="mBtnSaveProfile">
                 <i class="fa-solid fa-check"></i> 수정사항 저장하기

@@ -16,31 +16,7 @@
                 <div class="profile-user-identity" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
                     <h2 class="profile-user-nickname" id="currentNickname" style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; line-height: 1;">{{ user.nickname }}</h2>
                     <span class="user-role-chip" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-solid fa-paw"></i> PawStar 펫 집사</span>
-                    <!-- 소셜 링크 버튼 세트 -->
-                    <div class="profile-social-links">
-                        {% set inst_raw = (user.sns_inst or user.SNS_INST or '').strip() %}
-                        {% set ytb_raw = (user.sns_ytb or user.SNS_YTB or '').strip() %}
-                        {% set fsb_raw = (user.sns_fsb or user.SNS_FSB or '').strip() %}
-                        {% set blg_raw = (user.sns_blg or user.SNS_BLG or '').strip() %}
 
-                        {% set inst_link = ('https://' ~ inst_raw) if inst_raw and not (inst_raw.startswith('http://') or inst_raw.startswith('https://')) else inst_raw %}
-                        {% set ytb_link = ('https://' ~ ytb_raw) if ytb_raw and not (ytb_raw.startswith('http://') or ytb_raw.startswith('https://')) else ytb_raw %}
-                        {% set fsb_link = ('https://' ~ fsb_raw) if fsb_raw and not (fsb_raw.startswith('http://') or fsb_raw.startswith('https://')) else fsb_raw %}
-                        {% set blg_link = ('https://' ~ blg_raw) if blg_raw and not (blg_raw.startswith('http://') or blg_raw.startswith('https://')) else blg_raw %}
-
-                        {% if inst_link %}
-                            <a href="{{ inst_link }}" class="profile-social-btn instagram" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
-                        {% endif %}
-                        {% if ytb_link %}
-                            <a href="{{ ytb_link }}" class="profile-social-btn youtube" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i></a>
-                        {% endif %}
-                        {% if fsb_link %}
-                            <a href="{{ fsb_link }}" class="profile-social-btn facebook" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f"></i></a>
-                        {% endif %}
-                        {% if blg_link %}
-                            <a href="{{ blg_link }}" class="profile-social-btn blog" title="Blog" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-blog"></i></a>
-                        {% endif %}
-                    </div>
                     {% if user.email %}
                         <span class="user-google-chip" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.3rem;"><i class="fa-brands fa-google" style="color: #ea4335;"></i> {{ user.email }}</span>
                     {% endif %}
@@ -239,10 +215,10 @@
                                 <div class="author-detail" style="min-width: 0; flex: 1;">
                                     <div style="display: flex; align-items: center; gap: 0.35rem; width: 100%;">
                                         <div class="nickname" style="font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 1;">{{ p.NK_NM or p.user_nickname or u_obj.nickname or u_obj.NK_NM or '' }}</div>
-                                        {% set s_inst = (p.sns_inst or p.SNS_INST or u_obj.sns_inst or u_obj.SNS_INST or '').strip() %}
-                                        {% set s_ytb = (p.sns_ytb or p.SNS_YTB or u_obj.sns_ytb or u_obj.SNS_YTB or '').strip() %}
-                                        {% set s_fsb = (p.sns_fsb or p.SNS_FSB or u_obj.sns_fsb or u_obj.SNS_FSB or '').strip() %}
-                                        {% set s_blg = (p.sns_blg or p.SNS_BLG or u_obj.sns_blg or u_obj.SNS_BLG or '').strip() %}
+                                        {% set s_inst = (p.sns_inst or p.SNS_INST or '').strip() %}
+                                        {% set s_ytb = (p.sns_ytb or p.SNS_YTB or '').strip() %}
+                                        {% set s_fsb = (p.sns_fsb or p.SNS_FSB or '').strip() %}
+                                        {% set s_blg = (p.sns_blg or p.SNS_BLG or '').strip() %}
                                         {% set s_inst_link = ('https://' ~ s_inst) if s_inst and not (s_inst.startswith('http://') or s_inst.startswith('https://')) else s_inst %}
                                         {% set s_ytb_link = ('https://' ~ s_ytb) if s_ytb and not (s_ytb.startswith('http://') or s_ytb.startswith('https://')) else s_ytb %}
                                         {% set s_fsb_link = ('https://' ~ s_fsb) if s_fsb and not (s_fsb.startswith('http://') or s_fsb.startswith('https://')) else s_fsb %}
@@ -528,40 +504,7 @@
                 <div id="nicknameCheckMsg" style="font-size: 0.82rem; margin-top: 0.45rem; font-weight: 700; display: none;"></div>
             </div>
 
-            <!-- SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
-            <div style="border-top: 1.5px dashed #e2e8f0; padding-top: 1.25rem; margin-top: 1.25rem;">
-                <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
-                    SNS / 소셜 계정 주소 설정
-                </div>
 
-                <div class="form-group" style="margin-bottom: 0.85rem;">
-                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-instagram" style="color: #e1306c; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 인스타그램 주소
-                    </label>
-                    <input type="text" id="editSnsInst" class="form-control" placeholder="https://www.instagram.com/your_id" value="{{ user.sns_inst or user.SNS_INST or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0.85rem;">
-                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 유튜브 주소
-                    </label>
-                    <input type="text" id="editSnsYtb" class="form-control" placeholder="https://www.youtube.com/@your_channel" value="{{ user.sns_ytb or user.SNS_YTB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0.85rem;">
-                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 페이스북 주소
-                    </label>
-                    <input type="text" id="editSnsFsb" class="form-control" placeholder="https://www.facebook.com/your_id" value="{{ user.sns_fsb or user.SNS_FSB or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label style="font-weight: 700; font-size: 0.82rem; color: #475569; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-blog" style="color: #03cf5d; font-size: 0.95rem; width: 1.2rem; text-align: center;"></i> 블로그 주소
-                    </label>
-                    <input type="text" id="editSnsBlg" class="form-control" placeholder="https://blog.naver.com/your_id" value="{{ user.sns_blg or user.SNS_BLG or '' }}" style="width: 100%; height: 42px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 0.85rem; font-size: 0.88rem;">
-                </div>
-            </div>
 
             <button type="submit" class="btn-save-profile" id="btnSaveProfile" style="width: 100%; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); color: #ffffff; font-weight: 800; font-size: 1rem; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                 <i class="fa-solid fa-check"></i> 수정사항 저장하기
