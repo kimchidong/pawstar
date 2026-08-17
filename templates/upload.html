@@ -71,179 +71,68 @@
 
 
             <!-- 상단: 2열 입력 폼 영역 -->
-
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
-
-                <!-- 좌측 폼 컨트롤 그룹 -->
-
+                <!-- 좌측 폼 컨트롤 그룹 (이름, 동물 종류, 자랑 제목, SNS 계정 설정) -->
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-
-
-                    <!-- 2. 이름 & 동물 종류 -->
-
+                    <!-- 1. 이름 & 동물 종류 -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-
                         <div class="form-group" style="margin-bottom: 0;">
-
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-
                                 🐶 이름
-
                             </label>
-
                             <input type="text" name="pet_name" id="uploadPetName" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
-
                         </div>
 
-
-
                         <div class="form-group" style="margin-bottom: 0;">
-
                             <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-
                                 🐾 동물 종류
-
                             </label>
-
                             <!-- 숨겨진 정식 select (폼 전송 & 라이브 프리뷰 100% 연동) -->
-
                             <select name="pet_type" id="hiddenUploadPetType" class="upload-pet-type-select" required style="display: none;">
-
                                 <option value="" selected>선택</option>
-
                                 {% for k in pet_kinds %}
-
                                     {% set k_nm = k.KIND_NM %}
-
                                     {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
-
                                     {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
-
                                     <option value="{{ opt_text }}">{{ opt_text }}</option>
-
                                 {% endfor %}
-
                             </select>
 
-
-
                             <!-- 검색 블럭과 100% 동일한 단색 FontAwesome 아이콘 커스텀 셀렉트 드롭다운 -->
-
                             <div class="custom-pet-dropdown" id="uploadPetTypeDropdown" style="width: 100%; height: 48px;">
-
                                 <div class="custom-pet-trigger" onclick="toggleUploadPetDropdown(this, event)" style="height: 48px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; padding: 0 0.9rem; cursor: pointer;">
-
                                     <span style="display: inline-flex; align-items: center; gap: 0.6rem; line-height: 1; pointer-events: none;">
-
                                         <i class="pet-icon fa-solid fa-paw" id="uploadTriggerIcon" style="width: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: #475569;"></i>
-
                                         <span class="selected-text" id="uploadTriggerText" style="color: var(--text-muted); line-height: 1;">종류 선택</span>
-
                                     </span>
-
                                     <i class="fa-solid fa-chevron-down arrow-icon" style="margin-left: auto; pointer-events: none;"></i>
-
                                 </div>
-
                                 <div class="custom-pet-options" style="display: none; margin-top: 8px !important; top: calc(100% + 10px) !important; z-index: 99999; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 14px 35px rgba(0,0,0,0.22);">
-
                                     {% for k in pet_kinds %}
-
                                         {% set k_nm = k.KIND_NM %}
-
                                         {% set k_clean = k_nm|replace('🐕 ', '')|replace('🐈 ', '')|replace('🐹 ', '')|replace('🦜 ', '')|replace('🐾 ', '') %}
-
                                         {% set k_icon = 'fa-solid fa-dog' if ('강아지' in k_nm or '개' in k_nm) else ('fa-solid fa-cat' if '고양이' in k_nm else ('fa-solid fa-otter' if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('fa-solid fa-frog' if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('fa-solid fa-fish' if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('fa-solid fa-crow' if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('fa-solid fa-horse' if ('말' in k_nm or '큰동물' in k_nm) else 'fa-solid fa-paw')))))) %}
-
                                         {% set opt_text = '🐕 ' ~ k_clean if ('강아지' in k_nm or '개' in k_nm) else ('🐈 ' ~ k_clean if '고양이' in k_nm else ('🐹 ' ~ k_clean if ('햄스터' in k_nm or '소동물' in k_nm or '토끼' in k_nm or '고슴도치' in k_nm or '작은동물' in k_nm) else ('🦜 ' ~ k_clean if ('새' in k_nm or '앵무새' in k_nm or '조류' in k_nm) else ('🐟 ' ~ k_clean if ('어류' in k_nm or '관상어' in k_nm or '물고기' in k_nm) else ('🐢 ' ~ k_clean if ('거북이' in k_nm or '파충류' in k_nm or '도마뱀' in k_nm) else ('🐴 ' ~ k_clean if ('말' in k_nm or '큰동물' in k_nm) else '🐾 ' ~ k_clean)))))) %}
-
                                         <div class="custom-pet-option" onclick="selectUploadPetOption(this, '{{ opt_text }}', '{{ k_icon }}', '{{ k_clean }}', event)" data-value="{{ opt_text }}" data-icon="{{ k_icon }}" data-text="{{ k_clean }}" style="cursor: pointer; padding: 0.8rem 0.9rem; margin-bottom: 5px; border-radius: 8px; display: flex; align-items: center; gap: 0.6rem;">
-
                                             <i class="{{ k_icon }}" style="width: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: #64748b;"></i> <span style="line-height: 1;">{{ k_clean }}</span>
-
                                         </div>
-
                                     {% endfor %}
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
-
-
-                    <!-- 3. 자랑 게시물 제목 -->
-
+                    <!-- 2. 자랑 게시물 제목 -->
                     <div class="form-group" style="margin-bottom: 0;">
-
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-
                             ✨ 자랑 제목
-
                         </label>
-
                         <input type="text" name="title" id="uploadTitle" class="form-control" required style="width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); font-weight: 600;">
-
                     </div>
 
-
-
-                    <!-- 4. 파일 업로드 -->
-
-                    <div class="form-group" style="margin-bottom: 0;">
-
-                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-
-                            🖼️ 출전 사진 파일 첨부
-
-                        </label>
-
-                        <!-- 숨겨진 정식 file input -->
-
-                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
-
-
-
-                        <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
-
-                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-
-                            <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 100%; height: 100%;">
-
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
-
-                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.2rem;"></i>
-
-                                </div>
-
-                                <span style="font-weight: 800; font-size: 0.88rem; color: #1e293b; margin-top: 0.1rem;">📸 예쁜 아이 사진 선택하기</span>
-
-                                <span style="font-size: 0.76rem; color: #64748b;">클릭하여 컴퓨터에서 사진 업로드 (JPG, PNG, WEBP)</span>
-
-                            </div>
-
-                            <div id="pcCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.85rem 1.1rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); width: 100%; box-sizing: border-box;">
-
-                                <div style="display: flex; align-items: center; gap: 0.65rem; overflow: hidden; text-align: left;">
-
-                                    <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.3rem; flex-shrink: 0;"></i>
-
-                                    <span id="pcCustomFileName" style="font-weight: 800; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
-
-                                </div>
-
-                                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
-
-                            </div>
-
-                        </div>
-
-                    <!-- SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
-                    <div style="border-top: 1px dashed var(--border-light); padding-top: 1.25rem; margin-top: 1.25rem;">
+                    <!-- 3. SNS 주소 입력 영역 (SNS_INST, SNS_YTB, SNS_FSB, SNS_BLG) -->
+                    <div style="border-top: 1px dashed var(--border-light); padding-top: 1.25rem; margin-top: 0.25rem;">
                         <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
                             🔗 SNS / 소셜 계정 주소 설정 <span style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted);">(선택 입력)</span>
                         </div>
@@ -281,20 +170,42 @@
 
                 </div>
 
-                <!-- 우측: 자랑 내용 및 소개글 -->
+                <!-- 우측 폼 컨트롤 그룹 (출전 사진 파일 첨부, 자랑 내용 및 소개글) -->
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-                <div style="display: flex; flex-direction: column;">
-
-                    <div class="form-group" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
-
+                    <!-- 1. 출전 사진 파일 첨부 -->
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
-
-                            📝 자랑 내용 및 소개글
-
+                            🖼️ 출전 사진 파일 첨부
                         </label>
+                        <!-- 숨겨진 정식 file input -->
+                        <input type="file" id="uploadMediaFile" name="media_file" accept="image/*" required style="display: none;">
 
-                        <textarea name="content" class="form-control" required style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 240px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
+                        <!-- 트렌디하고 감각적인 커스텀 파일 업로드 컨트롤 -->
+                        <div id="pcCustomFileDropzone" onclick="document.getElementById('uploadMediaFile').click();" style="border: 1px solid var(--border-light); background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.75rem 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; min-height: 104px; height: 104px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                            <div id="pcCustomFileEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 100%; height: 100%;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12); color: #7c3aed;">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <span style="font-weight: 800; font-size: 0.88rem; color: #1e293b; margin-top: 0.1rem;">📸 예쁜 아이 사진 선택하기</span>
+                                <span style="font-size: 0.76rem; color: #64748b;">클릭하여 컴퓨터에서 사진 업로드 (JPG, PNG, WEBP)</span>
+                            </div>
+                            <div id="pcCustomFileSelectedState" style="display: none; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; padding: 0.85rem 1.1rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); width: 100%; box-sizing: border-box;">
+                                <div style="display: flex; align-items: center; gap: 0.65rem; overflow: hidden; text-align: left;">
+                                    <i class="fa-solid fa-file-image" style="color: #e11d48; font-size: 1.3rem; flex-shrink: 0;"></i>
+                                    <span id="pcCustomFileName" style="font-weight: 800; font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">선택된 파일 없음</span>
+                                </div>
+                                <span style="font-size: 0.78rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0;">사진 변경</span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- 2. 자랑 내용 및 소개글 -->
+                    <div class="form-group" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
+                        <label style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; margin-bottom: 0.5rem;">
+                            📝 자랑 내용 및 소개글
+                        </label>
+                        <textarea name="content" class="form-control" required style="width: 100%; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex: 1; min-height: 160px; font-family: inherit; resize: vertical; line-height: 1.6;"></textarea>
                     </div>
 
                 </div>
