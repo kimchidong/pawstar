@@ -576,37 +576,20 @@ function openDetailModal(post, isHallOfFame = false) {
     const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
     const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
 
-    if (!isClosedRound && !isMine) {
-        if (card) {
-            const btnView = card.querySelector('.btn-view');
-            if (btnView) {
-                btnView.classList.add('active');
-                const icon = btnView.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
-            }
-        }
-
-        const detailBtnViewPopup = document.getElementById('detailBtnView');
-        if (detailBtnViewPopup) {
-            detailBtnViewPopup.classList.add('active');
-            const icon = detailBtnViewPopup.querySelector('i');
+    if (card) {
+        const btnView = card.querySelector('.btn-view');
+        if (btnView) {
+            btnView.classList.add('active');
+            const icon = btnView.querySelector('i');
             if (icon) icon.className = 'fa-solid fa-eye';
         }
-    } else {
-        if (card) {
-            const btnView = card.querySelector('.btn-view');
-            if (btnView) {
-                btnView.classList.remove('active');
-                const icon = btnView.querySelector('i');
-                if (icon) icon.className = 'fa-regular fa-eye';
-            }
-        }
-        const detailBtnViewPopup = document.getElementById('detailBtnView');
-        if (detailBtnViewPopup) {
-            detailBtnViewPopup.classList.remove('active');
-            const icon = detailBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-regular fa-eye';
-        }
+    }
+
+    const detailBtnViewPopup = document.getElementById('detailBtnView');
+    if (detailBtnViewPopup) {
+        detailBtnViewPopup.classList.add('active');
+        const icon = detailBtnViewPopup.querySelector('i');
+        if (icon) icon.className = 'fa-solid fa-eye';
     }
 
     // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩

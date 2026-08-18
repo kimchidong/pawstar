@@ -575,14 +575,9 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    const mCurUserId = String(window.currentUserId || '').trim();
-                    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
-                    const isMine = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
-                    
-                    const isViewed = !isMine && !!(data.actions && data.actions.is_viewed);
-                    mBtnViewPopup.classList.toggle('active', isViewed);
+                    mBtnViewPopup.classList.add('active');
                     const icon = mBtnViewPopup.querySelector('i');
-                    if (icon) icon.className = isViewed ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+                    if (icon) icon.className = 'fa-solid fa-eye';
                 }
             }
         })
@@ -1597,6 +1592,13 @@ async function triggerMobileEvent(postId, eventType) {
 
             const mViewEl = document.getElementById('mDetailViewCount');
             if (mViewEl && finalView !== undefined) mViewEl.textContent = Number(finalView).toLocaleString();
+
+            const mBtnViewPopup = document.getElementById('mDetailBtnView');
+            if (mBtnViewPopup && finalView !== undefined) {
+                mBtnViewPopup.classList.add('active');
+                const icon = mBtnViewPopup.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-eye';
+            }
 
             const mLandingViewEl = document.getElementById('mShareLandingViewCnt');
             if (mLandingViewEl && finalView !== undefined) mLandingViewEl.textContent = Number(finalView).toLocaleString();
