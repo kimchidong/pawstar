@@ -247,7 +247,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     // 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
     const mContestBadge = document.getElementById('mDetailContestBadge');
     if (mContestBadge) {
-        let rawRound = postData.CONTEST_ROUND || postData.contest_round || postData.contest_id || postData.ROUND_NO || postData.round_no;
+        let rawRound = postData.CONTEST_ROUND || postData.contest_round || postData.contest_id;
+        if (!rawRound && postData.post_id && String(postData.post_id).includes('_')) {
+            rawRound = String(postData.post_id).split('_')[0];
+        }
         if (!rawRound) {
             const pageRoundEl = document.querySelector('.hero-round-badge') || document.querySelector('.round-badge-text') || document.getElementById('selectedContestRound');
             if (pageRoundEl) {
@@ -256,7 +259,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 if (m) rawRound = m[0];
             }
         }
-        let roundNo = '1';
+        let roundNo = '16';
         if (rawRound) {
             let m = String(rawRound).match(/\d+/);
             roundNo = m ? m[0] : String(rawRound).trim();

@@ -595,7 +595,10 @@ function openDetailModal(post, isHallOfFame = false) {
     // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
     const pcContestBadge = document.getElementById('detailContestBadge');
     if (pcContestBadge) {
-        let rawRound = post.CONTEST_ROUND || post.contest_round || post.contest_id || post.ROUND_NO || post.round_no;
+        let rawRound = post.CONTEST_ROUND || post.contest_round || post.contest_id;
+        if (!rawRound && post.post_id && String(post.post_id).includes('_')) {
+            rawRound = String(post.post_id).split('_')[0];
+        }
         if (!rawRound) {
             const pageRoundEl = document.querySelector('.hero-round-badge') || document.querySelector('.round-badge-text') || document.getElementById('selectedContestRound');
             if (pageRoundEl) {
@@ -604,7 +607,7 @@ function openDetailModal(post, isHallOfFame = false) {
                 if (m) rawRound = m[0];
             }
         }
-        let roundNo = '1';
+        let roundNo = '16';
         if (rawRound) {
             let m = String(rawRound).match(/\d+/);
             roundNo = m ? m[0] : String(rawRound).trim();
