@@ -259,7 +259,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 if (m) rawRound = m[0];
             }
         }
-        let roundNo = '16';
+        let roundNo = '1';
         if (rawRound) {
             let m = String(rawRound).match(/\d+/);
             roundNo = m ? m[0] : String(rawRound).trim();
