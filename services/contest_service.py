@@ -1893,37 +1893,45 @@ class PawStarService:
                         'is_author': True
                     }
 
-                vw_user = view_user_id
-                if not vw_user:
-                    ip_str = str(client_ip or 'GUEST').replace(':', '_').replace('.', '_')
-                    vw_user = f"ANON_{ip_str}"
+                # 1. 전달받은 view_user_id가 PST_USER 테이블에 존재하는 회원인지 검증
+                is_member = False
+                valid_user_id = None
+                if view_user_id and not str(view_user_id).startswith('ANON_'):
+                    cur.execute("SELECT USER_ID FROM PST_USER WHERE USER_ID = %s", (view_user_id,))
+                    u_row = cur.fetchone()
+                    if u_row:
+                        is_member = True
+                        valid_user_id = u_row['USER_ID']
 
-                # 1. 이미 동일 유저/IP가 해당 출전글을 열람한 기록이 있는지 검증
-                cur.execute("""
-                    SELECT 1 FROM PST_CONTEST_VW
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
-                """, (contest_id, round_no, vw_user))
-                already_viewed = bool(cur.fetchone())
+                already_viewed = False
 
-                if not already_viewed:
-                    # 최초 조회인 경우에만 누적 조회수(VW_CNT) 1 가산 및 이력 신규 추가
+                if is_member and valid_user_id:
+                    # 오직 회원인 경우에만 PST_CONTEST_VW 테이블 조회 및 이력 기록
                     cur.execute("""
-                        UPDATE PST_CONTEST_ROUND
-                        SET VW_CNT = COALESCE(VW_CNT, 0) + 1
-                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
-                    """, (contest_id, round_no))
-
-                    cur.execute("""
-                        INSERT INTO PST_CONTEST_VW (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
-                        VALUES (%s, %s, %s, NOW())
-                    """, (contest_id, round_no, vw_user))
-                else:
-                    # 이미 읽은 게시물인 경우 조회 일시만 최신화 (조회수 가산 없음)
-                    cur.execute("""
-                        UPDATE PST_CONTEST_VW
-                        SET VW_DT = NOW()
+                        SELECT 1 FROM PST_CONTEST_VW
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
-                    """, (contest_id, round_no, vw_user))
+                    """, (contest_id, round_no, valid_user_id))
+                    already_viewed = bool(cur.fetchone())
+
+                    if not already_viewed:
+                        # 최초 조회인 회원인 경우 누적 조회수(VW_CNT) 1 가산 및 이력 신규 추가
+                        cur.execute("""
+                            UPDATE PST_CONTEST_ROUND
+                            SET VW_CNT = COALESCE(VW_CNT, 0) + 1
+                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                        """, (contest_id, round_no))
+
+                        cur.execute("""
+                            INSERT INTO PST_CONTEST_VW (CONTEST_ROUND, ROUND_NO, VW_USER_ID, VW_DT)
+                            VALUES (%s, %s, %s, NOW())
+                        """, (contest_id, round_no, valid_user_id))
+                    else:
+                        # 이미 읽은 회원인 경우 조회 일시만 최신화 (조회수 가산 없음)
+                        cur.execute("""
+                            UPDATE PST_CONTEST_VW
+                            SET VW_DT = NOW()
+                            WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND VW_USER_ID = %s
+                        """, (contest_id, round_no, valid_user_id))
 
                 # 2. DB에서 4요소 재조회 -> 점수 계산 -> DB 최신화 -> 최종 수치 반환
                 stats = self.sync_and_get_post_stats(cur, contest_id, round_no)
