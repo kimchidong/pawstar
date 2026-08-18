@@ -592,12 +592,20 @@ function openDetailModal(post, isHallOfFame = false) {
         if (icon) icon.className = 'fa-solid fa-eye';
     }
 
-    // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩
-    const pcContestBadge = document.getElementById('detailContestBadge');
-    if (pcContestBadge) {
-        let rawRound = post.CONTEST_ROUND || post.contest_round || post.contest_id;
-        if (!rawRound && post.post_id && String(post.post_id).includes('_')) {
-            rawRound = String(post.post_id).split('_')[0];
+    // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩 함수
+    const updatePcContestBadgeUI = (pObj) => {
+        const pcContestBadge = document.getElementById('detailContestBadge');
+        if (!pcContestBadge || !pObj) return;
+
+        const pIsClosed = isHallOfFame || 
+                           (pObj.is_closed === true) || 
+                           (pObj.closed === true) || 
+                           (pObj.contest_stat === 'G001C002') || 
+                           (pObj.CONTEST_STAT === 'G001C002');
+
+        let rawRound = pObj.CONTEST_ROUND || pObj.contest_round || pObj.contest_id;
+        if (!rawRound && pObj.post_id && String(pObj.post_id).includes('_')) {
+            rawRound = String(pObj.post_id).split('_')[0];
         }
         if (!rawRound) {
             const pageRoundEl = document.querySelector('.hero-round-badge') || document.querySelector('.round-badge-text') || document.getElementById('selectedContestRound');
@@ -613,7 +621,7 @@ function openDetailModal(post, isHallOfFame = false) {
             roundNo = m ? m[0] : String(rawRound).trim();
         }
         
-        let contestTitle = post.CONTEST_TITLE || post.contest_title || post.THEME_NM || post.theme_nm || post.CONTEST_NM || post.contest_nm || post.theme_title || '';
+        let contestTitle = pObj.CONTEST_TITLE || pObj.contest_title || pObj.THEME_NM || pObj.theme_nm || pObj.CONTEST_NM || pObj.contest_nm || pObj.theme_title || '';
         if (!contestTitle) {
             const pageContestEl = document.querySelector('.hero-title') || document.querySelector('.selected-text') || document.getElementById('selectedContestTitle');
             if (pageContestEl) {
@@ -622,19 +630,22 @@ function openDetailModal(post, isHallOfFame = false) {
             }
         }
         if (!contestTitle) contestTitle = '포스타 콘테스트';
-        const badgeStyle = isClosedRound 
+
+        const bStyle = pIsClosed 
             ? 'color: #475569; background: #f1f5f9; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.12);' 
             : 'color: #db2777; background: #fce7f3; border: 1.5px solid #fbcfe8; box-shadow: 0 2px 6px rgba(219, 39, 119, 0.12);';
 
         pcContestBadge.innerHTML = `
-            <span style="font-size: 0.75rem; font-weight: 800; ${badgeStyle} padding: 0.22rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
+            <span style="font-size: 0.75rem; font-weight: 800; ${bStyle} padding: 0.22rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.25rem; flex-shrink: 0;">
                 제 ${roundNo}회
             </span>
             <span style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; filter: drop-shadow(0 1px 2px rgba(124, 58, 237, 0.12));">
                 ${contestTitle}
             </span>
         `;
-    }
+    };
+
+    updatePcContestBadgeUI(post);
 
     const imgEl = document.getElementById('detailImg');
     const imgSrc = post.popup_image_path || post.POPUP_IMAGE_PATH || post.IMAGE_PATH || post.image_path || post.media_url || 
@@ -767,6 +778,8 @@ function openDetailModal(post, isHallOfFame = false) {
 
     const shareCountEl = document.getElementById('detailShareCount');
     if (shareCountEl) shareCountEl.textContent = Number(post.share_count || 0).toLocaleString();
+
+    updatePcContestBadgeUI(post);
 
     const isCommented = (post.actions && post.actions.is_commented) || post.is_commented || false;
     window.currentDetailPost = post;
