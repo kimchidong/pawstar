@@ -118,11 +118,11 @@
                 {% endif %}
 
                 {% if post and not is_closed %}
-                <a href="/?open_post={{ contest_round or post.contest_round or post.CONTEST_ROUND }}_{{ round_no or post.round_no or post.ROUND_NO }}" style="width: 100%; padding: 0.95rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 1rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                <a href="/?contest_id={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}&open_post={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}_{{ round_no or post.round_no or post.ROUND_NO or 1 }}" style="width: 100%; padding: 0.95rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 1rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
                     <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
                 </a>
                 {% else %}
-                <a href="/" style="width: 100%; padding: 0.95rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 1rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                <a href="/?contest_id={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}&open_post={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}_{{ round_no or post.round_no or post.ROUND_NO or 1 }}" style="width: 100%; padding: 0.95rem; border-radius: 14px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 1rem; font-weight: 800; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
                     <i class="fa-solid fa-paw"></i> 메인 콘테스트 피드 보러가기
                 </a>
                 {% endif %}
