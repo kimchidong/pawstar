@@ -140,7 +140,7 @@
                 <span>{{ current_user.nickname }}</span>
             </a>
         {% else %}
-            <a href="#" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; } else { const m = document.getElementById('mAuthModal') || document.getElementById('googleAuthModal'); if(m) { m.style.display='flex'; m.style.zIndex='999999'; m.classList.add('show','active'); } else { window.location.href='/auth/google'; } return false; }">
+            <a href="#" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); } else { const m = document.getElementById('googleAuthModal'); if(m) { m.style.display='flex'; m.style.zIndex='999999'; m.classList.add('show','active'); } } return false;">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 <span>가입/로그인</span>
             </a>

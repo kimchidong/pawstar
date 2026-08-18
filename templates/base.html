@@ -405,26 +405,16 @@
         const btnCloseGoogleModal = document.getElementById('btnCloseGoogleModal');
         const googleAuthForm = document.getElementById('googleAuthForm');
 
-        function openGoogleAuthWindow() {
-            window.location.href = '/auth/google';
-        }
-
-        // 최상단 프로필/로그인 버튼 클릭 시 바로 구글 로그인 페이지로 이동
+        // 상단 가입/로그인 버튼 클릭 시 자동 이동하지 않고 구글 인증 모달 팝업만 오픈
         if (btnNavProfile) {
             btnNavProfile.addEventListener('click', function(e) {
                 {% if not is_logged_in %}
                     e.preventDefault();
                     e.stopPropagation();
-                    openGoogleAuthWindow();
+                    if (typeof openGoogleAuthModal === 'function') {
+                        openGoogleAuthModal();
+                    }
                 {% endif %}
-            });
-        }
-
-        const btnOfficialGoogleAuth = document.getElementById('btnOfficialGoogleAuth');
-        if (btnOfficialGoogleAuth) {
-            btnOfficialGoogleAuth.addEventListener('click', function(e) {
-                e.preventDefault();
-                openGoogleAuthWindow();
             });
         }
 

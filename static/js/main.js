@@ -1638,26 +1638,42 @@ document.addEventListener('DOMContentLoaded', function() {
         if (googleModal) googleModal.classList.add('show');
     }
 
-    // 2. 모든 출전 신청 링크/버튼 클릭 시 비로그인이면 즉시 로그인 모달 팝업 표출
-    const uploadLinks = document.querySelectorAll('a[href="/upload"], a[href="/m/upload"], .btn-hero-cta');
+    // 2. 모든 출전 신청 링크/버튼 클릭 시 비로그인이면 즉시 반투명 구글 인증 모달 팝업 표출
+    const uploadLinks = document.querySelectorAll('a[href="/upload"], a[href="/m/upload"], .btn-hero-cta, .m-btn-hero-cta');
     uploadLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // UI 상의 프로필/로그아웃 요소 존재 여부를 함께 체크하여 실제 로그인 상태 정확히 판별
             const hasProfileUI = document.querySelector('.profile-dropdown') || document.querySelector('.m-nav-profile') || document.querySelector('a[href="/logout"]') || document.querySelector('a[href="/api/logout"]');
             const isLoggedIn = window.isUserLoggedIn || !!hasProfileUI;
 
             if (!isLoggedIn) {
                 e.preventDefault();
                 e.stopPropagation();
-                const targetPath = link.getAttribute('href') || '/upload';
-                window.location.href = '/auth/google?next=' + encodeURIComponent(targetPath);
+                if (typeof openGoogleAuthModal === 'function') {
+                    openGoogleAuthModal();
+                } else {
+                    const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
+                    if (m) {
+                        m.style.display = 'flex';
+                        m.style.zIndex = '999999';
+                        m.classList.add('show', 'active');
+                    }
+                }
             }
         });
     });
 });
 
 function openGoogleLoginModal() {
-    window.location.href = '/auth/google';
+    if (typeof openGoogleAuthModal === 'function') {
+        openGoogleAuthModal();
+    } else {
+        const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
+        if (m) {
+            m.style.display = 'flex';
+            m.style.zIndex = '999999';
+            m.classList.add('show', 'active');
+        }
+    }
 }
 window.openGoogleLoginModal = openGoogleLoginModal;
 
