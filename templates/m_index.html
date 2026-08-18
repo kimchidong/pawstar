@@ -16,7 +16,7 @@
             <div class="m-hero-badge"><span class="live-dot"></span> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status if current_contest else '진행중' }}</span></div>
         {% endif %}
         
-        <a href="/m/upload" class="m-btn-hero-cta">
+        <a href="/m/upload" class="m-btn-hero-cta" onclick="return handleMobileUploadNavClick(event);">
             <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
         </a>
     </div>

@@ -31,8 +31,38 @@
                     <button type="button" class="btn-withdraw-profile" id="btnWithdrawUser" title="회원 탈퇴">
                         <i class="fa-solid fa-user-xmark"></i> 회원 탈퇴
                     </button>
+                    <!-- 로그아웃 버튼 -->
+                    <button type="button" class="btn-logout-profile" id="btnLogoutUser" onclick="handlePcDirectLogout(event)" title="로그아웃" style="height: 38px; padding: 0 0.8rem; background: #f8fafc; border: 1.2px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                    </button>
                 </div>
             </div>
+
+<script>
+function handlePcDirectLogout(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    try {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            var c = cookies[i];
+            var eqPos = c.indexOf("=");
+            var name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+            if (name) {
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/m";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+        }
+    } catch(err) {}
+
+    fetch('/api/logout', { method: 'POST' }).finally(function() {
+        window.location.replace('/logout?t=' + Date.now());
+    });
+}
+</script>
 
             <!-- 사용자 최초 가입일자 및 최근 로그인일자 정보 칩 세트 -->
             <div class="profile-user-dates" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; flex-wrap: wrap;">
@@ -791,6 +821,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('회원 탈퇴 처리 중 오류가 발생했습니다.');
                 });
             }
+        });
+    }
+
+    // 프로필 로그아웃 버튼 이벤트 바인딩
+    const btnLogout = document.getElementById('btnLogoutUser');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.replace('/logout?t=' + Date.now());
         });
     }
     // 30분 비활동 클라이언트 자동 로그아웃 타임아웃 (30분 = 1800초 = 1,800,000ms)

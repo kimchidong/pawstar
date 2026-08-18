@@ -128,7 +128,7 @@
             <i class="fa-solid fa-ranking-star"></i>
             <span>명예전당</span>
         </a>
-        <a href="/m/upload" class="m-nav-item m-nav-upload {{ 'active' if request.path == '/m/upload' }}">
+        <a href="/m/upload" class="m-nav-item m-nav-upload {{ 'active' if request.path == '/m/upload' }}" onclick="return handleMobileUploadNavClick(event);">
             <div class="m-nav-upload-btn">
                 <i class="fa-solid fa-paw"></i>
             </div>
@@ -140,7 +140,7 @@
                 <span>{{ current_user.nickname }}</span>
             </a>
         {% else %}
-            <a href="/auth/google" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}">
+            <a href="#" id="mBtnNavProfile" class="m-nav-item {{ 'active' if request.path == '/m/profile' or request.path == '/m/profile/' }}" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; } else { const m = document.getElementById('mAuthModal') || document.getElementById('googleAuthModal'); if(m) { m.style.display='flex'; m.style.zIndex='999999'; m.classList.add('show','active'); } else { window.location.href='/auth/google'; } return false; }">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 <span>가입/로그인</span>
             </a>
@@ -274,49 +274,55 @@
         </div>
     </div>
 
-    <!-- 모바일 로그인 & 회원가입 바텀시트 모달 -->
-    <div class="m-modal-backdrop" id="mAuthModal">
-        <div class="m-modal-sheet" style="padding: 1.5rem 1.25rem;">
-            <div class="m-modal-header">
-                <h3 id="mAuthModalTitle">🔑 회원 로그인</h3>
-                <button type="button" class="btn-close" id="mBtnCloseAuth"><i class="fa-solid fa-xmark"></i></button>
+    <!-- 구글 전용 인증 레이어 팝업 모달 (Google Auth Modal - 모바일/PC 호환) -->
+    <div class="modal-backdrop m-modal-backdrop" id="googleAuthModal" style="display: none; position: fixed; inset: 0; z-index: 999999; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
+        <div class="modal-content m-modal-sheet" style="max-width: 480px; width: 94%; padding: 1.6rem 1.35rem; text-align: center; background: #ffffff; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+            <div class="modal-header" style="margin-bottom: 0.9rem; display: flex; align-items: center; justify-content: space-between;">
+                <h3 style="display: flex; align-items: center; justify-content: center; gap: 0.45rem; margin: 0; font-size: 1.25rem; font-weight: 900; color: #0f172a;">
+                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google 계정 인증
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseGoogleModal" onclick="if(typeof closeGoogleAuthModal==='function'){closeGoogleAuthModal();}else{const m=document.getElementById('googleAuthModal')||document.getElementById('mAuthModal');if(m){m.classList.remove('show','active');m.style.display='none';}}" style="background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- 탭 스위치 -->
-            <div style="display: flex; background: var(--bg-primary); border-radius: var(--radius-sm); padding: 0.2rem; margin-bottom: 1rem; border: 1px solid var(--border-light);">
-                <button type="button" id="mTabLoginBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: var(--gradient-brand); color: #fff;">로그인</button>
-                <button type="button" id="mTabRegisterBtn" style="flex: 1; padding: 0.45rem; border: none; border-radius: 6px; font-weight: 800; font-size: 0.85rem; background: transparent; color: var(--text-secondary);">회원가입</button>
+            <div style="margin: 1rem 0; text-align: center;">
+                <p style="font-size: 0.88rem; color: #475569; line-height: 1.6; margin-bottom: 1.15rem; font-weight: 600;">
+                    PawStar에 오신 것을 환영합니다! 🐾<br>
+                    <strong style="color: #0f172a;">Google 계정</strong>을 선택하고 서명하여 안전하게 로그인하세요.
+                </p>
+
+                <!-- Google 공식 로그인 인증 리다이렉트 -->
+                <a href="/auth/google" id="btnOfficialGoogleAuthMobile" style="width: 100%; padding: 0.88rem 1.1rem; border-radius: 20px; border: none; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; font-weight: 900; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.65rem; text-decoration: none; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35); margin-bottom: 1.15rem; box-sizing: border-box;">
+                    <div style="width: 30px; height: 30px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); flex-shrink: 0;">
+                        <svg width="17" height="17" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.13-.45-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                    </div>
+                    <span><i class="fa-solid fa-globe" style="font-size: 0.9rem; margin-right: 0.2rem; opacity: 0.9;"></i> Google 공식 계정 선택 창으로 이동</span>
+                </a>
             </div>
 
-            <!-- 로그인 폼 -->
-            <form id="mLoginForm">
-                <div class="m-form-group">
-                    <label>회원 아이디</label>
-                    <input type="text" id="mLoginUserId" class="m-form-control" placeholder="아이디 입력 (예: user1)" required>
+            <div style="background: rgba(139, 92, 246, 0.05); border: 1.2px solid rgba(139, 92, 246, 0.2); border-radius: 16px; padding: 0.85rem; font-size: 0.76rem; color: #475569; text-align: left; line-height: 1.55;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); padding-bottom: 0.35rem; flex-wrap: wrap; gap: 0.25rem;">
+                    <span style="font-weight: 800; color: #6d28d9; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap;">
+                        <i class="fa-solid fa-file-contract"></i> PawStar 약관 및 개인정보 안내
+                    </span>
+                    <div style="display: flex; gap: 0.4rem; align-items: center; white-space: nowrap;">
+                        <button type="button" onclick="openMobileTermsModal()" style="background: none; border: none; color: #7c3aed; font-size: 0.74rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0;">
+                            이용약관 <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+                        </button>
+                        <span style="color: #cbd5e1; font-size: 0.65rem;">|</span>
+                        <button type="button" onclick="openMobilePrivacyModal()" style="background: none; border: none; color: #7c3aed; font-size: 0.74rem; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0;">
+                            개인정보 방침 <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="m-form-group">
-                    <label>사용자인증번호 (비밀번호)</label>
-                    <input type="password" id="mLoginPassword" class="m-form-control" placeholder="비밀번호 입력 (기본: 1234)" required>
-                </div>
-                <button type="submit" class="m-btn-submit">🚀 로그인 하기</button>
-            </form>
-
-            <!-- 회원가입 폼 -->
-            <form id="mRegisterForm" style="display: none;">
-                <div class="m-form-group">
-                    <label>희망 아이디</label>
-                    <input type="text" id="mRegUserId" class="m-form-control" placeholder="아이디 입력" required>
-                </div>
-                <div class="m-form-group">
-                    <label>집사 닉네임</label>
-                    <input type="text" id="mRegNickname" class="m-form-control" placeholder="멋진 닉네임" required>
-                </div>
-                <div class="m-form-group">
-                    <label>사용자인증번호 (비밀번호)</label>
-                    <input type="password" id="mRegPassword" class="m-form-control" placeholder="비밀번호 입력" required>
-                </div>
-                <button type="submit" class="m-btn-submit" style="background: linear-gradient(135deg, #059669, #10b981);">✨ 회원가입 시작하기</button>
-            </form>
+                • <strong>이용약관 동의</strong>: Google 계정 인증으로 로그인 시 PawStar 서비스 <strong>이용약관</strong> 및 개인정보 처리방침에 동의하게 됩니다.<br>
+                • <strong>Google 식별자의 안전한 저장</strong>: Google 수집 식별자는 원본을 저장하지 않으며 복호화가 불가능한 <strong>일방향 암호화(SHA-256 해시)</strong> 방식으로 저장됩니다.<br>
+                • <strong>최소 개인정보 수집</strong>: 비밀번호, 전화번호, 이메일 내용 등 불필요한 정보는 수집하지 않으며 서비스 이용에 필요한 최소한의 정보만 이용합니다.
+            </div>
         </div>
     </div>
 
@@ -381,8 +387,13 @@
     <script>
     function openMobilePrivacyModal() {
         const m = document.getElementById('mPrivacyModal');
-        if (m) { m.style.display = 'flex'; m.classList.add('show', 'active'); }
-        else { location.href = '/m/privacy'; }
+        if (m) {
+            m.style.display = 'flex';
+            m.style.zIndex = '2000000';
+            m.classList.add('show', 'active');
+        } else {
+            location.href = '/m/privacy';
+        }
     }
     function closeMobilePrivacyModal() {
         const m = document.getElementById('mPrivacyModal');
@@ -390,13 +401,42 @@
     }
     function openMobileTermsModal() {
         const m = document.getElementById('mTermsModal');
-        if (m) { m.style.display = 'flex'; m.classList.add('show', 'active'); }
-        else { location.href = '/m/terms'; }
+        if (m) {
+            m.style.display = 'flex';
+            m.style.zIndex = '2000000';
+            m.classList.add('show', 'active');
+        } else {
+            location.href = '/m/terms';
+        }
     }
     function closeMobileTermsModal() {
         const m = document.getElementById('mTermsModal');
         if (m) { m.style.display = 'none'; m.classList.remove('show', 'active'); }
     }
+    window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+    window.openMobilePrivacyModal = openMobilePrivacyModal;
+    window.closeMobilePrivacyModal = closeMobilePrivacyModal;
+    window.openMobileTermsModal = openMobileTermsModal;
+    window.closeMobileTermsModal = closeMobileTermsModal;
+
+    function handleMobileUploadNavClick(e) {
+        if (window.isUserLoggedIn) {
+            return true; // 로그인 상태면 /m/upload 페이지로 정상 이동
+        }
+        if (e) e.preventDefault();
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
+        } else {
+            const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
+            if (m) {
+                m.style.display = 'flex';
+                m.style.zIndex = '999999';
+                m.classList.add('show', 'active');
+            }
+        }
+        return false; // 비로그인 상태면 이동하지 않고 그 자리에서 반투명 구글 로그인 모달 팝업 노출
+    }
+    window.handleMobileUploadNavClick = handleMobileUploadNavClick;
 
     document.addEventListener('DOMContentLoaded', function() {
         ['mPrivacyModal', 'mTermsModal'].forEach(id => {
@@ -428,10 +468,10 @@
             const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]open_login=true/, '').replace(/^&/, '?');
             window.history.replaceState({}, document.title, cleanUrl || '/m');
             setTimeout(() => {
-                if (typeof openGoogleLoginModal === 'function') {
+                if (typeof openGoogleAuthModal === 'function') {
+                    openGoogleAuthModal();
+                } else if (typeof openGoogleLoginModal === 'function') {
                     openGoogleLoginModal();
-                } else if (typeof openMobileAuthModal === 'function') {
-                    openMobileAuthModal();
                 }
             }, 100);
         }

@@ -47,11 +47,37 @@
         <button type="button" id="mBtnWithdrawUser" style="height: 38px; padding: 0 0.75rem; background: #fff1f2; border: 1.2px solid #fecdd3; border-radius: 12px; color: #e11d48; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
             <i class="fa-solid fa-user-xmark" style="font-size: 0.8rem;"></i> 탈퇴
         </button>
-        <a href="/logout" style="height: 38px; padding: 0 0.75rem; background: #f8fafc; border: 1.2px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 800; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
+        <button type="button" id="mBtnLogoutUser" onclick="handleMobileDirectLogout(event)" style="height: 38px; padding: 0 0.75rem; background: #f8fafc; border: 1.2px solid #cbd5e1; border-radius: 12px; color: #334155; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
             <i class="fa-solid fa-right-from-bracket" style="font-size: 0.8rem;"></i> 로그아웃
-        </a>
+        </button>
     </div>
 </div>
+
+<script>
+function handleMobileDirectLogout(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    try {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            var c = cookies[i];
+            var eqPos = c.indexOf("=");
+            var name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+            if (name) {
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/m";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+        }
+    } catch(err) {}
+
+    fetch('/api/logout', { method: 'POST' }).finally(function() {
+        window.location.replace('/m/logout?t=' + Date.now());
+    });
+}
+</script>
 
 <!-- 모바일 프로필 전형적인 탭 스타일 정의 -->
 <style>
@@ -1045,6 +1071,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('회원 탈퇴 요청 중 오류가 발생했습니다.');
                 });
             }
+        });
+    }
+
+    // 모바일 프로필 전용 로그아웃 버튼 이벤트 바인딩
+    const mBtnLogout = document.getElementById('mBtnLogoutUser');
+    if (mBtnLogout) {
+        mBtnLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.replace('/m/logout?t=' + Date.now());
         });
     }
     // 모바일 30분 비활동 클라이언트 자동 로그아웃 타임아웃

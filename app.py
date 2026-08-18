@@ -109,6 +109,10 @@ def m_time_ago_filter(dt_val):
 @app.before_request
 def check_session_timeout():
     """ 웹 서비스 이용(요청) 중 아무런 액션 없이 30분(1800초) 경과 시 세션 자동 만료 파기 처리 """
+    if session.get('logged_out'):
+        session.pop('user_id', None)
+        return
+
     now_ts = datetime.datetime.now().timestamp()
     last_act = session.get('last_activity')
 
@@ -116,15 +120,35 @@ def check_session_timeout():
         if last_act and (now_ts - last_act > SESSION_TIMEOUT_SECONDS):
             session.clear()
             session['logged_out_reason'] = 'timeout'
+            session['logged_out'] = True
         else:
             session['last_activity'] = now_ts
+
+@app.after_request
+def add_no_cache_headers(response):
+    """ 로그아웃 및 비로그인 상태일 때 세션 및 사용자 관련 쿠키 완벽 제거 헤더 부여 """
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+
+    # 비로그인 상태이거나 logout 요청인 경우 session 및 user_uuid 쿠키 강제 파기
+    if not session.get('user_id') or request.path in ['/logout', '/m/logout', '/api/logout']:
+        for k in ['session', 'user_uuid', 'pst_user_id', 'user_id', 'remember_token', 'access_token']:
+            response.delete_cookie(k, path='/')
+            response.delete_cookie(k, path='/m')
+            response.delete_cookie(k)
+    return response
 
 
 @app.context_processor
 def inject_global_vars():
     """ 템플릿 전역에서 사용할 회원 프로필 정보 전달 """
-    user_id = session.get('user_id')
-    is_logged_in = bool(user_id and not session.get('logged_out', False))
+    if session.get('logged_out'):
+        user_id = None
+        is_logged_in = False
+    else:
+        user_id = session.get('user_id')
+        is_logged_in = bool(user_id)
 
     if is_logged_in:
         # DB에 실제 회원 레코드가 존재하는지 검증 (DB 초기화/Truncate 시 세션 자동 리셋)
@@ -217,14 +241,30 @@ def inject_global_vars():
 # --- 로그인 / 로그아웃 라우트 ---
 
 @app.route('/logout')
+@app.route('/m/logout')
 @app.route('/api/logout', methods=['GET', 'POST'])
 def logout():
-    """ 사용자 로그아웃 처리 """
+    """ 사용자 로그아웃 처리 (PC 및 모바일 완벽 호환, 세션 및 쿠키 완벽 파기) """
+    is_mobile = request.path.startswith('/m') or is_mobile_user_agent() or (request.referrer and '/m' in str(request.referrer))
+    
     session.clear()
-    session['logged_out'] = True
+
+    target_url = url_for('m_index') if is_mobile else url_for('index')
+    
     if request.is_json or request.path.startswith('/api'):
-        return jsonify({'success': True, 'message': '성공적으로 로그아웃되었습니다.'})
-    return redirect(url_for('index'))
+        resp = make_response(jsonify({'success': True, 'message': '성공적으로 로그아웃되었습니다.', 'target_url': target_url}))
+    else:
+        resp = make_response(redirect(target_url))
+
+    for cookie_name in ['session', 'user_uuid', 'pst_user_id', 'user_id', 'remember_token', 'access_token', 'share_info']:
+        resp.delete_cookie(cookie_name, path='/')
+        resp.delete_cookie(cookie_name, path='/m')
+        resp.delete_cookie(cookie_name)
+    
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 @app.route('/withdraw', methods=['POST', 'GET'])
 @app.route('/api/auth/withdraw', methods=['POST'])
@@ -544,7 +584,6 @@ def auth_google_callback():
 
         msg = f"{user_info['nickname']}님, Google 계정({email}) 인증으로 로그인되었습니다!"
         resp = make_response(render_template('google_callback.html', success=True, message=msg, user=user_info, target_url=saved_next_url))
-        resp.set_cookie('pst_user_id', user_info['user_id'], max_age=365*24*3600)
         return resp
     except Exception as err:
         print(f"[Google OAuth Exception] {err}")
@@ -597,6 +636,8 @@ def get_current_user_id():
     """ 
     로그인한 회원 유저 ID 반환 (로그아웃/비로그인 시 None 반환)
     """
+    if session.get('logged_out'):
+        return None
     if session.get('user_id'):
         return session['user_id']
     return None
@@ -734,20 +775,14 @@ def index():
     current_contest = service.get_contest(contest_id)
     paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=12, user_id=current_user_id)
 
-    response = make_response(render_template(
+    return render_template(
         'index.html',
         current_contest=current_contest,
         posts=paginated_res['posts'],
         pagination=paginated_res,
-        sort_type=sort_type,
         search_q=search_q,
         pet_type=pet_type
-    ))
-    if current_user_id:
-        response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
-    else:
-        response.delete_cookie('pst_user_id')
-    return response
+    )
 
 # 📜 개인정보 처리 방침 (Privacy Policy)
 @app.route('/privacy')
@@ -844,7 +879,7 @@ def m_index():
     current_contest = service.get_contest(contest_id)
     paginated_res = service.get_posts(contest_id=contest_id, sort_type=sort_type, search_query=search_q, pet_type=pet_type, page=page, per_page=10, user_id=current_user_id)
 
-    response = make_response(render_template(
+    return render_template(
         'm_index.html',
         current_contest=current_contest,
         posts=paginated_res['posts'],
@@ -853,12 +888,7 @@ def m_index():
         search_q=search_q,
         pet_type=pet_type,
         pet_kinds=service.get_pet_kinds()
-    ))
-    if current_user_id:
-        response.set_cookie('pst_user_id', current_user_id, max_age=365*24*3600)
-    else:
-        response.delete_cookie('pst_user_id')
-    return response
+    )
 
 @app.route('/api/m/posts')
 def api_m_posts():
@@ -1002,7 +1032,10 @@ def save_uploaded_media(file):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
-    user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
+    user_id = session.get('user_id')
+    if not user_id:
+        session['next_url'] = '/upload'
+        return redirect(url_for('index', open_login='true', next='/upload'))
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
@@ -1014,7 +1047,6 @@ def upload_page():
         else:
             contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 13) if current_contest else 13
 
-        user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
         pet_name = (request.form.get('pet_name') or '').strip()
         pet_type = (request.form.get('pet_type') or '').strip()
         title = (request.form.get('title') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
@@ -1110,7 +1142,10 @@ def upload_page():
 
 @app.route('/m/upload', methods=['GET', 'POST'])
 def m_upload_page():
-    user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
+    user_id = session.get('user_id')
+    if not user_id:
+        session['next_url'] = '/m/upload'
+        return redirect(url_for('m_index', open_login='true', next='/m/upload'))
 
     contests = service.get_contests()
     current_contest = service.get_current_contest() or (contests[0] if contests else None)
@@ -1122,7 +1157,6 @@ def m_upload_page():
         else:
             contest_id = (current_contest.get('CONTEST_ROUND') or current_contest.get('contest_id') or 13) if current_contest else 13
 
-        user_id = session.get('user_id') or request.form.get('user_id') or 'user1'
         pet_name = (request.form.get('pet_name') or '').strip()
         pet_type = (request.form.get('pet_type') or '').strip()
         title = (request.form.get('title') or '').strip()
@@ -1230,11 +1264,10 @@ def upload_profile():
         web_url = f"/static/image/temp/profile/{unique_name}"
         return jsonify({"success": True, "url": web_url})
 
-# 4-2. 프로필 수정 API (닉네임 중복 검사 적용)
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
     data = request.json or {}
-    user_id = (data.get('user_id') or session.get('user_id') or request.cookies.get('pst_user_id') or 'user1').strip()
+    user_id = get_current_user_id() or data.get('user_id', '').strip()
     if not user_id:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
     nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
@@ -1276,7 +1309,7 @@ def api_profile_update():
 @app.route('/api/profile/check_nickname', methods=['GET', 'POST'])
 def api_check_nickname():
     data = request.args if request.method == 'GET' else (request.json or {})
-    user_id = (data.get('user_id') or session.get('user_id') or request.cookies.get('pst_user_id') or '').strip()
+    user_id = get_current_user_id() or data.get('user_id', '').strip()
     nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
     
     if not nickname:
@@ -1650,7 +1683,9 @@ def create_post():
             pet_type = request.form.get('pet_type', '🐕 강아지').strip()
             cid_raw = request.form.get('contest_id')
             contest_id = int(cid_raw) if (cid_raw and str(cid_raw).isdigit()) else default_cid
-            user_id = session.get('user_id') or request.form.get('user_id', 'user1')
+            user_id = get_current_user_id() or request.form.get('user_id')
+            if not user_id:
+                return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해 주세요! 🐾', 'require_login': True}), 401
             temp_filename = request.form.get('temp_filename') or request.form.get('temp_url')
             file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
             sns_inst = (request.form.get('sns_inst') or '').strip()
@@ -1661,7 +1696,9 @@ def create_post():
             data = request.get_json() or {}
             cid_raw = data.get('contest_id')
             contest_id = int(cid_raw) if (cid_raw and str(cid_raw).isdigit()) else default_cid
-            user_id = session.get('user_id') or data.get('user_id', 'user1')
+            user_id = get_current_user_id() or data.get('user_id')
+            if not user_id:
+                return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해 주세요! 🐾', 'require_login': True}), 401
             pet_name = data.get('pet_name', '강아지')
             pet_type = data.get('pet_type', '🐕 강아지')
             title = (data.get('title') or '').strip().replace('\r\n', '\n').replace('\r', '\n')

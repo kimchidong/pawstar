@@ -288,39 +288,50 @@
     </div>
 
     <script>
+    window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+
+    function handlePcUploadNavClick(e) {
+        if (window.isUserLoggedIn) {
+            return true; // 로그인 상태면 /upload 로 정상 이동
+        }
+        if (e) e.preventDefault();
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
+        } else {
+            const modal = document.getElementById('googleAuthModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.zIndex = '999999';
+                modal.classList.add('show', 'active');
+            }
+        }
+        return false; // 비로그인 상태면 이동하지 않고 그 자리에서 반투명 구글 로그인 모달 팝업 노출
+    }
+    window.handlePcUploadNavClick = handlePcUploadNavClick;
     window.openGoogleAuthModal = function() {
-        const modal = document.getElementById('googleAuthModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            modal.classList.add('show');
-            modal.classList.add('active');
-        }
-        const mModal = document.getElementById('mGoogleAuthModal');
-        if (mModal) {
-            mModal.style.display = 'flex';
-            mModal.classList.add('show');
-            mModal.classList.add('active');
-        }
+        ['googleAuthModal', 'mGoogleAuthModal', 'mAuthModal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.zIndex = '999999';
+                modal.classList.add('show', 'active');
+            }
+        });
     };
 
     window.closeGoogleAuthModal = function() {
-        const modal = document.getElementById('googleAuthModal');
-        if (modal) {
-            modal.classList.remove('show');
-            modal.classList.remove('active');
-            modal.style.display = 'none';
-        }
-        const mModal = document.getElementById('mGoogleAuthModal');
-        if (mModal) {
-            mModal.classList.remove('show');
-            mModal.classList.remove('active');
-            mModal.style.display = 'none';
-        }
+        ['googleAuthModal', 'mGoogleAuthModal', 'mAuthModal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('show', 'active');
+                modal.style.display = 'none';
+            }
+        });
     };
     </script>
 
     <!-- 구글 전용 인증 레이어 팝업 모달 (Google Auth Modal) -->
-    <div class="modal-backdrop" id="googleAuthModal">
+    <div class="modal-backdrop" id="googleAuthModal" style="display: none; position: fixed; inset: 0; z-index: 999999; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
         <div class="modal-content" style="max-width: 500px; width: 92%; padding: 2rem; text-align: center;">
             <div class="modal-header" style="margin-bottom: 1rem;">
                 <h3 style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
@@ -1063,6 +1074,7 @@
         const modal = document.getElementById('privacyPolicyModal');
         if (!modal) return;
         modal.style.display = 'flex';
+        modal.style.zIndex = '2000000';
         setTimeout(() => {
             modal.style.opacity = '1';
             const card = modal.firstElementChild;
@@ -1083,6 +1095,7 @@
         const modal = document.getElementById('termsNoticeModal');
         if (!modal) return;
         modal.style.display = 'flex';
+        modal.style.zIndex = '2000000';
         setTimeout(() => {
             modal.style.opacity = '1';
             const card = modal.firstElementChild;
@@ -1137,7 +1150,9 @@
             const cleanUrl = window.location.pathname + window.location.search.replace(/[\?&]open_login=true/, '').replace(/^&/, '?');
             window.history.replaceState({}, document.title, cleanUrl || '/');
             setTimeout(() => {
-                if (typeof openGoogleLoginModal === 'function') {
+                if (typeof openGoogleAuthModal === 'function') {
+                    openGoogleAuthModal();
+                } else if (typeof openGoogleLoginModal === 'function') {
                     openGoogleLoginModal();
                 }
             }, 100);
