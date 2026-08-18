@@ -50,9 +50,6 @@
                             <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
                             {{ current_user.NK_NM or current_user.nickname or '집사' }}
                         </a>
-                        <a href="/logout" id="btnNavLogout" style="margin-left: 0.4rem;">
-                            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
-                        </a>
                     {% else %}
                         <a href="/auth/google" id="btnNavLogin" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
                             <i class="fa-solid fa-right-to-bracket"></i> 가입/로그인

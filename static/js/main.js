@@ -457,10 +457,16 @@ if (!window.postsDataStore) {
  */
 function openDetailModal(post, isHallOfFame = false) {
     if (!window.isUserLoggedIn) {
-        showToast('로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
-        setTimeout(() => {
-            window.location.href = '/auth/google';
-        }, 400);
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
+        } else {
+            const m = document.getElementById('googleAuthModal');
+            if (m) {
+                m.style.display = 'flex';
+                m.style.zIndex = '999999';
+                m.classList.add('show', 'active');
+            }
+        }
         return;
     }
 

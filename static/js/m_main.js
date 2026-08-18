@@ -140,12 +140,11 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         if (typeof openGoogleAuthModal === 'function') {
             openGoogleAuthModal();
         } else {
-            const mModal = document.getElementById('mGoogleAuthModal') || document.getElementById('googleAuthModal');
+            const mModal = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
             if (mModal) {
                 mModal.style.display = 'flex';
+                mModal.style.zIndex = '999999';
                 mModal.classList.add('show', 'active');
-            } else {
-                window.location.href = '/auth/google';
             }
         }
         return;
