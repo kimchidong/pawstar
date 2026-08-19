@@ -356,8 +356,28 @@ async function triggerEvent(postId, eventType) {
                 }
             }
         }
-        const dView = document.getElementById('detailViewCount');
-        if (dView && data && data.view_count !== undefined) dView.textContent = Number(data.view_count || 0).toLocaleString();
+        if (eventType === 'view' || data.is_viewed !== undefined || data.view_count !== undefined) {
+            const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
+            const curUserId = String(window.CURRENT_USER_ID || '').trim();
+            const postOwnerId = String((window.currentDetailPostData || {}).ENT_USER_ID || (window.currentDetailPostData || {}).user_id || '').trim();
+            const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
+            const isViewAct = isUserLoggedIn && !isMine && (data.is_viewed !== false);
+
+            const detailBtnViewPopup = document.getElementById('detailBtnView');
+            if (detailBtnViewPopup) {
+                detailBtnViewPopup.classList.toggle('active', isViewAct);
+                const icon = detailBtnViewPopup.querySelector('i');
+                if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+            }
+            if (card) {
+                const btnView = card.querySelector('.btn-view');
+                if (btnView) {
+                    btnView.classList.toggle('active', isViewAct);
+                    const icon = btnView.querySelector('i');
+                    if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+                }
+            }
+        }
         const dLike = document.getElementById('detailLikeCount');
         if (dLike && data && data.like_count !== undefined) dLike.textContent = Number(data.like_count || 0).toLocaleString();
         if (data && data.is_liked !== undefined) {
@@ -576,36 +596,22 @@ function openDetailModal(post, isHallOfFame = false) {
     const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
     const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
 
-    if (!isMine && !isClosedRound) {
-        if (card) {
-            const btnView = card.querySelector('.btn-view');
-            if (btnView) {
-                btnView.classList.add('active');
-                const icon = btnView.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
-            }
+    const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
+    const isViewAct = isUserLoggedIn && !isMine && !isClosedRound;
+
+    if (card) {
+        const btnView = card.querySelector('.btn-view');
+        if (btnView) {
+            btnView.classList.toggle('active', isViewAct);
+            const icon = btnView.querySelector('i');
+            if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
         }
-        const detailBtnViewPopup = document.getElementById('detailBtnView');
-        if (detailBtnViewPopup) {
-            detailBtnViewPopup.classList.add('active');
-            const icon = detailBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-eye';
-        }
-    } else {
-        if (card) {
-            const btnView = card.querySelector('.btn-view');
-            if (btnView) {
-                btnView.classList.remove('active');
-                const icon = btnView.querySelector('i');
-                if (icon) icon.className = 'fa-regular fa-eye';
-            }
-        }
-        const detailBtnViewPopup = document.getElementById('detailBtnView');
-        if (detailBtnViewPopup) {
-            detailBtnViewPopup.classList.remove('active');
-            const icon = detailBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-regular fa-eye';
-        }
+    }
+    const detailBtnViewPopup = document.getElementById('detailBtnView');
+    if (detailBtnViewPopup) {
+        detailBtnViewPopup.classList.toggle('active', isViewAct);
+        const icon = detailBtnViewPopup.querySelector('i');
+        if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
     }
 
     // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩 함수
@@ -1007,7 +1013,8 @@ function openDetailModal(post, isHallOfFame = false) {
     const updatePopupViewUI = (viewedState) => {
         const btnView = document.getElementById('detailBtnView');
         if (btnView) {
-            const isViewActive = !isMine && !isClosedRound && !!viewedState;
+            const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
+            const isViewActive = isUserLoggedIn && !isMine && !isClosedRound;
             btnView.classList.toggle('active', isViewActive);
             const icon = btnView.querySelector('i');
             if (icon) icon.className = isViewActive ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
