@@ -353,7 +353,7 @@
                             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         </svg>
                     </div>
-                    <span><i class="fa-solid fa-globe" style="font-size: 0.95rem; margin-right: 0.2rem; opacity: 0.9;"></i> Google 공식 계정 선택 창으로 이동</span>
+                    <span>Google 공식 계정 선택 창으로 이동</span>
                 </a>
 
             </div>
@@ -438,18 +438,23 @@
         });
     }
 
-    if (googleModal) {
-        let isMouseDownOnBackdrop = false;
-        googleModal.addEventListener('mousedown', function(e) {
-            isMouseDownOnBackdrop = (e.target === googleModal);
-        });
-        googleModal.addEventListener('click', function(e) {
-            if (e.target === googleModal && isMouseDownOnBackdrop) {
-                closeGoogleAuthModal();
-            }
-            isMouseDownOnBackdrop = false;
-        });
-    }
+    ['googleAuthModal', 'mGoogleAuthModal', 'mAuthModal'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m) {
+            let isPointerDownOnBackdrop = false;
+            const handlePointerDown = (e) => {
+                isPointerDownOnBackdrop = (e.target === m || e.target.classList.contains('modal-backdrop') || e.target.classList.contains('m-modal-backdrop'));
+            };
+            m.addEventListener('mousedown', handlePointerDown);
+            m.addEventListener('touchstart', handlePointerDown, { passive: true });
+            m.addEventListener('click', function(e) {
+                if ((e.target === m || e.target.classList.contains('modal-backdrop') || e.target.classList.contains('m-modal-backdrop')) && isPointerDownOnBackdrop) {
+                    closeGoogleAuthModal();
+                }
+                isPointerDownOnBackdrop = false;
+            });
+        }
+    });
 
         // 구글 로그인 처리 함수
         function handleGoogleAuthResponse(googleUser) {

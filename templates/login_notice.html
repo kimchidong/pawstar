@@ -126,7 +126,7 @@
                             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                         </svg>
                     </div>
-                    <span><i class="fa-solid fa-globe" style="font-size: 0.92rem; margin-right: 0.2rem; opacity: 0.9;"></i> Google 공식 계정 선택 창으로 이동</span>
+                    <span>Google 공식 계정 선택 창으로 이동</span>
                 </a>
             </div>
 
@@ -167,6 +167,24 @@
             var isMobile = "{{ 'true' if is_mobile else 'false' }}" === "true" || window.location.pathname.startsWith('/m');
             window.location.href = isMobile ? '/m' : '/';
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var nb = document.querySelector('.notice-backdrop');
+            if (nb) {
+                var isPointerDownOnBackdrop = false;
+                var handlePointerDown = function(e) {
+                    isPointerDownOnBackdrop = (e.target === nb || e.target.classList.contains('notice-backdrop'));
+                };
+                nb.addEventListener('mousedown', handlePointerDown);
+                nb.addEventListener('touchstart', handlePointerDown, { passive: true });
+                nb.addEventListener('click', function(e) {
+                    if ((e.target === nb || e.target.classList.contains('notice-backdrop')) && isPointerDownOnBackdrop) {
+                        doGoHome();
+                    }
+                    isPointerDownOnBackdrop = false;
+                });
+            }
+        });
     </script>
 </body>
 </html>
