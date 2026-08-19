@@ -533,21 +533,17 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
         mHeaderLikeBtn.classList.toggle('active', mIsLiked);
     }
 
+    // 모바일 상세 팝업 열릴 때 본인 게시물 및 조회 상태 확인
+    const mCurUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
+    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || postData.USER_ID || postData.ent_user_id || '').trim();
+    const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
+
     fetch(`/api/post/user_actions/${postData.post_id}`)
         .then(res => res.json())
         .then(data => {
             if (data && data.success && data.actions) {
                 const mIsLiked = !!data.actions.is_liked;
-                if (mBtnLikePopup) {
-                    const icon = mBtnLikePopup.querySelector('i');
-                    if (mIsLiked) {
-                        mBtnLikePopup.classList.add('active');
-                        if (icon) icon.className = 'fa-solid fa-heart';
-                    } else {
-                        mBtnLikePopup.classList.remove('active');
-                        if (icon) icon.className = 'fa-regular fa-heart';
-                    }
-                }
+                if (mBtnLikePopup) mBtnLikePopup.classList.toggle('active', mIsLiked);
                 if (mHeartIcon) {
                     mHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
                     mHeartIcon.style.color = mIsLiked ? '#e11d48' : '';
@@ -556,19 +552,14 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                     mHeaderHeartIcon.className = mIsLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
                     mHeaderHeartIcon.style.color = '#e11d48';
                 }
-                if (mHeaderLikeBtn) {
-                    mHeaderLikeBtn.classList.toggle('active', mIsLiked);
-                }
-                const mIsCommented = !!data.actions.is_commented;
-                if (btnCommentPopup) {
-                    if (mIsCommented) {
-                        btnCommentPopup.classList.add('active');
+                if (mHeaderLikeBtn) mHeaderLikeBtn.classList.toggle('active', mIsLiked);
+                
+                if (data.actions.is_commented !== undefined) {
+                    const btnCommentPopup = document.getElementById('mDetailBtnComment');
+                    if (btnCommentPopup) {
+                        btnCommentPopup.classList.toggle('active', !!data.actions.is_commented);
                         const icon = btnCommentPopup.querySelector('i');
-                        if (icon) icon.className = 'fa-solid fa-comment';
-                    } else {
-                        btnCommentPopup.classList.remove('active');
-                        const icon = btnCommentPopup.querySelector('i');
-                        if (icon) icon.className = 'fa-regular fa-comment';
+                        if (icon) icon.className = data.actions.is_commented ? 'fa-solid fa-comment' : 'fa-regular fa-comment';
                     }
                 }
                 if (data.actions.is_shared !== undefined) {
@@ -578,9 +569,10 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    mBtnViewPopup.classList.add('active');
+                    const isViewAct = !isMinePost && !isClosedRound && !!data.actions.is_viewed;
+                    mBtnViewPopup.classList.toggle('active', isViewAct);
                     const icon = mBtnViewPopup.querySelector('i');
-                    if (icon) icon.className = 'fa-solid fa-eye';
+                    if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
                 }
             }
         })
@@ -590,10 +582,6 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     loadMobileComments(postData.post_id);
 
     // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거 (단, 본인 게시물이 아닐 때만)
-    const mCurUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
-    const mPostOwnerId = String(postData.ENT_USER_ID || postData.user_id || postData.USER_ID || postData.ent_user_id || '').trim();
-    const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
-
     if (postData.post_id && !isMinePost) {
         triggerMobileEvent(postData.post_id, 'view');
     }

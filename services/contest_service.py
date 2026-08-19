@@ -2046,7 +2046,7 @@ class PawStarService:
                 'share_count': res_vw.get('share_count', 0),
                 'new_score': res_vw.get('new_score', 0),
                 'score': res_vw.get('score', 0),
-                'is_viewed': True
+                'is_viewed': False if res_vw.get('is_author') else True
             }
         elif event_type == 'share':
             # 단순 공유 버튼 클릭은 전용 공유 주소 전달 용도이며, 카운트 증가는 오직 공유 링크로 유입된 사용자가 가입/로그인 시에만 처리됨
