@@ -121,6 +121,47 @@ function ensureLoggedIn(onSuccess) {
 }
 window.ensureLoggedIn = ensureLoggedIn;
 
+/**
+ * 서버 측 세션 타임아웃 실시간 검증 헬퍼
+ * @returns {Promise<boolean>}
+ */
+async function verifyServerSessionAsync() {
+    try {
+        const res = await fetch('/api/auth/check-session', {
+            method: 'GET',
+            headers: { 'Cache-Control': 'no-cache, no-store' }
+        });
+        const data = await res.json();
+        if (data && data.logged_in) {
+            return true;
+        }
+    } catch (e) {
+        console.warn('verifyServerSessionAsync error:', e);
+    }
+
+    // 서버 세션 만료 시 메모리 세션 파기 및 구글 로그인 안내 모달 발동
+    window.isUserLoggedIn = false;
+    window.CURRENT_USER_ID = '';
+    try {
+        localStorage.setItem('pawstar_logged_out', 'true');
+    } catch(e) {}
+    
+    if (typeof openGoogleAuthModal === 'function') {
+        openGoogleAuthModal();
+    } else {
+        const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
+        if (m) {
+            m.style.display = 'flex';
+            m.style.zIndex = '999999';
+            m.classList.add('show', 'active');
+        } else {
+            window.location.href = '/auth/google';
+        }
+    }
+    return false;
+}
+window.verifyServerSessionAsync = verifyServerSessionAsync;
+
 // 멀티 탭 동기화: 다른 탭에서 로그아웃 발생 시 즉시 상태 동기화
 window.addEventListener('storage', (e) => {
     if (e.key === 'pawstar_auth_event' || e.key === 'pawstar_logged_out') {
@@ -616,8 +657,12 @@ window.resetPcModalScroll = resetPcModalScroll;
 /**
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
-function openDetailModal(post, isHallOfFame = false) {
+async function openDetailModal(post, isHallOfFame = false) {
     if (!ensureLoggedIn()) {
+        return;
+    }
+    const isServerSessionAlive = await verifyServerSessionAsync();
+    if (!isServerSessionAlive) {
         return;
     }
 
@@ -2022,9 +2067,11 @@ window.openBadgeZoomModal = openBadgeZoomModal;
 window.closeBadgeZoomModal = closeBadgeZoomModal;
 
 // 게시물 ID 또는 (ROUND_ENTRYNO) 기반 즉시 팝업 모달 오픈 헬퍼 함수
-function openPostById(postId, isHallOfFame = false) {
+async function openPostById(postId, isHallOfFame = false) {
     if (!postId) return;
     if (!ensureLoggedIn()) return;
+    const isServerSessionAlive = await verifyServerSessionAsync();
+    if (!isServerSessionAlive) return;
     if (window.postsDataStore && window.postsDataStore[postId]) {
         openDetailModal(window.postsDataStore[postId], isHallOfFame);
     } else {

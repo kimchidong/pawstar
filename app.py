@@ -243,6 +243,14 @@ def inject_global_vars():
 
 # --- 로그인 / 로그아웃 라우트 ---
 
+@app.route('/api/auth/check-session', methods=['GET', 'POST'])
+def check_session_api():
+    """ 실시간 서버 세션 타임아웃 및 로그인 상태 검사 API """
+    user_id = session.get('user_id')
+    if not user_id or session.get('logged_out'):
+        return jsonify({'success': False, 'logged_in': False, 'reason': 'session_expired'})
+    return jsonify({'success': True, 'logged_in': True, 'user_id': user_id})
+
 @app.route('/logout')
 @app.route('/m/logout')
 @app.route('/api/logout', methods=['GET', 'POST'])
