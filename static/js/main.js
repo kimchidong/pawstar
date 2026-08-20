@@ -619,11 +619,7 @@ function openDetailModal(post, isHallOfFame = false) {
         const pcContestBadge = document.getElementById('detailContestBadge');
         if (!pcContestBadge || !pObj) return;
 
-        const pIsClosed = isHallOfFame || 
-                           (pObj.is_closed === true) || 
-                           (pObj.closed === true) || 
-                           (pObj.contest_stat === 'G001C002') || 
-                           (pObj.CONTEST_STAT === 'G001C002');
+        const pIsClosed = isClosedRound;
 
         let rawRound = pObj.CONTEST_ROUND || pObj.contest_round || pObj.contest_id;
         if (!rawRound && pObj.post_id && String(pObj.post_id).includes('_')) {
@@ -1880,7 +1876,7 @@ window.openBadgeZoomModal = openBadgeZoomModal;
 window.closeBadgeZoomModal = closeBadgeZoomModal;
 
 // 게시물 ID 또는 (ROUND_ENTRYNO) 기반 즉시 팝업 모달 오픈 헬퍼 함수
-function openPostById(postId, isHallOfFame = true) {
+function openPostById(postId, isHallOfFame = false) {
     if (!postId) return;
     if (window.postsDataStore && window.postsDataStore[postId]) {
         openDetailModal(window.postsDataStore[postId], isHallOfFame);
@@ -1904,7 +1900,8 @@ function checkAndAutoOpenPost() {
     const urlParams = new URLSearchParams(window.location.search);
     const openPostId = urlParams.get('open_post');
     if (openPostId) {
-        openPostById(openPostId, true);
+        const isHOFPage = window.location.pathname.includes('hall-of-fame');
+        openPostById(openPostId, isHOFPage);
         const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
