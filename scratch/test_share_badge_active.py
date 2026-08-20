@@ -29,6 +29,10 @@ class TestShareBadgeActive(unittest.TestCase):
         self.assertIn('const pIsClosed = isClosedRound;', content,
                       "updatePcContestBadgeUI pIsClosed should be synchronized with isClosedRound")
 
+        # 4. Scroll reset check on openDetailModal and closeDetailModal
+        self.assertIn('if (detailInfoContainer) detailInfoContainer.scrollTop = 0;', content,
+                      "openDetailModal/closeDetailModal should reset detailInfoContainer scrollTop to 0")
+
     def test_share_detail_html_link(self):
         js_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'share_detail.html')
         with open(js_path, 'r', encoding='utf-8') as f:

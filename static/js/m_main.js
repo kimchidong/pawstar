@@ -154,6 +154,15 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     if (!detailModal) return;
     detailModal.style.display = '';
 
+    // 모바일 팝업 및 내부 스크롤 컨테이너 최상단 스크롤 초기화
+    detailModal.scrollTop = 0;
+    const mSheet = detailModal.querySelector('.m-modal-sheet');
+    if (mSheet) mSheet.scrollTop = 0;
+    const mScrollBody = detailModal.querySelector('.m-modal-scroll-body');
+    if (mScrollBody) mScrollBody.scrollTop = 0;
+    const mCommentList = document.getElementById('mDetailCommentList');
+    if (mCommentList) mCommentList.scrollTop = 0;
+
     postData.post_id = postData.post_id || postData.POST_ID || ((postData.CONTEST_ROUND || postData.contest_id) && (postData.ROUND_NO || postData.round_no) ? `${postData.CONTEST_ROUND || postData.contest_id}_${postData.ROUND_NO || postData.round_no}` : (postData.ROUND_NO || postData.round_no));
     postData.title = postData.title || postData.TITLE || '';
     postData.content = postData.content || postData.CONTS || postData.conts || '';
@@ -667,6 +676,13 @@ function closeMobileDetailModal() {
     if (detailModal) {
         detailModal.classList.remove('active', 'show');
         detailModal.style.display = '';
+        detailModal.scrollTop = 0;
+        const mSheet = detailModal.querySelector('.m-modal-sheet');
+        if (mSheet) mSheet.scrollTop = 0;
+        const mScrollBody = detailModal.querySelector('.m-modal-scroll-body');
+        if (mScrollBody) mScrollBody.scrollTop = 0;
+        const mCommentList = document.getElementById('mDetailCommentList');
+        if (mCommentList) mCommentList.scrollTop = 0;
         document.body.style.overflow = '';
     }
 }
@@ -1147,14 +1163,15 @@ function checkAndAutoOpenMobilePost() {
     const urlParams = new URLSearchParams(window.location.search);
     const openPostId = urlParams.get('open_post');
     if (openPostId) {
+        const isHOFPage = window.location.pathname.includes('hall-of-fame');
         if (window.postsDataStore && window.postsDataStore[openPostId]) {
-            openMobileDetailModal(window.postsDataStore[openPostId]);
+            openMobileDetailModal(window.postsDataStore[openPostId], isHOFPage);
         } else {
             fetch(`/api/post/detail/${openPostId}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.post) {
-                        openMobileDetailModal(data.post);
+                        openMobileDetailModal(data.post, isHOFPage);
                     }
                 })
                 .catch(err => console.error('모바일 자동 포스트 팝업 실패:', err));
@@ -1714,7 +1731,7 @@ async function triggerMobileEvent(postId, eventType) {
 window.triggerMobileEvent = triggerMobileEvent;
 
 // 모바일 포스트 ID 기반 상세 팝업 오픈 헬퍼 함수
-function openPostById(postId, isHallOfFame = true) {
+function openPostById(postId, isHallOfFame = false) {
     if (!postId) return;
     if (window.postsDataStore && window.postsDataStore[postId]) {
         openMobileDetailModal(window.postsDataStore[postId], isHallOfFame);

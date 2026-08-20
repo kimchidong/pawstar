@@ -494,6 +494,13 @@ function openDetailModal(post, isHallOfFame = false) {
     if (!modal || !post) return;
     modal.style.display = '';
 
+    // 모달 및 스크롤 영역 최상단 스크롤 초기화
+    modal.scrollTop = 0;
+    const detailInfoContainer = modal.querySelector('.detail-info-container');
+    if (detailInfoContainer) detailInfoContainer.scrollTop = 0;
+    const detailCommentList = document.getElementById('detailCommentList');
+    if (detailCommentList) detailCommentList.scrollTop = 0;
+
     // 객체 데이터 속성 표준화
     post.post_id = post.post_id || post.POST_ID || ((post.CONTEST_ROUND || post.contest_id) && (post.ROUND_NO || post.round_no) ? `${post.CONTEST_ROUND || post.contest_id}_${post.ROUND_NO || post.round_no}` : (post.ROUND_NO || post.round_no));
     post.title = post.title || post.TITLE || '';
@@ -1162,9 +1169,16 @@ function closeDetailModal() {
     if (modal) {
         modal.classList.remove('show', 'active');
         modal.style.display = '';
+        modal.scrollTop = 0;
+        const detailInfoContainer = modal.querySelector('.detail-info-container');
+        if (detailInfoContainer) detailInfoContainer.scrollTop = 0;
+        const detailCommentList = document.getElementById('detailCommentList');
+        if (detailCommentList) detailCommentList.scrollTop = 0;
         document.body.style.overflow = '';
     }
 }
+window.closeDetailModal = closeDetailModal;
+window.closePostDetailModal = closeDetailModal;
 
 /**
  * 댓글 목록 로드 및 렌더링
