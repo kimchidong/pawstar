@@ -61,6 +61,77 @@ function formatTimeAgo(dateInput) {
 window.formatTimeAgo = formatTimeAgo;
 window.timeAgo = formatTimeAgo;
 
+/**
+ * 브라우저 쿠키(document.cookie) 기준 실시간 로그인 유효성 검사
+ */
+function checkCurrentLoginCookie() {
+    if (!document.cookie) return false;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const parts = cookies[i].trim().split('=');
+        const name = parts[0];
+        const val = parts[1] || '';
+        if ((name === 'user_id' || name === 'pst_user_id' || name === 'user_uuid' || name === 'session') && val.trim() !== '' && val !== 'deleted' && val !== 'null') {
+            return true;
+        }
+    }
+    return false;
+}
+window.checkCurrentLoginCookie = checkCurrentLoginCookie;
+
+/**
+ * 현재 시점 로그인 상태 엄격 체크 헬퍼 (멀티 탭 동기화 및 실시간 쿠키/Storage 평가)
+ * @param {Function} [onSuccess] 로그인 상태일 때 실행할 콜백
+ * @returns {boolean} 로그인 상태 여부
+ */
+function ensureLoggedIn(onSuccess) {
+    const hasCookie = checkCurrentLoginCookie();
+    const hasStorageLogout = localStorage.getItem('pawstar_logged_out') === 'true';
+
+    // 다른 탭에서 로그아웃했거나 실제 로그인 쿠키가 삭제되었으면 메모리 세션 파기
+    if (!hasCookie || hasStorageLogout) {
+        window.isUserLoggedIn = false;
+        window.CURRENT_USER_ID = '';
+    }
+
+    const isLoggedIn = !!(window.isUserLoggedIn && !hasStorageLogout && hasCookie);
+
+    if (!isLoggedIn) {
+        window.isUserLoggedIn = false;
+        window.CURRENT_USER_ID = '';
+        if (typeof openGoogleAuthModal === 'function') {
+            openGoogleAuthModal();
+        } else {
+            const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
+            if (m) {
+                m.style.display = 'flex';
+                m.style.zIndex = '999999';
+                m.classList.add('show', 'active');
+            } else {
+                window.location.href = '/auth/google';
+            }
+        }
+        return false;
+    }
+
+    if (typeof onSuccess === 'function') {
+        onSuccess();
+    }
+    return true;
+}
+window.ensureLoggedIn = ensureLoggedIn;
+
+// 멀티 탭 동기화: 다른 탭에서 로그아웃 발생 시 즉시 상태 동기화
+window.addEventListener('storage', (e) => {
+    if (e.key === 'pawstar_auth_event' || e.key === 'pawstar_logged_out') {
+        if (localStorage.getItem('pawstar_logged_out') === 'true' || (e.newValue && e.newValue.startsWith('logout_'))) {
+            window.isUserLoggedIn = false;
+            window.CURRENT_USER_ID = '';
+            if (typeof closeDetailModal === 'function') closeDetailModal();
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     initEventHandlers();
 });
@@ -546,17 +617,7 @@ window.resetPcModalScroll = resetPcModalScroll;
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
 function openDetailModal(post, isHallOfFame = false) {
-    if (!window.isUserLoggedIn) {
-        if (typeof openGoogleAuthModal === 'function') {
-            openGoogleAuthModal();
-        } else {
-            const m = document.getElementById('googleAuthModal');
-            if (m) {
-                m.style.display = 'flex';
-                m.style.zIndex = '999999';
-                m.classList.add('show', 'active');
-            }
-        }
+    if (!ensureLoggedIn()) {
         return;
     }
 
@@ -1963,6 +2024,7 @@ window.closeBadgeZoomModal = closeBadgeZoomModal;
 // 게시물 ID 또는 (ROUND_ENTRYNO) 기반 즉시 팝업 모달 오픈 헬퍼 함수
 function openPostById(postId, isHallOfFame = false) {
     if (!postId) return;
+    if (!ensureLoggedIn()) return;
     if (window.postsDataStore && window.postsDataStore[postId]) {
         openDetailModal(window.postsDataStore[postId], isHallOfFame);
     } else {

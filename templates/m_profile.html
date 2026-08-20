@@ -60,6 +60,8 @@ function handleMobileDirectLogout(e) {
         e.stopPropagation();
     }
     try {
+        localStorage.setItem('pawstar_logged_out', 'true');
+        localStorage.setItem('pawstar_auth_event', 'logout_' + Date.now());
         var cookies = document.cookie.split(";");
         for (var i = 0; i < cookies.length; i++) {
             var c = cookies[i];

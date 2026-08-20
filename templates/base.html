@@ -40,7 +40,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/upload" class="{{ 'active' if request.path == '/upload' }}">
+                    <a href="/upload" class="{{ 'active' if request.path == '/upload' }}" onclick="if(typeof ensureLoggedIn === 'function'){ return ensureLoggedIn(); }">
                         <i class="fa-solid fa-paw"></i> 출전하기
                     </a>
                 </li>
@@ -287,8 +287,16 @@
         </div>
     </div>
 
-    <script>
     window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+    if (window.isUserLoggedIn) {
+        try {
+            localStorage.removeItem('pawstar_logged_out');
+        } catch(e) {}
+    } else {
+        try {
+            localStorage.setItem('pawstar_logged_out', 'true');
+        } catch(e) {}
+    }
 
     function handlePcUploadNavClick(e) {
         if (window.isUserLoggedIn) {

@@ -200,9 +200,43 @@ function resetMobileModalScroll() {
     });
 }
 
-// 3. 모바일 전용 게시물 상세보기 모달 open
-function openMobileDetailModal(postData, isHallOfFame = false) {
-    if (!window.isUserLoggedIn) {
+/**
+ * 브라우저 쿠키(document.cookie) 기준 실시간 로그인 유효성 검사
+ */
+function checkCurrentLoginCookie() {
+    if (!document.cookie) return false;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const parts = cookies[i].trim().split('=');
+        const name = parts[0];
+        const val = parts[1] || '';
+        if ((name === 'user_id' || name === 'pst_user_id' || name === 'user_uuid' || name === 'session') && val.trim() !== '' && val !== 'deleted' && val !== 'null') {
+            return true;
+        }
+    }
+    return false;
+}
+window.checkCurrentLoginCookie = checkCurrentLoginCookie;
+
+/**
+ * 모바일 전용 현재 시점 로그인 상태 엄격 체크 헬퍼 (멀티 탭 동기화 및 실시간 쿠키/Storage 평가)
+ * @param {Function} [onSuccess] 로그인 상태일 때 실행할 콜백
+ * @returns {boolean} 로그인 상태 여부
+ */
+function ensureLoggedIn(onSuccess) {
+    const hasCookie = checkCurrentLoginCookie();
+    const hasStorageLogout = localStorage.getItem('pawstar_logged_out') === 'true';
+
+    if (!hasCookie || hasStorageLogout) {
+        window.isUserLoggedIn = false;
+        window.CURRENT_USER_ID = '';
+    }
+
+    const isLoggedIn = !!(window.isUserLoggedIn && !hasStorageLogout && hasCookie);
+
+    if (!isLoggedIn) {
+        window.isUserLoggedIn = false;
+        window.CURRENT_USER_ID = '';
         if (typeof openGoogleAuthModal === 'function') {
             openGoogleAuthModal();
         } else {
@@ -211,8 +245,33 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
                 mModal.style.display = 'flex';
                 mModal.style.zIndex = '999999';
                 mModal.classList.add('show', 'active');
+            } else {
+                window.location.href = '/auth/google';
             }
         }
+        return false;
+    }
+    if (typeof onSuccess === 'function') {
+        onSuccess();
+    }
+    return true;
+}
+window.ensureLoggedIn = ensureLoggedIn;
+
+// 멀티 탭 동기화: 다른 탭에서 로그아웃 발생 시 즉시 모바일 상태 동기화
+window.addEventListener('storage', (e) => {
+    if (e.key === 'pawstar_auth_event' || e.key === 'pawstar_logged_out') {
+        if (localStorage.getItem('pawstar_logged_out') === 'true' || (e.newValue && e.newValue.startsWith('logout_'))) {
+            window.isUserLoggedIn = false;
+            window.CURRENT_USER_ID = '';
+            if (typeof closeMobileDetailModal === 'function') closeMobileDetailModal();
+        }
+    }
+});
+
+// 3. 모바일 전용 게시물 상세보기 모달 open
+function openMobileDetailModal(postData, isHallOfFame = false) {
+    if (!ensureLoggedIn()) {
         return;
     }
 
@@ -1805,6 +1864,7 @@ window.triggerMobileEvent = triggerMobileEvent;
 // 모바일 포스트 ID 기반 상세 팝업 오픈 헬퍼 함수
 function openPostById(postId, isHallOfFame = false) {
     if (!postId) return;
+    if (!ensureLoggedIn()) return;
     if (window.postsDataStore && window.postsDataStore[postId]) {
         openMobileDetailModal(window.postsDataStore[postId], isHallOfFame);
     } else {

@@ -414,6 +414,15 @@
         if (m) { m.style.display = 'none'; m.classList.remove('show', 'active'); }
     }
     window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+    if (window.isUserLoggedIn) {
+        try {
+            localStorage.removeItem('pawstar_logged_out');
+        } catch(e) {}
+    } else {
+        try {
+            localStorage.setItem('pawstar_logged_out', 'true');
+        } catch(e) {}
+    }
     window.openMobilePrivacyModal = openMobilePrivacyModal;
     window.closeMobilePrivacyModal = closeMobilePrivacyModal;
     window.openMobileTermsModal = openMobileTermsModal;
