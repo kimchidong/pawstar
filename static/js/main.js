@@ -521,6 +521,28 @@ if (!window.postsDataStore) {
 }
 
 /**
+ * PC 상세보기 모달 스크롤 100% 최상단 리셋 헬퍼
+ */
+function resetPcModalScroll() {
+    const modal = document.getElementById('postDetailModal');
+    if (!modal) return;
+    modal.scrollTop = 0;
+    const targets = [
+        modal.querySelector('.detail-info-container'),
+        modal.querySelector('.detail-modal-content'),
+        modal.querySelector('.detail-modal-body'),
+        document.getElementById('detailCommentList'),
+        document.querySelector('.detail-info-container')
+    ];
+    targets.forEach(el => {
+        if (el) {
+            el.scrollTop = 0;
+        }
+    });
+}
+window.resetPcModalScroll = resetPcModalScroll;
+
+/**
  * 게시물 상세 레이어 팝업 모달 띄우기
  */
 function openDetailModal(post, isHallOfFame = false) {
@@ -543,11 +565,7 @@ function openDetailModal(post, isHallOfFame = false) {
     modal.style.display = '';
 
     // 모달 및 스크롤 영역 최상단 스크롤 초기화
-    modal.scrollTop = 0;
-    const detailInfoContainer = modal.querySelector('.detail-info-container');
-    if (detailInfoContainer) detailInfoContainer.scrollTop = 0;
-    const detailCommentList = document.getElementById('detailCommentList');
-    if (detailCommentList) detailCommentList.scrollTop = 0;
+    resetPcModalScroll();
 
     // 객체 데이터 속성 표준화
     post.post_id = post.post_id || post.POST_ID || ((post.CONTEST_ROUND || post.contest_id) && (post.ROUND_NO || post.round_no) ? `${post.CONTEST_ROUND || post.contest_id}_${post.ROUND_NO || post.round_no}` : (post.ROUND_NO || post.round_no));
@@ -1155,6 +1173,15 @@ function openDetailModal(post, isHallOfFame = false) {
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
+
+    // 팝업 show 활성화 틱 및 애니메이션 후 스크롤 100% 최상단 보정
+    resetPcModalScroll();
+    requestAnimationFrame(() => {
+        resetPcModalScroll();
+        setTimeout(resetPcModalScroll, 0);
+        setTimeout(resetPcModalScroll, 50);
+        setTimeout(resetPcModalScroll, 150);
+    });
 }
 
 /**
@@ -1217,11 +1244,7 @@ function closeDetailModal() {
     if (modal) {
         modal.classList.remove('show', 'active');
         modal.style.display = '';
-        modal.scrollTop = 0;
-        const detailInfoContainer = modal.querySelector('.detail-info-container');
-        if (detailInfoContainer) detailInfoContainer.scrollTop = 0;
-        const detailCommentList = document.getElementById('detailCommentList');
-        if (detailCommentList) detailCommentList.scrollTop = 0;
+        resetPcModalScroll();
         document.body.style.overflow = '';
     }
 }

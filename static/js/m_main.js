@@ -382,14 +382,23 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     }
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
     const mTitleEl = document.getElementById('mDetailTitle');
-    if (mTitleEl) mTitleEl.textContent = postData.title || postData.TITLE || '';
+    const titleText = (postData.title || postData.TITLE || '').trim();
+    const contentText = (postData.content || postData.CONTS || '').trim();
+
+    if (mTitleEl) {
+        mTitleEl.textContent = titleText;
+        mTitleEl.style.display = titleText ? 'block' : 'none';
+        mTitleEl.style.marginBottom = contentText ? '0.5rem' : '0';
+    }
     
     const mContentEl = document.getElementById('mDetailContent');
     const mContentBox = document.getElementById('mDetailContentBox');
-    const contentText = (postData.content || postData.CONTS || '').trim();
-    if (mContentEl) mContentEl.textContent = contentText;
+    if (mContentEl) {
+        mContentEl.textContent = contentText;
+        mContentEl.style.display = contentText ? 'block' : 'none';
+    }
     if (mContentBox) {
-        mContentBox.style.display = contentText ? 'block' : 'none';
+        mContentBox.style.display = (titleText || contentText) ? 'block' : 'none';
     }
 
     const mCreatedAtEl = document.getElementById('mDetailCreatedAt');
