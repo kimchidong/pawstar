@@ -134,6 +134,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// 모바일 상세보기 모달 스크롤 100% 최상단 리셋 헬퍼
+function resetMobileModalScroll() {
+    const detailModal = document.getElementById('mDetailModal');
+    if (!detailModal) return;
+    detailModal.scrollTop = 0;
+    const targets = [
+        detailModal.querySelector('.m-modal-sheet'),
+        detailModal.querySelector('.m-modal-scroll-body'),
+        document.getElementById('mDetailCommentList'),
+        document.querySelector('.m-modal-scroll-body')
+    ];
+    targets.forEach(el => {
+        if (el) {
+            el.scrollTop = 0;
+        }
+    });
+}
+
 // 3. 모바일 전용 게시물 상세보기 모달 open
 function openMobileDetailModal(postData, isHallOfFame = false) {
     if (!window.isUserLoggedIn) {
@@ -155,13 +173,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
     detailModal.style.display = '';
 
     // 모바일 팝업 및 내부 스크롤 컨테이너 최상단 스크롤 초기화
-    detailModal.scrollTop = 0;
-    const mSheet = detailModal.querySelector('.m-modal-sheet');
-    if (mSheet) mSheet.scrollTop = 0;
-    const mScrollBody = detailModal.querySelector('.m-modal-scroll-body');
-    if (mScrollBody) mScrollBody.scrollTop = 0;
-    const mCommentList = document.getElementById('mDetailCommentList');
-    if (mCommentList) mCommentList.scrollTop = 0;
+    resetMobileModalScroll();
 
     postData.post_id = postData.post_id || postData.POST_ID || ((postData.CONTEST_ROUND || postData.contest_id) && (postData.ROUND_NO || postData.round_no) ? `${postData.CONTEST_ROUND || postData.contest_id}_${postData.ROUND_NO || postData.round_no}` : (postData.ROUND_NO || postData.round_no));
     postData.title = postData.title || postData.TITLE || '';
@@ -669,6 +681,15 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     detailModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // 팝업 active 활성화 틱 및 애니메이션 후 스크롤 100% 최상단 보정
+    resetMobileModalScroll();
+    requestAnimationFrame(() => {
+        resetMobileModalScroll();
+        setTimeout(resetMobileModalScroll, 0);
+        setTimeout(resetMobileModalScroll, 50);
+        setTimeout(resetMobileModalScroll, 150);
+    });
 }
 
 function closeMobileDetailModal() {
@@ -676,13 +697,7 @@ function closeMobileDetailModal() {
     if (detailModal) {
         detailModal.classList.remove('active', 'show');
         detailModal.style.display = '';
-        detailModal.scrollTop = 0;
-        const mSheet = detailModal.querySelector('.m-modal-sheet');
-        if (mSheet) mSheet.scrollTop = 0;
-        const mScrollBody = detailModal.querySelector('.m-modal-scroll-body');
-        if (mScrollBody) mScrollBody.scrollTop = 0;
-        const mCommentList = document.getElementById('mDetailCommentList');
-        if (mCommentList) mCommentList.scrollTop = 0;
+        resetMobileModalScroll();
         document.body.style.overflow = '';
     }
 }

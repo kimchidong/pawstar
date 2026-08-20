@@ -24,10 +24,10 @@ class TestMobileShareBadgeActive(unittest.TestCase):
                       "checkAndAutoOpenMobilePost should check if current page is hall-of-fame")
 
         # 3. Mobile Scroll reset check
-        self.assertIn('const mScrollBody = detailModal.querySelector(\'.m-modal-scroll-body\');', content,
-                      "openMobileDetailModal should reset m-modal-scroll-body scrollTop")
-        self.assertIn('if (mScrollBody) mScrollBody.scrollTop = 0;', content,
-                      "closeMobileDetailModal / openMobileDetailModal should set mScrollBody scrollTop to 0")
+        self.assertIn('function resetMobileModalScroll()', content,
+                      "m_main.js should contain resetMobileModalScroll helper function")
+        self.assertIn('resetMobileModalScroll();', content,
+                      "openMobileDetailModal and closeMobileDetailModal should call resetMobileModalScroll")
 
 if __name__ == '__main__':
     unittest.main()
