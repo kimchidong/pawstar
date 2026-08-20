@@ -136,7 +136,7 @@
 <!-- 1열 피드 그리드 (1줄 1카드 - PC 구성 요소 완전 탑재) -->
 <div class="m-feed-grid">
     {% for p in posts %}
-        <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="openMobileDetailModal({{ p | tojson | forceescape }})">
+        <div class="m-feed-card" id="m-post-card-{{ p.ENT_USER_ID or p.post_id }}" data-post-id="{{ p.post_id or p.ENT_USER_ID }}" data-ent-user-id="{{ p.ENT_USER_ID }}" onclick="handleMobileCardClick({{ p | tojson | forceescape }})">
             <div class="m-card-thumb">
                 <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                 

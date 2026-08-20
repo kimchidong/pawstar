@@ -204,7 +204,7 @@ function handlePcDirectLogout(e) {
 
     <div class="posts-grid" id="myPostsGrid" style="width: 1280px; margin: 0 auto 3rem auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; box-sizing: border-box;">
         {% for p in my_posts %}
-            <div class="post-card my-post-card-item" id="post-card-{{ p.post_id or p.ENT_USER_ID }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="openDetailModal({{ p | tojson | forceescape }})" style="cursor: pointer;">
+            <div class="post-card my-post-card-item" id="post-card-{{ p.post_id or p.ENT_USER_ID }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" onclick="handleCardClick({{ p | tojson | forceescape }})" style="cursor: pointer;">
                 <div class="card-media">
                     <img src="{% if p.PHT_PATH and p.PHT_FILE1 %}{{ p.PHT_PATH }}/{{ p.PHT_FILE1 }}{% else %}{{ p.IMAGE_PATH or p.image_path or p.media_url }}{% endif %}" alt="{{ p.TITLE or p.title }}" loading="lazy">
                     
@@ -403,7 +403,7 @@ function handlePcDirectLogout(e) {
             {% set c_id = a.CONTEST_ROUND or a.contest_id %}
             {% set p_img = a.image_path or a.PHT_FILE_PATH1 or '/static/sample_image/sample_01.jpg' %}
 
-            <div class="trophy-row-item" onclick="openDetailModal({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.15rem 1.4rem; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;">
+            <div class="trophy-row-item" onclick="handleCardClick({{ a | tojson | forceescape }}, true)" style="background: #ffffff; border: 1.5px solid #f1f5f9; border-radius: 20px; padding: 1.15rem 1.4rem; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; cursor: pointer; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative;">
                 <!-- 1. 좌측: 회차 배지 + 3D 메달 아이콘 + 펫 썸네일 (고정 너비 부여로 세로 열 정렬) -->
                 <div style="display: flex; align-items: center; flex-shrink: 0;">
                     {% if sel_c_id == 'all' or not selected_contest_id %}

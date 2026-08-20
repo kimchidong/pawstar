@@ -122,6 +122,20 @@ function ensureLoggedIn(onSuccess) {
 window.ensureLoggedIn = ensureLoggedIn;
 
 /**
+ * 카드 클릭 전용 세션 체킹 래퍼 함수 (서버 세션 100% 검증 후 출전작 팝업 열기)
+ */
+async function handleCardClick(post, isHallOfFame = false) {
+    if (!ensureLoggedIn()) return false;
+    const isAlive = await verifyServerSessionAsync();
+    if (!isAlive) {
+        if (typeof openGoogleAuthModal === 'function') openGoogleAuthModal();
+        return false;
+    }
+    openDetailModal(post, isHallOfFame);
+}
+window.handleCardClick = handleCardClick;
+
+/**
  * 서버 측 세션 타임아웃 실시간 검증 헬퍼
  * @returns {Promise<boolean>}
  */
@@ -155,14 +169,14 @@ async function verifyServerSessionAsync() {
     if (typeof openGoogleAuthModal === 'function') {
         openGoogleAuthModal();
     } else {
-        const m = document.getElementById('googleAuthModal') || document.getElementById('mAuthModal');
-        if (m) {
-            m.style.display = 'flex';
-            m.style.zIndex = '999999';
-            m.classList.add('show', 'active');
-        } else {
-            window.location.href = '/auth/google';
-        }
+        ['googleAuthModal', 'mGoogleAuthModal', 'mAuthModal'].forEach(id => {
+            const m = document.getElementById(id);
+            if (m) {
+                m.style.display = 'flex';
+                m.style.zIndex = '9999999';
+                m.classList.add('show', 'active');
+            }
+        });
     }
     return false;
 }
