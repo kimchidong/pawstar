@@ -248,8 +248,13 @@ def check_session_api():
     """ 실시간 서버 세션 타임아웃 및 로그인 상태 검사 API """
     user_id = session.get('user_id')
     if not user_id or session.get('logged_out'):
-        return jsonify({'success': False, 'logged_in': False, 'reason': 'session_expired'})
-    return jsonify({'success': True, 'logged_in': True, 'user_id': user_id})
+        resp = make_response(jsonify({'success': False, 'logged_in': False, 'reason': 'session_expired'}))
+    else:
+        resp = make_response(jsonify({'success': True, 'logged_in': True, 'user_id': user_id}))
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, private'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 @app.route('/logout')
 @app.route('/m/logout')
@@ -735,8 +740,13 @@ def api_post_detail(post_id):
         post = service.get_post_detail(contest_round, round_no, current_user_id)
     
     if post:
-        return jsonify({'success': True, 'post': post})
-    return jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404
+        resp = make_response(jsonify({'success': True, 'post': post}))
+    else:
+        resp = make_response(jsonify({'success': False, 'message': '게시물을 찾을 수 없습니다.'}), 404)
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, private'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 @app.route('/api/contest/share_url', methods=['GET', 'POST'])
 def api_contest_share_url():

@@ -264,9 +264,12 @@ window.ensureLoggedIn = ensureLoggedIn;
  */
 async function verifyServerSessionAsync() {
     try {
-        const res = await fetch('/api/auth/check-session', {
+        const res = await fetch('/api/auth/check-session?t=' + Date.now(), {
             method: 'GET',
-            headers: { 'Cache-Control': 'no-cache, no-store' }
+            headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
         });
         const data = await res.json();
         if (data && data.logged_in) {
@@ -276,13 +279,16 @@ async function verifyServerSessionAsync() {
         console.warn('verifyServerSessionAsync error:', e);
     }
 
-    // 서버 세션 만료 시 메모리 세션 파기 및 구글 로그인 안내 모달 발동
+    // 서버 세션 만료 시 메모리 세션 파기 및 기존 열린 팝업 닫기 후 구글 로그인 안내 모달 발동
     window.isUserLoggedIn = false;
     window.CURRENT_USER_ID = '';
     try {
         localStorage.setItem('pawstar_logged_out', 'true');
     } catch(e) {}
-    
+
+    if (typeof closeMobileDetailModal === 'function') closeMobileDetailModal();
+    if (typeof closeDetailModal === 'function') closeDetailModal();
+
     if (typeof openGoogleAuthModal === 'function') {
         openGoogleAuthModal();
     } else {
