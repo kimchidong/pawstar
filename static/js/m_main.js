@@ -13,6 +13,54 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+/**
+ * 모바일 전용 일자시간 상대시간(방금 전, N초 전, N분 전, N시간 전, N일 전, N달 전, N년 전) 포맷팅
+ */
+function formatTimeAgo(dateInput) {
+    if (!dateInput) return '';
+    let dtStr = String(dateInput).trim();
+    if (!dtStr) return '';
+
+    let date = new Date(dtStr);
+    if (isNaN(date.getTime())) {
+        date = new Date(dtStr.replace(/-/g, '/'));
+    }
+    if (isNaN(date.getTime())) {
+        return dtStr;
+    }
+
+    const now = new Date();
+    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffSec < 0 || diffSec < 10) {
+        return '방금 전';
+    }
+    if (diffSec < 60) {
+        return `${diffSec}초 전`;
+    }
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) {
+        return `${diffMin}분 전`;
+    }
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) {
+        return `${diffHour}시간 전`;
+    }
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 30) {
+        return `${diffDay}일 전`;
+    }
+    const diffMonth = Math.floor(diffDay / 30);
+    if (diffMonth < 12) {
+        return `${diffMonth}달 전`;
+    }
+    let diffYear = Math.floor(diffDay / 365);
+    if (diffYear < 1) diffYear = 1;
+    return `${diffYear}년 전`;
+}
+window.formatTimeAgo = formatTimeAgo;
+window.timeAgo = formatTimeAgo;
+
 document.addEventListener('DOMContentLoaded', function() {
     // 회차 선택 셀렉트박스 배경색 실시간 동기화 (진행중 VS 종료)
     document.querySelectorAll('.select-custom, .m-select-custom').forEach(selectEl => {
@@ -346,7 +394,7 @@ function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const mCreatedAtEl = document.getElementById('mDetailCreatedAt');
     if (mCreatedAtEl) {
-        mCreatedAtEl.textContent = postData.created_at || postData.ENT_DT || postData.dt_ago || '';
+        mCreatedAtEl.textContent = formatTimeAgo(postData.created_at || postData.ENT_DT || postData.dt_ago || '');
     }
 
     // 4요소 실시간 액션 수치 팝업 세팅
@@ -801,7 +849,7 @@ function renderMobileDetailComments(comments) {
                         <span>${escapeHtml(c.user_nickname || '집사')}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.4rem;">
-                        <span style="font-size: 0.68rem; color: var(--text-muted);">${c.created_at || ''}</span>
+                        <span style="font-size: 0.68rem; color: var(--text-muted);">${formatTimeAgo(c.created_at || c.ENT_DT || c.CMT_DT || '')}</span>
                         ${deleteBtnHtml}
                     </div>
                 </div>

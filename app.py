@@ -65,8 +65,9 @@ def finalize_temp_profile_image(avatar_icon):
     return f"/static/image/profile/{year_str}/{month_str}/{perm_filename}"
 
 
+@app.template_filter('time_ago')
 @app.template_filter('m_time_ago')
-def m_time_ago_filter(dt_val):
+def time_ago_filter(dt_val):
     if not dt_val:
         return ''
     try:
@@ -84,11 +85,11 @@ def m_time_ago_filter(dt_val):
         now = datetime.datetime.now()
         diff = now - dt
         seconds = int(diff.total_seconds())
-        if seconds < 0:
+        if seconds < 0 or seconds < 10:
             return '방금 전'
 
         if seconds < 60:
-            return '방금 전'
+            return f'{seconds}초 전'
         minutes = seconds // 60
         if minutes < 60:
             return f'{minutes}분 전'
@@ -100,8 +101,10 @@ def m_time_ago_filter(dt_val):
             return f'{days}일 전'
         months = days // 30
         if months < 12:
-            return f'{months}개월 전'
-        years = months // 12
+            return f'{months}달 전'
+        years = days // 365
+        if years < 1:
+            years = 1
         return f'{years}년 전'
     except Exception:
         return str(dt_val)[:10]

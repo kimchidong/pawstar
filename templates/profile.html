@@ -307,7 +307,7 @@ function handlePcDirectLogout(e) {
                     <!-- 등록 일시 (시분초) 및 총 점수 -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.65rem;">
                         <span style="font-size: 0.78rem; color: var(--text-muted);">
-                            {{ p.ENT_DT or p.created_at }}
+                            {{ (p.ENT_DT or p.created_at)|time_ago }}
                         </span>
                         <div class="card-total-score">
                             <i class="fa-solid fa-star"></i> <span class="score-num">{{ "{:,}".format((p.SCORE or p.score or 0)|int) }}</span> 점

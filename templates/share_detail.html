@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
-                <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">{{ post.created_at or post.ENT_DT }}</span>
+                <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">{{ (post.created_at or post.ENT_DT)|time_ago }}</span>
             </div>
         </div>
 
