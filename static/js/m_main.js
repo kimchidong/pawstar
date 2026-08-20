@@ -219,20 +219,12 @@ function checkCurrentLoginCookie() {
 window.checkCurrentLoginCookie = checkCurrentLoginCookie;
 
 /**
- * 모바일 전용 현재 시점 로그인 상태 엄격 체크 헬퍼 (멀티 탭 동기화 및 실시간 쿠키/Storage 평가)
+ * 모바일 전용 현재 시점 로그인 상태 엄격 체크 헬퍼
  * @param {Function} [onSuccess] 로그인 상태일 때 실행할 콜백
  * @returns {boolean} 로그인 상태 여부
  */
 function ensureLoggedIn(onSuccess) {
-    const hasCookie = checkCurrentLoginCookie();
-    const hasStorageLogout = localStorage.getItem('pawstar_logged_out') === 'true';
-
-    if (!hasCookie || hasStorageLogout) {
-        window.isUserLoggedIn = false;
-        window.CURRENT_USER_ID = '';
-    }
-
-    const isLoggedIn = !!(window.isUserLoggedIn && !hasStorageLogout && hasCookie);
+    const isLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
 
     if (!isLoggedIn) {
         window.isUserLoggedIn = false;
@@ -287,13 +279,18 @@ async function verifyServerSessionAsync() {
         });
         const data = await res.json();
         if (data && data.logged_in) {
+            // 진짜 정상 로그인 회원 -> 로그인 상태 확정 및 pawstar_logged_out 플래그 제거
+            window.isUserLoggedIn = true;
+            if (data.user_id) window.CURRENT_USER_ID = data.user_id;
+            try { localStorage.removeItem('pawstar_logged_out'); } catch(e) {}
             return true;
         }
     } catch (e) {
         console.warn('verifyServerSessionAsync error:', e);
+        if (window.isUserLoggedIn) return true;
     }
 
-    // 서버 세션 만료 시 메모리 세션 파기 및 기존 열린 팝업 닫기 후 구글 로그인 안내 모달 발동
+    // 서버 세션 만료/로그아웃된 경우에만 세션 파기 및 기존 열린 팝업 닫기 후 구글 로그인 안내 모달 발동
     window.isUserLoggedIn = false;
     window.CURRENT_USER_ID = '';
     try {
