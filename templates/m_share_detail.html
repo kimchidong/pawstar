@@ -98,8 +98,8 @@
         </div>
 
         <!-- 미디어 영역 -->
-        <div style="width: 100%; aspect-ratio: 4/3; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <img src="{{ post.image_path or post.PHT_FILE_PATH1 or '/static/image/contest/default_pet.jpg' }}" alt="{{ post.title }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/image/contest/default_pet.jpg';">
+        <div style="width: 100%; height: 280px; aspect-ratio: 4 / 3; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img src="{{ post.image_path or post.PHT_FILE_PATH1 or '/static/image/contest/default_pet.jpg' }}" alt="{{ post.title }}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.src='/static/image/contest/default_pet.jpg';">
         </div>
 
         <!-- 본문 정보 -->
