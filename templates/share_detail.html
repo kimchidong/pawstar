@@ -68,8 +68,8 @@
         {% endif %}
     </div>
 
-    <!-- 2. 단독 게시물 카드 -->
-    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); transition: all 0.3s ease;">
+    <!-- 2. 단독 게시물 카드 (카드 전체 영역 클릭 시 메인 콘테스트 피드 보러가기와 동일하게 이동) -->
+    <div onclick="window.location.href='/?contest_id={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}&open_post={{ contest_round or post.contest_round or post.CONTEST_ROUND or 1 }}_{{ round_no or post.round_no or post.ROUND_NO or 1 }}';" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); transition: all 0.3s ease; cursor: pointer;">
         <!-- 상단 헤더: 작성자 및 공유번호 -->
         <div style="padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
             <div style="display: flex; align-items: center; gap: 0.8rem;">
@@ -152,7 +152,7 @@
             <!-- 대형 콜투액션(CTA) 버튼 그룹 -->
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 {% if not is_logged_in %}
-                <button type="button" onclick="if(typeof openGoogleAuthModal === 'function'){ openGoogleAuthModal(); } else { const modal = document.getElementById('googleAuthModal'); if(modal) { modal.style.display='flex'; modal.classList.add('show','active'); } else { window.location.href = '/auth/google'; } }" style="width: 100%; padding: 1.05rem; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); transition: transform 0.2s ease;">
+                <button type="button" onclick="event.stopPropagation(); if(typeof openGoogleAuthModal === 'function'){ openGoogleAuthModal(); } else { const modal = document.getElementById('googleAuthModal'); if(modal) { modal.style.display='flex'; modal.classList.add('show','active'); } else { window.location.href = '/auth/google'; } }" style="width: 100%; padding: 1.05rem; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3); transition: transform 0.2s ease;">
                     <i class="fa-solid fa-user-plus" style="font-size: 1.2rem;"></i> 회원가입하고 응원하기 (+10점 자동적립)
                 </button>
                 {% endif %}
