@@ -768,7 +768,8 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    const isViewAct = !isMinePost && !isClosedRound && !!data.actions.is_viewed;
+                    const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
+                    const isViewAct = isUserLoggedIn && !isMinePost;
                     mBtnViewPopup.classList.toggle('active', isViewAct);
                     const icon = mBtnViewPopup.querySelector('i');
                     if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
@@ -827,7 +828,8 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                   document.querySelector(`[data-ent-user-id="${mRawEntId}"]`) ||
                   document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
 
-    if (!isClosedRound && !isMinePost) {
+    const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
+    if (isUserLoggedIn && !isMinePost) {
         if (mCard) {
             const mBtnView = mCard.querySelector('.btn-view');
             if (mBtnView) {

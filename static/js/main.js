@@ -535,7 +535,7 @@ async function triggerEvent(postId, eventType) {
             const curUserId = String(window.CURRENT_USER_ID || '').trim();
             const postOwnerId = String((window.currentDetailPostData || {}).ENT_USER_ID || (window.currentDetailPostData || {}).user_id || '').trim();
             const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
-            const isViewAct = isUserLoggedIn && !isMine && (data.is_viewed !== false);
+            const isViewAct = isUserLoggedIn && !isMine;
 
             const detailBtnViewPopup = document.getElementById('detailBtnView');
             if (detailBtnViewPopup) {
@@ -672,9 +672,6 @@ async function openDetailModal(post, isHallOfFame = false) {
     if (!modal || !post) return;
     modal.style.display = '';
 
-    // 모달 및 스크롤 영역 최상단 스크롤 초기화
-    resetPcModalScroll();
-
     // 객체 데이터 속성 표준화
     post.post_id = post.post_id || post.POST_ID || ((post.CONTEST_ROUND || post.contest_id) && (post.ROUND_NO || post.round_no) ? `${post.CONTEST_ROUND || post.contest_id}_${post.ROUND_NO || post.round_no}` : (post.ROUND_NO || post.round_no));
     post.title = post.title || post.TITLE || '';
@@ -682,11 +679,16 @@ async function openDetailModal(post, isHallOfFame = false) {
     post.score = post.score !== undefined ? post.score : (post.SCORE !== undefined ? post.SCORE : 0);
     post.created_at = post.created_at || post.ENT_DT || '';
 
-    // 최신 메모리 데이터 객체 동기화
+    // 최신 메모리 데이터 객체 및 전역 포인터 즉시 동기화
+    window.currentDetailPostData = post;
+    window.currentDetailPostId = post.post_id;
     if (!window.postsDataStore[post.post_id]) {
         window.postsDataStore[post.post_id] = Object.assign({}, post);
     }
     post = window.postsDataStore[post.post_id];
+
+    // 모달 및 스크롤 영역 최상단 스크롤 초기화
+    resetPcModalScroll();
 
     // 회차 종료/마감 여부 판별
     const isClosedRound = isHallOfFame || 
@@ -768,17 +770,19 @@ async function openDetailModal(post, isHallOfFame = false) {
 
     const cleanId = String(post.post_id);
     const rawEntId = cleanId.replace(/^\d+_/, '');
-    const card = document.getElementById(`post-card-${cleanId}`) || 
+    const entUserIdVal = String(post.ENT_USER_ID || post.user_id || '').trim();
+    const card = (entUserIdVal ? document.getElementById(`post-card-${entUserIdVal}`) : null) ||
+                 document.getElementById(`post-card-${cleanId}`) || 
                  document.getElementById(`post-card-${rawEntId}`) ||
                  document.querySelector(`[data-post-id="${cleanId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${rawEntId}"]`) ||
                  document.querySelector(`[data-ent-user-id="${cleanId}"]`);
     const curUserId = String(window.CURRENT_USER_ID || '').trim();
-    const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
+    const postOwnerId = entUserIdVal;
     const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
-    const isViewAct = isUserLoggedIn && !isMine && !isClosedRound;
+    const isViewAct = isUserLoggedIn && !isMine;
 
     if (card) {
         const btnView = card.querySelector('.btn-view');
