@@ -19,6 +19,7 @@
     </div>
 
     <!-- 최초 가입일자 및 최근 로그인일자 모바일 정보 칩 -->
+    {% if is_my_profile %}
     {% set j_date = (user.join_date|string) if user and user.join_date else '-' %}
     {% set l_date = (user.last_login|string) if user and user.last_login else '-' %}
     {% if j_date|length >= 19 and j_date[10] != ' ' %}{% set j_date = j_date[:10] ~ ' ' ~ j_date[10:] %}{% endif %}
@@ -51,6 +52,7 @@
             <i class="fa-solid fa-right-from-bracket" style="font-size: 0.8rem;"></i> 로그아웃
         </button>
     </div>
+    {% endif %}
 </div>
 
 <script>
@@ -774,6 +776,7 @@ function renderTrophyPagination(page) {
 }
 </script>
 
+{% if is_my_profile %}
 <!-- 모바일 프로필 수정 레이어 바텀시트 모달 -->
 <div class="m-modal-backdrop" id="mProfileEditModal">
     <div class="m-modal-sheet">
@@ -810,6 +813,7 @@ function renderTrophyPagination(page) {
         </form>
     </div>
 </div>
+{% endif %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

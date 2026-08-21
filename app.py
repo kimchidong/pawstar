@@ -328,11 +328,20 @@ def logout():
 @app.route('/api/auth/withdraw', methods=['POST'])
 def withdraw():
     """ 회원 탈퇴 처리 API (구글 인증 회원의 경우 Google 동의 권한도 자동 철회/Revoke) """
-    user_id = session.get('user_id')
-    if not user_id:
+    current_user_id = get_current_user_id() or session.get('user_id')
+    if not current_user_id:
         if request.is_json or request.path.startswith('/api'):
             return jsonify({'success': False, 'message': '로그인된 상태가 아닙니다.'}), 401
         return redirect(url_for('index'))
+
+    data = (request.json or {}) if request.is_json else (request.form or {})
+    req_user_id = (data.get('user_id') or '').strip() if isinstance(data, dict) else ''
+    if req_user_id and req_user_id != current_user_id:
+        if request.is_json or request.path.startswith('/api'):
+            return jsonify({'success': False, 'message': '본인 계정만 탈퇴할 수 있습니다.'}), 403
+        return redirect(url_for('index'))
+
+    user_id = current_user_id
 
     # 구글 소셜 회원일 경우 구글 동의 권한 철회 API 호출 (Google OAuth Revoke Token)
     access_token = session.get('access_token')
@@ -909,6 +918,8 @@ def profile():
     else:
         user_id = target_user_id
 
+    is_my_profile = (current_user_id is not None and user_id == current_user_id)
+
     contest_id = request.args.get('contest_id', 'all')
     profile_data = service.get_user_profile(user_id, contest_id=contest_id)
 
@@ -919,7 +930,8 @@ def profile():
         my_posts=profile_data['my_posts'],
         my_awards=profile_data['my_awards'],
         contests=service.get_contests(),
-        selected_contest_id=contest_id
+        selected_contest_id=contest_id,
+        is_my_profile=is_my_profile
     )
 
 # --- 모바일 전용 별도 라우트 (m_ 접두사 템플릿 독립 제공) ---
@@ -1019,6 +1031,8 @@ def m_profile():
     else:
         user_id = target_user_id
 
+    is_my_profile = (current_user_id is not None and user_id == current_user_id)
+
     contest_id = request.args.get('contest_id', 'all')
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1052,7 +1066,8 @@ def m_profile():
         my_posts_pagination=my_posts_pagination,
         my_awards=profile_data['my_awards'],
         contests=service.get_contests(),
-        selected_contest_id=contest_id
+        selected_contest_id=contest_id,
+        is_my_profile=is_my_profile
     )
 
 @app.route('/m/admin')
@@ -1330,10 +1345,16 @@ def upload_profile():
 
 @app.route('/api/profile/update', methods=['POST'])
 def api_profile_update():
-    data = request.json or {}
-    user_id = get_current_user_id() or data.get('user_id', '').strip()
-    if not user_id:
+    current_user_id = get_current_user_id()
+    if not current_user_id:
         return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
+
+    data = request.json or {}
+    req_user_id = (data.get('user_id') or '').strip()
+    if req_user_id and req_user_id != current_user_id:
+        return jsonify({'success': False, 'message': '본인의 프로필만 수정할 수 있습니다.'}), 403
+
+    user_id = current_user_id
     nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
     if not nickname:
         return jsonify({'success': False, 'message': '집사 닉네임을 입력해 주세요.'}), 400

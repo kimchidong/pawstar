@@ -22,6 +22,7 @@
                     {% endif %}
                 </div>
                 
+                {% if is_my_profile %}
                 <div class="profile-action-btns" style="display: flex; align-items: center; gap: 0.6rem;">
                     <!-- 프로필 정보 수정 버튼 -->
                     <button type="button" class="btn-edit-profile" id="btnOpenProfileModal">
@@ -36,6 +37,7 @@
                         <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
                     </button>
                 </div>
+                {% endif %}
             </div>
 
 <script>
@@ -67,6 +69,7 @@ function handlePcDirectLogout(e) {
 </script>
 
             <!-- 사용자 최초 가입일자 및 최근 로그인일자 정보 칩 세트 -->
+            {% if is_my_profile %}
             <div class="profile-user-dates" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; flex-wrap: wrap;">
                 <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1.5px solid #e2e8f0; padding: 0.35rem 0.8rem; border-radius: 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                     <i class="fa-solid fa-calendar-check" style="color: #7c3aed; font-size: 0.85rem; width: 1.15rem; text-align: center; display: inline-block; flex-shrink: 0;"></i>
@@ -79,6 +82,7 @@ function handlePcDirectLogout(e) {
                     <strong style="color: #1e3a8a; font-weight: 800; font-size: 0.82rem;">{{ user.last_login if user and user.last_login else '-' }}</strong>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
     
@@ -511,6 +515,7 @@ function handlePcDirectLogout(e) {
     </div>
 </div>
 
+{% if is_my_profile %}
 <!-- 프로필 수정 레이어 팝업 모달 (Profile Edit Modal) -->
 <div class="modal-backdrop" id="profileEditModal">
     <div class="modal-content" style="max-width: 520px; width: 92%; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 1.75rem 2rem;">
@@ -547,6 +552,7 @@ function handlePcDirectLogout(e) {
         </form>
     </div>
 </div>
+{% endif %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
