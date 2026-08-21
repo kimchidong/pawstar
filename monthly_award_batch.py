@@ -6,30 +6,18 @@ Paw Star 매월 1일 대회 당선 및 회차 생성 배치 스크립트
 [Crontab 설정 방법]
 매월 1일 0시 0분 0초 실행:
 0 0 1 * * /usr/bin/python3 /path/to/pawstar/monthly_award_batch.py >> /path/to/pawstar/batch.log 2>&1
-
-[업무 처리 내용]
-1. 현재 진행 중(G001C001) 회차 조회 (PST_CONTEST)
-2. 해당 회차 참가자 전원의 점수(SCORE) 계산
-3. 전체 순위(TOTAL_RANKING) 및 품종별 순위(KIND_RANKING) 산출 및 PST_CONTEST_ROUND 저장 (PRC_DT 동결)
-4. 수상자 레코드(PST_CONTEST_AWARD) INSERT
-   - 전체 1~3위 (G002P001: P001A101, P001A102, P001A103)
-   - 품종별 1~3위 (G002P002: P002A901, P002A902, P002A903)
-5. 진행 중 회차 상태 종료(G001C002) 처리
-6. 다음 월 테마(PST_THEME)를 기반으로 새 회차(G001C001) 자동 생성
 """
 
 import sys
 import os
 import datetime
 import pymysql
+import importlib.util
 
 if sys.platform == 'win32':
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-
-import os
-import importlib.util
 
 def _get_config_batch():
     curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -49,21 +37,29 @@ def _get_config_batch():
 config_batch = _get_config_batch()
 DB_CONFIG = config_batch.DB_CONFIG
 
+from utils.logger import get_batch_logger, hash_ip
+
+batch_logger = get_batch_logger()
+LOCAL_HASH = hash_ip('127.0.0.1')
+LOG_EXTRA = {'device': 'BATCH', 'ip_hash': LOCAL_HASH}
+
 def get_db_connection():
     try:
         return pymysql.connect(**DB_CONFIG, cursorclass=pymysql.cursors.DictCursor)
     except Exception as e:
-        print(f"[{datetime.datetime.now()}] DB 연결 실패: {e}")
+        msg = f"Database connection failed: {e}"
+        print(f"[{datetime.datetime.now()}] {msg}")
+        batch_logger.error(msg, extra=LOG_EXTRA)
         return None
 
 def run_monthly_award_batch():
     now = datetime.datetime.now()
-    print("==================================================")
-    print(f"[{now}] PAW STAR 월간 당선 & 회차 생성 배치 실행")
-    print("==================================================")
+    batch_logger.info("Batch process started: Monthly award & contest round creation.", extra=LOG_EXTRA)
 
     conn = get_db_connection()
     if not conn:
+        batch_logger.error("Batch process failed: Could not connect to DB.", extra=LOG_EXTRA)
+        batch_logger.info("Batch process ended with failure.", extra=LOG_EXTRA)
         sys.exit(1)
 
     try:
@@ -71,6 +67,7 @@ def run_monthly_award_batch():
             cur.execute("SET NAMES utf8mb4;")
 
             # 1. 진행 중인 회차 조회 (G001C001)
+            batch_logger.info("[Step 1] Fetching active contest round (G001C001)...", extra=LOG_EXTRA)
             cur.execute("""
                 SELECT CONTEST_ROUND, THEME_CD, ST_DT, ED_DT
                 FROM PST_CONTEST
@@ -81,7 +78,7 @@ def run_monthly_award_batch():
             current_contest = cur.fetchone()
 
             if not current_contest:
-                print(f"[{now}] 기존 진행 중인 회차가 없으므로 집계/마감 처리를 스킵하고 제1회 콘테스트를 생성합니다.")
+                batch_logger.info("[Step 1] No active contest round found. Initializing 1st contest round...", extra=LOG_EXTRA)
                 current_month = now.month
                 target_theme_cd = f'T{current_month:03d}'
                 cur.execute("SELECT THEME_CD FROM PST_THEME WHERE THEME_CD = %s", (target_theme_cd,))
@@ -95,14 +92,17 @@ def run_monthly_award_batch():
                     ON DUPLICATE KEY UPDATE THEME_CD = VALUES(THEME_CD), ED_DT = VALUES(ED_DT), CONTEST_STAT = 'G001C001'
                 """, (target_theme_cd,))
                 conn.commit()
-                print(f"[{now}] 제1회 콘테스트(테마: {target_theme_cd}) 오픈 생성이 완료되었습니다.")
+                batch_logger.info(f"[Step 1] 1st contest round created successfully with theme {target_theme_cd}.", extra=LOG_EXTRA)
+                batch_logger.info("Batch process completed successfully.", extra=LOG_EXTRA)
+                batch_logger.info("Batch process ended.", extra=LOG_EXTRA)
                 conn.close()
                 return
 
             round_id = current_contest['CONTEST_ROUND']
-            print(f"[{now}] 대상 콘테스트 회차: 제{round_id}회")
+            batch_logger.info(f"[Step 1] Active contest round fetched: Round #{round_id}.", extra=LOG_EXTRA)
 
-            # 2. 해당 회차 모든 참가물의 실시간 DB 이력(조회/좋아요/댓글/공유) 재집계 및 점수(SCORE) 산출
+            # 2. 해당 회차 모든 참가물의 실시간 DB 이력 재집계 및 점수(SCORE) 산출
+            batch_logger.info(f"[Step 2] Recalculating participant metrics and scores for Round #{round_id}...", extra=LOG_EXTRA)
             cur.execute("""
                 SELECT 
                     R.CONTEST_ROUND, 
@@ -129,7 +129,7 @@ def run_monthly_award_batch():
             """, (round_id,))
             participants = cur.fetchall()
 
-            print(f"[{now}] 총 참가 작품 수: {len(participants)}개")
+            batch_logger.info(f"[Step 2] Total participant entries to update: {len(participants)}.", extra=LOG_EXTRA)
 
             for p in participants:
                 calc_score = p['CALC_SCORE']
@@ -142,8 +142,11 @@ def run_monthly_award_batch():
                     SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (real_vw, real_like, real_cmt, real_share, calc_score, round_id, p['ROUND_NO']))
+            
+            batch_logger.info("[Step 2] Metric recalculation completed.", extra=LOG_EXTRA)
 
-            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장 (우선순위: SCORE -> CMT_CNT -> LIKE_CNT -> VW_CNT -> SHARE_CNT)
+            # 3. 전체 순위(TOTAL_RANKING) 산출 & 저장
+            batch_logger.info("[Step 3] Calculating and saving overall total rankings...", extra=LOG_EXTRA)
             cur.execute("""
                 SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, KIND_CD, VW_CNT, LIKE_CNT, CMT_CNT, SHARE_CNT, SCORE
                 FROM PST_CONTEST_ROUND
@@ -170,8 +173,11 @@ def run_monthly_award_batch():
                     SET TOTAL_RANKING = %s, PRC_DT = NOW()
                     WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                 """, (current_rank, round_id, item['ROUND_NO']))
+            
+            batch_logger.info("[Step 3] Overall total rankings saved.", extra=LOG_EXTRA)
 
             # 4. 품종별 순위(KIND_RANKING) 산출 & 저장
+            batch_logger.info("[Step 4] Calculating and saving category kind rankings...", extra=LOG_EXTRA)
             cur.execute("""
                 SELECT DISTINCT KIND_CD FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND KIND_CD IS NOT NULL
             """, (round_id,))
@@ -209,8 +215,11 @@ def run_monthly_award_batch():
                     """, (k_rank, round_id, k_item['ROUND_NO']))
 
                 kind_sorted_with_rank_dict[k_cd] = k_list
+            
+            batch_logger.info("[Step 4] Category kind rankings saved.", extra=LOG_EXTRA)
 
-            # 5. 당선자 레코드 (PST_CONTEST_AWARD) INSERT (KIND_CD 저장 포함 및 rank <= 3 인 모든 동률 포함)
+            # 5. 당선자 레코드 (PST_CONTEST_AWARD) INSERT
+            batch_logger.info("[Step 5] Inserting contest award records for overall & kind top winners...", extra=LOG_EXTRA)
             award_codes_overall = {1: 'P001A101', 2: 'P001A102', 3: 'P001A103'}
             top_overall = [item for item in total_sorted_with_rank if item['rank'] <= 3]
 
@@ -251,19 +260,21 @@ def run_monthly_award_batch():
                             ENT_USER_ID=VALUES(ENT_USER_ID)
                     """, (round_id, item['ROUND_NO'], award_cd, item['ENT_USER_ID'], item['KIND_CD'], item['VW_CNT'], item['LIKE_CNT'], item['CMT_CNT'], item['SCORE'], r_val))
 
+            batch_logger.info("[Step 5] Contest award records inserted successfully.", extra=LOG_EXTRA)
+
             # 6. 현재 회차 종료 (G001C002) 처리
+            batch_logger.info(f"[Step 6] Closing active contest round #{round_id}...", extra=LOG_EXTRA)
             cur.execute("""
                 UPDATE PST_CONTEST
                 SET CONTEST_STAT = 'G001C002'
                 WHERE CONTEST_ROUND = %s
             """, (round_id,))
 
-            # 7. 다음 회차 (CONTEST_ROUND + 1) 생성 (G001C001) - 실행 시점 기준 월의 테마 적용
+            # 7. 다음 회차 생성
             next_round = round_id + 1
             current_month = now.month
             target_theme_cd = f'T{current_month:03d}'
 
-            # DB에 해당 테마가 존재하는지 확인
             cur.execute("SELECT THEME_CD FROM PST_THEME WHERE THEME_CD = %s", (target_theme_cd,))
             theme_row = cur.fetchone()
             if not theme_row:
@@ -276,11 +287,16 @@ def run_monthly_award_batch():
             """, (next_round, target_theme_cd))
 
             conn.commit()
-            print(f"[{now}] 제{round_id}회 마감 및 당선자 선정 완료! 제{next_round}회(테마: {target_theme_cd}) 진행중으로 새로 오픈되었습니다.")
+            batch_logger.info(f"[Step 7] Next contest round #{next_round} created with theme {target_theme_cd}.", extra=LOG_EXTRA)
+            batch_logger.info("Batch process completed successfully.", extra=LOG_EXTRA)
+            batch_logger.info("Batch process ended.", extra=LOG_EXTRA)
             conn.close()
 
     except Exception as e:
-        print(f"[{now}] 배치 실패: {e}")
+        msg = f"Batch process failed with error: {e}"
+        print(f"[{now}] {msg}")
+        batch_logger.error(msg, extra=LOG_EXTRA)
+        batch_logger.info("Batch process ended with failure.", extra=LOG_EXTRA)
         if conn:
             conn.rollback()
             conn.close()

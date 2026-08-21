@@ -12,6 +12,9 @@ import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response, flash, send_from_directory
 from werkzeug.utils import secure_filename
 from services.contest_service import service
+from utils.logger import get_web_logger, hash_ip
+
+web_logger = get_web_logger()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pawstar_secret_key_2026'
@@ -128,8 +131,11 @@ def check_session_timeout():
             session['last_activity'] = now_ts
 
 @app.after_request
-def add_no_cache_headers(response):
-    """ 로그아웃 및 비로그인 상태일 때 세션 및 사용자 관련 쿠키 완벽 제거 헤더 부여 """
+def add_no_cache_headers_and_log(response):
+    """ 
+    1. 로그아웃 및 비로그인 상태일 때 쿠키 완벽 제거 헤더 부여
+    2. 요구 규격 포맷에 맞추어 모든 페이지 접근 및 비동기 API 호출 영문 로깅 (pawstar-web.log)
+    """
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -140,6 +146,33 @@ def add_no_cache_headers(response):
             response.delete_cookie(k, path='/')
             response.delete_cookie(k, path='/m')
             response.delete_cookie(k)
+
+    # 정적 리소스 요청이 아닌 경우 접근 주소 및 비동기 호출 주소 로깅
+    path = request.path
+    if not path.startswith('/static') and path != '/favicon.ico':
+        try:
+            client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+            ip_hash = hash_ip(client_ip)
+            
+            is_mobile = path.startswith('/m') or (callable(globals().get('is_mobile_user_agent')) and is_mobile_user_agent())
+            device = 'MOBILE' if is_mobile else 'PC'
+            
+            full_url = request.full_path.rstrip('?')
+            is_async = (
+                path.startswith('/api/') or 
+                request.headers.get('X-Requested-With') == 'XMLHttpRequest' or
+                request.accept_mimetypes.best == 'application/json'
+            )
+            
+            if is_async:
+                msg = f"Async API request: {request.method} {full_url} - Status: {response.status_code}"
+            else:
+                msg = f"Page access: {request.method} {full_url} - Status: {response.status_code}"
+                
+            web_logger.info(msg, extra={'device': device, 'ip_hash': ip_hash})
+        except Exception as e:
+            web_logger.error(f"Failed to write access log: {e}", extra={'device': 'PC', 'ip_hash': hash_ip('127.0.0.1')})
+
     return response
 
 
