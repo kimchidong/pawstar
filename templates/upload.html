@@ -1110,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 1. 동물 종류 선택 체크
             if (!petType) {
-                alert('🐾 동물 종류를 선택해 주세요.');
+                alert('🐾 동물 종류를 선택해 주세요!');
                 const dropdown = document.getElementById('uploadPetTypeDropdown');
                 if (dropdown) window.toggleUploadPetDropdown(dropdown.querySelector('.custom-pet-trigger'));
                 return false;
@@ -1118,43 +1118,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 2. 이름 입력 체크
             if (!petName) {
-                alert('🐶 아이의 이름을 입력해 주세요.');
+                alert('🐶 아이 이름을 입력해 주세요!');
                 if (petNameEl) petNameEl.focus();
                 return false;
             }
             if (petName.length > 20) {
-                alert('🐶 아이의 이름은 20자 이내로 입력해 주세요.');
+                alert('🐶 아이 이름은 20자 이내로 입력해 주세요!');
                 if (petNameEl) petNameEl.focus();
                 return false;
             }
 
             // 3. 자랑 제목 입력 체크
             if (!title) {
-                alert('✨ 자랑 제목을 입력해 주세요.');
+                alert('✨ 자랑 제목을 입력해 주세요!');
                 if (titleEl) titleEl.focus();
                 return false;
             }
             if (title.length > 80) {
-                alert('✨ 자랑 제목은 80자 이내로 입력해 주세요.');
+                alert('✨ 자랑 제목은 80자 이내로 입력해 주세요!');
                 if (titleEl) titleEl.focus();
                 return false;
             }
 
             // 4. 자랑 내용 및 소개글 입력 체크
             if (!content) {
-                alert('📝 자랑 내용 및 소개글을 입력해 주세요.');
+                alert('📝 자랑 내용 및 소개글을 입력해 주세요!');
                 if (contentEl) contentEl.focus();
                 return false;
             }
             if (content.length > 100) {
-                alert('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요.');
+                alert('📝 자랑 내용 및 소개글은 100자 이내로 입력해 주세요!');
                 if (contentEl) contentEl.focus();
                 return false;
             }
 
             // 5. 출전 사진 파일 첨부 체크
             if (!hasFile) {
-                alert('🖼️ 출전 사진 파일(이미지)을 첨부해 주세요.');
+                alert('🖼️ 출전시킬 펫 이미지 파일을 첨부해 주세요!');
                 const dropzone = document.getElementById('pcCustomFileDropzone');
                 if (dropzone) dropzone.click();
                 return false;
@@ -1164,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const snsInstEl = document.getElementById('uploadSnsInst');
             const snsInst = snsInstEl ? snsInstEl.value.trim() : '';
             if (snsInst && snsInst.length > 200) {
-                alert('🔗 인스타그램 주소는 200자 이내로 입력해 주세요.');
+                alert('🔗 인스타그램 주소는 200자 이내로 입력해 주세요!');
                 if (snsInstEl) snsInstEl.focus();
                 return false;
             }
@@ -1173,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const snsYtbEl = document.getElementById('uploadSnsYtb');
             const snsYtb = snsYtbEl ? snsYtbEl.value.trim() : '';
             if (snsYtb && snsYtb.length > 200) {
-                alert('🔗 유튜브 주소는 200자 이내로 입력해 주세요.');
+                alert('🔗 유튜브 주소는 200자 이내로 입력해 주세요!');
                 if (snsYtbEl) snsYtbEl.focus();
                 return false;
             }
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const snsFsbEl = document.getElementById('uploadSnsFsb');
             const snsFsb = snsFsbEl ? snsFsbEl.value.trim() : '';
             if (snsFsb && snsFsb.length > 200) {
-                alert('🔗 페이스북 주소는 200자 이내로 입력해 주세요.');
+                alert('🔗 페이스북 주소는 200자 이내로 입력해 주세요!');
                 if (snsFsbEl) snsFsbEl.focus();
                 return false;
             }
@@ -1191,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const snsBlgEl = document.getElementById('uploadSnsBlg');
             const snsBlg = snsBlgEl ? snsBlgEl.value.trim() : '';
             if (snsBlg && snsBlg.length > 200) {
-                alert('🔗 블로그 주소는 200자 이내로 입력해 주세요.');
+                alert('🔗 블로그 주소는 200자 이내로 입력해 주세요!');
                 if (snsBlgEl) snsBlgEl.focus();
                 return false;
             }

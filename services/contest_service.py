@@ -1982,7 +1982,7 @@ class PawStarService:
                     return {
                         'success': False,
                         'is_author': True,
-                        'message': '💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾'
+                        'message': '본인의 게시물은 평가에 반영할 수 없습니다.'
                     }
 
                 cur.execute("""
@@ -2116,7 +2116,7 @@ class PawStarService:
                     return {
                         'success': False,
                         'is_author': True,
-                        'message': '💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾'
+                        'message': '본인의 게시물은 평가에 반영할 수 없습니다.'
                     }
 
                 # 1. DB에 댓글 먼저 저장

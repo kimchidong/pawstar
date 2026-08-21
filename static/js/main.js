@@ -373,7 +373,7 @@ async function triggerEvent(postId, eventType) {
         const postOwnerId = String(window.currentDetailPostData.ENT_USER_ID || window.currentDetailPostData.user_id || '').trim();
         if (curUserId && postOwnerId && curUserId === postOwnerId) {
             if (eventType === 'like' || eventType === 'unlike' || eventType === 'toggle_like') {
-                showToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
+                showToast('본인의 게시물은 평가에 반영할 수 없습니다.', 'warning');
                 return false;
             }
         }
@@ -401,7 +401,7 @@ async function triggerEvent(postId, eventType) {
             }
 
             if (res.require_login) {
-                showToast(res.message || '로그인이 필요한 서비스입니다.', 'warning');
+                showToast(res.message || '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'warning');
                 window.location.href = '/auth/google';
             } else if (res.is_owner || res.is_author) {
                 if (eventType === 'like') {
@@ -623,22 +623,10 @@ async function runAwardBatch(contestId) {
     }
 }
 
-/** 토스트 메시지 팝업 */
+/** 토스트 메시지 팝업 대신 alert 팝업으로 출력 */
 function showToast(message) {
-    const existing = document.querySelector('.toast-notification');
-    if (existing) existing.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.innerHTML = `<i class="fa-solid fa-sparkles"></i> <span>${message}</span>`;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.4s ease';
-        setTimeout(() => toast.remove(), 400);
-    }, 2500);
+    if (!message) return;
+    alert(message);
 }
 
 // 전역 post 데이터 레지스트리
@@ -1250,7 +1238,7 @@ async function openDetailModal(post, isHallOfFame = false) {
         const curUserId = String(window.CURRENT_USER_ID || '').trim();
         const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
         if (curUserId && postOwnerId && curUserId === postOwnerId) {
-            showToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
+            showToast('본인의 게시물은 평가에 반영할 수 없습니다.', 'warning');
             return;
         }
 
@@ -1334,22 +1322,10 @@ async function runAwardBatch(contestId) {
     }
 }
 
-/** 토스트 메시지 팝업 */
+/** 토스트 메시지 팝업 대신 alert 팝업으로 출력 */
 function showToast(message) {
-    const existing = document.querySelector('.toast-notification');
-    if (existing) existing.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.innerHTML = `<i class="fa-solid fa-sparkles"></i> <span>${message}</span>`;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.4s ease';
-        setTimeout(() => toast.remove(), 400);
-    }, 2500);
+    if (!message) return;
+    alert(message);
 }
 
 // 전역 post 데이터 레지스트리
@@ -1767,11 +1743,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
 
     try {
         await navigator.clipboard.writeText(shareUrl);
-        if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-        } else {
-            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
-        }
+        alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
     } catch (err) {
         const tempInput = document.createElement('input');
         tempInput.value = shareUrl;
@@ -1779,11 +1751,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         tempInput.select();
         document.execCommand('copy');
         document.body.removeChild(tempInput);
-        if (typeof showToast === 'function') {
-            showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-        } else {
-            alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
-        }
+        alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
     }
 }
 

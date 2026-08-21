@@ -1333,10 +1333,10 @@ def api_profile_update():
     data = request.json or {}
     user_id = get_current_user_id() or data.get('user_id', '').strip()
     if not user_id:
-        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
+        return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
     nickname = (data.get('nickname') or '').strip().replace('\r\n', '\n').replace('\r', '\n')
     if not nickname:
-        return jsonify({'success': False, 'message': '🐶 집사 닉네임을 입력해 주세요.'}), 400
+        return jsonify({'success': False, 'message': '집사 닉네임을 입력해 주세요.'}), 400
     if len(nickname) > 10:
         return jsonify({'success': False, 'message': '🐶 집사 닉네임은 10자 이내로 입력해 주세요.'}), 400
     profile_img = data.get('profile_img')
@@ -1421,7 +1421,7 @@ def post_event():
         user_id = session.get('user_id')
 
         if not user_id:
-            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요! 🐾', 'require_login': True}), 401
+            return jsonify({'success': False, 'message': '로그인이 필요한 서비스입니다. 먼저 로그인해주세요!', 'require_login': True}), 401
 
         if not post_id or not event_type:
             return jsonify({'success': False, 'message': '잘못된 요청입니다.'}), 200
@@ -1442,7 +1442,7 @@ def delete_post_entry():
     try:
         user_id = get_current_user_id()
         if not user_id:
-            return jsonify({'success': False, 'message': '로그인이 필요합니다. 먼저 로그인해 주세요! 🐾', 'require_login': True}), 401
+            return jsonify({'success': False, 'message': '로그인이 필요합니다. 먼저 로그인해 주세요!', 'require_login': True}), 401
 
         data = request.get_json() or {}
         post_id = data.get('post_id')

@@ -1123,6 +1123,7 @@ function submitMobileDetailComment() {
         }
         
         inputEl.value = '';
+        alert('한줄 댓글 작성 완료! (+10점 반영)');
         
         window.currentMobileDetailPostIsCommented = true;
         if (window.currentMobileDetailPost) {
@@ -1309,11 +1310,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
     if (!webShareDone) {
         try {
             await navigator.clipboard.writeText(shareUrl);
-            if (typeof showToast === 'function') {
-                showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-            } else {
-                alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
-            }
+            alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
         } catch (err) {
             const tempInput = document.createElement('input');
             tempInput.value = shareUrl;
@@ -1321,11 +1318,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            if (typeof showToast === 'function') {
-                showToast('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
-            } else {
-                alert(`🔗 전용 공유주소가 복사되었습니다!\n${shareUrl}`);
-            }
+            alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
         }
     }
 }
@@ -1721,11 +1714,15 @@ window.selectMobileSortOption = selectMobileSortOption;
 window.selectMobilePetType = selectMobilePetType;
 window.fetchMobilePostsAjax = fetchMobilePostsAjax;
 
+function showMobileToast(message) {
+    if (!message) return;
+    alert(message);
+}
+window.showMobileToast = showMobileToast;
+
 async function triggerMobileEvent(postId, eventType) {
-    const mToast = (msg, type = 'warning') => {
-        if (typeof showMobileToast === 'function') showMobileToast(msg, type);
-        else if (typeof showToast === 'function') showToast(msg, type);
-        else alert(msg);
+    const mToast = (msg) => {
+        alert(msg);
     };
 
     if (!window.isUserLoggedIn) {
@@ -1743,7 +1740,7 @@ async function triggerMobileEvent(postId, eventType) {
         const mUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
         if (mUserId && entUserId && mUserId === entUserId) {
             if (eventType === 'like' || eventType === 'unlike' || eventType === 'toggle_like') {
-                mToast('💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
+                mToast('본인의 게시물은 평가에 반영할 수 없습니다.', 'warning');
                 return;
             }
         }

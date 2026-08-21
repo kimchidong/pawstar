@@ -752,25 +752,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function showCustomToast(message, iconClass = 'fa-circle-exclamation') {
-        let toast = document.getElementById('pawCustomToast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'pawCustomToast';
-            toast.className = 'paw-custom-toast-container';
-            toast.innerHTML = `<i id="pawCustomToastIcon" class="fa-solid ${iconClass} paw-custom-toast-icon"></i><span id="pawCustomToastMsg"></span>`;
-            document.body.appendChild(toast);
-        }
-        const msgEl = document.getElementById('pawCustomToastMsg');
-        const iconEl = document.getElementById('pawCustomToastIcon');
-        if (msgEl) msgEl.textContent = message;
-        if (iconEl && iconClass) iconEl.className = `fa-solid ${iconClass} paw-custom-toast-icon`;
-
-        toast.classList.add('show');
-        clearTimeout(window.pawToastTimer);
-        window.pawToastTimer = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3200);
+    function showCustomToast(message) {
+        if (!message) return;
+        alert(message);
     }
 
     function highlightInvalidField(element) {
