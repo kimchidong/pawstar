@@ -769,10 +769,16 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
                     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
-                    const isViewAct = isUserLoggedIn && !isMinePost;
-                    mBtnViewPopup.classList.toggle('active', isViewAct);
-                    const icon = mBtnViewPopup.querySelector('i');
-                    if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+                    const isViewAct = isUserLoggedIn && !isMinePost && !!(data.actions && data.actions.is_viewed);
+                    if (isViewAct) {
+                        mBtnViewPopup.classList.add('active');
+                        const icon = mBtnViewPopup.querySelector('i');
+                        if (icon) icon.className = 'fa-solid fa-eye';
+                    } else {
+                        mBtnViewPopup.classList.remove('active');
+                        const icon = mBtnViewPopup.querySelector('i');
+                        if (icon) icon.className = 'fa-regular fa-eye';
+                    }
                 }
             }
         })
@@ -781,8 +787,8 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 
-    // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거 (단, 본인 게시물이 아닐 때만)
-    if (postData.post_id && !isMinePost) {
+    // 모바일 상세 팝업 열릴 때 자동 조회수(+1) 이벤트 트리거 (단, 진행 중 회차 + 본인 게시물이 아닐 때만)
+    if (!isClosedRound && postData.post_id && !isMinePost) {
         triggerMobileEvent(postData.post_id, 'view');
     }
 
@@ -829,7 +835,8 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                   document.querySelector(`[data-ent-user-id="${mCleanId}"]`);
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
-    if (isUserLoggedIn && !isMinePost) {
+    const isViewed = !!(postData.is_viewed || (postData.actions && postData.actions.is_viewed) || (mCard && mCard.querySelector('.btn-view.active')));
+    if (isUserLoggedIn && !isMinePost && isViewed) {
         if (mCard) {
             const mBtnView = mCard.querySelector('.btn-view');
             if (mBtnView) {
@@ -1914,6 +1921,9 @@ async function triggerMobileEvent(postId, eventType) {
                 }
             }
         } else {
+            if (resData.is_ended || data.is_ended) {
+                return;
+            }
             if (typeof showToast === 'function') showToast(data.message || resData.message || '요청 처리 실패', 'warning');
         }
     } catch (err) {

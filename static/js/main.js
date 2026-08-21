@@ -408,8 +408,8 @@ async function triggerEvent(postId, eventType) {
                     showToast(res.message || '💡 본인의 게시물은 평가에 반영할 수 없습니다. 🐾', 'warning');
                 }
                 return false;
-            } else if (res.already_viewed) {
-                // 이미 조회한 글인 경우 조용히 무시
+            } else if (res.already_viewed || res.is_ended) {
+                // 이미 조회했거나 마감된 회차인 경우 조용히 무시
                 return false;
             } else {
                 showToast(res.message || '요청 처리 실패', 'warning');
@@ -535,7 +535,7 @@ async function triggerEvent(postId, eventType) {
             const curUserId = String(window.CURRENT_USER_ID || '').trim();
             const postOwnerId = String((window.currentDetailPostData || {}).ENT_USER_ID || (window.currentDetailPostData || {}).user_id || '').trim();
             const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
-            const isViewAct = isUserLoggedIn && !isMine;
+            const isViewAct = isUserLoggedIn && !isMine && (data.is_viewed === true || data.is_viewed === undefined);
 
             const detailBtnViewPopup = document.getElementById('detailBtnView');
             if (detailBtnViewPopup) {
@@ -782,7 +782,7 @@ async function openDetailModal(post, isHallOfFame = false) {
     const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
-    const isViewAct = isUserLoggedIn && !isMine;
+    const isViewAct = isUserLoggedIn && !isMine && !!(post.is_viewed || (post.actions && post.actions.is_viewed) || (card && card.querySelector('.btn-view.active')));
 
     if (card) {
         const btnView = card.querySelector('.btn-view');
@@ -988,6 +988,25 @@ async function openDetailModal(post, isHallOfFame = false) {
     window.currentDetailPost = post;
     window.currentDetailPostData = post;
     window.currentDetailPostIsCommented = isCommented;
+
+    const curUserIdVal = String(window.CURRENT_USER_ID || '').trim();
+    const postOwnerIdVal = String(post.ENT_USER_ID || post.user_id || '').trim();
+    const isMineVal = !!(curUserIdVal && postOwnerIdVal && curUserIdVal === postOwnerIdVal);
+    const isUserLoggedInVal = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
+    const isViewActiveVal = isUserLoggedInVal && !isMineVal && !!((card && card.querySelector('.btn-view.active')) || (post.actions && post.actions.is_viewed) || post.is_viewed);
+
+    btnViewPopup = document.getElementById('detailBtnView');
+    if (btnViewPopup) {
+        if (isViewActiveVal) {
+            btnViewPopup.classList.add('active');
+            const icon = btnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-solid fa-eye';
+        } else {
+            btnViewPopup.classList.remove('active');
+            const icon = btnViewPopup.querySelector('i');
+            if (icon) icon.className = 'fa-regular fa-eye';
+        }
+    }
 
     btnCommentPopup = document.getElementById('detailBtnComment');
     if (btnCommentPopup) {
@@ -1195,7 +1214,7 @@ async function openDetailModal(post, isHallOfFame = false) {
         const btnView = document.getElementById('detailBtnView');
         if (btnView) {
             const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
-            const isViewActive = isUserLoggedIn && !isMine && !isClosedRound;
+            const isViewActive = isUserLoggedIn && !isMine && !!viewedState;
             btnView.classList.toggle('active', isViewActive);
             const icon = btnView.querySelector('i');
             if (icon) icon.className = isViewActive ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
