@@ -1005,10 +1005,10 @@ function renderMobileDetailComments(comments) {
         return `
             <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 10px; padding: 0.4rem 0.6rem; font-size: 0.78rem; display: flex; flex-direction: column; gap: 0.15rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 0.3rem; font-weight: 800; color: var(--text-primary);">
+                    <a href="${cUserId ? `/profile?user_id=${encodeURIComponent(cUserId)}` : 'javascript:void(0)'}" style="display: flex; align-items: center; gap: 0.3rem; font-weight: 800; color: var(--text-primary); text-decoration: none; cursor: ${cUserId ? 'pointer' : 'default'}; transition: opacity 0.2s;" ${cUserId ? `title="${escapeHtml(cNickname || '집사')} 님의 프로필 보기"` : ''} onmouseover="if('${cUserId}') this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
                         <img src="${c.user_profile || '/static/image/profile/default_profile.png'}" style="width: 16px; height: 16px; border-radius: 50%; object-fit: cover;">
                         <span>${escapeHtml(c.user_nickname || '집사')}</span>
-                    </div>
+                    </a>
                     <div style="display: flex; align-items: center; gap: 0.4rem;">
                         <span style="font-size: 0.68rem; color: var(--text-muted);">${formatTimeAgo(c.created_at || c.ENT_DT || c.CMT_DT || '')}</span>
                         ${deleteBtnHtml}
