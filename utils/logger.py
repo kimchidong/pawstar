@@ -34,12 +34,7 @@ def setup_logger(logger_name, log_dir, log_filename):
     """
     하루 단위 로테이팅 (when='D', interval=1), 총 7일 (1주일) 보관 (backupCount=7) 로거 생성
     """
-    try:
-        os.makedirs(log_dir, exist_ok=True)
-    except Exception:
-        log_dir = "log/web" if "web" in log_filename else "log/batch"
-        os.makedirs(log_dir, exist_ok=True)
-        
+    os.makedirs(log_dir, exist_ok=True)
     log_file_path = os.path.join(log_dir, log_filename)
     
     logger = logging.getLogger(logger_name)
@@ -62,60 +57,49 @@ def setup_logger(logger_name, log_dir, log_filename):
         
     return logger
 
-def _load_config_module(mod_name):
-    """ config.web 또는 config.batch 모듈을 안정적으로 동적 로드 """
+def _load_config_module(mod_filename):
+    """ config.web.py 또는 config.batch.py 모듈을 spec_from_file_location으로 정확하게 동적 로드 """
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(curr_dir)
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-        
-    try:
-        return importlib.import_module(mod_name)
-    except Exception:
-        config_path = os.path.join(project_root, f"{mod_name}.py")
-        if os.path.exists(config_path):
-            spec = importlib.util.spec_from_file_location(mod_name, config_path)
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            return mod
+    
+    candidates = [
+        os.path.join(project_root, mod_filename),
+        os.path.join(os.getcwd(), mod_filename)
+    ]
+    
+    for path in candidates:
+        if os.path.exists(path):
+            try:
+                module_alias = mod_filename.replace('.', '_')
+                spec = importlib.util.spec_from_file_location(module_alias, path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                return mod
+            except Exception as e:
+                print(f"Error loading {path}: {e}")
+                
     return None
 
 def get_web_logger():
     """ 
-    웹 전용 로거 (pawstar-web.log)
-    디렉터리 감지 우선순위:
-    1. /svc/log/pawstar/web (운영 경로 존재 시 최우선 사용)
-    2. config.web.py의 LOG_DIR
-    3. log/web (기본 상대경로)
+    config.web.py에 정의된 LOG_DIR(APP_ENV 환경에 따른 local/prd 구분)을 정직하게 참조하는 웹 전용 로거
     """
-    prd_path = "/svc/log/pawstar/web"
-    if os.path.exists(prd_path) or os.getenv("APP_ENV") == "prd":
-        log_dir = prd_path
+    config_web = _load_config_module("config.web.py")
+    if config_web and hasattr(config_web, "LOG_DIR"):
+        log_dir = config_web.LOG_DIR
     else:
-        config_web = _load_config_module("config.web")
-        if config_web and hasattr(config_web, "LOG_DIR"):
-            log_dir = config_web.LOG_DIR
-        else:
-            log_dir = "log/web"
+        log_dir = "log/web"
             
     return setup_logger('pawstar_web_logger', log_dir, 'pawstar-web.log')
 
 def get_batch_logger():
     """ 
-    배치 전용 로거 (pawstar-batch.log)
-    디렉터리 감지 우선순위:
-    1. /svc/log/pawstar/batch (운영 경로 존재 시 최우선 사용)
-    2. config.batch.py의 LOG_DIR
-    3. log/batch (기본 상대경로)
+    config.batch.py에 정의된 LOG_DIR(APP_ENV 환경에 따른 local/prd 구분)을 정직하게 참조하는 배치 전용 로거
     """
-    prd_path = "/svc/log/pawstar/batch"
-    if os.path.exists(prd_path) or os.getenv("APP_ENV") == "prd":
-        log_dir = prd_path
+    config_batch = _load_config_module("config.batch.py")
+    if config_batch and hasattr(config_batch, "LOG_DIR"):
+        log_dir = config_batch.LOG_DIR
     else:
-        config_batch = _load_config_module("config.batch")
-        if config_batch and hasattr(config_batch, "LOG_DIR"):
-            log_dir = config_batch.LOG_DIR
-        else:
-            log_dir = "log/batch"
+        log_dir = "log/batch"
             
     return setup_logger('pawstar_batch_logger', log_dir, 'pawstar-batch.log')
