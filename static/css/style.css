@@ -3598,6 +3598,12 @@ option.opt-closed {
 #mDetailImg {
     border-radius: inherit !important;
     clip-path: inset(0) !important;
+    background-color: #ffffff !important;
+}
+
+.detail-media-container {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
 }
 
 /* PC 상세 모달 우측 스크롤 영역: 서서히 페이드 인/아웃(Fade Effect) 되는 파스텔 스크롤바 */

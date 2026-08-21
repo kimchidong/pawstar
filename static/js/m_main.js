@@ -382,7 +382,24 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const mPopupSrc = postData.popup_image_path || postData.IMAGE_PATH || postData.image_path || postData.media_url || 
         ((postData.file_path && postData.list_file_name) ? (postData.file_path.endsWith('/') ? postData.file_path : postData.file_path + '/') + postData.list_file_name : '');
-    document.getElementById('mDetailImg').src = mPopupSrc;
+    const mImgEl = document.getElementById('mDetailImg');
+    if (mImgEl) {
+        mImgEl.style.opacity = '0';
+        mImgEl.style.transition = 'opacity 0.2s ease-in-out';
+        mImgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
+        if (mPopupSrc) {
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                mImgEl.src = mPopupSrc;
+                mImgEl.style.opacity = '1';
+            };
+            tempImg.src = mPopupSrc;
+            if (tempImg.complete) {
+                mImgEl.src = mPopupSrc;
+                mImgEl.style.opacity = '1';
+            }
+        }
+    }
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
     
@@ -886,6 +903,11 @@ function closeMobileDetailModal() {
         detailModal.style.display = '';
         resetMobileModalScroll();
         document.body.style.overflow = '';
+    }
+    const mImgEl = document.getElementById('mDetailImg');
+    if (mImgEl) {
+        mImgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
+        mImgEl.style.opacity = '0';
     }
 }
 

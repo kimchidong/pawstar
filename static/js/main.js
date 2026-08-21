@@ -854,7 +854,21 @@ async function openDetailModal(post, isHallOfFame = false) {
     const imgSrc = post.popup_image_path || post.POPUP_IMAGE_PATH || post.IMAGE_PATH || post.image_path || post.media_url || 
         ((post.file_path && post.list_file_name) ? (post.file_path.endsWith('/') ? post.file_path : post.file_path + '/') + post.list_file_name : '');
     if (imgEl) {
-        imgEl.src = imgSrc;
+        imgEl.style.opacity = '0';
+        imgEl.style.transition = 'opacity 0.2s ease-in-out';
+        imgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
+        if (imgSrc) {
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                imgEl.src = imgSrc;
+                imgEl.style.opacity = '1';
+            };
+            tempImg.src = imgSrc;
+            if (tempImg.complete) {
+                imgEl.src = imgSrc;
+                imgEl.style.opacity = '1';
+            }
+        }
     }
 
     const authorImgEl = document.getElementById('detailAuthorImg');
@@ -1365,6 +1379,11 @@ function closeDetailModal() {
         modal.style.display = '';
         resetPcModalScroll();
         document.body.style.overflow = '';
+    }
+    const imgEl = document.getElementById('detailImg');
+    if (imgEl) {
+        imgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
+        imgEl.style.opacity = '0';
     }
 }
 window.closeDetailModal = closeDetailModal;
