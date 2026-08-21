@@ -716,7 +716,8 @@ def route_share():
                 (post.get('STATUS_CD') == 'G001C002') or 
                 (post.get('CONTEST_STAT') == 'G001C002')
             )
-            session['share_info']['is_closed'] = is_closed
+            if 'share_info' in session and session['share_info']:
+                session['share_info']['is_closed'] = is_closed
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(

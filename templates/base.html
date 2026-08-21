@@ -9,7 +9,19 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
-    <meta property="og:image" content="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <!-- Open Graph & SNS 공유 메타태그 설정 -->
+    {% block og_meta %}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="포스타">
+    <meta property="og:title" content="포스타 - 반려동물도 스타가 될 수 있다">
+    <meta property="og:description" content="반려동물 스타 콘테스트 포스타(Paw Star)에서 여러분의 소중한 아이를 자랑해 보세요! 🌟">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="포스타 - 반려동물도 스타가 될 수 있다">
+    <meta name="twitter:description" content="반려동물 스타 콘테스트 포스타(Paw Star)에서 여러분의 소중한 아이를 자랑해 보세요! 🌟">
+    <meta name="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    {% endblock %}
     <!-- FontAwesome icons & Google Script Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">

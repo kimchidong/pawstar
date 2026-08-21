@@ -1,5 +1,37 @@
 {% extends "base.html" %}
 
+{% block og_meta %}
+{% if post %}
+    {% set pet_name = post.pet_name or post.PET_NM or '반려동물' %}
+    {% set post_title = post.title or '반려동물 콘테스트 출전작' %}
+    {% set raw_img = post.image_path or post.PHT_FILE_PATH1 or post.PHT_FILE_PATH or '/static/image/contest/default_pet.jpg' %}
+    {% if raw_img.startswith('http://') or raw_img.startswith('https://') %}
+        {% set og_img = raw_img %}
+    {% else %}
+        {% set og_img = request.url_root.rstrip('/') + (raw_img if raw_img.startswith('/') else '/' + raw_img) %}
+    {% endif %}
+    {% set og_desc = (post.content or '자랑스러운 반려동물의 출전작에 응원해 보세요! 🌟') | replace('\r', '') | replace('\n', ' ') | truncate(120) %}
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="포스타">
+    <meta property="og:title" content="[포스타 🐾] {{ pet_name }} - {{ post_title }}">
+    <meta property="og:description" content="{{ og_desc }}">
+    <meta property="og:image" content="{{ og_img }}">
+    <meta property="og:image:secure_url" content="{{ og_img }}">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
+    <meta property="og:url" content="{{ request.url }}">
+
+    <!-- Twitter / Kakao preview cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="[포스타 🐾] {{ pet_name }} - {{ post_title }}">
+    <meta name="twitter:description" content="{{ og_desc }}">
+    <meta name="twitter:image" content="{{ og_img }}">
+{% else %}
+    {{ super() }}
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div style="max-width: 800px; margin: 2.5rem auto; padding: 0 1rem;">
 
