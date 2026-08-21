@@ -14,9 +14,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/m_style.css') }}?v=20260813_14">
     <!-- 모바일/브라우저 전용 앱 로고 아이콘 및 파비콘 설정 -->
     <link rel="manifest" href="/static/manifest.json">
-    <link rel="icon" type="image/jpeg" href="/static/image/app/app_logo_icon.jpg">
-    <link rel="apple-touch-icon" href="/static/image/app/app_logo_icon.jpg">
-    <meta property="og:image" content="/static/image/app/app_logo_icon.jpg">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
     <script>
         window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
         window.CURRENT_USER_ID = "{{ current_user.user_id if current_user else '' }}";

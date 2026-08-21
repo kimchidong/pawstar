@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paw Star - 반려동물도 스타가 될 수 있다 🌟</title>
+    <!-- 브라우저 파비콘 / 앱 아이콘 설정 -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <meta property="og:image" content="{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
     <!-- FontAwesome icons & Google Script Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">

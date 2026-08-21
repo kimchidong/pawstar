@@ -9,7 +9,7 @@ import uuid
 import shutil
 import random
 import requests
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response, flash, send_from_directory
 from werkzeug.utils import secure_filename
 from services.contest_service import service
 
@@ -141,6 +141,15 @@ def add_no_cache_headers(response):
             response.delete_cookie(k, path='/m')
             response.delete_cookie(k)
     return response
+
+
+@app.route('/favicon.ico')
+def favicon():
+    """ 브라우저 아이콘(favicon) 제공 """
+    fav_path = os.path.join(app.root_path, 'static')
+    if os.path.exists(os.path.join(fav_path, 'favicon.ico')):
+        return send_from_directory(fav_path, 'favicon.ico', mimetype='image/x-icon')
+    return send_from_directory(os.path.join(app.root_path, 'static', 'image', 'app'), 'app_logo_icon.png', mimetype='image/png')
 
 
 @app.context_processor
