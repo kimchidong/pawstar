@@ -57,9 +57,15 @@
         <h2 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.5px;">
             자랑스러운 반려동물의 출전작에 응원해 보세요!
         </h2>
+        {% if is_closed or post.is_closed or post.closed or post.STATUS_CD == 'G001C002' %}
+        <p style="font-size: 0.95rem; opacity: 0.95; font-weight: 500; margin: 0;">
+            종료된 과거 회차의 출전작입니다. <strong style="color: #fef08a; font-size: 1.05rem;">종료된 회차는 공유 평가 요소 및 점수가 가산되지 않습니다.</strong> 🐾
+        </p>
+        {% else %}
         <p style="font-size: 0.95rem; opacity: 0.95; font-weight: 500; margin: 0;">
             이 링크를 통해 회원가입 하시면 해당 게시물에 <strong style="color: #fef08a; font-size: 1.05rem;">공유 점수 +10점</strong>이 즉시 선물로 적립됩니다! 🐾
         </p>
+        {% endif %}
     </div>
 
     <!-- 2. 단독 게시물 카드 -->
@@ -131,7 +137,7 @@
                         <i class="fa-{% if is_logged_in and post.actions and post.actions.is_commented %}solid{% else %}regular{% endif %} fa-comment" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.comment_count or post.CMT_CNT or 0) }}</span>
                     </div>
-                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" style="border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: default; min-width: 68px;" title="공유 가입 수">
+                    <div class="action-btn btn-share {% if is_logged_in and post.actions and post.actions.is_shared %}active{% endif %}" onclick="event.stopPropagation(); copyPostShareUrl('{{ contest_round or post.contest_round or post.CONTEST_ROUND }}', '{{ round_no or post.round_no or post.ROUND_NO }}', '{{ share_sn or post.share_sn or post.SHARE_SN }}');" style="border-radius: 14px; padding: 0.65rem 0.9rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; cursor: pointer; min-width: 68px;" title="공유 가입 수">
                         <i class="fa-solid fa-share-nodes" style="font-size: 1.1rem;"></i>
                         <span style="font-weight: 800; font-size: 0.92rem;">{{ "{:,}".format(post.share_count or post.SHARE_CNT or 0) }}</span>
                     </div>

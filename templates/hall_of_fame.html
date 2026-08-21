@@ -256,7 +256,7 @@
                                             <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수" onclick="event.stopPropagation(); copyPostShareUrl('{{ star.CONTEST_ROUND or star.contest_id }}', '{{ star.ROUND_NO or star.round_no }}', '{{ star.SHARE_SN or star.share_sn }}');" style="cursor: pointer;">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>
@@ -407,7 +407,7 @@
                                             <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수" onclick="event.stopPropagation(); copyPostShareUrl('{{ star.CONTEST_ROUND or star.contest_id }}', '{{ star.ROUND_NO or star.round_no }}', '{{ star.SHARE_SN or star.share_sn }}');" style="cursor: pointer;">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>
@@ -559,7 +559,7 @@
                                             <i class="fa-{% if is_cmt_act %}solid{% else %}regular{% endif %} fa-comment" style="color: #8b5cf6;"></i>
                                             <span class="count">{{ "{:,}".format((star.CMT_CNT or star.comment_count or 0)|int) }}</span>
                                         </div>
-                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수">
+                                        <div class="hof-action-item btn-share {% if is_share_act %}active{% endif %}" title="공유 가입 수" onclick="event.stopPropagation(); copyPostShareUrl('{{ star.CONTEST_ROUND or star.contest_id }}', '{{ star.ROUND_NO or star.round_no }}', '{{ star.SHARE_SN or star.share_sn }}');" style="cursor: pointer;">
                                             <i class="fa-solid fa-share-nodes" style="color: #10b981;"></i>
                                             <span class="count">{{ "{:,}".format((star.SHARE_CNT or star.share_count or 0)|int) }}</span>
                                         </div>

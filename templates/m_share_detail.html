@@ -57,9 +57,15 @@
         <h2 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.35rem; letter-spacing: -0.5px;">
             자랑스러운 반려동물의 출전작!
         </h2>
+        {% if is_closed or post.is_closed or post.closed or post.STATUS_CD == 'G001C002' %}
+        <p style="font-size: 0.82rem; opacity: 0.95; font-weight: 500; margin: 0;">
+            종료된 과거 회차 출전작입니다. <strong style="color: #fef08a; font-size: 0.88rem;">종료된 회차는 공유 평가 요소 및 점수가 가산되지 않습니다.</strong> 🐾
+        </p>
+        {% else %}
         <p style="font-size: 0.82rem; opacity: 0.95; font-weight: 500; margin: 0;">
             회원가입 시 해당 게시물에 <strong style="color: #fef08a; font-size: 0.92rem;">공유 점수 +10점</strong>이 적립됩니다! 🐾
         </p>
+        {% endif %}
     </div>
 
     <!-- 2. 단독 게시물 카드 -->

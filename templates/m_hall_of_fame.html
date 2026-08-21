@@ -154,7 +154,7 @@
                                         <span style="{{ 'color: #0284c7; font-weight: 900;' if is_view_act else '' }}">👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · 
                                         <span style="{{ 'color: #e11d48; font-weight: 900;' if is_like_act else '' }}">❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · 
                                         <span style="{{ 'color: #7c3aed; font-weight: 900;' if is_cmt_act else '' }}">💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · 
-                                        <span style="display: inline-flex; align-items: center; gap: 0.15rem; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
+                                        <span onclick="event.stopPropagation(); copyPostShareUrl('{{ w.CONTEST_ROUND or w.contest_id }}', '{{ w.ROUND_NO or w.round_no }}', '{{ w.SHARE_SN or w.share_sn }}');" style="display: inline-flex; align-items: center; gap: 0.15rem; cursor: pointer; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
                                     </span>
                                 </div>
                             </div>
@@ -283,7 +283,7 @@
                                         <span style="{{ 'color: #0284c7; font-weight: 900;' if is_view_act else '' }}">👁️ {{ "{:,}".format(w.VW_CNT or w.view_count or 0) }}</span> · 
                                         <span style="{{ 'color: #e11d48; font-weight: 900;' if is_like_act else '' }}">❤️ {{ "{:,}".format(w.LIKE_CNT or w.like_count or 0) }}</span> · 
                                         <span style="{{ 'color: #7c3aed; font-weight: 900;' if is_cmt_act else '' }}">💬 {{ "{:,}".format(w.CMT_CNT or w.comment_count or 0) }}</span> · 
-                                        <span style="display: inline-flex; align-items: center; gap: 0.15rem; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
+                                        <span onclick="event.stopPropagation(); copyPostShareUrl('{{ w.CONTEST_ROUND or w.contest_id }}', '{{ w.ROUND_NO or w.round_no }}', '{{ w.SHARE_SN or w.share_sn }}');" style="display: inline-flex; align-items: center; gap: 0.15rem; cursor: pointer; {{ 'color: #15803d; font-weight: 900;' if is_share_act else '' }}"><i class="fa-solid fa-share-nodes" style="color: {{ '#15803d' if is_share_act else '#6366f1' }}; font-size: 0.54rem; transform: translateY(1px);"></i> {{ "{:,}".format(w.SHARE_CNT or w.share_count or 0) }}</span>
                                     </span>
                                 </div>
                             </div>

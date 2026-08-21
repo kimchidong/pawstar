@@ -727,14 +727,31 @@ async function openDetailModal(post, isHallOfFame = false) {
         if (commentFormContainer) commentFormContainer.style.display = 'none';
         if (commentScoreNotice) commentScoreNotice.style.display = 'none';
         if (heartLikeBtn) heartLikeBtn.style.display = 'none';
-        if (shareIconBtn) shareIconBtn.style.display = 'none';
-        [btnViewPopup, btnLike, btnCommentPopup, btnSharePopup].forEach(el => {
+        if (shareIconBtn) {
+            shareIconBtn.style.display = 'inline-flex';
+            shareIconBtn.style.pointerEvents = 'auto';
+            shareIconBtn.style.cursor = 'pointer';
+            shareIconBtn.onclick = function(e) {
+                if (e) e.stopPropagation();
+                handleShareClick();
+            };
+        }
+        [btnViewPopup, btnLike, btnCommentPopup].forEach(el => {
             if (el) {
                 el.style.display = 'flex';
                 el.style.pointerEvents = 'none';
                 el.style.cursor = 'default';
             }
         });
+        if (btnSharePopup) {
+            btnSharePopup.style.display = 'flex';
+            btnSharePopup.style.pointerEvents = 'auto';
+            btnSharePopup.style.cursor = 'pointer';
+            btnSharePopup.onclick = function(e) {
+                if (e) e.stopPropagation();
+                handleShareClick();
+            };
+        }
     } else {
         if (commentFormContainer) commentFormContainer.style.display = 'flex';
         if (commentScoreNotice) commentScoreNotice.style.display = '';
@@ -1761,6 +1778,14 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         }
     }
 
+    let isClosedContest = false;
+    if (window.currentDetailPostData) {
+        const p = window.currentDetailPostData;
+        if (p.is_closed || p.closed || p.STATUS_CD === 'G001C002' || p.CONTEST_STAT === 'G001C002') {
+            isClosedContest = true;
+        }
+    }
+
     let shareUrl = '';
     if (contestRound && roundNo) {
         try {
@@ -1768,6 +1793,9 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
             const data = await res.json();
             if (data.success && data.share_url) {
                 shareUrl = data.share_url;
+                if (data.is_closed) {
+                    isClosedContest = true;
+                }
             }
         } catch (e) {
             console.error('copyPostShareUrl API error:', e);
@@ -1783,9 +1811,13 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         shareUrl = window.location.href;
     }
 
+    const alertMsg = isClosedContest 
+        ? '🔗 전용 공유주소가 복사되었습니다!' 
+        : '🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.';
+
     try {
         await navigator.clipboard.writeText(shareUrl);
-        alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+        alert(alertMsg);
     } catch (err) {
         const tempInput = document.createElement('input');
         tempInput.value = shareUrl;
@@ -1793,7 +1825,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn) {
         tempInput.select();
         document.execCommand('copy');
         document.body.removeChild(tempInput);
-        alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+        alert(alertMsg);
     }
 }
 

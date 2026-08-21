@@ -821,8 +821,16 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     if (isClosedRound) {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'none';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = 'none';
-        if (mShareIconBtn) mShareIconBtn.style.display = 'none';
-        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup, mBtnSharePopup].forEach(el => {
+        if (mShareIconBtn) {
+            mShareIconBtn.style.display = 'inline-flex';
+            mShareIconBtn.style.pointerEvents = 'auto';
+            mShareIconBtn.style.cursor = 'pointer';
+            mShareIconBtn.onclick = function(e) {
+                if (e) e.stopPropagation();
+                handleShareClick();
+            };
+        }
+        [mBtnViewPopup, mBtnLikePopup, mBtnCommentPopup].forEach(el => {
             if (el) {
                 el.style.display = 'flex';
                 el.style.pointerEvents = 'none';
@@ -830,6 +838,15 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 el.onclick = null;
             }
         });
+        if (mBtnSharePopup) {
+            mBtnSharePopup.style.display = 'flex';
+            mBtnSharePopup.style.pointerEvents = 'auto';
+            mBtnSharePopup.style.cursor = 'pointer';
+            mBtnSharePopup.onclick = function(e) {
+                if (e) e.stopPropagation();
+                handleShareClick();
+            };
+        }
     } else {
         if (mCommentFormContainer) mCommentFormContainer.style.display = 'flex';
         if (mCommentScoreNotice) mCommentScoreNotice.style.display = '';
@@ -1301,6 +1318,14 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
         }
     }
 
+    let isClosedContest = false;
+    if (window.currentMobileDetailPostData) {
+        const p = window.currentMobileDetailPostData;
+        if (p.is_closed || p.closed || p.STATUS_CD === 'G001C002' || p.CONTEST_STAT === 'G001C002') {
+            isClosedContest = true;
+        }
+    }
+
     let shareUrl = '';
     if (contestRound && roundNo) {
         try {
@@ -1308,6 +1333,9 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
             const data = await res.json();
             if (data.success && data.share_url) {
                 shareUrl = data.share_url;
+                if (data.is_closed) {
+                    isClosedContest = true;
+                }
             }
         } catch (e) {
             console.error('copyPostShareUrl API error:', e);
@@ -1339,9 +1367,13 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
     }
 
     if (!webShareDone) {
+        const alertMsg = isClosedContest 
+            ? '🔗 전용 공유주소가 복사되었습니다!' 
+            : '🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.';
+
         try {
             await navigator.clipboard.writeText(shareUrl);
-            alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+            alert(alertMsg);
         } catch (err) {
             const tempInput = document.createElement('input');
             tempInput.value = shareUrl;
@@ -1349,7 +1381,7 @@ async function copyPostShareUrl(contestRound, roundNo, shareSn, targetPostId) {
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            alert('🔗 전용 공유주소가 복사되었습니다!\n이 주소로 접근해 회원가입이나 로그인 시 공유점수 +10점이 적립됩니다.');
+            alert(alertMsg);
         }
     }
 }

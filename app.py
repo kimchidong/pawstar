@@ -425,9 +425,13 @@ def api_auth_login():
         return jsonify({'success': False, 'message': result}), 401
 
 def process_signup_share_referral(new_user_id=None):
-    """ 공유 링크 유입 가입/로그인 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 """
+    """ 공유 링크 유입 가입/로그인 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 (종료된 과거 회차는 철저히 차단) """
     share_info = session.get('share_info')
     if share_info and isinstance(share_info, dict):
+        if share_info.get('is_closed'):
+            session.pop('share_info', None)
+            return
+
         c_round = share_info.get('contest_round')
         r_no = share_info.get('round_no')
         s_sn = share_info.get('share_sn')
@@ -724,12 +728,34 @@ def route_share():
     is_closed = False
     post = None
     if contest_round and round_no:
-        # 1. 이미 로그인된 회원이 공유 주소로 유입된 경우: 공유 카운트 및 점수 즉시 가산
-        if current_user_id and share_sn:
-            try:
-                service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
-            except Exception as e:
-                print("route_share increment_share_count error:", e)
+        # 게시물 상세 정보 및 회차 종료 여부 먼저 파악
+        post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
+        if post:
+            is_closed = bool(
+                post.get('is_closed') or 
+                post.get('closed') or 
+                (post.get('STATUS_CD') == 'G001C002') or 
+                (post.get('CONTEST_STAT') == 'G001C002')
+            )
+
+        # 1. 진행 중인 회차인 경우에만 공유 가입/유입 점수 가산 및 세션 저장 허용 (지난 회차는 절대 반영 불가)
+        if is_closed:
+            session.pop('share_info', None)
+        else:
+            if current_user_id and share_sn:
+                try:
+                    service.increment_share_count_on_signup(int(contest_round), int(round_no), str(share_sn), user_id=current_user_id)
+                except Exception as e:
+                    print("route_share increment_share_count error:", e)
+
+            if share_sn:
+                session['share_info'] = {
+                    'contest_round': int(contest_round),
+                    'round_no': int(round_no),
+                    'share_sn': str(share_sn),
+                    'post_id': f"{contest_round}_{round_no}",
+                    'is_closed': False
+                }
 
         # 2. 로그인 여부 불문 조회수(+1) 무조건 즉시 반영 (IP 기준 익명 조회 기록 지원)
         try:
@@ -739,27 +765,6 @@ def route_share():
             service.increase_view_count(contest_round, round_no, view_user_id=current_user_id, client_ip=client_ip)
         except Exception as e:
             print("route_share increase_view_count error:", e)
-
-        # 3. 로그인 여부 불문 공유 유입 정보를 세션에 보존 (미로그인 유저가 가입/로그인 시 공유 점수 자동 반영)
-        if share_sn:
-            session['share_info'] = {
-                'contest_round': int(contest_round),
-                'round_no': int(round_no),
-                'share_sn': str(share_sn),
-                'post_id': f"{contest_round}_{round_no}"
-            }
-
-        # 최신 반영된 게시물 정보 (조회수, 공유수, 점수, actions 4요소) 가져오기
-        post = service.get_post_detail(contest_round, round_no, current_user_id, share_sn=share_sn)
-        if post:
-            is_closed = bool(
-                post.get('is_closed') or 
-                post.get('closed') or 
-                (post.get('STATUS_CD') == 'G001C002') or 
-                (post.get('CONTEST_STAT') == 'G001C002')
-            )
-            if 'share_info' in session and session['share_info']:
-                session['share_info']['is_closed'] = is_closed
 
     template_name = 'm_share_detail.html' if is_mobile else 'share_detail.html'
     return render_template(
@@ -816,12 +821,21 @@ def api_contest_share_url():
 
     base_url = request.host_url.rstrip('/')
     share_url = f"{base_url}/share?contest_round={contest_round}&round_no={round_no}&share_sn={share_sn}"
+
+    contest_obj = service.get_contest(contest_round)
+    is_closed = False
+    if contest_obj:
+        c_stat = str(contest_obj.get('CONTEST_STAT') or contest_obj.get('status') or '').strip()
+        if c_stat == 'G001C002' or '종료' in str(contest_obj.get('CONTEST_STAT_NM') or ''):
+            is_closed = True
+
     return jsonify({
         'success': True,
         'contest_round': int(contest_round),
         'round_no': int(round_no),
         'share_sn': share_sn,
-        'share_url': share_url
+        'share_url': share_url,
+        'is_closed': is_closed
     })
 
 # --- PC 전용 라우트 (1280px 고정) ---
