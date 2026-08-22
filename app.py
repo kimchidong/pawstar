@@ -154,6 +154,14 @@ def add_no_cache_headers_and_log(response):
             client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
             ip_hash = hash_ip(client_ip)
             
+            # 로그인 유저인 경우 user_id 앞 6자리로 USER-XXXXXX 태그 생성
+            user_id = session.get('user_id')
+            if user_id and not session.get('logged_out'):
+                u_str = str(user_id).strip()[:6]
+                user_tag = f"USER-{u_str}"
+            else:
+                user_tag = None
+            
             is_mobile = path.startswith('/m') or (callable(globals().get('is_mobile_user_agent')) and is_mobile_user_agent())
             device = 'MOBILE' if is_mobile else 'PC'
             
@@ -169,9 +177,9 @@ def add_no_cache_headers_and_log(response):
             else:
                 msg = f"Page access: {request.method} {full_url} - Status: {response.status_code}"
                 
-            web_logger.info(msg, extra={'device': device, 'ip_hash': ip_hash})
+            web_logger.info(msg, extra={'device': device, 'ip_hash': ip_hash, 'user_tag': user_tag})
         except Exception as e:
-            web_logger.error(f"Failed to write access log: {e}", extra={'device': 'PC', 'ip_hash': hash_ip('127.0.0.1')})
+            web_logger.error(f"Failed to write access log: {e}", extra={'device': 'PC', 'ip_hash': hash_ip('127.0.0.1'), 'user_tag': None})
 
     return response
 

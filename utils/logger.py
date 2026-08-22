@@ -20,15 +20,17 @@ def hash_ip(ip_address):
 class CustomLogFormatter(logging.Formatter):
     """
     요구 로그 포맷:
-    [YYYY-MM-DD hh:mm:ss] [LEVEL] [PC 또는 MOBILE] [클라이언트 아이피 해시 앞 6자리] - 로그 메세지
+    [YYYY-MM-DD hh:mm:ss] [LEVEL] [PC 또는 MOBILE] [클라이언트 아이피 해시 앞 6자리] [USER-6636ab](로그인 시) - 로그 메세지
     """
     def format(self, record):
         dt_str = datetime.datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S')
         level = record.levelname
         device = getattr(record, 'device', 'PC')
         ip_hash = str(getattr(record, 'ip_hash', hash_ip('127.0.0.1')))[:6]
+        user_tag = getattr(record, 'user_tag', None)
+        user_part = f" [{user_tag}]" if user_tag else ""
         msg = record.getMessage()
-        return f"[{dt_str}] [{level}] [{device}] [{ip_hash}] - {msg}"
+        return f"[{dt_str}] [{level}] [{device}] [{ip_hash}]{user_part} - {msg}"
 
 def setup_logger(logger_name, log_dir, log_filename):
     """
