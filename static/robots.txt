@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pawstar.co.kr/sitemap.xml
