@@ -295,10 +295,60 @@ body {
     padding: 0;
 }
 
-.capsule-logout-btn:hover {
+/* 로그인 후 활성화 상태 (이미지 2: 빨간색 전원 버튼) */
+.capsule-logout-btn.active {
     background: #ffe4e6 !important;
     color: #e11d48 !important;
     box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15);
+}
+
+.capsule-logout-btn:hover {
+    background: #fecdd3 !important;
+    color: #be123c !important;
+    box-shadow: 0 3px 10px rgba(225, 29, 72, 0.22);
+}
+
+/* 로그인 전 상태 캡슐 및 비활성화(회색) 전원 버튼 (이미지 1) */
+.user-capsule-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.2rem 0.65rem 0.2rem 0.7rem;
+    height: 36px;
+    border-radius: 18px;
+    text-decoration: none;
+    color: #4f46e5;
+    font-weight: 800;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.user-capsule-login:hover {
+    background: #f1f5f9;
+    color: #4338ca;
+}
+
+.capsule-power-off-btn.disabled {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.capsule-power-off-btn.disabled:hover {
+    background: #e2e8f0;
+    color: #64748b;
 }
 
 /* 비로그인 가입/로그인 프리미엄 강조 버튼 */

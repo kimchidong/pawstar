@@ -88,14 +88,20 @@
                                 </div>
                                 <span class="capsule-nickname">{{ current_user.NK_NM or current_user.nickname or '집사' }}</span>
                             </a>
-                            <button type="button" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" class="capsule-logout-btn" title="로그아웃">
+                            <button type="button" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" class="capsule-logout-btn active" title="로그아웃">
                                 <i class="fa-solid fa-power-off"></i>
                             </button>
                         </div>
                     {% else %}
-                        <a href="/auth/google" id="btnNavLogin" class="btn-header-login" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
-                            <i class="fa-solid fa-right-to-bracket"></i> <span>가입/로그인</span>
-                        </a>
+                        <div class="header-user-capsule login-capsule">
+                            <a href="/auth/google" id="btnNavLogin" class="user-capsule-login" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                <span>가입/로그인</span>
+                            </a>
+                            <button type="button" class="capsule-power-off-btn disabled" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }" title="로그인 필요">
+                                <i class="fa-solid fa-power-off"></i>
+                            </button>
+                        </div>
                     {% endif %}
                 </li>
             </ul>
