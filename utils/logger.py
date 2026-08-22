@@ -8,25 +8,25 @@ import datetime
 
 def hash_ip(ip_address):
     """
-    클라이언트 IP를 복호화 불가능한 SHA-256 해시 암호문자로 변환합니다.
+    클라이언트 IP를 복호화 불가능한 SHA-256 해시 암호문자로 변환한 뒤 앞 6자리만 반환합니다.
     """
     if not ip_address:
         ip_address = "127.0.0.1"
     ip_str = str(ip_address).strip()
     if ',' in ip_str:
         ip_str = ip_str.split(',')[0].strip()
-    return hashlib.sha256(ip_str.encode('utf-8')).hexdigest()
+    return hashlib.sha256(ip_str.encode('utf-8')).hexdigest()[:6]
 
 class CustomLogFormatter(logging.Formatter):
     """
     요구 로그 포맷:
-    [YYYY-MM-DD hh:mm:ss] [LEVEL] [PC 또는 MOBILE] [클라이언트 아이피 해시된 복호화 불가능한 암호문자] - 로그 메세지
+    [YYYY-MM-DD hh:mm:ss] [LEVEL] [PC 또는 MOBILE] [클라이언트 아이피 해시 앞 6자리] - 로그 메세지
     """
     def format(self, record):
         dt_str = datetime.datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S')
         level = record.levelname
         device = getattr(record, 'device', 'PC')
-        ip_hash = getattr(record, 'ip_hash', hash_ip('127.0.0.1'))
+        ip_hash = str(getattr(record, 'ip_hash', hash_ip('127.0.0.1')))[:6]
         msg = record.getMessage()
         return f"[{dt_str}] [{level}] [{device}] [{ip_hash}] - {msg}"
 
