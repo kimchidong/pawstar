@@ -203,6 +203,26 @@ def serve_naver_site_verification(naver_file):
     return render_template('404.html'), 404
 
 
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    """ 검색엔진용 sitemap.xml 서빙 """
+    static_dir = os.path.join(app.root_path, 'static')
+    return send_from_directory(static_dir, 'sitemap.xml', mimetype='text/xml; charset=utf-8')
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    """ 검색엔진 수집 로봇용 robots.txt 서빙 """
+    static_dir = os.path.join(app.root_path, 'static')
+    if os.path.exists(os.path.join(static_dir, 'robots.txt')):
+        return send_from_directory(static_dir, 'robots.txt', mimetype='text/plain; charset=utf-8')
+    # 기본 robots.txt 응답 생성
+    content = "User-agent: *\nAllow: /\nSitemap: https://pawstar.co.kr/sitemap.xml\n"
+    res = make_response(content)
+    res.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    return res
+
+
 @app.context_processor
 def inject_global_vars():
     """ 템플릿 전역에서 사용할 회원 프로필 정보 전달 """

@@ -1,15 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- 메인 콘테스트 페이지 -->
     <url>
         <loc>https://pawstar.co.kr/</loc>
         <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
+    <!-- 명예의 전당 페이지 -->
     <url>
-        <loc>https://pawstar.co.kr/tools</loc>
+        <loc>https://pawstar.co.kr/hall-of-fame</loc>
         <lastmod>2026-08-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
+    </url>
+    <!-- 반려동물 콘테스트 출전하기 페이지 -->
+    <url>
+        <loc>https://pawstar.co.kr/upload</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 모바일 전용 메인 콘테스트 페이지 -->
+    <url>
+        <loc>https://pawstar.co.kr/m/</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <!-- 모바일 전용 명예의 전당 페이지 -->
+    <url>
+        <loc>https://pawstar.co.kr/m/hall-of-fame</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <!-- 모바일 전용 콘테스트 출전하기 페이지 -->
+    <url>
+        <loc>https://pawstar.co.kr/m/upload</loc>
+        <lastmod>2026-08-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
     </url>
 </urlset>
