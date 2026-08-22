@@ -1709,16 +1709,15 @@ function renderMobileFeedGrid(posts) {
 }
 
 function selectMobileContestOption(el, contestId) {
-    document.querySelectorAll('.custom-contest-option').forEach(opt => opt.classList.remove('selected'));
-    if (el) el.classList.add('selected');
+    if (!contestId) return;
 
-    const dropdown = document.getElementById('mCustomContestDropdown');
-    if (dropdown) dropdown.classList.remove('open');
-
-    const mCurrentContestId = document.getElementById('mCurrentContestId');
-    if (mCurrentContestId) mCurrentContestId.value = contestId;
-
-    fetchMobilePostsAjax({ contest_id: contestId });
+    try {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('contest_id', contestId);
+        window.location.href = currentUrl.toString();
+    } catch (e) {
+        window.location.href = '/m/?contest_id=' + encodeURIComponent(contestId);
+    }
 }
 
 function handleMobileSearchSubmit(e) {
