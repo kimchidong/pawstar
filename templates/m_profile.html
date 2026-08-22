@@ -3,7 +3,7 @@
 {% block content %}
 
 <!-- 모바일 프로필 카드 -->
-<div class="m-profile-card">
+<div class="m-profile-card" style="{% if is_my_profile %}background: #fefce8; border-color: #fef08a;{% else %}background: #ffffff;{% endif %}">
     <img src="{{ user.profile_img }}" class="m-profile-avatar" id="mCurrentProfileImg" alt="profile">
     <h2 class="m-profile-name" id="mCurrentNickname">{{ user.nickname }}</h2>
 
@@ -251,7 +251,7 @@ function handleMobileDirectLogout(e) {
                 <i class="fa-solid fa-paw"></i>
             </div>
             <div style="min-width: 0;">
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.25rem;">내 펫 출전작</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.25rem;">{% if is_my_profile %}내 펫 출전작{% else %}펫 출전작{% endif %}</div>
                 <div style="font-size: 0.95rem; font-weight: 900; color: #0f172a; line-height: 1.1;">{{ "{:,}".format(stats.my_post_count if (stats and stats.my_post_count is not none) else 0) }}개</div>
             </div>
         </div>
@@ -292,7 +292,7 @@ function handleMobileDirectLogout(e) {
 <div class="m-profile-tabs-wrapper" style="margin-top: 0.75rem;">
     <div class="m-profile-tabs-header">
         <button type="button" class="m-tab-btn {{ 'active' if current_tab != 'awards' else '' }}" id="mTabBtnPosts" onclick="switchMobileProfileTab('posts')">
-            <i class="fa-solid fa-paw"></i> 내 펫 출전작
+            <i class="fa-solid fa-paw"></i> {% if is_my_profile %}내 펫 출전작{% else %}펫 출전작{% endif %}
         </button>
         <button type="button" class="m-tab-btn {{ 'active' if current_tab == 'awards' else '' }}" id="mTabBtnAwards" onclick="switchMobileProfileTab('awards')">
             <i class="fa-solid fa-trophy"></i> 수상 트로피
