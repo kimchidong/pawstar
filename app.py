@@ -204,8 +204,9 @@ def serve_naver_site_verification(naver_file):
 
 
 @app.route('/sitemap.xml')
+@app.route('/stiemap.xml')
 def sitemap_xml():
-    """ 검색엔진용 sitemap.xml 서빙 """
+    """ 검색엔진용 sitemap.xml 서빙 (stiemap.xml 접근 경로 지원) """
     static_dir = os.path.join(app.root_path, 'static')
     return send_from_directory(static_dir, 'sitemap.xml', mimetype='text/xml; charset=utf-8')
 
