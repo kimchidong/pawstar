@@ -855,7 +855,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
         document.addEventListener(evt, resetIdleTimer, false);
     });
-    resetIdleTimer();
+if (typeof window.switchMobileProfileTab !== 'function') {
+    window.switchMobileProfileTab = function(tabName) {
+        console.log('Mobile tab switch invoked on PC profile:', tabName);
+    };
+}
 });
 </script>
 

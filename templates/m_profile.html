@@ -288,6 +288,40 @@ function handleMobileDirectLogout(e) {
     </div>
 </div>
 
+<script>
+function switchMobileProfileTab(tabName) {
+    const postsTabBtn = document.getElementById('mTabBtnPosts');
+    const awardsTabBtn = document.getElementById('mTabBtnAwards');
+    const postsContent = document.getElementById('mTabContentPosts');
+    const awardsContent = document.getElementById('mTabContentAwards');
+
+    if (!postsTabBtn || !awardsTabBtn || !postsContent || !awardsContent) return;
+
+    if (tabName === 'awards') {
+        postsTabBtn.classList.remove('active');
+        awardsTabBtn.classList.add('active');
+        postsContent.classList.remove('active');
+        awardsContent.classList.add('active');
+        if (window.history && window.history.replaceState) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', 'awards');
+            window.history.replaceState(null, '', url.toString());
+        }
+    } else {
+        awardsTabBtn.classList.remove('active');
+        postsTabBtn.classList.add('active');
+        awardsContent.classList.remove('active');
+        postsContent.classList.add('active');
+        if (window.history && window.history.replaceState) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', 'posts');
+            window.history.replaceState(null, '', url.toString());
+        }
+    }
+}
+window.switchMobileProfileTab = switchMobileProfileTab;
+</script>
+
 <!-- 전형적인 모바일 탭 바 -->
 <div class="m-profile-tabs-wrapper" style="margin-top: 0.75rem;">
     <div class="m-profile-tabs-header">
@@ -301,17 +335,17 @@ function handleMobileDirectLogout(e) {
 </div>
 
 <!-- 1. 탭 컨텐츠: 내 펫 출전작 -->
-<div id="mTabContentPosts" class="m-tab-content {{ 'active' if current_tab != 'awards' else '' }}">
-    <div style="padding: 0 0.85rem 0.5rem 0.85rem;">
+<div id="mTabContentPosts" class="m-tab-content {{ 'active' if current_tab != 'awards' else '' }}" style="margin-bottom: 1.5rem;">
+    <div style="padding: 0 0.85rem; margin: 0.5rem 0 0.75rem 0;">
         {% set curr_p = (my_posts_pagination.page if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.page is defined) else 1) %}
         {% set total_p = (my_posts_pagination.total_pages if (my_posts_pagination is defined and my_posts_pagination and my_posts_pagination.total_pages is defined) else 1) %}
 
         <!-- 내 펫 출전작 서브 헤더 (페이지 상태 표기) -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.3rem 0 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
-            <h3 style="font-size: 1.02rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800;">총 {{ total_cnt }}마리 출전</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0; min-height: 24px; height: 24px;">
+            <h3 style="font-size: 1.02rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%; height: 24px; line-height: 24px;">
+                <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center;">총 {{ total_cnt }}마리 출전</span>
                 {% if total_p > 0 %}
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #64748b;">
+                    <span style="font-size: 0.85rem; font-weight: 800; color: #64748b; display: inline-flex; align-items: center;">
                         {{ curr_p }} / {{ total_p }} 페이지
                     </span>
                 {% endif %}
@@ -319,7 +353,7 @@ function handleMobileDirectLogout(e) {
         </div>
     </div>
 
-    <div class="m-feed-grid">
+    <div class="m-feed-grid" style="padding-bottom: 0; margin-bottom: 0;">
             {% for p in my_posts %}
                 <div class="m-feed-card m-my-post-card-item" id="m-post-card-{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" data-post-id="{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" onclick="handleMobileCardClick({{ p | tojson | forceescape }})">
                     <div class="m-card-thumb">
@@ -455,12 +489,14 @@ function handleMobileDirectLogout(e) {
                     </div>
                 </div>
             {% else %}
-                <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); color: var(--text-muted);">
-                    {% if sel_c_id != 'all' %}
-                        선택하신 회차에는 출전한 게시물이 없습니다.
-                    {% else %}
-                        아직 출전한 자랑 게시물이 없습니다.
-                    {% endif %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem; background: #ffffff; border-radius: 16px; border: 1.5px solid #cbd5e1; color: var(--text-muted); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <p style="font-size: 0.85rem; font-weight: 700; color: #64748b; margin: 0;">
+                        {% if sel_c_id != 'all' %}
+                            선택하신 회차에는 출전한 게시물이 없습니다.
+                        {% else %}
+                            아직 출전한 자랑 게시물이 없습니다.
+                        {% endif %}
+                    </p>
                 </div>
             {% endfor %}
     </div>
@@ -495,16 +531,17 @@ function handleMobileDirectLogout(e) {
 </div>
 
 <!-- 2. 탭 컨텐츠: 수상 트로피 -->
-<div id="mTabContentAwards" class="m-tab-content {{ 'active' if current_tab == 'awards' else '' }}">
-    <div style="padding: 0 0.85rem; margin: 0.5rem 0 1rem 0;">
+<div id="mTabContentAwards" class="m-tab-content {{ 'active' if current_tab == 'awards' else '' }}" style="margin-bottom: 1.5rem;">
+    <div style="padding: 0 0.85rem; margin: 0.5rem 0 0.75rem 0;">
         <!-- 수상 트로피 서브 헤더 (총 개수 & 10개 단위 페이지 상태) -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.3rem 0 0.75rem 0; flex-wrap: wrap; gap: 0.5rem;">
-            <h3 style="font-size: 1.02rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800;">총 {{ award_total_cnt }}개 수상</span>
-                <span id="mAwardsPageIndicator" style="font-size: 0.85rem; font-weight: 800; color: #64748b; display: none;"></span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0; min-height: 24px; height: 24px;">
+            <h3 style="font-size: 1.02rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: space-between; width: 100%; height: 24px; line-height: 24px;">
+                <span style="color: #6366f1; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center;">총 {{ award_total_cnt }}개 수상</span>
+                <span id="mAwardsPageIndicator" style="font-size: 0.85rem; font-weight: 800; color: #64748b; display: inline-flex; align-items: center;"></span>
             </h3>
         </div>
-        <div>
+    </div>
+    <div style="padding: 0 0.85rem;">
             {% for a in my_awards %}
                 {% set a_cd = (a.AWARD_CD or a.award_cd or '')|string %}
                 {% set a_nm = a.AWARD_NM or a.prize_name or '수상작' %}
@@ -629,7 +666,7 @@ function handleMobileDirectLogout(e) {
                     </div>
                 </div>
             {% else %}
-                <div style="text-align: center; padding: 2.5rem 1rem; background: #ffffff; border: 1.5px solid #e9d5ff; border-radius: 16px; color: var(--text-muted);">
+                <div style="text-align: center; padding: 2.5rem 1rem; background: #ffffff; border-radius: 16px; border: 1.5px solid #cbd5e1; color: var(--text-muted); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                     <p style="font-size: 0.85rem; font-weight: 700; color: #64748b; margin: 0;">
                         {% if sel_c_id != 'all' %}
                             선택하신 회차에는 수상 기록이 없습니다.
@@ -642,7 +679,7 @@ function handleMobileDirectLogout(e) {
         </div>
 
         <!-- 모바일 수상 트로피 전용 10개 단위 페이징 바 -->
-        <div id="mAwardsPaginationBar" class="m-pagination-bar" style="margin: 1.5rem 0 1.5rem 0; display: flex; align-items: center; justify-content: center; gap: 0.4rem;"></div>
+        <div id="mAwardsPaginationBar" class="m-pagination-bar" style="margin: 1.25rem 0 0.5rem 0; display: none; align-items: center; justify-content: center; gap: 0.4rem;"></div>
     </div>
 </div>
 
@@ -653,35 +690,8 @@ function selectMobileContestEdition(cId) {
     window.location.href = `?user_id={{ user.user_id }}&contest_id=${cId}&tab=${activeTab}`;
 }
 
-function switchMobileProfileTab(tabName) {
-    const postsTabBtn = document.getElementById('mTabBtnPosts');
-    const awardsTabBtn = document.getElementById('mTabBtnAwards');
-    const postsContent = document.getElementById('mTabContentPosts');
-    const awardsContent = document.getElementById('mTabContentAwards');
-
-    if (!postsTabBtn || !awardsTabBtn || !postsContent || !awardsContent) return;
-
-    if (tabName === 'awards') {
-        postsTabBtn.classList.remove('active');
-        awardsTabBtn.classList.add('active');
-        postsContent.classList.remove('active');
-        awardsContent.classList.add('active');
-        if (window.history && window.history.replaceState) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('tab', 'awards');
-            window.history.replaceState(null, '', url.toString());
-        }
-    } else {
-        awardsTabBtn.classList.remove('active');
-        postsTabBtn.classList.add('active');
-        awardsContent.classList.remove('active');
-        postsContent.classList.add('active');
-        if (window.history && window.history.replaceState) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('tab', 'posts');
-            window.history.replaceState(null, '', url.toString());
-        }
-    }
+if (typeof window.switchMobileProfileTab !== 'function') {
+    window.switchMobileProfileTab = switchMobileProfileTab;
 }
 
 function filterMobileMyPostsByRound(selectedRound) {
@@ -710,7 +720,15 @@ const TROPHIES_PER_PAGE = 10;
 function renderTrophyPagination(page) {
     const trophyItems = document.querySelectorAll('.m-award-trophy-item');
     const totalItems = trophyItems.length;
-    if (totalItems === 0) return;
+    const pagBar = document.getElementById('mAwardsPaginationBar');
+
+    if (totalItems === 0) {
+        if (pagBar) {
+            pagBar.style.display = 'none';
+            pagBar.innerHTML = '';
+        }
+        return;
+    }
 
     const totalPages = Math.ceil(totalItems / TROPHIES_PER_PAGE);
     if (page < 1) page = 1;
@@ -738,7 +756,6 @@ function renderTrophyPagination(page) {
         }
     }
 
-    const pagBar = document.getElementById('mAwardsPaginationBar');
     if (!pagBar) return;
 
     if (totalPages <= 1) {
@@ -774,6 +791,7 @@ function renderTrophyPagination(page) {
 
     pagBar.innerHTML = html;
 }
+window.renderTrophyPagination = renderTrophyPagination;
 </script>
 
 {% if is_my_profile %}
