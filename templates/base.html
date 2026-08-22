@@ -72,14 +72,20 @@
                         <i class="fa-solid fa-paw"></i> 출전하기
                     </a>
                 </li>
-                <li class="nav-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                
+                <!-- 메인 서비스 메뉴와 유저 개인 계정 영역 구분을 위한 세로 구분선 -->
+                <li style="width: 1.5px; height: 20px; background: #cbd5e1; margin: 0 0.3rem 0 0.5rem; border-radius: 1px; flex-shrink: 0; align-self: center;"></li>
+
+                <!-- 2. 유저 개인 계정 / 인증 제어 전용 그룹 -->
+                <li class="nav-item user-account-group" style="display: flex; align-items: center; gap: 0.35rem;">
                     {% if is_logged_in %}
-                        <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
-                            <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
-                            {{ current_user.NK_NM or current_user.nickname or '집사' }}
+                        <a href="/profile" id="btnNavProfile" class="nav-user-chip {{ 'active' if request.path == '/profile' }}">
+                            <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; flex-shrink: 0;">
+                            <span>{{ current_user.NK_NM or current_user.nickname or '집사' }}</span>
                         </a>
-                        <a href="/logout" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" title="로그아웃" style="height: 42px; padding: 0 1.15rem; box-sizing: border-box; border-radius: 20px; background: #ffffff; border: 1px solid var(--border-light); color: var(--text-primary); font-size: 0.92rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; transition: var(--transition); cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);">
-                            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                        <a href="/logout" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" title="로그아웃" class="btn-header-logout">
+                            <i class="fa-solid fa-right-from-bracket" style="font-size: 0.8rem;"></i>
+                            <span>로그아웃</span>
                         </a>
                     {% else %}
                         <a href="/auth/google" id="btnNavLogin" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
