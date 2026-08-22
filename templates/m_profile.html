@@ -353,7 +353,7 @@ window.switchMobileProfileTab = switchMobileProfileTab;
         </div>
     </div>
 
-    <div class="m-feed-grid" style="padding-bottom: 0; margin-bottom: 0;">
+    <div class="m-feed-grid">
             {% for p in my_posts %}
                 <div class="m-feed-card m-my-post-card-item" id="m-post-card-{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" data-contest-id="{{ p.CONTEST_ROUND or p.contest_id }}" data-post-id="{{ p.post_id or p.POST_ID or (p.CONTEST_ROUND ~ '_' ~ p.ROUND_NO) }}" onclick="handleMobileCardClick({{ p | tojson | forceescape }})">
                     <div class="m-card-thumb">
@@ -541,7 +541,7 @@ window.switchMobileProfileTab = switchMobileProfileTab;
             </h3>
         </div>
     </div>
-    <div style="padding: 0 0.85rem;">
+    <div style="padding: 0 0.85rem 2rem 0.85rem;">
             {% for a in my_awards %}
                 {% set a_cd = (a.AWARD_CD or a.award_cd or '')|string %}
                 {% set a_nm = a.AWARD_NM or a.prize_name or '수상작' %}
