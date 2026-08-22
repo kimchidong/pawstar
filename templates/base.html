@@ -72,11 +72,14 @@
                         <i class="fa-solid fa-paw"></i> 출전하기
                     </a>
                 </li>
-                <li class="nav-item" style="display: flex; align-items: center; gap: 0.1rem;">
+                <li class="nav-item" style="display: flex; align-items: center; gap: 0.5rem;">
                     {% if is_logged_in %}
                         <a href="/profile" id="btnNavProfile" class="{{ 'active' if request.path == '/profile' }}">
                             <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; vertical-align: middle;">
                             {{ current_user.NK_NM or current_user.nickname or '집사' }}
+                        </a>
+                        <a href="/logout" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" title="로그아웃" style="height: 42px; padding: 0 1.15rem; box-sizing: border-box; border-radius: 20px; background: #ffffff; border: 1px solid var(--border-light); color: var(--text-primary); font-size: 0.92rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; transition: var(--transition); cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);">
+                            <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
                         </a>
                     {% else %}
                         <a href="/auth/google" id="btnNavLogin" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
@@ -1168,6 +1171,33 @@
     window.closePrivacyPolicyModal = closePrivacyPolicyModal;
     window.openTermsNoticeModal = openTermsNoticeModal;
     window.closeTermsNoticeModal = closeTermsNoticeModal;
+
+    function handlePcDirectHeaderLogout(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        try {
+            localStorage.setItem('pawstar_logged_out', 'true');
+            localStorage.setItem('pawstar_auth_event', 'logout_' + Date.now());
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var c = cookies[i];
+                var eqPos = c.indexOf("=");
+                var name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+                if (name) {
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/m";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                }
+            }
+        } catch(err) {}
+
+        fetch('/api/logout', { method: 'POST' }).finally(function() {
+            window.location.replace('/logout?t=' + Date.now());
+        });
+    }
+    window.handlePcDirectHeaderLogout = handlePcDirectHeaderLogout;
 
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
