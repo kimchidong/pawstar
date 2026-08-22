@@ -73,23 +73,23 @@
                     </a>
                 </li>
                 
-                <!-- 메인 서비스 메뉴와 유저 개인 계정 영역 구분을 위한 세로 구분선 -->
-                <li style="width: 1.5px; height: 20px; background: #cbd5e1; margin: 0 0.3rem 0 0.5rem; border-radius: 1px; flex-shrink: 0; align-self: center;"></li>
-
-                <!-- 2. 유저 개인 계정 / 인증 제어 전용 그룹 -->
-                <li class="nav-item user-account-group" style="display: flex; align-items: center; gap: 0.35rem;">
+                <!-- 우측 유저 계정 전용 프리미엄 캡슐 패널 -->
+                <li class="nav-item-account">
                     {% if is_logged_in %}
-                        <a href="/profile" id="btnNavProfile" class="nav-user-chip {{ 'active' if request.path == '/profile' }}">
-                            <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: none; flex-shrink: 0;">
-                            <span>{{ current_user.NK_NM or current_user.nickname or '집사' }}</span>
-                        </a>
-                        <a href="/logout" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" title="로그아웃" class="btn-header-logout">
-                            <i class="fa-solid fa-right-from-bracket" style="font-size: 0.8rem;"></i>
-                            <span>로그아웃</span>
-                        </a>
+                        <div class="header-user-capsule">
+                            <a href="/profile" id="btnNavProfile" class="user-capsule-profile {{ 'active' if request.path == '/profile' }}" title="내 프로필 페이지로 이동">
+                                <div class="capsule-avatar-wrap">
+                                    <img src="{{ current_user.PROFILE_URL or current_user.profile_img or '/static/image/profile/default_profile.png' }}" alt="profile">
+                                </div>
+                                <span class="capsule-nickname">{{ current_user.NK_NM or current_user.nickname or '집사' }}</span>
+                            </a>
+                            <button type="button" id="btnHeaderLogout" onclick="handlePcDirectHeaderLogout(event)" class="capsule-logout-btn" title="로그아웃">
+                                <i class="fa-solid fa-power-off"></i>
+                            </button>
+                        </div>
                     {% else %}
-                        <a href="/auth/google" id="btnNavLogin" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
-                            <i class="fa-solid fa-right-to-bracket"></i> 가입/로그인
+                        <a href="/auth/google" id="btnNavLogin" class="btn-header-login" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); return false; }">
+                            <i class="fa-solid fa-right-to-bracket"></i> <span>가입/로그인</span>
                         </a>
                     {% endif %}
                 </li>

@@ -185,6 +185,24 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static', 'image', 'app'), 'app_logo_icon.png', mimetype='image/png')
 
 
+@app.route('/naver3c6f6108a5c718b491ce886b35ff89ac.html')
+def naver_site_verification_specific():
+    """ 네이버 서치콘솔 웹마스터 소유 확인 전용 HTML 서빙 """
+    static_dir = os.path.join(app.root_path, 'static')
+    return send_from_directory(static_dir, 'naver3c6f6108a5c718b491ce886b35ff89ac.html', mimetype='text/html; charset=utf-8')
+
+
+@app.route('/<naver_file>.html')
+def serve_naver_site_verification(naver_file):
+    """ 네이버 사이트 소유확인 범용 (naver*.html) 패턴 서빙 """
+    if naver_file.startswith('naver'):
+        target_file = f"{naver_file}.html"
+        static_dir = os.path.join(app.root_path, 'static')
+        if os.path.exists(os.path.join(static_dir, target_file)):
+            return send_from_directory(static_dir, target_file, mimetype='text/html; charset=utf-8')
+    return render_template('404.html'), 404
+
+
 @app.context_processor
 def inject_global_vars():
     """ 템플릿 전역에서 사용할 회원 프로필 정보 전달 """

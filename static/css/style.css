@@ -153,38 +153,44 @@ body {
 
 .nav-links {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.6rem;
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-item a {
     text-decoration: none;
     color: var(--text-primary);
-    height: 42px;
-    padding: 0 1.15rem;
+    height: 44px;
+    padding: 0 1.2rem;
     box-sizing: border-box;
-    border-radius: 20px;
-    font-weight: 700;
+    border-radius: 22px;
+    font-weight: 800;
     font-size: 0.92rem;
-    transition: var(--transition);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
     background: #ffffff;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .nav-item a:hover {
-    /* 마우스 오버 효과 제거 */
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 .nav-item a.active {
     background: var(--gradient-brand);
     color: #ffffff !important;
-    border-color: transparent;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+    border-color: transparent !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3) !important;
+    transform: none;
 }
 
 .nav-item a.active i,
@@ -192,64 +198,146 @@ body {
     color: #ffffff !important;
 }
 
-/* 유저 계정/인증 그룹 전용 디자인 차별화 */
-.nav-user-chip {
-    height: 42px;
-    padding: 0 1.1rem;
+/* 프리미엄 유저 계정/인증 전용 캡슐 모듈 (Glassmorphism Capsule Panel) */
+.header-user-capsule {
+    height: 44px;
+    padding: 3px 4px 3px 5px;
     box-sizing: border-box;
-    border-radius: 20px;
-    font-weight: 800;
-    font-size: 0.9rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
-    border: 1.5px solid #cbd5e1 !important;
-    color: #1e293b !important;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    border-radius: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 0.4rem;
+}
+
+.header-user-capsule:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 6px 20px -2px rgba(99, 102, 241, 0.12);
+}
+
+.user-capsule-profile {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    transition: all 0.2s ease;
+    padding: 0.2rem 0.75rem 0.2rem 0.3rem;
+    height: 36px;
+    border-radius: 18px;
     text-decoration: none;
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
-.nav-user-chip:hover {
-    background: #ffffff !important;
-    border-color: #6366f1 !important;
-    color: #4f46e5 !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+.user-capsule-profile:hover {
+    background: #f1f5f9;
+    color: #4f46e5;
 }
 
-.nav-user-chip.active {
+.user-capsule-profile.active {
     background: var(--gradient-brand) !important;
     color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
+    box-shadow: 0 3px 10px rgba(124, 58, 237, 0.25);
 }
 
-.btn-header-logout {
-    height: 42px;
-    padding: 0 0.95rem;
-    box-sizing: border-box;
-    border-radius: 20px;
+.user-capsule-profile.active .capsule-avatar-wrap img {
+    border-color: #ffffff;
+}
+
+.capsule-avatar-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #ffffff;
-    border: 1.5px solid #e2e8f0 !important;
-    color: #64748b !important;
-    font-size: 0.85rem;
-    font-weight: 700;
+}
+
+.capsule-avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.capsule-nickname {
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+}
+
+.capsule-logout-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.capsule-logout-btn:hover {
+    background: #ffe4e6 !important;
+    color: #e11d48 !important;
+    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15);
+}
+
+/* 비로그인 가입/로그인 프리미엄 강조 버튼 */
+.btn-header-login {
+    height: 44px;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1.8px solid #6366f1 !important;
+    color: #4f46e5 !important;
+    font-weight: 800;
+    font-size: 0.92rem;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    gap: 0.45rem;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.14);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-header-logout:hover {
-    background: #fef2f2 !important;
-    border-color: #fca5a5 !important;
-    color: #dc2626 !important;
-    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.12);
+.btn-header-login i {
+    color: #6366f1;
+    font-size: 0.95rem;
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.btn-header-login:hover {
+    background: var(--gradient-brand) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-header-login:hover i {
+    color: #ffffff !important;
+    transform: translateX(2px);
 }
 
 .btn-upload {
