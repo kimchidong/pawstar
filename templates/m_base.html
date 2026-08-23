@@ -79,7 +79,7 @@
         <div class="m-footer-recent-stars" style="padding: 1.25rem 1rem 1rem 1rem; background: #ffffff; border-top: 1px solid #e2e8f0; margin-top: 1.5rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
                 <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.35rem;">
-                    <i class="fa-solid fa-star" style="color: #eab308; font-size: 1.05rem;"></i>
+                    <i class="fa-solid fa-star footer-star-title-icon" style="color: #eab308; font-size: 1.05rem;"></i>
                     <span>최근 콘테스트 펫 스타</span>
                 </h4>
                 <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 0.18rem 0.55rem; border-radius: 16px; border: 1px solid #e2e8f0;">TOP 1, 2, 3위 출전작</span>
@@ -116,8 +116,8 @@
 
                                             <div class="footer-star-photo-item {% if loop.first %}active{% endif %}" onclick="openPostById('{{ p_id }}', true);" title="{{ rk_title }} - {{ star.PET_NM or star.pet_name or '펫 스타' }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                                                 <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 84px; border-radius: 16px; object-fit: cover; border: 1px solid {{ border_color }}; box-shadow: none; display: block;" alt="펫 스타 사진">
-                                                <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
-                                                <span style="position: absolute; top: 3px; right: 3px; z-index: 3; font-size: 0.46rem; font-weight: 800; padding: 0.06rem 0.28rem; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.12); display: inline-flex; align-items: center; gap: 0.1rem; {{ star_style }}">
+                                                <img src="/static/image/badge/{{ badge_file }}.png" class="hall-medal-effect" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; z-index: 2;" alt="메달">
+                                                <span class="footer-star-badge-effect" style="position: absolute; top: 3px; right: 3px; z-index: 3; font-size: 0.46rem; font-weight: 800; padding: 0.06rem 0.28rem; border-radius: 5px; display: inline-flex; align-items: center; gap: 0.1rem; {{ star_style }}">
                                                     <i class="fa-solid fa-star" style="font-size: 0.42rem; transform: translateY(1px);"></i> {{ star_label }}
                                                 </span>
                                             </div>
