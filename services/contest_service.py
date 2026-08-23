@@ -1768,6 +1768,30 @@ class PawStarService:
                     cmt_list.append(c)
 
                 post['comments'] = cmt_list
+
+                # 수상 내역(PST_AWARD_HIST) 정보 쿼리하여 post['awards'] 에 바인딩
+                try:
+                    cur.execute("""
+                        SELECT 
+                            a.AWARD_CD,
+                            a.AWARD_NM,
+                            a.AWARD_PART,
+                            a.RANKING,
+                            COALESCE(a.BADGE_IMAGE_PATH, CONCAT('/static/image/badge/', a.AWARD_CD, '.png')) AS badge_img,
+                            a.AWARD_CD AS award_cd,
+                            a.AWARD_NM AS award_nm,
+                            a.AWARD_PART AS award_part,
+                            a.RANKING AS ranking
+                        FROM PST_AWARD_HIST a
+                        WHERE a.CONTEST_ROUND = %s AND a.ROUND_NO = %s
+                        ORDER BY a.AWARD_CD ASC
+                    """, (contest_id, round_no))
+                    awards_rows = cur.fetchall()
+                    if awards_rows:
+                        post['awards'] = awards_rows
+                except Exception as award_err:
+                    print("get_post_detail awards query error:", award_err)
+
                 author_id = post.get('ENT_USER_ID') or post.get('user_id')
                 is_author = bool(current_user_id and author_id and str(current_user_id) == str(author_id))
                 if is_author:

@@ -1072,13 +1072,32 @@ async function openDetailModal(post, isHallOfFame = false) {
     if (medalsLeftEl) medalsLeftEl.innerHTML = '';
 
     let awardsData = (post.awards && post.awards.length > 0) ? post.awards : [];
-    if (awardsData.length === 0 && (post.award_cd || post.AWARD_CD)) {
+    if (awardsData.length === 0) {
         const cd = post.award_cd || post.AWARD_CD;
-        const nm = post.award_nm || post.AWARD_NM || '수상 메달';
-        const part = post.award_part || post.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
-        const img = post.badge_img || post.badge_image_path || post.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
-        const rk = post.ranking || post.RANKING || post.rank || post.rank_candidate;
-        awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+        let rk = post.ranking || post.RANKING || post.rank || post.final_rank || post.AWARD_RANK || post.rank_no;
+        if (!rk && (isHallOfFame || post.is_closed) && post.round_no && (post.round_no == 1 || post.round_no == 2 || post.round_no == 3)) {
+            rk = Number(post.round_no);
+        }
+
+        if (cd) {
+            const nm = post.award_nm || post.AWARD_NM || '수상 메달';
+            const part = post.award_part || post.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
+            const img = post.badge_img || post.badge_image_path || post.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
+            awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+        } else if (rk && (rk == 1 || rk == 2 || rk == 3)) {
+            const rkNum = Number(rk);
+            const cdMap = { 1: 'P001A101', 2: 'P001A102', 3: 'P001A103' };
+            const nmMap = { 1: '슈퍼스타', 2: '브라이트스타', 3: '라이징스타' };
+            const autoCd = cdMap[rkNum];
+            const autoNm = nmMap[rkNum];
+            awardsData = [{
+                award_cd: autoCd,
+                award_nm: autoNm,
+                award_part: 'G002P001',
+                badge_img: `/static/image/badge/${autoCd}.png`,
+                ranking: rkNum
+            }];
+        }
     }
 
     if (awardsData.length > 0) {

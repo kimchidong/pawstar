@@ -566,13 +566,32 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     if (mMedalsLeftEl) mMedalsLeftEl.innerHTML = '';
 
     let awardsData = (postData.awards && postData.awards.length > 0) ? postData.awards : [];
-    if (awardsData.length === 0 && (postData.award_cd || postData.AWARD_CD)) {
+    if (awardsData.length === 0) {
         const cd = postData.award_cd || postData.AWARD_CD;
-        const nm = postData.award_nm || postData.AWARD_NM || '수상 메달';
-        const part = postData.award_part || postData.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
-        const img = postData.badge_img || postData.badge_image_path || postData.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
-        const rk = postData.ranking || postData.RANKING || postData.rank || postData.rank_candidate;
-        awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+        let rk = postData.ranking || postData.RANKING || postData.rank || postData.final_rank || postData.AWARD_RANK || postData.rank_no;
+        if (!rk && (isHallOfFame || postData.is_closed) && postData.round_no && (postData.round_no == 1 || postData.round_no == 2 || postData.round_no == 3)) {
+            rk = Number(postData.round_no);
+        }
+
+        if (cd) {
+            const nm = postData.award_nm || postData.AWARD_NM || '수상 메달';
+            const part = postData.award_part || postData.AWARD_PART || (cd.startsWith('P001') ? 'G002P001' : 'G002P002');
+            const img = postData.badge_img || postData.badge_image_path || postData.BADGE_IMAGE_PATH || `/static/image/badge/${cd}.png`;
+            awardsData = [{ award_cd: cd, award_nm: nm, award_part: part, badge_img: img, ranking: rk }];
+        } else if (rk && (rk == 1 || rk == 2 || rk == 3)) {
+            const rkNum = Number(rk);
+            const cdMap = { 1: 'P001A101', 2: 'P001A102', 3: 'P001A103' };
+            const nmMap = { 1: '슈퍼스타', 2: '브라이트스타', 3: '라이징스타' };
+            const autoCd = cdMap[rkNum];
+            const autoNm = nmMap[rkNum];
+            awardsData = [{
+                award_cd: autoCd,
+                award_nm: autoNm,
+                award_part: 'G002P001',
+                badge_img: `/static/image/badge/${autoCd}.png`,
+                ranking: rkNum
+            }];
+        }
     }
 
     if (awardsData.length > 0) {
