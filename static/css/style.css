@@ -3854,12 +3854,10 @@ option.opt-closed {
 /* 푸터 '최근 콘테스트 펫 스타' 별 아이콘 영롱 스파클링 펄스 애니메이션 */
 @keyframes starTwinklePulse {
     0%, 100% {
-        transform: scale(1) rotate(0deg);
         filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.4));
         color: #eab308;
     }
     50% {
-        transform: scale(1.22) rotate(12deg);
         filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.9)) drop-shadow(0 0 16px rgba(250, 204, 21, 0.65));
         color: #facc15;
     }
