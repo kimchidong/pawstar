@@ -2436,6 +2436,8 @@ class PawStarService:
                         r.CONTS AS CONTS,
                         r.ENT_USER_ID,
                         DATE_FORMAT(r.ENT_DT, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+                        r.PHT_FILE_PATH1,
+                        r.PHT_FILE_PATH2,
                         COALESCE(NULLIF(r.PHT_FILE_PATH1, ''), '/static/image/contest/default_pet.jpg') AS IMAGE_PATH,
                         COALESCE(NULLIF(r.PHT_FILE_PATH2, ''), r.PHT_FILE_PATH1, '/static/image/contest/default_pet.jpg') AS popup_image_path,
                         u.USER_ID,
@@ -2486,14 +2488,13 @@ class PawStarService:
 
                 if winners:
                     for w in winners:
-                        # 1. 출전작 삭제 여부 검증 (PST_CONTEST_ROUND 조인이 없거나 제목/이미지가 'None'/NULL 인 경우)
+                        # 1. 출전작 삭제 여부 검증 (PST_CONTEST_ROUND 조인이 없어서 TITLE 이 NULL 이거나 실제 삭제된 경우만)
                         raw_title = str(w.get('TITLE') or w.get('title') or '').strip()
                         raw_img = str(w.get('IMAGE_PATH') or w.get('image_path') or '').strip()
                         is_post_del = (
                             w.get('TITLE') is None or 
-                            w.get('PHT_FILE_PATH1') is None or 
-                            raw_title in ['', 'None', 'none', 'null'] or 
-                            raw_img in ['', 'None', 'none', 'null'] or
+                            raw_title in ['None', 'none', 'null'] or 
+                            raw_img in ['None', 'none', 'null'] or
                             w.get('is_post_deleted') is True
                         )
 

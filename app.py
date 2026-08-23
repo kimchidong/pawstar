@@ -1151,7 +1151,7 @@ def save_uploaded_media(file):
     if not file or file.filename == '':
         return None
 
-    upload_dir = os.path.join(app.root_path, 'static', 'image', 'post')
+    upload_dir = os.path.join(app.root_path, 'static', 'image', 'temp')
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir, exist_ok=True)
 
@@ -1175,9 +1175,9 @@ def save_uploaded_media(file):
         file.seek(0)
         fallback_name = f"post_{int(now.timestamp())}_{filename if filename else 'photo.jpg'}"
         file.save(os.path.join(upload_dir, fallback_name))
-        return f"/static/image/post/{fallback_name}"
+        return f"/static/image/temp/{fallback_name}"
 
-    return f"/static/image/post/{unique_name}"
+    return f"/static/image/temp/{unique_name}"
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_page():
@@ -1792,7 +1792,7 @@ def delete_comment_api(post_id):
 
 from PIL import Image
 
-TEMP_CONTEST_DIR = os.path.join(app.root_path, 'static', 'image', 'temp', 'contest')
+TEMP_CONTEST_DIR = os.path.join(app.root_path, 'static', 'image', 'temp')
 PERM_CONTEST_BASE_DIR = os.path.join(app.root_path, 'static', 'image', 'contest')
 
 os.makedirs(TEMP_CONTEST_DIR, exist_ok=True)
@@ -1800,7 +1800,7 @@ os.makedirs(PERM_CONTEST_BASE_DIR, exist_ok=True)
 
 @app.route('/api/post/upload-temp', methods=['POST'])
 def upload_temp_image():
-    """ 출전 신청 페이지에서 파일 선택 시 일단 임시 폴더(static/image/temp/contest/)에 임시 저장 """
+    """ 출전 신청 페이지에서 파일 선택 시 일단 1차 임시 폴더(static/image/temp/)에 임시 저장 """
     try:
         file = request.files.get('media_file') or request.files.get('file') or request.files.get('image')
         if not file or not file.filename:
@@ -1814,7 +1814,7 @@ def upload_temp_image():
         temp_filepath = os.path.join(TEMP_CONTEST_DIR, temp_filename)
         file.save(temp_filepath)
 
-        temp_url = f"/static/image/temp/contest/{temp_filename}"
+        temp_url = f"/static/image/temp/{temp_filename}"
         return jsonify({
             'success': True,
             'temp_url': temp_url,

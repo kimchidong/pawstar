@@ -742,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         mCurrentTempFilename = data.temp_filename;
                         const mPreviewCardImg = document.getElementById('mPreviewCardImg');
                         const mPreviewModalImg = document.getElementById('mPreviewModalImg');
-                        // static/image/temp/contest/ 경로 임시 이미지 URL로 미리보기 반영
+                        // static/image/temp/ 경로 임시 이미지 URL로 미리보기 반영
                         if (mPreviewCardImg) mPreviewCardImg.src = data.temp_url;
                         if (mPreviewModalImg) mPreviewModalImg.src = data.temp_url;
                     }
