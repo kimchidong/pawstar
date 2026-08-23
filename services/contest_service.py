@@ -806,6 +806,9 @@ class PawStarService:
                         r.SHARE_SN,
                         r.SCORE,
                         r.ENT_DT,
+                        COALESCE(c.CONTEST_STAT, 'G001C002') AS CONTEST_STAT,
+                        COALESCE(c.CONTEST_STAT, 'G001C002') AS contest_stat,
+                        COALESCE(c.CONTEST_STAT, 'G001C002') AS STATUS_CD,
                         -- 호환 키
                         r.CONTEST_ROUND AS contest_id,
                         r.ROUND_NO AS round_no,
@@ -827,6 +830,7 @@ class PawStarService:
                     FROM PST_CONTEST_ROUND r
                     JOIN PST_USER u ON r.ENT_USER_ID = u.USER_ID
                     LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
+                    LEFT JOIN PST_CONTEST c ON r.CONTEST_ROUND = c.CONTEST_ROUND
                     WHERE r.ENT_USER_ID = %s
                 """
                 params = [user_id]
@@ -849,6 +853,11 @@ class PawStarService:
                     k_fmt = self.format_pet_kind(p.get('KIND_NM') or p.get('pet_type'))
                     p['KIND_NM'] = k_fmt
                     p['pet_type'] = k_fmt
+                    is_post_closed = (p.get('CONTEST_STAT') == 'G001C002' or p.get('STATUS_CD') == 'G001C002' or self.is_contest_closed(p.get('CONTEST_ROUND')))
+                    p['is_closed'] = is_post_closed
+                    p['closed'] = is_post_closed
+                    p['is_ended'] = is_post_closed
+                    p['IS_ENDED'] = is_post_closed
 
                 my_post_count = len(my_posts)
                 total_score = sum(p.get('SCORE', 0) for p in my_posts)
@@ -1298,14 +1307,14 @@ class PawStarService:
                     conn.close()
                     return {'success': False, 'message': '본인의 출전물만 포기(삭제)할 수 있습니다.'}
 
-                # 3. 회차 마감 여부 검증 (종료된 회차는 삭제 불가)
-                cur.execute("""
-                    SELECT CONTEST_STAT FROM PST_CONTEST WHERE CONTEST_ROUND = %s
-                """, (c_round,))
-                c_info = cur.fetchone()
-                if c_info and c_info.get('CONTEST_STAT') == 'G001C002':
-                    conn.close()
-                    return {'success': False, 'message': '이미 마감(종료)된 회차의 출전물은 포기(삭제)할 수 없습니다.'}
+                # 3. 회차 마감 여부 검증 (종료된 회차도 본인/관리자가 삭제 요청시 허용)
+                # cur.execute("""
+                #     SELECT CONTEST_STAT FROM PST_CONTEST WHERE CONTEST_ROUND = %s
+                # """, (c_round,))
+                # c_info = cur.fetchone()
+                # if c_info and c_info.get('CONTEST_STAT') == 'G001C002':
+                #     conn.close()
+                #     return {'success': False, 'message': '이미 마감(종료)된 회차의 출전물은 포기(삭제)할 수 없습니다.'}
 
                 # 4. 관련 하위 레코드 및 출전물 삭제
                 cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))

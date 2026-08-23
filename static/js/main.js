@@ -690,12 +690,20 @@ async function openDetailModal(post, isHallOfFame = false) {
     // 모달 및 스크롤 영역 최상단 스크롤 초기화
     resetPcModalScroll();
 
-    // 회차 종료/마감 여부 판별
+    // 회차 종료/마감 여부 판별 (회차 번호 비교 및 온갖 마감 키 값 종합 검증)
+    const pcPostRoundNum = parseInt(post.CONTEST_ROUND || post.contest_round || post.contest_id || (String(post.post_id || '').split('_')[0]) || '0', 10);
+    const pcActiveRoundNum = parseInt(window.CURRENT_CONTEST_ROUND || window.ACTIVE_CONTEST_ROUND || (document.getElementById('currentActiveRound') ? document.getElementById('currentActiveRound').value : '0') || '0', 10);
+
     const isClosedRound = isHallOfFame || 
                           post.contest_stat === 'G001C002' || 
                           post.CONTEST_STAT === 'G001C002' || 
+                          post.STATUS_CD === 'G001C002' ||
+                          post.status_cd === 'G001C002' ||
+                          post.is_closed === true || 
+                          post.closed === true || 
                           post.is_ended === true || 
-                          post.IS_ENDED === true;
+                          post.IS_ENDED === true ||
+                          (pcPostRoundNum > 0 && pcActiveRoundNum > 0 && pcPostRoundNum < pcActiveRoundNum);
 
     // 메인 피드 카드 DOM 수치가 더 최신일 경우 읽어와 보정 (종료 회차는 DB 확정 수치 100% 보존)
     if (!isClosedRound) {
@@ -773,13 +781,18 @@ async function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    // 출전 포기(삭제) 버튼 제어 (진행 중인 회차 + 본인 출전물인 경우 노출)
+    // 출전 포기(삭제) 버튼 제어 (진행 중인 회차는 "출전 포기", 지난 회차는 "삭제")
     const deleteBtn = document.getElementById('detailDeleteBtn');
     if (deleteBtn) {
         const currentUserId = String(window.CURRENT_USER_ID || '').trim();
         const postOwnerId = String(post.ENT_USER_ID || post.user_id || '').trim();
-        if (!isClosedRound && currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
+        if (currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
             deleteBtn.style.display = 'inline-flex';
+            if (isClosedRound) {
+                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> 삭제';
+            } else {
+                deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> 출전 포기';
+            }
         } else {
             deleteBtn.style.display = 'none';
         }

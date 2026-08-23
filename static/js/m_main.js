@@ -349,14 +349,20 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     postData.content = postData.content || postData.CONTS || postData.conts || '';
     window.currentMobileDetailPostId = postData.post_id;
 
-    // 회차 마감 여부 판별
+    // 회차 마감 여부 판별 (회차 번호 비교 및 온갖 마감 키 값 종합 검증)
+    const postRoundNum = parseInt(postData.CONTEST_ROUND || postData.contest_round || postData.contest_id || (String(postData.post_id || '').split('_')[0]) || '0', 10);
+    const activeRoundNum = parseInt(window.CURRENT_CONTEST_ROUND || window.ACTIVE_CONTEST_ROUND || (document.getElementById('currentActiveRound') ? document.getElementById('currentActiveRound').value : '0') || '0', 10);
+
     const isClosedRound = isHallOfFame || 
                           postData.contest_stat === 'G001C002' || 
                           postData.CONTEST_STAT === 'G001C002' || 
+                          postData.STATUS_CD === 'G001C002' ||
+                          postData.status_cd === 'G001C002' ||
                           postData.is_closed === true || 
                           postData.closed === true || 
                           postData.is_ended === true || 
-                          postData.IS_ENDED === true;
+                          postData.IS_ENDED === true ||
+                          (postRoundNum > 0 && activeRoundNum > 0 && postRoundNum < activeRoundNum);
 
     // 종료된 회차의 경우 원형 핑크 하트 버튼 숨김
     let mHeaderLikeBtn = document.getElementById('mDetailHeaderLikeBtn');
@@ -368,13 +374,18 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
         }
     }
 
-    // 모바일 출전 포기(삭제) 버튼 제어
+    // 모바일 출전 포기(삭제) 버튼 제어 (지난 회차는 "삭제", 진행중 회차는 "출전 포기")
     const mDeleteBtn = document.getElementById('mDetailDeleteBtn');
     if (mDeleteBtn) {
         const currentUserId = String(window.CURRENT_USER_ID || '').trim();
         const postOwnerId = String(postData.ENT_USER_ID || postData.user_id || '').trim();
-        if (!isClosedRound && currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
+        if (currentUserId && postOwnerId && (currentUserId === postOwnerId || currentUserId === 'admin')) {
             mDeleteBtn.style.display = 'inline-flex';
+            if (isClosedRound) {
+                mDeleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> 삭제';
+            } else {
+                mDeleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> 출전 포기';
+            }
         } else {
             mDeleteBtn.style.display = 'none';
         }
