@@ -2401,8 +2401,50 @@ class PawStarService:
                 """, (contest_id,))
                 winners = cur.fetchall()
 
+                WHITE_IMAGE_DATA_URI = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1' fill='white'><rect width='1' height='1' fill='white'/></svg>"
+
                 if winners:
                     for w in winners:
+                        # 1. 출전작 삭제 여부 검증 (PST_CONTEST_ROUND 조인이 없거나 제목/이미지가 'None'/NULL 인 경우)
+                        raw_title = str(w.get('TITLE') or w.get('title') or '').strip()
+                        raw_img = str(w.get('IMAGE_PATH') or w.get('image_path') or '').strip()
+                        is_post_del = (
+                            w.get('TITLE') is None or 
+                            w.get('PHT_FILE_PATH1') is None or 
+                            raw_title in ['', 'None', 'none', 'null'] or 
+                            raw_img in ['', 'None', 'none', 'null'] or
+                            w.get('is_post_deleted') is True
+                        )
+
+                        if is_post_del:
+                            w['is_post_deleted'] = True
+                            w['TITLE'] = '해당 유저가 삭제하였습니다'
+                            w['title'] = '해당 유저가 삭제하였습니다'
+                            w['CONTS'] = '해당 유저가 삭제하였습니다'
+                            w['content'] = '해당 유저가 삭제하였습니다'
+                            w['IMAGE_PATH'] = WHITE_IMAGE_DATA_URI
+                            w['image_path'] = WHITE_IMAGE_DATA_URI
+                            w['popup_image_path'] = WHITE_IMAGE_DATA_URI
+                            w['PET_NM'] = ''
+                            w['pet_name'] = ''
+
+                        # 2. 회원 탈퇴 여부 검증 (PST_USER 조인이 없거나 USER_ID/닉네임이 'None'/NULL 인 경우)
+                        raw_uid = str(w.get('USER_ID') or w.get('user_id') or '').strip()
+                        raw_nknm = str(w.get('NK_NM') or w.get('user_nickname') or '').strip()
+                        is_user_del = (
+                            w.get('USER_ID') is None or 
+                            raw_uid in ['', 'None', 'none', 'null'] or 
+                            raw_nknm in ['None', 'none', 'null'] or
+                            w.get('is_user_deleted') is True
+                        )
+
+                        if is_user_del:
+                            w['is_user_deleted'] = True
+                            w['NK_NM'] = ''
+                            w['user_nickname'] = ''
+                            w['PROFILE_URL'] = WHITE_IMAGE_DATA_URI
+                            w['user_profile'] = WHITE_IMAGE_DATA_URI
+
                         w_c_id = w['CONTEST_ROUND']
                         w_r_no = w['ROUND_NO']
                         cur.execute("""
