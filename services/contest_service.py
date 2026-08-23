@@ -1769,26 +1769,80 @@ class PawStarService:
 
                 post['comments'] = cmt_list
 
-                # 수상 내역(PST_AWARD_HIST) 정보 쿼리하여 post['awards'] 에 바인딩
+                # 수상 내역(PST_CONTEST_AWARD 및 PST_AWARD_HIST) 정보 쿼리하여 post['awards'] 에 바인딩
                 try:
                     cur.execute("""
                         SELECT 
-                            a.AWARD_CD,
-                            a.AWARD_NM,
-                            a.AWARD_PART,
-                            a.RANKING,
-                            COALESCE(a.BADGE_IMAGE_PATH, CONCAT('/static/image/badge/', a.AWARD_CD, '.png')) AS badge_img,
-                            a.AWARD_CD AS award_cd,
-                            a.AWARD_NM AS award_nm,
-                            a.AWARD_PART AS award_part,
-                            a.RANKING AS ranking
-                        FROM PST_AWARD_HIST a
-                        WHERE a.CONTEST_ROUND = %s AND a.ROUND_NO = %s
-                        ORDER BY a.AWARD_CD ASC
+                            ca.AWARD_PART,
+                            ca.AWARD_CD,
+                            COALESCE(a.AWARD_NM, '당선작') AS AWARD_NM,
+                            ca.RANKING,
+                            ca.AWARD_PART AS award_part,
+                            ca.AWARD_CD AS award_cd,
+                            COALESCE(a.AWARD_NM, '당선작') AS award_nm,
+                            ca.RANKING AS ranking,
+                            a.BADGE_IMG_PATH_FILE
+                        FROM PST_CONTEST_AWARD ca
+                        LEFT JOIN PST_AWARD a ON ca.AWARD_CD = a.AWARD_CD
+                        WHERE ca.CONTEST_ROUND = %s AND ca.ROUND_NO = %s
+                        ORDER BY ca.AWARD_PART ASC, ca.RANKING ASC
                     """, (contest_id, round_no))
                     awards_rows = cur.fetchall()
+                    if not awards_rows:
+                        cur.execute("""
+                            SELECT 
+                                a.AWARD_CD,
+                                a.AWARD_NM,
+                                a.AWARD_PART,
+                                a.RANKING,
+                                COALESCE(a.BADGE_IMAGE_PATH, CONCAT('/static/image/badge/', a.AWARD_CD, '.png')) AS badge_img,
+                                a.AWARD_CD AS award_cd,
+                                a.AWARD_NM AS award_nm,
+                                a.AWARD_PART AS award_part,
+                                a.RANKING AS ranking
+                            FROM PST_AWARD_HIST a
+                            WHERE a.CONTEST_ROUND = %s AND a.ROUND_NO = %s
+                            ORDER BY a.AWARD_CD ASC
+                        """, (contest_id, round_no))
+                        awards_rows = cur.fetchall()
+
                     if awards_rows:
-                        post['awards'] = awards_rows
+                        w_awards_list = []
+                        for wa in awards_rows:
+                            wb_file = wa.get('BADGE_IMG_PATH_FILE') or wa.get('badge_img') or wa.get('AWARD_CD') or wa.get('award_cd') or ''
+                            if wb_file and not wb_file.startswith('/') and not wb_file.startswith('http'):
+                                wb_fn = wb_file.split('/')[-1]
+                                if not wb_fn.lower().endswith(('.png', '.jpg', '.svg', '.jpeg')):
+                                    wb_fn += '.png'
+                                wb_url = f'/static/image/badge/{wb_fn}'
+                            else:
+                                wb_url = wb_file or f"/static/image/badge/{wa.get('AWARD_CD') or wa.get('award_cd')}.png"
+
+                            wb_url = wb_url.replace('.webp', '.png')
+                            aw_cd_val = str(wa.get('AWARD_CD') or wa.get('award_cd') or '')
+                            aw_nm_val = str(wa.get('AWARD_NM') or wa.get('award_nm') or '')
+                            aw_rk_val = wa.get('RANKING') if wa.get('RANKING') is not None else wa.get('ranking')
+
+                            if aw_cd_val == 'P001A101':
+                                aw_nm_val = '슈퍼스타'
+                            elif aw_cd_val == 'P001A102':
+                                aw_nm_val = '브라이트스타'
+                            elif aw_cd_val == 'P001A103':
+                                aw_nm_val = '라이징스타'
+                            elif 'P002' in aw_cd_val or not ('P001' in aw_cd_val or '슈퍼' in aw_nm_val or '브라이트' in aw_nm_val or '라이징' in aw_nm_val):
+                                if aw_rk_val:
+                                    aw_nm_val = f'패밀리 {aw_rk_val}위'
+                                else:
+                                    aw_nm_val = '패밀리'
+
+                            w_awards_list.append({
+                                'award_part': wa.get('AWARD_PART') or wa.get('award_part'),
+                                'award_cd': aw_cd_val,
+                                'award_nm': aw_nm_val,
+                                'badge_img': wb_url,
+                                'ranking': aw_rk_val
+                            })
+                        post['awards'] = w_awards_list
                 except Exception as award_err:
                     print("get_post_detail awards query error:", award_err)
 
