@@ -1001,11 +1001,17 @@ async function openDetailModal(post, isHallOfFame = false) {
 
     updateScoreBadgeUI(post.score || post.SCORE || 0);
 
+    const pcTitleText = (post.title || post.TITLE || '').trim();
+    let pcContentText = (post.content || post.CONTS || '').trim();
+    if (post.is_post_deleted || pcTitleText === '출전자에 의해 삭제된 출전작입니다' || pcTitleText.includes('삭제된 출전작')) {
+        pcContentText = '';
+    }
+
     const titleEl = document.getElementById('detailTitle');
-    if (titleEl) titleEl.textContent = post.title || '';
+    if (titleEl) titleEl.textContent = pcTitleText;
 
     const contentEl = document.getElementById('detailContent');
-    if (contentEl) contentEl.textContent = post.content || '';
+    if (contentEl) contentEl.textContent = pcContentText;
 
     const createdAtEl = document.getElementById('detailCreatedAt');
     if (createdAtEl) createdAtEl.textContent = formatTimeAgo(post.created_at || post.ENT_DT || '');

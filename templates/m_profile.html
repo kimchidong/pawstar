@@ -575,7 +575,7 @@ window.switchMobileProfileTab = switchMobileProfileTab;
                     <div style="display: flex; align-items: center; gap: 0.85rem;">
                         
                         <!-- 프로필 사진 (동물 썸네일 이미지 - 96px x 96px) -->
-                        <img src="{{ p_img }}" alt="수상작" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); flex-shrink: 0; display: block;">
+                        <img src="{{ p_img or 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'1\' height=\'1\' fill=\'white\'><rect width=\'1\' height=\'1\' fill=\'white\'/></svg>' }}" alt="수상작" style="width: 96px; height: 96px; border-radius: 18px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15); flex-shrink: 0; display: block; background: #ffffff;">
 
                         <!-- 4줄 상세 영역 (명예의 전당 규격과 폰트, 크기, 간격 100% 동일) -->
                         <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 0.1rem; justify-content: center;">
@@ -1079,20 +1079,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm(confirmMsg)) {
                 fetch('/api/auth/withdraw', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: window.CURRENT_USER_ID || '' })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        alert(data.message);
+                    if (data && data.success) {
+                        alert(data.message || '회원 탈퇴가 성공적으로 완료되었습니다.');
                         window.location.href = '/m/';
                     } else {
-                        alert('회원 탈퇴 실패: ' + (data.message || '오류 발생'));
+                        alert(data.message || '회원 탈퇴 처리 실패');
                     }
                 })
                 .catch(err => {
-                    console.error(err);
-                    alert('회원 탈퇴 요청 중 오류가 발생했습니다.');
+                    console.error('Mobile Withdraw Fetch Error:', err);
+                    alert('회원 탈퇴 요청 중 네트워크 오류가 발생했습니다.');
                 });
             }
         });

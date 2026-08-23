@@ -423,7 +423,7 @@ function handlePcDirectLogout(e) {
                     </div>
 
                     <!-- 출전작 썸네일 (정확히 정렬) -->
-                    <img src="{{ p_img }}" alt="수상작 썸네일" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15); flex-shrink: 0;">
+                    <img src="{{ p_img or 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'1\' height=\'1\' fill=\'white\'><rect width=\'1\' height=\'1\' fill=\'white\'/></svg>' }}" alt="수상작 썸네일" style="width: 64px; height: 64px; border-radius: 16px; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15); flex-shrink: 0; background: #ffffff;">
                 </div>
 
                 <!-- 2. 중앙 좌측: 펫 정보 (고정 너비 220px 부여로 스탯 바 시작선 세로 정렬) -->
@@ -452,8 +452,8 @@ function handlePcDirectLogout(e) {
                     </div>
                 </div>
 
-                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (체크포인트 4: 스탯 모듈과의 간격 띄움) -->
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-shrink: 0; align-self: center; margin-left: 0.85rem;">
+                <!-- 4. 우측: 엠보싱 수상 트로피 뱃지 리스트 (체크포인트 4: 스탯 모듈과의 간격 띄움 및 줄바꿈 지원) -->
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 0.4rem 0.35rem; flex-wrap: wrap; max-width: 380px; flex-shrink: 0; align-self: center; margin-left: 0.85rem;">
                     {% for b in (a.awards or [a]) %}
                         {% set b_cd = (b.AWARD_CD or b.award_cd or '')|string %}
                         {% set b_nm = b.AWARD_NM or b.prize_name or '수상작' %}
@@ -809,20 +809,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm(confirmMsg)) {
                 fetch('/api/auth/withdraw', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: window.CURRENT_USER_ID || '' })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        alert(data.message);
+                    if (data && data.success) {
+                        alert(data.message || '회원 탈퇴가 성공적으로 완료되었습니다.');
                         window.location.href = '/';
                     } else {
-                        alert('회원 탈퇴 처리 실패: ' + (data.message || '오류 발생'));
+                        alert(data.message || '회원 탈퇴 처리 실패');
                     }
                 })
                 .catch(err => {
-                    console.error('Withdraw Error:', err);
-                    alert('회원 탈퇴 처리 중 오류가 발생했습니다.');
+                    console.error('PC Withdraw Fetch Error:', err);
+                    alert('회원 탈퇴 처리 중 네트워크 오류가 발생했습니다.');
                 });
             }
         });

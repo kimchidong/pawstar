@@ -532,7 +532,11 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     document.getElementById('mDetailScoreNum').textContent = (postData.score || postData.SCORE || 0).toLocaleString();
     const mTitleEl = document.getElementById('mDetailTitle');
     const titleText = (postData.title || postData.TITLE || '').trim();
-    const contentText = (postData.content || postData.CONTS || '').trim();
+    let contentText = (postData.content || postData.CONTS || '').trim();
+
+    if (postData.is_post_deleted || titleText === '출전자에 의해 삭제된 출전작입니다' || titleText.includes('삭제된 출전작')) {
+        contentText = '';
+    }
 
     if (mTitleEl) {
         mTitleEl.textContent = titleText;

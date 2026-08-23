@@ -138,7 +138,7 @@
                                 </div>
                                 <!-- 3줄: 출전 제목 (위쪽 간격은 좁히고 아래쪽 간격은 늘림) -->
                                 <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.05rem; margin-bottom: 0.32rem; line-height: 1.18;">
-                                    {{ '해당 유저가 삭제하였습니다' if (w.is_post_deleted or w.TITLE == 'None' or w.title == 'None') else (w.TITLE or w.title or w.PET_NM or w.pet_name or '해당 유저가 삭제하였습니다') }}
+                                    {{ '출전자에 의해 삭제된 출전작입니다' if (w.is_post_deleted or w.TITLE == 'None' or w.title == 'None') else (w.TITLE or w.title or w.PET_NM or w.pet_name or '출전자에 의해 삭제된 출전작입니다') }}
                                 </div>
                                 <!-- 4줄: 점수, 4요소 -->
                                 <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">
@@ -267,7 +267,7 @@
                                 </div>
                                 <!-- 3줄: 출전 제목 (위쪽 간격은 좁히고 아래쪽 간격은 늘림) -->
                                 <div style="font-size: 0.84rem; color: #0f172a; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.05rem; margin-bottom: 0.32rem; line-height: 1.18;">
-                                    {{ '해당 유저가 삭제하였습니다' if (w.is_post_deleted or w.TITLE == 'None' or w.title == 'None') else (w.TITLE or w.title or w.PET_NM or w.pet_name or '해당 유저가 삭제하였습니다') }}
+                                    {{ '출전자에 의해 삭제된 출전작입니다' if (w.is_post_deleted or w.TITLE == 'None' or w.title == 'None') else (w.TITLE or w.title or w.PET_NM or w.pet_name or '출전자에 의해 삭제된 출전작입니다') }}
                                 </div>
                                 <!-- 4줄: 점수, 4요소 -->
                                 <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;">

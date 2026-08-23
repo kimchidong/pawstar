@@ -375,42 +375,51 @@ def logout():
 @app.route('/api/auth/withdraw', methods=['POST'])
 def withdraw():
     """ 회원 탈퇴 처리 API (구글 인증 회원의 경우 Google 동의 권한도 자동 철회/Revoke) """
-    current_user_id = get_current_user_id() or session.get('user_id')
-    if not current_user_id:
+    try:
+        current_user_id = get_current_user_id() or session.get('user_id') or session.get('USER_ID')
+        if not current_user_id:
+            if request.is_json or request.path.startswith('/api'):
+                return jsonify({'success': False, 'message': '로그인된 상태가 아닙니다. 다시 로그인 후 시도해주세요.'})
+            return redirect(url_for('index'))
+
+        data = (request.json or {}) if request.is_json else (request.form or {})
+        req_user_id = (data.get('user_id') or data.get('USER_ID') or '').strip() if isinstance(data, dict) else ''
+        if req_user_id and req_user_id != current_user_id:
+            if request.is_json or request.path.startswith('/api'):
+                return jsonify({'success': False, 'message': '본인 계정만 탈퇴할 수 있습니다.'})
+            return redirect(url_for('index'))
+
+        user_id = current_user_id
+
+        # 구글 소셜 회원일 경우 구글 동의 권한 철회 API 호출 (Google OAuth Revoke Token)
+        access_token = session.get('access_token')
+        if access_token:
+            try:
+                requests.post(
+                    'https://oauth2.googleapis.com/revoke',
+                    params={'token': access_token},
+                    headers={'content-type': 'application/x-www-form-urlencoded'},
+                    timeout=5
+                )
+                print(f"[Google Revoke] 구글 연동 권한 및 동의 철회 성공: {user_id}")
+            except Exception as err:
+                print(f"[Google Revoke Warning] 구글 동의 철회 중 경고 발생: {err}")
+
+        res = service.delete_user(user_id)
+        session.clear()
+        session['logged_out'] = True
+
         if request.is_json or request.path.startswith('/api'):
-            return jsonify({'success': False, 'message': '로그인된 상태가 아닙니다.'}), 401
+            if res:
+                return jsonify({'success': True, 'message': 'PawStar 회원 탈퇴가 성공적으로 처리되었습니다. 그동안 이용해주셔서 감사합니다. 🐾'})
+            else:
+                return jsonify({'success': False, 'message': '회원 탈퇴 처리 중 DB 오류가 발생했습니다.'})
         return redirect(url_for('index'))
-
-    data = (request.json or {}) if request.is_json else (request.form or {})
-    req_user_id = (data.get('user_id') or '').strip() if isinstance(data, dict) else ''
-    if req_user_id and req_user_id != current_user_id:
+    except Exception as e:
+        print("[Withdraw Exception Error]:", e)
         if request.is_json or request.path.startswith('/api'):
-            return jsonify({'success': False, 'message': '본인 계정만 탈퇴할 수 있습니다.'}), 403
+            return jsonify({'success': False, 'message': f'회원 탈퇴 처리 중 예외 발생: {str(e)}'})
         return redirect(url_for('index'))
-
-    user_id = current_user_id
-
-    # 구글 소셜 회원일 경우 구글 동의 권한 철회 API 호출 (Google OAuth Revoke Token)
-    access_token = session.get('access_token')
-    if access_token:
-        try:
-            requests.post(
-                'https://oauth2.googleapis.com/revoke',
-                params={'token': access_token},
-                headers={'content-type': 'application/x-www-form-urlencoded'},
-                timeout=5
-            )
-            print(f"[Google Revoke] 구글 연동 권한 및 동의 철회 성공: {user_id}")
-        except Exception as err:
-            print(f"[Google Revoke Warning] 구글 동의 철회 중 경고 발생: {err}")
-
-    service.delete_user(user_id)
-    session.clear()
-    session['logged_out'] = True
-
-    if request.is_json or request.path.startswith('/api'):
-        return jsonify({'success': True, 'message': 'PawStar 회원 탈퇴 및 Google 서버의 계정 연동 동의 철회가 성공적으로 처리되었습니다. 그동안 이용해주셔서 감사합니다. 🐾'})
-    return redirect(url_for('index'))
 
 def get_post_login_redirect_url(is_mobile=False):
     """

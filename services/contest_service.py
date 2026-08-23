@@ -28,6 +28,29 @@ def _get_config_web():
 config_web = _get_config_web()
 DB_CONFIG = config_web.DB_CONFIG
 
+def _delete_physical_file(file_path):
+    """ 서버 디스크 파일 시스템 상의 물리적 이미지 파일 실시간 완전 삭제 """
+    if not file_path or not isinstance(file_path, str):
+        return
+    file_path = file_path.strip()
+    if not file_path or file_path.startswith('data:') or file_path.startswith('http://') or file_path.startswith('https://'):
+        return
+    # 기본 이미지 자산은 절대 보호
+    default_files = ['default_profile.png', 'default_pet.jpg', 'sample_01.jpg']
+    if any(df in file_path for df in default_files):
+        return
+
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    rel_path = file_path.lstrip('/').lstrip('\\')
+    abs_path = os.path.join(base_dir, rel_path.replace('/', os.sep).replace('\\', os.sep))
+
+    try:
+        if os.path.exists(abs_path) and os.path.isfile(abs_path):
+            os.remove(abs_path)
+            print(f"[Physical Delete Success] 파일 물리 삭제 완료: {abs_path}")
+    except Exception as err:
+        print(f"[Physical Delete Warning] 파일 물리 삭제 중 경고: {err}")
+
 def hash_google_id(google_id):
     """
     'google_식별자숫자' (예: 'google_101790422708324681983' 또는 '101790422708324681983')
@@ -726,14 +749,74 @@ class PawStarService:
         if not conn:
             return False
         try:
+            files_to_delete = []
             with conn.cursor() as cur:
+                # 1. 삭제할 유저의 프로필 이미지 경로 수집
+                cur.execute("SELECT PROFILE_URL FROM PST_USER WHERE USER_ID = %s", (user_id,))
+                u_row = cur.fetchone()
+                if u_row and u_row.get('PROFILE_URL'):
+                    files_to_delete.append(u_row.get('PROFILE_URL'))
+
+                # 2. 삭제할 유저의 모든 출전작 이미지 경로 수집
+                cur.execute("SELECT PHT_FILE_PATH1, PHT_FILE_PATH2 FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s", (user_id,))
+                r_rows = cur.fetchall()
+                if r_rows:
+                    for r in r_rows:
+                        if r.get('PHT_FILE_PATH1'): files_to_delete.append(r.get('PHT_FILE_PATH1'))
+                        if r.get('PHT_FILE_PATH2'): files_to_delete.append(r.get('PHT_FILE_PATH2'))
+
+                # 3. 탈퇴 유저 본인이 활동하여 생성된 반응 기록(좋아요, 댓글, 조회수, 공유기록) 삭제
+                cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE LIKE_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM PST_CONTEST_CMT WHERE CMT_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM PST_CONTEST_VW WHERE VW_USER_ID = %s", (user_id,))
+                cur.execute("DELETE FROM PST_CONTEST_SHARE WHERE SHARE_USER_ID = %s", (user_id,))
+
+                # 4. 탈퇴 유저가 출전했던 게시물들(PST_CONTEST_ROUND)에 달린 하위 반응 기록 일체 삭제
+                cur.execute("""
+                    DELETE FROM PST_CONTEST_LIKE WHERE (CONTEST_ROUND, ROUND_NO) IN (
+                        SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s
+                    )
+                """, (user_id,))
+                cur.execute("""
+                    DELETE FROM PST_CONTEST_CMT WHERE (CONTEST_ROUND, ROUND_NO) IN (
+                        SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s
+                    )
+                """, (user_id,))
+                cur.execute("""
+                    DELETE FROM PST_CONTEST_VW WHERE (CONTEST_ROUND, ROUND_NO) IN (
+                        SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s
+                    )
+                """, (user_id,))
+                cur.execute("""
+                    DELETE FROM PST_CONTEST_SHARE WHERE (CONTEST_ROUND, ROUND_NO) IN (
+                        SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s
+                    )
+                """, (user_id,))
+
+                # 5. 유저 본인의 출전작(PST_CONTEST_ROUND) 삭제
                 cur.execute("DELETE FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s", (user_id,))
+
+                # 6. 유저의 수상 내역(PST_CONTEST_AWARD) 삭제
+                cur.execute("DELETE FROM PST_CONTEST_AWARD WHERE ENT_USER_ID = %s", (user_id,))
+
+                # 7. 유저 프로필 및 계정(PST_USER) 삭제
                 cur.execute("DELETE FROM PST_USER WHERE USER_ID = %s", (user_id,))
+
                 conn.commit()
                 conn.close()
-                return True
+
+            # DB 트랜잭션 정상 커밋 후 물리 디스크 상의 이미지 파일들 100% 삭제
+            for fpath in files_to_delete:
+                _delete_physical_file(fpath)
+
+            return True
         except Exception as e:
             print("delete_user error:", e)
+            if conn:
+                try: conn.rollback()
+                except Exception: pass
+                try: conn.close()
+                except Exception: pass
             return False
 
     def get_user_profile(self, user_id, contest_id='all'):
@@ -887,7 +970,7 @@ class PawStarService:
                     LEFT JOIN PST_PET_KIND k ON r.KIND_CD = k.KIND_CD
                     LEFT JOIN PST_CONTEST c ON ca.CONTEST_ROUND = c.CONTEST_ROUND
                     LEFT JOIN PST_THEME t ON c.THEME_CD = t.THEME_CD
-                    WHERE ca.ENT_USER_ID = %s
+                    WHERE ca.ENT_USER_ID = %s AND r.CONTEST_ROUND IS NOT NULL
                 """
                 award_params = [user_id]
                 if contest_id and str(contest_id) != 'all':
@@ -1273,22 +1356,22 @@ class PawStarService:
                 ent_user_id = post_id_str
 
             with conn.cursor() as cur:
-                # 1. 해당 출전물 정보 조회
+                # 1. 해당 출전물 정보 및 사진 파일 경로 조회
                 if contest_round and round_no:
                     cur.execute("""
-                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, PHT_FILE_PATH1, PHT_FILE_PATH2 
                         FROM PST_CONTEST_ROUND 
                         WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
                     """, (contest_round, round_no))
                 elif contest_round and ent_user_id:
                     cur.execute("""
-                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, PHT_FILE_PATH1, PHT_FILE_PATH2 
                         FROM PST_CONTEST_ROUND 
                         WHERE CONTEST_ROUND = %s AND ENT_USER_ID = %s
                     """, (contest_round, ent_user_id))
                 else:
                     cur.execute("""
-                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID 
+                        SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, PHT_FILE_PATH1, PHT_FILE_PATH2 
                         FROM PST_CONTEST_ROUND 
                         WHERE ENT_USER_ID = %s
                     """, (ent_user_id,))
@@ -1301,22 +1384,15 @@ class PawStarService:
                 c_round = entry['CONTEST_ROUND']
                 r_no = entry['ROUND_NO']
                 owner_id = entry['ENT_USER_ID']
+                p1 = entry.get('PHT_FILE_PATH1')
+                p2 = entry.get('PHT_FILE_PATH2')
 
                 # 2. 본인 소유 확인 (단, 관리자인 경우 허용)
                 if owner_id != user_id and user_id != 'admin':
                     conn.close()
                     return {'success': False, 'message': '본인의 출전물만 포기(삭제)할 수 있습니다.'}
 
-                # 3. 회차 마감 여부 검증 (종료된 회차도 본인/관리자가 삭제 요청시 허용)
-                # cur.execute("""
-                #     SELECT CONTEST_STAT FROM PST_CONTEST WHERE CONTEST_ROUND = %s
-                # """, (c_round,))
-                # c_info = cur.fetchone()
-                # if c_info and c_info.get('CONTEST_STAT') == 'G001C002':
-                #     conn.close()
-                #     return {'success': False, 'message': '이미 마감(종료)된 회차의 출전물은 포기(삭제)할 수 없습니다.'}
-
-                # 4. 관련 하위 레코드 및 출전물 삭제
+                # 3. 관련 하위 레코드 및 출전물 DB 삭제
                 cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
                 cur.execute("DELETE FROM PST_CONTEST_CMT WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
                 cur.execute("DELETE FROM PST_CONTEST_VW WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
@@ -1324,6 +1400,11 @@ class PawStarService:
 
                 conn.commit()
                 conn.close()
+
+                # 4. 물리적 출전 사진 파일 디스크에서 삭제
+                _delete_physical_file(p1)
+                _delete_physical_file(p2)
+
                 return {'success': True, 'message': '출전이 성공적으로 포기(삭제)되었습니다.', 'post_id': post_id_str, 'contest_round': c_round, 'round_no': r_no}
         except Exception as e:
             print("delete_contest_entry error:", e)
@@ -2418,10 +2499,10 @@ class PawStarService:
 
                         if is_post_del:
                             w['is_post_deleted'] = True
-                            w['TITLE'] = '해당 유저가 삭제하였습니다'
-                            w['title'] = '해당 유저가 삭제하였습니다'
-                            w['CONTS'] = '해당 유저가 삭제하였습니다'
-                            w['content'] = '해당 유저가 삭제하였습니다'
+                            w['TITLE'] = '출전자에 의해 삭제된 출전작입니다'
+                            w['title'] = '출전자에 의해 삭제된 출전작입니다'
+                            w['CONTS'] = ''
+                            w['content'] = ''
                             w['IMAGE_PATH'] = WHITE_IMAGE_DATA_URI
                             w['image_path'] = WHITE_IMAGE_DATA_URI
                             w['popup_image_path'] = WHITE_IMAGE_DATA_URI

@@ -222,7 +222,7 @@
                                     </div>
 
                                     <!-- 📝 2. 게시글 제목 -->
-                                    {% set s_title = star.TITLE or star.title or star.PET_NM or star.pet_name or '자랑 게시물' %}
+                                    {% set s_title = '출전자에 의해 삭제된 출전작입니다' if (star.is_post_deleted or star.TITLE == 'None' or star.title == 'None') else (star.TITLE or star.title or star.PET_NM or star.pet_name or '출전자에 의해 삭제된 출전작입니다') %}
                                     <h3 class="post-title hof-post-title" style="text-align: left !important;" title="{{ s_title }}">{{ s_title }}</h3>
 
                                     <!-- 🌟 3. 등록 일시 & 스파클링 챔피언 총 점수 배지 -->
@@ -373,7 +373,7 @@
                                     </div>
 
                                     <!-- 📝 2. 게시글 제목 -->
-                                    {% set s_title = star.TITLE or star.title or star.PET_NM or star.pet_name or '자랑 게시물' %}
+                                    {% set s_title = '출전자에 의해 삭제된 출전작입니다' if (star.is_post_deleted or star.TITLE == 'None' or star.title == 'None') else (star.TITLE or star.title or star.PET_NM or star.pet_name or '출전자에 의해 삭제된 출전작입니다') %}
                                     <h3 class="post-title hof-post-title" style="text-align: left !important;" title="{{ s_title }}">{{ s_title }}</h3>
 
                                     <!-- 🌟 3. 등록 일시 & 스파클링 챔피언 총 점수 배지 -->
@@ -525,7 +525,7 @@
                                     </div>
 
                                     <!-- 📝 2. 게시글 제목 -->
-                                    {% set s_title = star.TITLE or star.title or star.PET_NM or star.pet_name or '자랑 게시물' %}
+                                    {% set s_title = '출전자에 의해 삭제된 출전작입니다' if (star.is_post_deleted or star.TITLE == 'None' or star.title == 'None') else (star.TITLE or star.title or star.PET_NM or star.pet_name or '출전자에 의해 삭제된 출전작입니다') %}
                                     <h3 class="post-title hof-post-title" style="text-align: left !important;" title="{{ s_title }}">{{ s_title }}</h3>
 
                                     <!-- 🌟 3. 등록 일시 & 스파클링 챔피언 총 점수 배지 -->
@@ -830,7 +830,7 @@
                                                             </div>
 
                                                             <!-- 📝 2. 게시글 제목 -->
-                                                            {% set s_title = star.TITLE or star.title or star.PET_NM or star.pet_name or '자랑 게시물' %}
+                                                            {% set s_title = '출전자에 의해 삭제된 출전작입니다' if (star.is_post_deleted or star.TITLE == 'None' or star.title == 'None') else (star.TITLE or star.title or star.PET_NM or star.pet_name or '출전자에 의해 삭제된 출전작입니다') %}
                                                             <h3 class="post-title hof-post-title" style="text-align: left !important;" title="{{ s_title }}">{{ s_title }}</h3>
 
                                                             <!-- 🌟 3. 등록 일시 & 스파클링 챔피언 총 점수 배지 -->
