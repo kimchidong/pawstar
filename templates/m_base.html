@@ -118,7 +118,7 @@
                                                 <img src="{{ star.PHT_FILE_PATH1 or star.image_path or '/static/sample_image/sample_01.jpg' }}" style="width: 100%; height: 84px; border-radius: 16px; object-fit: cover; border: 1px solid {{ border_color }}; box-shadow: none; display: block;" alt="펫 스타 사진">
                                                 <img src="/static/image/badge/{{ badge_file }}.png" style="position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2;" alt="메달">
                                                 <span style="position: absolute; top: 3px; right: 3px; z-index: 3; font-size: 0.46rem; font-weight: 800; padding: 0.06rem 0.28rem; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.12); display: inline-flex; align-items: center; gap: 0.1rem; {{ star_style }}">
-                                                    <i class="fa-solid fa-star" style="font-size: 0.42rem;"></i> {{ star_label }}
+                                                    <i class="fa-solid fa-star" style="font-size: 0.42rem; transform: translateY(1px);"></i> {{ star_label }}
                                                 </span>
                                             </div>
                                         {% endfor %}
