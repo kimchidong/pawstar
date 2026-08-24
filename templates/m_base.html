@@ -181,6 +181,16 @@
         {% endif %}
     </nav>
 
+    <!-- 원본 이미지 전용 확대 라이트박스 팝업 모달 -->
+    <div class="m-modal-backdrop" id="originalImageModal" onclick="closeOriginalImageModal()" style="display: none; position: fixed; inset: 0; z-index: 99999999; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1rem; cursor: zoom-out;">
+        <div style="position: relative; max-width: 98vw; max-height: 94vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation();">
+            <button type="button" class="btn-close" onclick="closeOriginalImageModal()" style="position: absolute; top: -1rem; right: -0.6rem; background: #ffffff; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1e293b; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.35); z-index: 100;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="originalImageViewImg" src="" style="max-width: 95vw; max-height: 90vh; object-fit: contain; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); display: block; cursor: default;" alt="원본 이미지 확대보기">
+        </div>
+    </div>
+
     <!-- 모바일 상세보기 모달 (아기자기 몽글몽글 젤리 파스텔 팝업) -->
     <div class="m-modal-backdrop" id="mDetailModal">
         <div class="m-modal-sheet" style="position: relative; max-height: 92vh; padding: 1.1rem 0 0 0; border-top-left-radius: 30px; border-top-right-radius: 30px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 -10px 40px rgba(244, 114, 182, 0.2); overflow: hidden !important;">
@@ -387,19 +397,6 @@
                 </div>
                 <div style="text-align: center; margin-top: 1rem;">
                     <a href="/m/privacy" style="display: inline-block; padding: 0.55rem 1.25rem; border-radius: 20px; background: linear-gradient(135deg, #f472b6, #a78bfa); color: #ffffff; text-decoration: none; font-weight: 800; font-size: 0.82rem;">전체 내용 전문 보기 페이지</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 모바일 이용약관 모달 팝업 -->
-    <div class="m-modal-backdrop" id="mTermsModal" style="display: none; z-index: 999999;">
-        <div class="m-modal-sheet" style="position: relative; max-height: 88vh; padding: 1.1rem 0 0 0; border-top-left-radius: 30px; border-top-right-radius: 30px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 -10px 40px rgba(244, 114, 182, 0.2); overflow: hidden !important;">
-            <div style="padding: 0 1rem; position: relative;">
-                <div style="width: 44px; height: 5px; background: linear-gradient(90deg, #f472b6, #a78bfa); border-radius: 10px; margin: 0 auto 0.75rem auto;"></div>
-                <button type="button" class="btn-close" onclick="closeMobileTermsModal()" style="position: absolute; top: -0.1rem; right: 0.85rem; z-index: 50; background: #ffe4e6; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e11d48; font-size: 0.9rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #7c3aed; background: #f3e8ff; border: 1.5px solid #e9d5ff; padding: 0.22rem 0.65rem; border-radius: 14px; display: inline-flex; align-items: center; gap: 0.25rem;">
                         <i class="fa-solid fa-file-contract"></i> PawStar 이용약관
                     </span>
                 </div>
