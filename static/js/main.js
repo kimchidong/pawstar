@@ -2160,6 +2160,7 @@ document.addEventListener('click', function(e) {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeBadgeZoomModal();
+        closeOriginalImageModal();
     }
 });
 
@@ -2225,6 +2226,27 @@ function initFooterCoWinnerRotation() {
         });
     });
 }
+
+function openOriginalImageModal(imgSrc) {
+    if (!imgSrc) return;
+    const modal = document.getElementById('originalImageModal');
+    const targetImg = document.getElementById('originalImageViewImg');
+    if (!modal || !targetImg) return;
+    
+    targetImg.src = imgSrc;
+    modal.style.display = 'flex';
+    modal.classList.add('show', 'active');
+}
+
+function closeOriginalImageModal() {
+    const modal = document.getElementById('originalImageModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.classList.remove('show', 'active');
+}
+
+window.openOriginalImageModal = openOriginalImageModal;
+window.closeOriginalImageModal = closeOriginalImageModal;
 
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(checkAndAutoOpenPost, 300);

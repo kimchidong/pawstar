@@ -212,6 +212,16 @@
     </footer>
 
 
+    <!-- 원본 이미지 전용 확대 라이트박스 팝업 모달 -->
+    <div class="modal-backdrop" id="originalImageModal" onclick="closeOriginalImageModal()" style="display: none; position: fixed; inset: 0; z-index: 9999999; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out;">
+        <div style="position: relative; max-width: 95vw; max-height: 92vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation();">
+            <button type="button" class="btn-close" onclick="closeOriginalImageModal()" style="position: absolute; top: -1.2rem; right: -1.2rem; background: #ffffff; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1e293b; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="originalImageViewImg" src="" style="max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: block; cursor: default;" alt="원본 이미지 확대보기">
+        </div>
+    </div>
+
     <!-- 게시물 상세 레이어 팝업 모달 (Post Detail Layer Popup Modal) -->
     <div class="modal-backdrop" id="postDetailModal">
         <div class="modal-content detail-modal-content" style="border-radius: 28px; background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); box-shadow: 0 20px 50px rgba(244, 114, 182, 0.25); border: 1.5px solid #fbcfe8; overflow: hidden; width: 900px !important; min-width: 900px !important; max-width: 900px !important; height: 562px !important; min-height: 562px !important; max-height: 562px !important; padding: 0;">
@@ -222,7 +232,7 @@
 
                 <!-- 좌측 미디어 이미지 뷰어 -->
                 <div class="detail-media-container" style="flex: 1.1; position: relative; overflow: hidden !important; background: #ffffff !important; border-top-left-radius: 26px; border-bottom-left-radius: 26px; -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0); min-height: 480px;">
-                    <img id="detailImg" src="" alt="pet image" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; background-color: #ffffff;">
+                    <img id="detailImg" src="" alt="pet image" onclick="if(typeof openOriginalImageModal==='function') openOriginalImageModal(this.src);" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; background-color: #ffffff; cursor: zoom-in;" title="클릭시 원본 이미지 확대보기">
                     <div id="detailMedalsLeft" style="position: absolute; top: 0.85rem; left: 0.75rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; pointer-events: auto;"></div>
                     <div id="detailRankBadge" class="detail-rank-badge" style="position: absolute; top: 0.85rem; right: 0.75rem; left: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; pointer-events: auto;"></div>
                     <!-- 좌측 하단 참가번호 오버레이 뱃지 -->
