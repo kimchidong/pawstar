@@ -750,6 +750,8 @@ class PawStarService:
             return False
         try:
             files_to_delete = []
+            affected_posts = set()
+
             with conn.cursor() as cur:
                 # 1. 삭제할 유저의 프로필 이미지 경로 수집
                 cur.execute("SELECT PROFILE_URL FROM PST_USER WHERE USER_ID = %s", (user_id,))
@@ -765,13 +767,26 @@ class PawStarService:
                         if r.get('PHT_FILE_PATH1'): files_to_delete.append(r.get('PHT_FILE_PATH1'))
                         if r.get('PHT_FILE_PATH2'): files_to_delete.append(r.get('PHT_FILE_PATH2'))
 
-                # 3. 탈퇴 유저 본인이 활동하여 생성된 반응 기록(좋아요, 댓글, 조회수, 공유기록) 삭제
+                # 3. 탈퇴 유저가 평가 반응(좋아요, 댓글, 조회수, 공유)을 남겨 수치가 영향받는 타인의 게시물 목록 사전 수집
+                cur.execute("""
+                    SELECT DISTINCT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_LIKE WHERE LIKE_USER_ID = %s
+                    UNION
+                    SELECT DISTINCT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_CMT WHERE CMT_USER_ID = %s
+                    UNION
+                    SELECT DISTINCT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_VW WHERE VW_USER_ID = %s
+                    UNION
+                    SELECT DISTINCT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_SHARE WHERE SHARE_USER_ID = %s
+                """, (user_id, user_id, user_id, user_id))
+                for r in cur.fetchall():
+                    affected_posts.add((r['CONTEST_ROUND'], r['ROUND_NO']))
+
+                # 4. 탈퇴 유저 본인이 활동하여 생성된 반응 기록(좋아요, 댓글, 조회수, 공유기록) 삭제
                 cur.execute("DELETE FROM PST_CONTEST_LIKE WHERE LIKE_USER_ID = %s", (user_id,))
                 cur.execute("DELETE FROM PST_CONTEST_CMT WHERE CMT_USER_ID = %s", (user_id,))
                 cur.execute("DELETE FROM PST_CONTEST_VW WHERE VW_USER_ID = %s", (user_id,))
                 cur.execute("DELETE FROM PST_CONTEST_SHARE WHERE SHARE_USER_ID = %s", (user_id,))
 
-                # 4. 탈퇴 유저가 출전했던 게시물들(PST_CONTEST_ROUND)에 달린 하위 반응 기록 일체 삭제
+                # 5. 탈퇴 유저가 출전했던 게시물들(PST_CONTEST_ROUND)에 달린 타인의 하위 반응 기록 일체 삭제
                 cur.execute("""
                     DELETE FROM PST_CONTEST_LIKE WHERE (CONTEST_ROUND, ROUND_NO) IN (
                         SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s
@@ -793,14 +808,19 @@ class PawStarService:
                     )
                 """, (user_id,))
 
-                # 5. 유저 본인의 출전작(PST_CONTEST_ROUND) 삭제
+                # 6. 유저 본인의 출전작(PST_CONTEST_ROUND) 삭제
                 cur.execute("DELETE FROM PST_CONTEST_ROUND WHERE ENT_USER_ID = %s", (user_id,))
 
-                # 6. 유저의 수상 내역(PST_CONTEST_AWARD) 삭제
-                cur.execute("DELETE FROM PST_CONTEST_AWARD WHERE ENT_USER_ID = %s", (user_id,))
+                # 7. (PST_CONTEST_AWARD 는 명예의 전당 및 역대 콘테스트 수상 영구 결과물이므로 절대 삭제하지 않고 100% 보존)
 
-                # 7. 유저 프로필 및 계정(PST_USER) 삭제
+                # 8. 유저 프로필 및 계정(PST_USER) 삭제
                 cur.execute("DELETE FROM PST_USER WHERE USER_ID = %s", (user_id,))
+
+                # 9. 영향받은 타인 게시물들의 평가 4요소(VW_CNT, LIKE_CNT, CMT_CNT, SHARE_CNT) 및 총 점수(SCORE) 실시간 재계산 & UPDATE 동기화
+                for c_round, r_no in affected_posts:
+                    cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (c_round, r_no))
+                    if cur.fetchone()['cnt'] > 0:
+                        self.recalculate_post_stats(cur, c_round, r_no)
 
                 conn.commit()
                 conn.close()
@@ -1950,24 +1970,13 @@ class PawStarService:
             print("get_post_detail error:", e)
             return None
 
-    def sync_and_get_post_stats(self, cur, contest_id, round_no, share_cnt_override=None):
+    def recalculate_post_stats(self, cur, contest_id, round_no):
         """
-        4가지 평가 요소(조회/좋아요/댓글/공유) 이벤트 발생 시 공통 적용:
-        1. 하위 테이블 및 PST_CONTEST_ROUND에서 실제 4요소 개수 DB 재조회
-        2. 조회된 개수로 총 점수(SCORE) 계산 (VW: 1, LIKE: 5, CMT: 10, SHARE: 10)
-        3. DB PST_CONTEST_ROUND 테이블에 4요소 카운트 및 SCORE 반영 UPDATE
-        4. DB에서 최종 4요소 및 SCORE를 반환
+        평가 4요소(조회/좋아요/댓글/공유) 하위 테이블의 실제 레코드 수를 기준 삼아
+        PST_CONTEST_ROUND 테이블의 4요소 컬럼(VW_CNT, LIKE_CNT, CMT_CNT, SHARE_CNT) 및 총점(SCORE)을 100% 동기화 UPDATE
         """
-        # 1. DB에서 하위 테이블 개수 재조회
         cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_VW WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-        vw_tbl_cnt = cur.fetchone()['cnt']
-
-        cur.execute("SELECT COALESCE(VW_CNT, 0) AS r_vw, COALESCE(SHARE_CNT, 0) AS r_share FROM PST_CONTEST_ROUND WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
-        r_row = cur.fetchone()
-        r_vw = r_row['r_vw'] if r_row else 0
-        
-        # 조회수: 테이블 레코드 수와 round 누적값 중 더 큰 값을 적용 (최소 누적 수치 보장)
-        vw_cnt = max(vw_tbl_cnt, r_vw)
+        vw_cnt = cur.fetchone()['cnt']
 
         cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_LIKE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         like_cnt = cur.fetchone()['cnt']
@@ -1975,15 +1984,12 @@ class PawStarService:
         cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_CMT WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
         cmt_cnt = cur.fetchone()['cnt']
 
-        if share_cnt_override is not None:
-            share_cnt = share_cnt_override
-        else:
-            share_cnt = r_row['r_share'] if r_row else 0
+        cur.execute("SELECT COUNT(*) AS cnt FROM PST_CONTEST_SHARE WHERE CONTEST_ROUND = %s AND ROUND_NO = %s", (contest_id, round_no))
+        share_cnt = cur.fetchone()['cnt']
 
-        # 2. 총 점수 계산 (조회 1점, 좋아요 5점, 댓글 10점, 공유 10점)
+        # 총 점수 재계산 (조회: 1점, 좋아요: 5점, 댓글: 10점, 공유: 10점)
         calc_score = (vw_cnt * 1) + (like_cnt * 5) + (cmt_cnt * 10) + (share_cnt * 10)
 
-        # 3. DB PST_CONTEST_ROUND 최신화 UPDATE
         cur.execute("""
             UPDATE PST_CONTEST_ROUND
             SET VW_CNT = %s, LIKE_CNT = %s, CMT_CNT = %s, SHARE_CNT = %s, SCORE = %s
@@ -1995,9 +2001,38 @@ class PawStarService:
             'like_count': like_cnt,
             'comment_count': cmt_cnt,
             'share_count': share_cnt,
-            'score': calc_score,
-            'new_score': calc_score
+            'score': calc_score
         }
+
+    def sync_all_contest_round_stats(self):
+        """ 전체 출전 게시물(PST_CONTEST_ROUND)의 평가 4요소 및 SCORE 수치를 하위 테이블 기반 전수 동기화 """
+        conn = self.get_db_connection()
+        if not conn:
+            return 0
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT CONTEST_ROUND, ROUND_NO FROM PST_CONTEST_ROUND")
+                posts = cur.fetchall()
+                count = 0
+                for p in posts:
+                    self.recalculate_post_stats(cur, p['CONTEST_ROUND'], p['ROUND_NO'])
+                    count += 1
+                conn.commit()
+                conn.close()
+                print(f"[Stats Sync Complete] 전체 {count}개 게시물의 평가 4요소(VW, LIKE, CMT, SHARE, SCORE) 전수 동기화 완료!")
+                return count
+        except Exception as e:
+            print("sync_all_contest_round_stats error:", e)
+            if conn:
+                try: conn.close()
+                except Exception: pass
+            return 0
+
+    def sync_and_get_post_stats(self, cur, contest_id, round_no, share_cnt_override=None):
+        """
+        4가지 평가 요소(조회/좋아요/댓글/공유) 이벤트 발생 시 공통 적용
+        """
+        return self.recalculate_post_stats(cur, contest_id, round_no)
 
     def is_contest_closed(self, contest_id):
         """ 백엔드 서버사이드 검증: 특정 회차가 마감/종료(G001C002) 상태인지 확인 """
