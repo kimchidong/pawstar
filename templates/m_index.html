@@ -4,9 +4,11 @@
 
 <!-- 모바일 히어로 배너 (PST_THEME 테이블 BANNER_IMG_FILE_PATH 바인딩 + PC 스타일 D-DAY 미니 카드) -->
 <div class="m-hero" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.72) 0%, rgba(79, 70, 229, 0.62) 50%, rgba(225, 29, 72, 0.48) 100%), url('{{ current_contest.BANNER_IMG_FILE_PATH or current_contest.banner_img }}') center center / cover no-repeat;">
-    {% set is_closed = (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str == '종료됨') if current_contest else False %}
+    {% set active_round_no = active_contest_round|default(ACTIVE_CONTEST_ROUND)|default(3)|int %}
+    {% set curr_round_num = (current_contest.CONTEST_ROUND or current_contest.contest_id or 0)|int %}
+    {% set is_closed = (curr_round_num > 0 and active_round_no > 0 and curr_round_num < active_round_no) or (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str in ['종료됨', '종료', '마감']) if current_contest else False %}
     
-    <h2>{% if current_contest %}<span class="hero-round-badge" style="color: #fef08a;">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}{% else %}Paw Star 콘테스트{% endif %}</h2>
+    <h2>{% if current_contest %}<span class="hero-round-badge {{ 'closed' if is_closed else '' }}" style="color: {{ '#94a3b8' if is_closed else '#fef08a' }};">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}{% else %}Paw Star 콘테스트{% endif %}</h2>
     <p>{{ current_contest.THEME_MENT or current_contest.CONTS or current_contest.description if current_contest else '대한민국 대표 펫 스타에 도전하세요!' }}</p>
     
     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 0.75rem; margin-bottom: 0.25rem;">
@@ -14,11 +16,10 @@
             <div class="m-hero-badge closed"><span>{{ current_contest.contest_year_month or '콘테스트 마감' }}</span></div>
         {% else %}
             <div class="m-hero-badge"><span class="live-dot"></span> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status if current_contest else '진행중' }}</span></div>
+            <a href="/m/upload" class="m-btn-hero-cta" onclick="return handleMobileUploadNavClick(event);">
+                <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
+            </a>
         {% endif %}
-        
-        <a href="/m/upload" class="m-btn-hero-cta" onclick="return handleMobileUploadNavClick(event);">
-            <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
-        </a>
     </div>
 
     <!-- 모바일 콘테스트 기간 & D-DAY 슬림 카드 -->
@@ -27,7 +28,7 @@
             <i class="fa-regular fa-calendar-days"></i>
             <span class="period-dates">{{ ((current_contest.ST_DT or current_contest.start_date)|string)[:10] if current_contest else '2026-08-01' }} ~ {{ ((current_contest.ED_DT or current_contest.end_date)|string)[:10] if current_contest else '2026-08-31' }}</span>
         </div>
-        <div class="m-hero-dday-badge">
+        <div class="m-hero-dday-badge {{ 'closed' if is_closed else '' }}" style="{{ 'background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important; color: #f1f5f9 !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;' if is_closed else '' }}">
             <span>{{ current_contest.d_day_str if current_contest else 'D-DAY' }}</span>
         </div>
     </div>

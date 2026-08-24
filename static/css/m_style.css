@@ -355,6 +355,17 @@ body.m-body {
     border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+.m-hero-dday-badge.closed {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.hero-round-badge.closed {
+    color: #94a3b8 !important;
+}
+
 .m-hero-actions {
     display: flex;
     align-items: center;

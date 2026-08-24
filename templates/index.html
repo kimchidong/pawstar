@@ -8,7 +8,9 @@
     <div class="hero-container">
         <!-- 좌측: 타이틀 & 대형 슬로건 -->
         <div class="hero-main-info">
-            {% set is_closed = (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str == '종료됨') %}
+            {% set active_round_no = active_contest_round|default(ACTIVE_CONTEST_ROUND)|default(3)|int %}
+            {% set curr_round_num = (current_contest.CONTEST_ROUND or current_contest.contest_id or 0)|int %}
+            {% set is_closed = (curr_round_num > 0 and active_round_no > 0 and curr_round_num < active_round_no) or (current_contest.is_closed or current_contest.CONTEST_STAT == 'G001C002' or current_contest.contest_stat == 'G001C002' or current_contest.status in ['종료', '마감', 'CLOSED'] or current_contest.CONTEST_STAT_NM in ['종료', '마감', 'CLOSED'] or current_contest.d_day_str in ['종료됨', '종료', '마감']) if current_contest else False %}
             {% if is_closed %}
                 <div class="contest-badge-closed">
                     <span>{{ current_contest.contest_year_month or '해당 년월 콘테스트' }}</span>
@@ -19,13 +21,15 @@
                     <i class="fa-solid fa-sparkles"></i> <span>{{ current_contest.CONTEST_STAT_NM or current_contest.status }}</span>
                 </div>
             {% endif %}
-            <h2 class="hero-title"><span class="hero-round-badge">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</h2>
+            <h2 class="hero-title"><span class="hero-round-badge {{ 'closed' if is_closed else '' }}">제{{ current_contest.CONTEST_ROUND or current_contest.contest_id }}회</span> {{ current_contest.THEME_NM or current_contest.title }}</h2>
             <p class="hero-desc">{{ current_contest.THEME_MENT or current_contest.description }}</p>
             
             <div class="hero-actions">
-                <a href="/upload" class="btn-hero-cta" onclick="return handlePcUploadNavClick(event);">
-                    <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
-                </a>
+                {% if not is_closed %}
+                    <a href="/upload" class="btn-hero-cta" onclick="return handlePcUploadNavClick(event);">
+                        <i class="fa-solid fa-paw"></i> 우리 아이 출전시키기
+                    </a>
+                {% endif %}
                 <a href="/hall-of-fame" class="btn-hero-sec">
                     <i class="fa-solid fa-ranking-star"></i> 명예의 전당
                 </a>
