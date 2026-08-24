@@ -521,16 +521,25 @@
     });
 
         // 구글 로그인 처리 함수
+        function getShareInfoPayload() {
+            try {
+                const raw = localStorage.getItem('pawstar_share_info');
+                if (raw) return JSON.parse(raw);
+            } catch(e) {}
+            return null;
+        }
+
         function handleGoogleAuthResponse(googleUser) {
+            const payload = Object.assign({}, googleUser || {}, { share_info: getShareInfoPayload() });
             fetch('/api/auth/google', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(googleUser || {})
+                body: JSON.stringify(payload)
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    location.href = '/profile';
+                    location.href = data.target_url || '/profile';
                 } else {
                     alert('Google 인증 실패: ' + data.message);
                 }
@@ -628,7 +637,8 @@
             const user_id = document.getElementById('pcLoginUserId').value.trim();
             const password = document.getElementById('pcLoginPassword').value.trim();
             if (!user_id || !password) return;
-            fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, password}) })
+            const share_info = getShareInfoPayload();
+            fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, password, share_info}) })
             .then(r => r.json()).then(data => {
                 if (data.success) {
                     if (data.target_url) {
@@ -648,7 +658,8 @@
             const nickname = document.getElementById('pcRegNickname').value.trim();
             const password = document.getElementById('pcRegPassword').value.trim();
             if (!user_id || !nickname || !password) return;
-            fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, nickname, password}) })
+            const share_info = getShareInfoPayload();
+            fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, nickname, password, share_info}) })
             .then(r => r.json()).then(data => {
                 if (data.success) { 
                     if(typeof showToast==='function') showToast('🎉 회원가입 성공!'); 

@@ -33,6 +33,28 @@
 {% endblock %}
 
 {% block content %}
+<script>
+    (function() {
+        const cRound = "{{ contest_round or (post.contest_round if post else '') or (post.CONTEST_ROUND if post else '') }}";
+        const rNo = "{{ round_no or (post.round_no if post else '') or (post.ROUND_NO if post else '') }}";
+        const shareSn = "{{ share_sn or (post.share_sn if post else '') or (post.SHARE_SN if post else '') }}";
+        const isClosed = {% if is_closed %}true{% else %}false{% endif %};
+        
+        if (cRound && rNo && !isClosed) {
+            const shareData = {
+                contest_round: parseInt(cRound),
+                round_no: parseInt(rNo),
+                share_sn: shareSn || 'DIRECT',
+                post_id: `${cRound}_${rNo}`,
+                is_closed: false
+            };
+            try {
+                localStorage.setItem('pawstar_share_info', JSON.stringify(shareData));
+                document.cookie = "pawstar_share_info=" + encodeURIComponent(JSON.stringify(shareData)) + "; path=/; max-age=86400;";
+            } catch(e) {}
+        }
+    })();
+</script>
 <div style="max-width: 800px; margin: 2.5rem auto; padding: 0 1rem;">
 
     {% if post %}

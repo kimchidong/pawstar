@@ -271,18 +271,28 @@
         document.getElementById('privacyModal').style.display = 'none';
     }
 
+    function getShareInfoPayload() {
+        try {
+            const raw = localStorage.getItem('pawstar_share_info');
+            if (raw) return JSON.parse(raw);
+        } catch(e) {}
+        return null;
+    }
+
     document.getElementById('googleLoginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const email = document.getElementById('gEmail').value.trim();
         if (!email) return;
 
+        const share_info = getShareInfoPayload();
         fetch('/api/auth/google', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 google_id: 'g_' + Math.floor(Math.random() * 1000000),
                 email: email,
-                name: email.split('@')[0]
+                name: email.split('@')[0],
+                share_info: share_info
             })
         })
         .then(res => res.json())

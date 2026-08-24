@@ -113,8 +113,35 @@ def time_ago_filter(dt_val):
         return str(dt_val)[:10]
 
 @app.before_request
-def check_session_timeout():
-    """ 웹 서비스 이용(요청) 중 아무런 액션 없이 30분(1800초) 경과 시 세션 자동 만료 파기 처리 """
+def check_session_timeout_and_share_referral():
+    """ 
+    1. 전역 공유 유입 파라미터 감지 훅 (비로그인 상태로 공유링크 진입 시 세션에 100% 자동 보관)
+    2. 웹 서비스 이용(요청) 중 아무런 액션 없이 30분(1800초) 경과 시 세션 자동 만료 파기 처리 
+    """
+    try:
+        c_round = request.args.get('contest_round') or request.args.get('contest_id')
+        r_no = request.args.get('round_no')
+        s_sn = request.args.get('share_sn')
+        open_post = request.args.get('open_post')
+
+        if not c_round or not r_no:
+            if open_post and '_' in str(open_post):
+                parts = str(open_post).split('_', 1)
+                c_round = parts[0]
+                r_no = parts[1]
+
+        if c_round and r_no and str(c_round).isdigit() and str(r_no).isdigit():
+            session.permanent = True
+            session['share_info'] = {
+                'contest_round': int(c_round),
+                'round_no': int(r_no),
+                'share_sn': str(s_sn or 'DIRECT_SHARE'),
+                'post_id': f"{c_round}_{r_no}",
+                'is_closed': False
+            }
+    except Exception as e:
+        print("capture_global_share_referral error:", e)
+
     if session.get('logged_out'):
         session.pop('user_id', None)
         return
@@ -464,7 +491,7 @@ def api_auth_login():
     success, result = service.authenticate_user(user_id, password)
     if success:
         # 공유 유입 접속 후 기존 회원 로그인 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
-        process_signup_share_referral(new_user_id=user_id)
+        process_signup_share_referral(new_user_id=user_id, request_data=data)
 
         is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
         target_url = get_post_login_redirect_url(is_mobile=is_mobile)
@@ -480,9 +507,25 @@ def api_auth_login():
     else:
         return jsonify({'success': False, 'message': result}), 401
 
-def process_signup_share_referral(new_user_id=None):
+def process_signup_share_referral(new_user_id=None, request_data=None):
     """ 공유 링크 유입 가입/로그인 시 PST_CONTEST_SHARE 저장 및 공유 카운트/점수 1 증가 처리 헬퍼 (종료된 과거 회차는 철저히 차단) """
+    if not new_user_id:
+        return
+
     share_info = session.get('share_info')
+    
+    # 세션에 없거나 유실된 경우 클라이언트 HTTP 요청 JSON (request_data) 백업 확인
+    if not share_info and request_data and isinstance(request_data, dict):
+        client_share = request_data.get('share_info')
+        if isinstance(client_share, dict):
+            share_info = client_share
+        elif isinstance(client_share, str) and '{' in client_share:
+            try:
+                import json
+                share_info = json.loads(client_share)
+            except Exception:
+                pass
+
     if share_info and isinstance(share_info, dict):
         if share_info.get('is_closed'):
             session.pop('share_info', None)
@@ -490,10 +533,12 @@ def process_signup_share_referral(new_user_id=None):
 
         c_round = share_info.get('contest_round')
         r_no = share_info.get('round_no')
-        s_sn = share_info.get('share_sn')
-        if c_round and r_no and s_sn:
+        s_sn = share_info.get('share_sn') or 'DIRECT'
+        if c_round and r_no:
             try:
-                service.increment_share_count_on_signup(c_round, r_no, s_sn, user_id=new_user_id)
+                res = service.increment_share_count_on_signup(int(c_round), int(r_no), str(s_sn), user_id=new_user_id)
+                if res:
+                    print(f"[Share Referral Success] User '{new_user_id}' referral for post ({c_round}-{r_no}) recorded successfully.")
             except Exception as e:
                 print("process_signup_share_referral error:", e)
 
@@ -519,14 +564,17 @@ def api_auth_register():
     new_user = service.register_user(user_id, nickname, password, profile_img)
 
     # 공유 유입 회원가입 시 PST_CONTEST_SHARE 기록, 공유 카운트 및 점수 +1 반영
-    process_signup_share_referral(new_user_id=user_id)
+    process_signup_share_referral(new_user_id=user_id, request_data=data)
 
     is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
     target_url = get_post_login_redirect_url(is_mobile=is_mobile)
 
+    saved_share_info = session.get('share_info')
     session.clear()
     session['user_id'] = user_id
     session['last_activity'] = datetime.datetime.now().timestamp()
+    if saved_share_info:
+        session['share_info'] = saved_share_info
     session.pop('logged_out', None)
 
     return jsonify({'success': True, 'message': '회원가입이 완료되었습니다!', 'user': new_user, 'target_url': target_url})
@@ -695,10 +743,12 @@ def auth_google_callback():
         # 3. PawStar 서비스 회원 가입/로그인 처리
         user_info = service.google_login_or_register(google_id, email, name, picture)
 
+        saved_next_url = session.get('next_url') or '/'
+        saved_share_info = session.get('share_info')
+
         if user_info:
             process_signup_share_referral(new_user_id=user_info['user_id'])
 
-        saved_next_url = session.get('next_url') or '/'
         session.clear()
         session['user_id'] = user_info['user_id']
         session['user'] = user_info
@@ -706,6 +756,8 @@ def auth_google_callback():
         session['access_token'] = access_token
         session['is_logged_in'] = True
         session['last_activity'] = datetime.datetime.now().timestamp()
+        if saved_share_info:
+            session['share_info'] = saved_share_info
         session.pop('logged_out', None)
         session['next_url'] = saved_next_url
 
@@ -733,17 +785,20 @@ def api_auth_google():
     user_info = service.google_login_or_register(google_id, email, name, picture)
 
     if user_info:
-        process_signup_share_referral(new_user_id=user_info['user_id'])
+        process_signup_share_referral(new_user_id=user_info['user_id'], request_data=data)
 
     is_mobile = request.path.startswith('/m') or is_mobile_user_agent()
     target_url = get_post_login_redirect_url(is_mobile=is_mobile)
 
+    saved_share_info = session.get('share_info')
     session.clear()
     session['user_id'] = user_info['user_id']
     session['user'] = user_info
     session['profile_img'] = user_info['profile_img']
     session['is_logged_in'] = True
     session['last_activity'] = datetime.datetime.now().timestamp()
+    if saved_share_info:
+        session['share_info'] = saved_share_info
     session.pop('logged_out', None)
 
     return jsonify({

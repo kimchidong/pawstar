@@ -1286,14 +1286,15 @@ class PawStarService:
                     conn.close()
                     return False
 
-                # 2. 게시물(SHARE_SN) 및 작성자 정보 확인
+                # 2. 게시물 및 작성자 정보 확인
                 cur.execute("""
                     SELECT CONTEST_ROUND, ROUND_NO, ENT_USER_ID, COALESCE(SHARE_CNT, 0) AS SHARE_CNT
                     FROM PST_CONTEST_ROUND
-                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_SN = %s
-                """, (contest_id, round_no, share_sn))
+                    WHERE CONTEST_ROUND = %s AND ROUND_NO = %s
+                """, (contest_id, round_no))
                 row = cur.fetchone()
                 if not row:
+                    print(f"increment_share_count_on_signup: contest_round {contest_id}, round_no {round_no} not found.")
                     conn.close()
                     return False
 
@@ -1306,19 +1307,23 @@ class PawStarService:
 
                 # 3. 공유 유입 이력 기록 (중복 유입 방지)
                 if user_id:
-                    affected = cur.execute("""
-                        INSERT IGNORE INTO PST_CONTEST_SHARE (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
-                        VALUES (%s, %s, %s)
+                    cur.execute("""
+                        SELECT COUNT(*) AS cnt FROM PST_CONTEST_SHARE 
+                        WHERE CONTEST_ROUND = %s AND ROUND_NO = %s AND SHARE_USER_ID = %s
                     """, (contest_id, round_no, user_id))
-                    if affected == 0:
-                        # 이미 해당 유저의 공유 유입 점수가 반영되었음
+                    already_exists = cur.fetchone()['cnt'] > 0
+                    if already_exists:
                         print(f"increment_share_count_on_signup: user {user_id} already registered share for {contest_id}-{round_no}, skip duplicate.")
                         conn.close()
                         return False
 
-                # 4. 공유 카운트 및 점수 반영
-                new_share_cnt = row['SHARE_CNT'] + 1
-                self.sync_and_get_post_stats(cur, contest_id, round_no, share_cnt_override=new_share_cnt)
+                    cur.execute("""
+                        INSERT INTO PST_CONTEST_SHARE (CONTEST_ROUND, ROUND_NO, SHARE_USER_ID)
+                        VALUES (%s, %s, %s)
+                    """, (contest_id, round_no, user_id))
+
+                # 4. 공유 카운트 및 점수 100% 동기화 반영
+                self.recalculate_post_stats(cur, contest_id, round_no)
                 conn.commit()
                 conn.close()
                 return True
