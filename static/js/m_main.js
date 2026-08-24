@@ -819,17 +819,9 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
-                    const isViewAct = isUserLoggedIn && !isMinePost && !!(data.actions && data.actions.is_viewed);
-                    if (isViewAct) {
-                        mBtnViewPopup.classList.add('active');
-                        const icon = mBtnViewPopup.querySelector('i');
-                        if (icon) icon.className = 'fa-solid fa-eye';
-                    } else {
-                        mBtnViewPopup.classList.remove('active');
-                        const icon = mBtnViewPopup.querySelector('i');
-                        if (icon) icon.className = 'fa-regular fa-eye';
-                    }
+                    mBtnViewPopup.classList.add('active');
+                    const icon = mBtnViewPopup.querySelector('i');
+                    if (icon) icon.className = 'fa-solid fa-eye';
                 }
             }
         })

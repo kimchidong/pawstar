@@ -241,8 +241,8 @@
 
                 <!-- 실시간 4요소 귀여운 젤리 버블 버튼 (조회수, 좋아요, 댓글수, 공유수) -->
                 <div class="m-card-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-bottom: 0.85rem; text-align: center;">
-                    <div class="m-btn-action btn-view" id="mDetailBtnView" title="조회수">
-                        <i class="fa-regular fa-eye"></i>
+                    <div class="m-btn-action btn-view active" id="mDetailBtnView" title="조회수">
+                        <i class="fa-solid fa-eye"></i>
                         <span class="view-count" id="mDetailViewCount">0</span>
                     </div>
                     <div class="m-btn-action btn-like" id="mDetailBtnLike" title="좋아요 수" onclick="if(window.currentMobileDetailPostId) triggerMobileEvent(window.currentMobileDetailPostId, 'like');" style="padding: 0.55rem 0.2rem; border-radius: 18px; background: #ffe4e6; border: 1.5px solid #fecdd3; color: #e11d48; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; box-shadow: 0 3px 8px rgba(225, 29, 72, 0.1);">
