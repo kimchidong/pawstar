@@ -827,6 +827,19 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
         })
         .catch(err => console.error(err));
 
+    // 참가번호 뱃지 바인딩 (모바일 이미지 좌측 하단)
+    const mEntryNoEl = document.getElementById('mDetailEntryNoText');
+    const mEntryNoBadge = document.getElementById('mDetailEntryNoBadge');
+    const mRoundNoVal = postData.ROUND_NO || postData.round_no || (postData.post_id && String(postData.post_id).includes('_') ? String(postData.post_id).split('_')[1] : null);
+    if (mEntryNoBadge && mEntryNoEl) {
+        if (mRoundNoVal) {
+            mEntryNoEl.textContent = `참가 ${mRoundNoVal}번`;
+            mEntryNoBadge.style.display = 'inline-flex';
+        } else {
+            mEntryNoBadge.style.display = 'none';
+        }
+    }
+
     window.currentMobileDetailPostId = postData.post_id;
     loadMobileComments(postData.post_id);
 

@@ -1984,4 +1984,9 @@ body.m-body {
 .sns-overlap-item.facebook  { background: #eff6ff; color: #2563eb; border: 0.8px solid #bfdbfe; }
 .sns-overlap-item.blog      { background: #f0fdf4; color: #16a34a; border: 0.8px solid #bbf7d0; }
 
+.m-entry-no-badge span, #mDetailEntryNoText {
+    transform: translateY(-1px);
+    display: inline-block;
+}
+
 

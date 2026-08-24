@@ -1079,6 +1079,19 @@ async function openDetailModal(post, isHallOfFame = false) {
         if (submitBtn) submitBtn.disabled = false;
     }
 
+    // 참가번호 뱃지 바인딩 (이미지 좌측 하단)
+    const entryNoEl = document.getElementById('detailEntryNoText');
+    const entryNoBadge = document.getElementById('detailEntryNoBadge');
+    const roundNoVal = post.ROUND_NO || post.round_no || (post.post_id && String(post.post_id).includes('_') ? String(post.post_id).split('_')[1] : null);
+    if (entryNoBadge && entryNoEl) {
+        if (roundNoVal) {
+            entryNoEl.textContent = `참가 ${roundNoVal}번`;
+            entryNoBadge.style.display = 'inline-flex';
+        } else {
+            entryNoBadge.style.display = 'none';
+        }
+    }
+
     // 랭킹 / 수상 배지 채우기 (오직 실물 메달/배지 이미지들만 전체부문 -> 품종부문 순서로 가로 나란히 표시)
     const medalsLeftEl = document.getElementById('detailMedalsLeft');
     const badgeEl = document.getElementById('detailRankBadge');

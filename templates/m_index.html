@@ -179,6 +179,14 @@
                     {% set rk_class = 'rank-1' if (rk_cand == 1 or rk_cand == '1') else ('rank-2' if (rk_cand == 2 or rk_cand == '2') else ('rank-3' if (rk_cand == 3 or rk_cand == '3') else '')) %}
                     <div class="m-card-badge {{ rk_class }}" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.45rem; left: 0.55rem; position: absolute; z-index: 10;">{{ rank_prefix }}{{ rk_cand }}위 후보</div>
                 {% endif %}
+
+                <!-- 참가번호 오버레이 뱃지 (모바일 이미지 좌측 하단) -->
+                {% set r_no = p.ROUND_NO or p.round_no %}
+                {% if r_no %}
+                    <div class="m-entry-no-badge" style="position: absolute; left: 0.45rem; bottom: 0.45rem; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; padding: 0.2rem 0.48rem; border-radius: 10px; font-size: 0.68rem; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 3px 10px rgba(0,0,0,0.15); z-index: 9; display: inline-flex; align-items: center; gap: 0.15rem; pointer-events: none;">
+                        <i class="fa-solid fa-hashtag" style="font-size: 0.62rem; color: #f472b6;"></i> <span style="transform: translateY(-1px); display: inline-block;">참가 {{ r_no }}번</span>
+                    </div>
+                {% endif %}
             </div>
             <div class="m-card-body">
                 <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
