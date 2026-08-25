@@ -1204,6 +1204,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
+            // 10. 유효값 체크 완료 후 최종 출전 확인 컨펌
+            const isConfirmed = confirm('콘테스트 출전 등록 후에는 수정이 불가능하며 삭제만 가능합니다. 출전하시겠습니까?');
+            if (!isConfirmed) {
+                return false;
+            }
+
             const submitBtn = uploadForm.querySelector('button[type="submit"]');
             let origHtml = '';
             if (submitBtn) {
