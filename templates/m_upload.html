@@ -243,16 +243,22 @@
                 </button>
             {% endif %}
 
-            <!-- 출전 제한 안내 하단 팁 카드 (모바일) -->
-            <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-circle-info" style="color: #4f46e5; font-size: 1.1rem; flex-shrink: 0;"></i>
+            <!-- 출전 기회 및 수정/삭제 주의사항 통합 안내 카드 (모바일) -->
+            <div style="margin-top: 1rem; padding: 0.95rem 1rem; background: rgba(79, 70, 229, 0.04); border: 1px solid rgba(79, 70, 229, 0.16); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 0.55rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.45rem;">
+                    <i class="fa-solid fa-circle-info" style="color: #4f46e5; font-size: 1rem; margin-top: 0.15rem; flex-shrink: 0;"></i>
                     <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
-                        💡 한 회차당 최대 5회 출전 가능 (현재 <strong style="color: #4f46e5;">{{ my_entry_count if my_entry_count is not none else 0 }}회</strong> 출전중)
+                        <strong>출전 기회 안내:</strong> 한 회차당 최대 5회 출전 가능 (현재 <strong style="color: #4f46e5;">{{ my_entry_count if my_entry_count is not none else 0 }}회</strong> 출전중)
                     </span>
                 </div>
-                <div style="display: flex; justify-content: flex-end;">
-                    <span style="font-size: 0.8rem; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 0.25rem 0.75rem; border-radius: 15px;">
+                <div style="display: flex; align-items: flex-start; gap: 0.45rem;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ea580c; font-size: 1rem; margin-top: 0.15rem; flex-shrink: 0;"></i>
+                    <span style="font-size: 0.81rem; font-weight: 700; color: #9a3412; line-height: 1.4;">
+                        <strong>수정 및 삭제 안내:</strong> 콘테스트 출전 등록 후에는 <strong style="color: #ea580c; text-decoration: underline;">수정이 불가능하며 삭제만 가능</strong>합니다.
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 0.1rem;">
+                    <span style="font-size: 0.78rem; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 0.25rem 0.75rem; border-radius: 15px;">
                         🏆 {{ remaining_entry_count if remaining_entry_count is not none else 5 }}회 남음 / 총 5회
                     </span>
                 </div>
@@ -937,6 +943,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (mSnsBlg && mSnsBlg.length > 200) {
                 showCustomToast('🔗 블로그 주소는 200자 이내로 입력해 주세요!', 'fa-link');
                 highlightInvalidField(mSnsBlgEl);
+                return;
+            }
+
+            // 10. 유효값 체크 완료 후 최종 출전 확인 컨펌
+            const isConfirmed = confirm('콘테스트 출전 등록 후에는 수정이 불가능하며 삭제만 가능합니다. 출전하시겠습니까?');
+            if (!isConfirmed) {
                 return;
             }
 
