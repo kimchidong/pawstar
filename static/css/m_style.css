@@ -161,6 +161,31 @@ body.m-body {
     font-weight: 700;
 }
 
+/* 🔴 모바일 상단 헤더 전원버튼(로그아웃) 전용 럭셔리 스타일 */
+.capsule-logout-btn, .m-header-logout-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #ffe4e6 !important;
+    color: #e11d48 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);
+}
+.capsule-logout-btn:hover, .m-header-logout-btn:hover {
+    background: #fecdd3 !important;
+    color: #be123c !important;
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.28);
+}
+
 /* 모바일 하단 내비게이션 바 */
 .m-bottom-nav {
     position: fixed;

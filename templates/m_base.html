@@ -69,6 +69,11 @@
             <a href="/m/hall-of-fame" class="m-nav-header-item {{ 'active' if request.path == '/m/hall-of-fame' }}" style="font-size: 0.8rem; font-weight: 800; padding: 0.35rem 0.5rem; border-radius: 14px; color: {{ 'var(--accent-purple)' if request.path == '/m/hall-of-fame' else 'var(--text-secondary)' }}; background: {{ '#f1f5f9' if request.path == '/m/hall-of-fame' else 'transparent' }}; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; flex-shrink: 0;">
                 <i class="fa-solid fa-ranking-star" style="font-size: 0.85rem; color: inherit;"></i> 명예의 전당
             </a>
+            {% if is_logged_in %}
+                <button type="button" id="mBtnHeaderLogout" onclick="handleMobileDirectLogout(event)" class="capsule-logout-btn active" style="margin-left: 0.25rem;" title="로그아웃">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            {% endif %}
         </div>
     </header>
 
@@ -494,6 +499,33 @@
         return false; // 비로그인 상태면 이동하지 않고 그 자리에서 반투명 구글 로그인 모달 팝업 노출
     }
     window.handleMobileUploadNavClick = handleMobileUploadNavClick;
+
+    function handleMobileDirectLogout(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        try {
+            localStorage.setItem('pawstar_logged_out', 'true');
+            localStorage.setItem('pawstar_auth_event', 'logout_' + Date.now());
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var c = cookies[i];
+                var eqPos = c.indexOf("=");
+                var name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+                if (name) {
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/m";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                }
+            }
+        } catch(err) {}
+
+        fetch('/api/logout', { method: 'POST' }).finally(function() {
+            window.location.replace('/m/logout?t=' + Date.now());
+        });
+    }
+    window.handleMobileDirectLogout = handleMobileDirectLogout;
 
     document.addEventListener('DOMContentLoaded', function() {
         ['mPrivacyModal', 'mTermsModal', 'googleAuthModal', 'mGoogleAuthModal', 'mAuthModal'].forEach(id => {
