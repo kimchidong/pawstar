@@ -348,6 +348,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     postData.title = postData.title || postData.TITLE || '';
     postData.content = postData.content || postData.CONTS || postData.conts || '';
     window.currentMobileDetailPostId = postData.post_id;
+    window.currentMobileDetailPostData = postData;
 
     // 회차 마감 여부 판별 (회차 번호 비교 및 온갖 마감 키 값 종합 검증)
     const postRoundNum = parseInt(postData.CONTEST_ROUND || postData.contest_round || postData.contest_id || (String(postData.post_id || '').split('_')[0]) || '0', 10);
@@ -819,9 +820,10 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 }
                 const mBtnViewPopup = document.getElementById('mDetailBtnView');
                 if (mBtnViewPopup) {
-                    mBtnViewPopup.classList.add('active');
+                    const mIsViewAct = !isMinePost && (data.actions.is_viewed === true || data.actions.is_viewed === undefined || !isClosedRound);
+                    mBtnViewPopup.classList.toggle('active', mIsViewAct);
                     const icon = mBtnViewPopup.querySelector('i');
-                    if (icon) icon.className = 'fa-solid fa-eye';
+                    if (icon) icon.className = mIsViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
                 }
             }
         })
@@ -854,6 +856,12 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     const mShareIconBtn = document.getElementById('mDetailShareIconBtn');
 
     const mBtnViewPopup = document.getElementById('mDetailBtnView');
+    if (mBtnViewPopup) {
+        const mIsInitViewAct = !isMinePost && (!isClosedRound || !!(postData.is_viewed || (postData.actions && postData.actions.is_viewed)));
+        mBtnViewPopup.classList.toggle('active', mIsInitViewAct);
+        const icon = mBtnViewPopup.querySelector('i');
+        if (icon) icon.className = mIsInitViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
+    }
     const mBtnCommentPopup = document.getElementById('mDetailBtnComment');
     mBtnSharePopup = mBtnSharePopup || document.getElementById('mDetailBtnShare');
 
@@ -909,34 +917,19 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
     const isViewed = !!(postData.is_viewed || (postData.actions && postData.actions.is_viewed) || (mCard && mCard.querySelector('.btn-view.active')));
-    if (isUserLoggedIn && !isMinePost && isViewed) {
-        if (mCard) {
-            const mBtnView = mCard.querySelector('.btn-view');
-            if (mBtnView) {
-                mBtnView.classList.add('active');
-                const icon = mBtnView.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
-            }
+    const isViewAct = isUserLoggedIn && !isMinePost && isViewed;
+    if (mCard) {
+        const mBtnView = mCard.querySelector('.btn-view');
+        if (mBtnView) {
+            mBtnView.classList.toggle('active', isViewAct);
+            const icon = mBtnView.querySelector('i');
+            if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
         }
-        if (mBtnViewPopup) {
-            mBtnViewPopup.classList.add('active');
-            const icon = mBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-eye';
-        }
-    } else {
-        if (mCard) {
-            const mBtnView = mCard.querySelector('.btn-view');
-            if (mBtnView) {
-                mBtnView.classList.remove('active');
-                const icon = mBtnView.querySelector('i');
-                if (icon) icon.className = 'fa-regular fa-eye';
-            }
-        }
-        if (mBtnViewPopup) {
-            mBtnViewPopup.classList.remove('active');
-            const icon = mBtnViewPopup.querySelector('i');
-            if (icon) icon.className = 'fa-regular fa-eye';
-        }
+    }
+    if (mBtnViewPopup) {
+        mBtnViewPopup.classList.toggle('active', isViewAct);
+        const icon = mBtnViewPopup.querySelector('i');
+        if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
     }
 
     detailModal.classList.add('active');
@@ -1894,9 +1887,13 @@ async function triggerMobileEvent(postId, eventType) {
 
             const mBtnViewPopup = document.getElementById('mDetailBtnView');
             if (mBtnViewPopup && finalView !== undefined) {
-                mBtnViewPopup.classList.add('active');
+                const mCurUserId = String(window.currentUserId || window.CURRENT_USER_ID || '').trim();
+                const mPostOwnerId = String((window.currentMobileDetailPostData || {}).ENT_USER_ID || (window.currentMobileDetailPostData || {}).user_id || (window.currentMobileDetailPostData || {}).USER_ID || (window.currentMobileDetailPostData || {}).ent_user_id || '').trim();
+                const isMinePost = !!(mCurUserId && mPostOwnerId && mCurUserId === mPostOwnerId);
+                const mIsViewAct = !isMinePost;
+                mBtnViewPopup.classList.toggle('active', mIsViewAct);
                 const icon = mBtnViewPopup.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
+                if (icon) icon.className = mIsViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
             }
 
             const mLandingViewEl = document.getElementById('mShareLandingViewCnt');

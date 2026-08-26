@@ -539,9 +539,9 @@ async function triggerEvent(postId, eventType) {
 
             const detailBtnViewPopup = document.getElementById('detailBtnView');
             if (detailBtnViewPopup) {
-                detailBtnViewPopup.classList.add('active');
+                detailBtnViewPopup.classList.toggle('active', isViewAct);
                 const icon = detailBtnViewPopup.querySelector('i');
-                if (icon) icon.className = 'fa-solid fa-eye';
+                if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
             }
             if (card) {
                 const btnView = card.querySelector('.btn-view');
@@ -824,10 +824,9 @@ async function openDetailModal(post, isHallOfFame = false) {
     }
     const detailBtnViewPopup = document.getElementById('detailBtnView');
     if (detailBtnViewPopup) {
-        // 상세 팝업 모달이 오픈되어 열람 중인 상태이므로 조회 버튼 무조건 활성화 룩앤필 적용
-        detailBtnViewPopup.classList.add('active');
+        detailBtnViewPopup.classList.toggle('active', isViewAct);
         const icon = detailBtnViewPopup.querySelector('i');
-        if (icon) icon.className = 'fa-solid fa-eye';
+        if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
     }
 
     // PC 대회 정보 (제 N회 & 실제 대회명 분리 뱃지) 바인딩 함수
@@ -1048,9 +1047,9 @@ async function openDetailModal(post, isHallOfFame = false) {
 
     btnViewPopup = document.getElementById('detailBtnView');
     if (btnViewPopup) {
-        btnViewPopup.classList.add('active');
+        btnViewPopup.classList.toggle('active', isViewActiveVal);
         const icon = btnViewPopup.querySelector('i');
-        if (icon) icon.className = 'fa-solid fa-eye';
+        if (icon) icon.className = isViewActiveVal ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
     }
 
     btnCommentPopup = document.getElementById('detailBtnComment');
@@ -1287,12 +1286,17 @@ async function openDetailModal(post, isHallOfFame = false) {
         }
     };
 
-    const updatePopupViewUI = () => {
+    const updatePopupViewUI = (isViewedState) => {
         const btnView = document.getElementById('detailBtnView');
+        const curUserId = String(window.CURRENT_USER_ID || '').trim();
+        const postOwnerId = String((window.currentDetailPostData || {}).ENT_USER_ID || (window.currentDetailPostData || {}).user_id || '').trim();
+        const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
+        const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
+        const isViewAct = isUserLoggedIn && !isMine && !!isViewedState;
         if (btnView) {
-            btnView.classList.add('active');
+            btnView.classList.toggle('active', isViewAct);
             const icon = btnView.querySelector('i');
-            if (icon) icon.className = 'fa-solid fa-eye';
+            if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
         }
     };
 

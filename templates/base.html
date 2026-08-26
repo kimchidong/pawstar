@@ -285,8 +285,8 @@
 
                         <!-- 실시간 4요소 귀여운 젤리 버블 버튼 (평가 미참여시 차분한 비활성 톤 표출) -->
                         <div class="card-actions detail-actions" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-bottom: 0.85rem; text-align: center;">
-                            <div class="action-btn btn-view active" id="detailBtnView" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
-                                <i class="fa-solid fa-eye" style="font-size: 0.95rem;"></i>
+                            <div class="action-btn btn-view" id="detailBtnView" title="조회수" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;">
+                                <i class="fa-regular fa-eye" style="font-size: 0.95rem;"></i>
                                 <span class="view-count" id="detailViewCount" style="font-size: 0.8rem; font-weight: 900;">0</span>
                             </div>
                             <div class="action-btn btn-like" id="detailBtnLike" title="좋아요 수" onclick="if(window.currentDetailPostId) triggerEvent(window.currentDetailPostId, 'like');" style="padding: 0.55rem 0.2rem; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer;">
