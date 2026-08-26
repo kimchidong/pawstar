@@ -3667,21 +3667,24 @@ option.opt-closed {
     padding: 0 1.1rem;
     box-sizing: border-box;
     border-radius: 24px;
-    background: #f1f5f9;
-    border: 1px solid var(--border-light);
-    color: var(--text-secondary);
+    background: #ffe4e6;
+    border: 1px solid #fecdd3;
+    color: #e11d48;
     font-size: 0.88rem;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
     transition: all 0.2s ease;
     line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(225, 29, 72, 0.12);
 }
 
 .btn-logout-profile:hover {
-    background: #ef4444;
-    color: #ffffff;
-    border-color: #ef4444;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    background: #fecdd3;
+    color: #be123c;
+    border-color: #fda4af;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.22);
+    transform: translateY(-1px);
 }
 
 /* Withdraw Profile Button Styling */
