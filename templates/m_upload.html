@@ -634,7 +634,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mPreviewCardTitle) mPreviewCardTitle.textContent = titleText;
         if (mPreviewModalTitle) mPreviewModalTitle.textContent = titleText;
         if (mPreviewModalDesc) mPreviewModalDesc.textContent = descText;
-        if (mPreviewModalDate) mPreviewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(currentFormattedDate) : null) || '방금 전';
+        const mPreviewCardDate = document.getElementById('mPreviewCardDate');
+        if (mPreviewCardDate) mPreviewCardDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(new Date()) : '방금 전');
+        if (mPreviewModalDate) mPreviewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(new Date()) : '방금 전');
     }
 
     if (inputPetName) inputPetName.addEventListener('input', updateMobilePreview);

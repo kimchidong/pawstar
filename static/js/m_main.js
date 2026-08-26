@@ -17,18 +17,43 @@ function escapeHtml(str) {
  * 모바일 전용 일자시간 상대시간(방금 전, N초 전, N분 전, N시간 전, N일 전, N달 전, N년 전) 포맷팅
  */
 function formatTimeAgo(dateInput) {
-    if (!dateInput) return '';
+    if (!dateInput) return '방금 전';
+
+    if (dateInput instanceof Date) {
+        if (isNaN(dateInput.getTime())) return '방금 전';
+        return _calculateTimeAgoMobile(dateInput);
+    }
+
     let dtStr = String(dateInput).trim();
-    if (!dtStr) return '';
+    if (!dtStr) return '방금 전';
+    if (dtStr.endsWith(' 전')) return dtStr;
 
-    let date = new Date(dtStr);
-    if (isNaN(date.getTime())) {
-        date = new Date(dtStr.replace(/-/g, '/'));
-    }
-    if (isNaN(date.getTime())) {
-        return dtStr;
+    let date = null;
+    const match = dtStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+    if (match) {
+        date = new Date(
+            parseInt(match[1], 10),
+            parseInt(match[2], 10) - 1,
+            parseInt(match[3], 10),
+            parseInt(match[4], 10),
+            parseInt(match[5], 10),
+            parseInt(match[6] || '0', 10)
+        );
+    } else {
+        date = new Date(dtStr);
+        if (isNaN(date.getTime())) {
+            date = new Date(dtStr.replace(/-/g, '/'));
+        }
     }
 
+    if (!date || isNaN(date.getTime())) {
+        return '방금 전';
+    }
+
+    return _calculateTimeAgoMobile(date);
+}
+
+function _calculateTimeAgoMobile(date) {
     const now = new Date();
     const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
 
@@ -58,6 +83,7 @@ function formatTimeAgo(dateInput) {
     if (diffYear < 1) diffYear = 1;
     return `${diffYear}년 전`;
 }
+
 window.formatTimeAgo = formatTimeAgo;
 window.timeAgo = formatTimeAgo;
 

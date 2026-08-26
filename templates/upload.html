@@ -346,9 +346,7 @@
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 0.85rem;">
 
                                     <span style="font-size: 0.78rem; color: var(--text-muted);" id="previewCardDate">
-
-                                        {{ now_str }}
-
+                                        방금 전
                                     </span>
 
                                     <div class="card-total-score">
@@ -798,8 +796,8 @@ function updatePreview() {
     if (previewModalTitle) previewModalTitle.textContent = titleText;
     if (previewCardDesc) previewCardDesc.textContent = descText;
     if (previewModalDesc) previewModalDesc.textContent = descText;
-    if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
-    if (previewModalDate) previewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(currentFormattedDate) : null) || '방금 전';
+    if (previewCardDate) previewCardDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(new Date()) : '방금 전');
+    if (previewModalDate) previewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(new Date()) : '방금 전');
 
     updateAllFieldStyles();
 }
