@@ -917,7 +917,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID || window.currentUserId);
     const isViewed = !!(postData.is_viewed || (postData.actions && postData.actions.is_viewed) || (mCard && mCard.querySelector('.btn-view.active')));
-    const isViewAct = isUserLoggedIn && !isMinePost && isViewed;
+    const isViewAct = isUserLoggedIn && !isMinePost && (!isClosedRound || isViewed);
     if (mCard) {
         const mBtnView = mCard.querySelector('.btn-view');
         if (mBtnView) {

@@ -812,7 +812,7 @@ async function openDetailModal(post, isHallOfFame = false) {
     const isMine = !!(curUserId && postOwnerId && curUserId === postOwnerId);
 
     const isUserLoggedIn = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
-    const isViewAct = isUserLoggedIn && !isMine && !!(post.is_viewed || (post.actions && post.actions.is_viewed) || (card && card.querySelector('.btn-view.active')));
+    const isViewAct = isUserLoggedIn && !isMine && (!isClosedRound || !!(post.is_viewed || (post.actions && post.actions.is_viewed) || (card && card.querySelector('.btn-view.active'))));
 
     if (card) {
         const btnView = card.querySelector('.btn-view');
@@ -1043,7 +1043,7 @@ async function openDetailModal(post, isHallOfFame = false) {
     const postOwnerIdVal = String(post.ENT_USER_ID || post.user_id || '').trim();
     const isMineVal = !!(curUserIdVal && postOwnerIdVal && curUserIdVal === postOwnerIdVal);
     const isUserLoggedInVal = !!(window.isUserLoggedIn || window.CURRENT_USER_ID);
-    const isViewActiveVal = isUserLoggedInVal && !isMineVal && !!((card && card.querySelector('.btn-view.active')) || (post.actions && post.actions.is_viewed) || post.is_viewed);
+    const isViewActiveVal = isUserLoggedInVal && !isMineVal && (!isClosedRound || !!((card && card.querySelector('.btn-view.active')) || (post.actions && post.actions.is_viewed) || post.is_viewed));
 
     btnViewPopup = document.getElementById('detailBtnView');
     if (btnViewPopup) {
