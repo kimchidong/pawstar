@@ -73,6 +73,10 @@
                 <button type="button" id="mBtnHeaderLogout" onclick="handleMobileDirectLogout(event)" class="capsule-logout-btn active" style="margin-left: 0.25rem;" title="로그아웃">
                     <i class="fa-solid fa-power-off"></i>
                 </button>
+            {% else %}
+                <button type="button" id="mBtnHeaderPowerOff" onclick="if(typeof openGoogleAuthModal==='function'){ openGoogleAuthModal(); } else { const m = document.getElementById('googleAuthModal'); if(m) { m.style.display='flex'; m.style.zIndex='999999'; m.classList.add('show','active'); } } return false;" class="m-capsule-power-off-btn disabled" style="margin-left: 0.25rem;" title="로그인 필요">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
             {% endif %}
         </div>
     </header>

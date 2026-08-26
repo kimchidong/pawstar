@@ -8,11 +8,13 @@ def test_m_header_power_off_button():
     client = app.test_client()
 
     with client:
-        # 1. 비로그인 상태일 때 모바일 상단 헤더에 전원버튼이 표시되지 않는지 검증
+        # 1. 비로그인 상태일 때 모바일 상단 헤더에 회색 전원버튼(mBtnHeaderPowerOff)이 존재하고 로그아웃 전원버튼은 없음을 검증
         res_guest = client.get('/m/')
         html_guest = res_guest.get_data(as_text=True)
-        assert 'id="mBtnHeaderLogout"' not in html_guest, "비로그인 상태에서는 모바일 상단 헤더에 전원버튼이 없어야 합니다."
-        print("[PASS 1] 비로그인 상태 헤더 전원버튼 미노출 확인")
+        assert 'id="mBtnHeaderLogout"' not in html_guest, "비로그인 상태에서는 로그아웃 활성 전원버튼이 없어야 합니다."
+        assert 'id="mBtnHeaderPowerOff"' in html_guest, "비로그인 상태에서는 모바일 상단 헤더에 회색 전원버튼(mBtnHeaderPowerOff)이 표시되어야 합니다."
+        assert 'fa-power-off' in html_guest, "비로그인 상태에서도 전원버튼 아이콘(fa-power-off)이 탑재되어야 합니다."
+        print("[PASS 1] 비로그인 상태 회색 전원버튼(mBtnHeaderPowerOff) 정상 노출 검증 완료!")
 
         # 2. 로그인 상태일 때 모바일 상단 헤더에 🔴전원버튼 (fa-power-off)이 존재하는지 검증
         with client.session_transaction() as sess:
