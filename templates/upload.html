@@ -527,7 +527,7 @@
                     <!-- 버블 카운터 아래: 별점 총점 뱃지 & 등록일시 & 숏컷 버튼 바 (원본 팝업과 1:1 동일) -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
                         <div style="display: flex; align-items: center; gap: 0.35rem;">
-                            <span id="previewModalDate" style="height: 34px; font-size: 0.76rem; color: #a855f7; font-weight: 600; background: #faf5ff; padding: 0 0.75rem; border-radius: 17px; border: 1px solid #f3e8ff; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">⏰ {{ now_str }}</span>
+                            <span id="previewModalDate" style="height: 34px; font-size: 0.76rem; color: #a855f7; font-weight: 600; background: #faf5ff; padding: 0 0.75rem; border-radius: 17px; border: 1px solid #f3e8ff; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">방금 전</span>
                         </div>
 
                         <!-- 우측: 별점 총점 노란 젤리 뱃지 & 원형 버튼들 (원본 팝업과 1:1 동일) -->
@@ -799,7 +799,7 @@ function updatePreview() {
     if (previewCardDesc) previewCardDesc.textContent = descText;
     if (previewModalDesc) previewModalDesc.textContent = descText;
     if (previewCardDate) previewCardDate.textContent = currentFormattedDate;
-    if (previewModalDate) previewModalDate.textContent = '⏰ ' + currentFormattedDate;
+    if (previewModalDate) previewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(currentFormattedDate) : null) || '방금 전';
 
     updateAllFieldStyles();
 }
