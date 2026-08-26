@@ -3667,23 +3667,23 @@ option.opt-closed {
     padding: 0 1.1rem;
     box-sizing: border-box;
     border-radius: 24px;
-    background: #ffe4e6;
-    border: 1px solid #fecdd3;
-    color: #e11d48;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
     font-size: 0.88rem;
     font-weight: 800;
     text-decoration: none;
     transition: all 0.2s ease;
     line-height: 1;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(225, 29, 72, 0.12);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
 }
 
 .btn-logout-profile:hover {
-    background: #fecdd3;
-    color: #be123c;
-    border-color: #fda4af;
-    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.22);
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #94a3b8;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
     transform: translateY(-1px);
 }
 
