@@ -140,11 +140,15 @@
                 <!-- 2. 최근 콘테스트 펫 스타 (최근 2개 회차 1, 2, 3위 사진 전용 표시) -->
                 <div class="footer-col footer-prev-stars-col" style="flex: 2; min-width: 0;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                        <h4 style="margin: 0; font-size: 1.08rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.45rem;">
-                            <i class="fa-solid fa-trophy" style="color: #eab308; font-size: 1.15rem;"></i>
-                            <span>최근 콘테스트 펫 스타</span>
-                        </h4>
-                        <span style="font-size: 0.78rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 0.2rem 0.65rem; border-radius: 20px; border: 1px solid #e2e8f0;">TOP 1, 2, 3위 출전작</span>
+                        <a href="/hall-of-fame" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer;" title="명예의 전당 페이지로 이동">
+                            <h4 style="margin: 0; font-size: 1.08rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.45rem; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-purple)'" onmouseout="this.style.color='#0f172a'">
+                                <i class="fa-solid fa-trophy" style="color: #eab308; font-size: 1.15rem;"></i>
+                                <span>최근 콘테스트 펫 스타</span>
+                            </h4>
+                        </a>
+                        <a href="/hall-of-fame" style="text-decoration: none; font-size: 0.78rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 0.2rem 0.65rem; border-radius: 20px; border: 1px solid #e2e8f0; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#1e293b';" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b';" title="명예의 전당 이동">
+                            <span>TOP 1, 2, 3위 출전작</span>
+                        </a>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
@@ -154,14 +158,14 @@
                                 {% set c_slots = item.rank_slots %}
                                 
                                 <div class="footer-round-card" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.1rem 1.2rem; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); position: relative;">
-                                    <div style="margin-bottom: 1.45rem; font-size: 0.88rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.45rem;">
+                                    <a href="/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}" style="text-decoration: none; margin-bottom: 1.45rem; font-size: 0.88rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.45rem; cursor: pointer;" title="제{{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회 명예의 전당 이동">
                                         <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; padding: 0.18rem 0.6rem; border-radius: 12px; font-size: 0.76rem; font-weight: 900; flex-shrink: 0; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
                                             제 {{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회
                                         </span>
                                         <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; font-size: 0.9rem; min-width: 0;">
                                             {{ c_obj.THEME_NM or c_obj.title or c_obj.CONTEST_NM or c_obj.name or '명예의 전당' }}
                                         </span>
-                                    </div>
+                                    </a>
 
                                     <div class="footer-stars-photos" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; width: 100%;">
                                         {% for slot in c_slots %}
