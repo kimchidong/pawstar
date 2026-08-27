@@ -28,12 +28,15 @@
     <meta property="og:site_name" content="포스타">
     <meta property="og:title" content="포스타 - 반려동물도 스타가 될 수 있다">
     <meta property="og:description" content="반려동물 스타 콘테스트 포스타(Paw Star)에서 여러분의 소중한 아이를 자랑해 보세요! 🌟">
-    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/og_image.png') }}">
+    <meta property="og:image:secure_url" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/og_image.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:url" content="{{ request.url }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="포스타 - 반려동물도 스타가 될 수 있다">
     <meta name="twitter:description" content="반려동물 스타 콘테스트 포스타(Paw Star)에서 여러분의 소중한 아이를 자랑해 보세요! 🌟">
-    <meta name="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/app_logo_icon.png') }}">
+    <meta name="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='image/app/og_image.png') }}">
     {% endblock %}
     <script>
         window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
