@@ -2097,6 +2097,64 @@ function initMobileFooterCoWinnerRotation() {
     });
 }
 
+let mOgScale = 1;
+let mOgTranslateX = 0;
+let mOgTranslateY = 0;
+let isMOgDragging = false;
+let mOgStartX = 0;
+let mOgStartY = 0;
+let mOgInitialPinchDistance = null;
+let mOgInitialScale = 1;
+let mOgEventsInitialized = false;
+
+function updateMOgImageTransform(animated = false) {
+    const targetImg = document.getElementById('originalImageViewImg');
+    const zoomText = document.getElementById('ogZoomPercent');
+    const zoomContainer = document.getElementById('ogImageZoomContainer');
+    
+    if (!targetImg) return;
+    
+    if (animated) {
+        targetImg.style.transition = 'transform 0.22s cubic-bezier(0.2, 0, 0.2, 1)';
+    } else {
+        targetImg.style.transition = 'none';
+    }
+
+    targetImg.style.transform = `translate(${mOgTranslateX}px, ${mOgTranslateY}px) scale(${mOgScale})`;
+    
+    if (zoomText) {
+        zoomText.textContent = Math.round(mOgScale * 100) + '%';
+    }
+
+    if (zoomContainer) {
+        if (mOgScale > 1) {
+            zoomContainer.style.cursor = isMOgDragging ? 'grabbing' : 'grab';
+        } else {
+            zoomContainer.style.cursor = 'default';
+        }
+    }
+}
+
+function zoomOriginalImage(delta) {
+    let newScale = mOgScale + delta;
+    if (newScale < 0.8) newScale = 0.8;
+    if (newScale > 5.0) newScale = 5.0;
+    
+    mOgScale = newScale;
+    if (mOgScale <= 1) {
+        mOgTranslateX = 0;
+        mOgTranslateY = 0;
+    }
+    updateMOgImageTransform(true);
+}
+
+function resetOriginalImageZoom() {
+    mOgScale = 1;
+    mOgTranslateX = 0;
+    mOgTranslateY = 0;
+    updateMOgImageTransform(true);
+}
+
 function openOriginalImageModal(imgSrc) {
     if (!imgSrc) return;
     const modal = document.getElementById('originalImageModal');
@@ -2104,17 +2162,152 @@ function openOriginalImageModal(imgSrc) {
     if (!modal || !targetImg) return;
     
     targetImg.src = imgSrc;
+    resetOriginalImageZoom();
+    
     modal.style.display = 'flex';
     modal.classList.add('show', 'active');
+    
+    initMOgZoomEventsOnce();
 }
 
 function closeOriginalImageModal() {
     const modal = document.getElementById('originalImageModal');
     if (!modal) return;
+    resetOriginalImageZoom();
     modal.style.display = 'none';
     modal.classList.remove('show', 'active');
 }
 
+function initMOgZoomEventsOnce() {
+    if (mOgEventsInitialized) return;
+    mOgEventsInitialized = true;
+    
+    const container = document.getElementById('ogImageZoomContainer');
+    if (!container) return;
+
+    // 1. 마우스 휠 줌 (Mouse Wheel Zoom)
+    container.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.18 : -0.18;
+        zoomOriginalImage(delta);
+    }, { passive: false });
+
+    // 2. 더블클릭/더블터치 토글 (Double Click/Tap Zoom)
+    let lastTapTime = 0;
+    container.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        if (mOgScale > 1.2) {
+            resetOriginalImageZoom();
+        } else {
+            mOgScale = 2.5;
+            mOgTranslateX = 0;
+            mOgTranslateY = 0;
+            updateMOgImageTransform(true);
+        }
+    });
+
+    // 3. 마우스 드래그 (Mouse Drag)
+    container.addEventListener('mousedown', function(e) {
+        if (e.button !== 0) return;
+        if (mOgScale <= 1) return;
+        isMOgDragging = true;
+        mOgStartX = e.clientX - mOgTranslateX;
+        mOgStartY = e.clientY - mOgTranslateY;
+        updateMOgImageTransform(false);
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (!isMOgDragging) return;
+        mOgTranslateX = e.clientX - mOgStartX;
+        mOgTranslateY = e.clientY - mOgStartY;
+        updateMOgImageTransform(false);
+    });
+
+    window.addEventListener('mouseup', function() {
+        if (isMOgDragging) {
+            isMOgDragging = false;
+            updateMOgImageTransform(false);
+        }
+    });
+
+    // 4. 모바일 터치 (Touch Pinch & Drag)
+    container.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault();
+                if (mOgScale > 1.2) {
+                    resetOriginalImageZoom();
+                } else {
+                    mOgScale = 2.5;
+                    mOgTranslateX = 0;
+                    mOgTranslateY = 0;
+                    updateMOgImageTransform(true);
+                }
+                lastTapTime = 0;
+                return;
+            }
+            lastTapTime = currentTime;
+
+            if (mOgScale > 1) {
+                isMOgDragging = true;
+                mOgStartX = e.touches[0].clientX - mOgTranslateX;
+                mOgStartY = e.touches[0].clientY - mOgTranslateY;
+            }
+        } else if (e.touches.length === 2) {
+            isMOgDragging = false;
+            mOgInitialPinchDistance = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            mOgInitialScale = mOgScale;
+        }
+    }, { passive: false });
+
+    container.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1 && isMOgDragging && mOgScale > 1) {
+            e.preventDefault();
+            mOgTranslateX = e.touches[0].clientX - mOgStartX;
+            mOgTranslateY = e.touches[0].clientY - mOgStartY;
+            updateMOgImageTransform(false);
+        } else if (e.touches.length === 2 && mOgInitialPinchDistance) {
+            e.preventDefault();
+            const currentDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const pinchFactor = currentDist / mOgInitialPinchDistance;
+            let newScale = mOgInitialScale * pinchFactor;
+            if (newScale < 0.8) newScale = 0.8;
+            if (newScale > 5.0) newScale = 5.0;
+            mOgScale = newScale;
+            updateMOgImageTransform(false);
+        }
+    }, { passive: false });
+
+    container.addEventListener('touchend', function(e) {
+        if (e.touches.length < 2) {
+            mOgInitialPinchDistance = null;
+        }
+        if (e.touches.length === 0) {
+            isMOgDragging = false;
+        }
+    });
+
+    // 5. Esc 키
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('originalImageModal');
+            if (modal && modal.style.display !== 'none') {
+                closeOriginalImageModal();
+            }
+        }
+    });
+}
+
+window.zoomOriginalImage = zoomOriginalImage;
+window.resetOriginalImageZoom = resetOriginalImageZoom;
 window.openOriginalImageModal = openOriginalImageModal;
 window.closeOriginalImageModal = closeOriginalImageModal;
 

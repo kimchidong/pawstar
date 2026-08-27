@@ -2257,6 +2257,64 @@ function initFooterCoWinnerRotation() {
     });
 }
 
+let ogScale = 1;
+let ogTranslateX = 0;
+let ogTranslateY = 0;
+let isOgDragging = false;
+let ogStartX = 0;
+let ogStartY = 0;
+let ogInitialPinchDistance = null;
+let ogInitialScale = 1;
+let ogEventsInitialized = false;
+
+function updateOgImageTransform(animated = false) {
+    const targetImg = document.getElementById('originalImageViewImg');
+    const zoomText = document.getElementById('ogZoomPercent');
+    const zoomContainer = document.getElementById('ogImageZoomContainer');
+    
+    if (!targetImg) return;
+    
+    if (animated) {
+        targetImg.style.transition = 'transform 0.22s cubic-bezier(0.2, 0, 0.2, 1)';
+    } else {
+        targetImg.style.transition = 'none';
+    }
+
+    targetImg.style.transform = `translate(${ogTranslateX}px, ${ogTranslateY}px) scale(${ogScale})`;
+    
+    if (zoomText) {
+        zoomText.textContent = Math.round(ogScale * 100) + '%';
+    }
+
+    if (zoomContainer) {
+        if (ogScale > 1) {
+            zoomContainer.style.cursor = isOgDragging ? 'grabbing' : 'grab';
+        } else {
+            zoomContainer.style.cursor = 'default';
+        }
+    }
+}
+
+function zoomOriginalImage(delta) {
+    let newScale = ogScale + delta;
+    if (newScale < 0.8) newScale = 0.8;
+    if (newScale > 5.0) newScale = 5.0;
+    
+    ogScale = newScale;
+    if (ogScale <= 1) {
+        ogTranslateX = 0;
+        ogTranslateY = 0;
+    }
+    updateOgImageTransform(true);
+}
+
+function resetOriginalImageZoom() {
+    ogScale = 1;
+    ogTranslateX = 0;
+    ogTranslateY = 0;
+    updateOgImageTransform(true);
+}
+
 function openOriginalImageModal(imgSrc) {
     if (!imgSrc) return;
     const modal = document.getElementById('originalImageModal');
@@ -2264,17 +2322,152 @@ function openOriginalImageModal(imgSrc) {
     if (!modal || !targetImg) return;
     
     targetImg.src = imgSrc;
+    resetOriginalImageZoom();
+    
     modal.style.display = 'flex';
     modal.classList.add('show', 'active');
+    
+    initOgZoomEventsOnce();
 }
 
 function closeOriginalImageModal() {
     const modal = document.getElementById('originalImageModal');
     if (!modal) return;
+    resetOriginalImageZoom();
     modal.style.display = 'none';
     modal.classList.remove('show', 'active');
 }
 
+function initOgZoomEventsOnce() {
+    if (ogEventsInitialized) return;
+    ogEventsInitialized = true;
+    
+    const container = document.getElementById('ogImageZoomContainer');
+    if (!container) return;
+
+    // 1. 마우스 휠 줌 (Mouse Wheel Zoom)
+    container.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.18 : -0.18;
+        zoomOriginalImage(delta);
+    }, { passive: false });
+
+    // 2. 더블클릭 토글 (Double Click Zoom)
+    let lastTapTime = 0;
+    container.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        if (ogScale > 1.2) {
+            resetOriginalImageZoom();
+        } else {
+            ogScale = 2.5;
+            ogTranslateX = 0;
+            ogTranslateY = 0;
+            updateOgImageTransform(true);
+        }
+    });
+
+    // 3. 마우스 드래그 (Mouse Drag)
+    container.addEventListener('mousedown', function(e) {
+        if (e.button !== 0) return;
+        if (ogScale <= 1) return;
+        isOgDragging = true;
+        ogStartX = e.clientX - ogTranslateX;
+        ogStartY = e.clientY - ogTranslateY;
+        updateOgImageTransform(false);
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (!isOgDragging) return;
+        ogTranslateX = e.clientX - ogStartX;
+        ogTranslateY = e.clientY - ogStartY;
+        updateOgImageTransform(false);
+    });
+
+    window.addEventListener('mouseup', function() {
+        if (isOgDragging) {
+            isOgDragging = false;
+            updateOgImageTransform(false);
+        }
+    });
+
+    // 4. 모바일 터치 (Touch Pinch & Drag)
+    container.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault();
+                if (ogScale > 1.2) {
+                    resetOriginalImageZoom();
+                } else {
+                    ogScale = 2.5;
+                    ogTranslateX = 0;
+                    ogTranslateY = 0;
+                    updateOgImageTransform(true);
+                }
+                lastTapTime = 0;
+                return;
+            }
+            lastTapTime = currentTime;
+
+            if (ogScale > 1) {
+                isOgDragging = true;
+                ogStartX = e.touches[0].clientX - ogTranslateX;
+                ogStartY = e.touches[0].clientY - ogTranslateY;
+            }
+        } else if (e.touches.length === 2) {
+            isOgDragging = false;
+            ogInitialPinchDistance = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            ogInitialScale = ogScale;
+        }
+    }, { passive: false });
+
+    container.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1 && isOgDragging && ogScale > 1) {
+            e.preventDefault();
+            ogTranslateX = e.touches[0].clientX - ogStartX;
+            ogTranslateY = e.touches[0].clientY - ogStartY;
+            updateOgImageTransform(false);
+        } else if (e.touches.length === 2 && ogInitialPinchDistance) {
+            e.preventDefault();
+            const currentDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const pinchFactor = currentDist / ogInitialPinchDistance;
+            let newScale = ogInitialScale * pinchFactor;
+            if (newScale < 0.8) newScale = 0.8;
+            if (newScale > 5.0) newScale = 5.0;
+            ogScale = newScale;
+            updateOgImageTransform(false);
+        }
+    }, { passive: false });
+
+    container.addEventListener('touchend', function(e) {
+        if (e.touches.length < 2) {
+            ogInitialPinchDistance = null;
+        }
+        if (e.touches.length === 0) {
+            isOgDragging = false;
+        }
+    });
+
+    // 5. Esc 키
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('originalImageModal');
+            if (modal && modal.style.display !== 'none') {
+                closeOriginalImageModal();
+            }
+        }
+    });
+}
+
+window.zoomOriginalImage = zoomOriginalImage;
+window.resetOriginalImageZoom = resetOriginalImageZoom;
 window.openOriginalImageModal = openOriginalImageModal;
 window.closeOriginalImageModal = closeOriginalImageModal;
 
