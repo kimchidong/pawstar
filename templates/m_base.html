@@ -107,7 +107,7 @@
                         {% set c_obj = item.contest %}
                         {% set c_slots = item.rank_slots %}
                         
-                        <div class="footer-round-card" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.85rem 0.9rem; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); position: relative;">
+                        <div class="footer-round-card" onclick="location.href='/m/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}';" style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 18px; padding: 0.85rem 0.9rem; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03); position: relative; cursor: pointer;">
                             <a href="/m/hall-of-fame?contest_id={{ c_obj.CONTEST_ROUND or c_obj.contest_id }}" style="text-decoration: none; margin-bottom: 0.85rem; font-size: 0.82rem; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 0.4rem;" title="제{{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회 명예의 전당 이동">
                                 <span style="color: #6d28d9; background: #f3e8ff; border: 1.5px solid #ddd6fe; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.15); padding: 0.15rem 0.5rem; border-radius: 12px; font-size: 0.74rem; font-weight: 900; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;">
                                     <span style="display: inline-block; transform: translateY(-1px);">제 {{ c_obj.CONTEST_ROUND or c_obj.contest_id }}회</span>
@@ -117,7 +117,7 @@
                                 </span>
                             </a>
 
-                            <div class="footer-stars-photos" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; width: 100%;">
+                            <div class="footer-stars-photos" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; width: 100%;" onclick="event.stopPropagation();">
                                 {% for slot in c_slots %}
                                     {% set rk = slot.rank %}
                                     {% set border_color = '#facc15' if rk == 1 else ('#38bdf8' if rk == 2 else '#a3e635') %}
