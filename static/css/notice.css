@@ -1,0 +1,524 @@
+/* 
+ * Paw Star - Notice Dedicated Stylesheet (공지사항 전용 CSS)
+ * 파일명: notice.css
+ * 앞으로 추가될 공지사항 및 공지 목록/상세 뷰의 모든 스타일은 본 파일을 참조합니다.
+ */
+
+/* ==========================================================================
+   1. 공지사항 컨테이너 & 레이아웃
+   ========================================================================== */
+.notice-page-container {
+    max-width: 960px;
+    margin: 2rem auto 3.5rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.notice-header-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-light, #e2e8f0);
+    padding: 1.75rem 2rem;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.25rem;
+}
+
+.notice-header-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+}
+
+.notice-badge-label {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 0.22rem 0.7rem;
+    border-radius: 20px;
+    letter-spacing: -0.2px;
+}
+
+.notice-date-text {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.notice-title-text {
+    font-size: 1.65rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0 0 0.6rem 0;
+    line-height: 1.38;
+    word-break: keep-all;
+}
+
+.notice-body-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-light, #e2e8f0);
+    padding: 2rem;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+    line-height: 1.75;
+    color: #334155;
+    margin-bottom: 2.5rem;
+}
+
+/* ==========================================================================
+   2. 공지사항 본문 공통 커스텀 컴포넌트
+   ========================================================================== */
+.notice-detail-content {
+    font-size: 0.95rem;
+}
+
+.notice-highlight-box {
+    background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%);
+    border: 1.5px solid #ddd6fe;
+    border-left: 5px solid #7c3aed;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.notice-highlight-title {
+    margin: 0 0 0.45rem 0;
+    color: #6d28d9;
+    font-size: 1.05rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.notice-highlight-desc {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #4c1d95;
+    font-weight: 500;
+}
+
+.notice-section {
+    margin-bottom: 2rem;
+}
+
+.notice-section-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.notice-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.notice-card-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.notice-card-item .card-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin: 0 auto 0.75rem auto;
+}
+.notice-card-item .card-icon.violet { background: #ede9fe; color: #7c3aed; }
+.notice-card-item .card-icon.pink   { background: #fce7f3; color: #db2777; }
+.notice-card-item .card-icon.amber  { background: #fef3c7; color: #d97706; }
+
+.notice-card-item .card-title {
+    margin: 0 0 0.35rem 0;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.notice-card-item .card-desc {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.notice-bullet-list {
+    padding-left: 1.2rem;
+    margin: 0;
+    color: #475569;
+    font-size: 0.92rem;
+}
+
+.notice-bullet-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   3. 공지사항 하단 목록 & 페이징 UI (Notice Table & Pagination)
+   ========================================================================== */
+.notice-list-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-light, #e2e8f0);
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+}
+
+.notice-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.notice-list-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.notice-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.notice-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.notice-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    padding: 0.8rem 1rem;
+    border-bottom: 1.5px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.notice-table td {
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.notice-table tr.current-notice-row {
+    background: #f5f3ff;
+    font-weight: 700;
+}
+
+.notice-table tr.current-notice-row td {
+    color: #6d28d9;
+}
+
+.notice-table-title-link {
+    color: #1e293b;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+.notice-table-title-link:hover {
+    color: #7c3aed;
+    text-decoration: underline;
+}
+
+.notice-current-tag {
+    background: #7c3aed;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    margin-left: 0.4rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* 페이징 컨테이너 */
+.notice-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+}
+
+.notice-pagination .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.5rem;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.notice-pagination .page-btn:hover:not(.disabled):not(.active) {
+    background: #f1f5f9;
+    color: #7c3aed;
+    border-color: #7c3aed;
+}
+
+.notice-pagination .page-btn.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(124, 58, 237, 0.25);
+}
+
+.notice-pagination .page-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* 모바일 반응형 조율 (아기자기한 미니 컴팩트 스타일) */
+@media (max-width: 768px) {
+    .notice-page-container {
+        margin: 0.5rem auto 1.5rem auto;
+        padding: 0 0.5rem;
+    }
+    .notice-header-card {
+        padding: 0.75rem 0.7rem;
+        border-radius: 14px;
+    }
+    .notice-title-text {
+        font-size: 0.92rem;
+        line-height: 1.35;
+    }
+    .notice-body-card {
+        padding: 0.85rem 0.7rem;
+        font-size: 0.75rem;
+        border-radius: 14px;
+    }
+
+    /* 보라색 하이라이트 공지 상자 초슬림 미니 튜닝 */
+    .notice-highlight-box {
+        padding: 0.6rem 0.7rem !important;
+        margin-bottom: 0.75rem !important;
+        border-radius: 10px !important;
+        border-left-width: 3px !important;
+    }
+    .notice-highlight-title {
+        font-size: 0.78rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+    .notice-highlight-title i {
+        font-size: 0.75rem !important;
+    }
+    .notice-highlight-desc {
+        font-size: 0.68rem !important;
+        line-height: 1.38 !important;
+    }
+
+    /* 본문 섹션 및 이용안내 카운트 카드 축소 */
+    .notice-section {
+        margin-bottom: 0.9rem !important;
+    }
+    .notice-section-title {
+        font-size: 0.8rem !important;
+        margin-bottom: 0.45rem !important;
+        padding-bottom: 0.25rem !important;
+    }
+    .notice-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+    .notice-card-item {
+        padding: 0.55rem 0.65rem !important;
+        border-radius: 10px !important;
+    }
+    .card-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.75rem !important;
+        border-radius: 8px !important;
+        margin-bottom: 0.4rem !important;
+    }
+    .card-title {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.15rem !important;
+    }
+    .card-desc {
+        font-size: 0.66rem !important;
+        line-height: 1.35 !important;
+    }
+    .notice-bullet-list {
+        padding-left: 0.85rem !important;
+        font-size: 0.68rem !important;
+        line-height: 1.45 !important;
+    }
+    .notice-bullet-list li {
+        margin-bottom: 0.25rem !important;
+    }
+
+    .notice-list-card {
+        padding: 0.75rem 0.65rem;
+        border-radius: 14px;
+    }
+    .notice-table {
+        font-size: 0.7rem;
+    }
+    .notice-table th, .notice-table td {
+        padding: 0.4rem 0.25rem;
+    }
+    .notice-pagination .page-btn {
+        min-width: 24px;
+        height: 24px;
+        font-size: 0.68rem;
+        border-radius: 6px;
+    }
+}
+
+/* ==========================================================================
+   4. 오픈 기념 이벤트 프리미엄 미니 카드 스타일
+   ========================================================================== */
+.notice-event-section {
+    margin-top: 1.25rem;
+}
+
+.notice-event-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1.5px solid #f1f5f9;
+}
+
+.notice-event-header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    box-shadow: 0 2px 6px rgba(225, 29, 72, 0.22);
+}
+
+.notice-event-header-title {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.notice-event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notice-event-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.6rem 0.8rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+    transition: all 0.2s ease;
+}
+
+.notice-event-card:hover {
+    border-color: #cbd5e1;
+    transform: translateX(2px);
+}
+
+.notice-event-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.notice-event-icon.blue   { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+.notice-event-icon.gold   { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.notice-event-icon.purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ede9fe; }
+
+.notice-event-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+}
+
+.notice-event-item-title {
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.notice-event-item-desc {
+    font-size: 0.68rem;
+    color: #64748b;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .notice-event-header-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.72rem;
+        border-radius: 7px;
+    }
+    .notice-event-header-title {
+        font-size: 0.82rem;
+    }
+    .notice-event-card {
+        padding: 0.48rem 0.6rem;
+        border-radius: 10px;
+        gap: 0.45rem;
+    }
+    .notice-event-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+    .notice-event-item-title {
+        font-size: 0.74rem;
+    }
+    .notice-event-item-desc {
+        font-size: 0.65rem;
+    }
+}

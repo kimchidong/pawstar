@@ -2632,4 +2632,67 @@ class PawStarService:
             print("get_hall_of_fame error:", e)
             return []
 
+    def get_latest_notice(self):
+        """ pst_notice 테이블에서 가장 최신 1건 조회 (상단 배너용) """
+        conn = self.get_db_connection()
+        if not conn:
+            return None
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM pst_notice ORDER BY NOTICE_NO DESC LIMIT 1")
+                row = cur.fetchone()
+                return row
+        except Exception as e:
+            print("get_latest_notice error:", e)
+            return None
+        finally:
+            conn.close()
+
+    def get_notice_by_id(self, notice_no):
+        """ pst_notice 테이블에서 특정 NOTICE_NO 공지사항 단건 조회 """
+        conn = self.get_db_connection()
+        if not conn:
+            return None
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM pst_notice WHERE NOTICE_NO = %s", (notice_no,))
+                row = cur.fetchone()
+                return row
+        except Exception as e:
+            print("get_notice_by_id error:", e)
+            return None
+        finally:
+            conn.close()
+
+    def get_notice_list(self, page=1, per_page=5):
+        """ pst_notice 공지사항 목록 및 페이징 정보 반환 """
+        conn = self.get_db_connection()
+        if not conn:
+            return {'items': [], 'total_count': 0, 'page': 1, 'per_page': per_page, 'total_pages': 1}
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) AS cnt FROM pst_notice")
+                res = cur.fetchone()
+                total_count = res['cnt'] if res else 0
+
+                total_pages = max(1, (total_count + per_page - 1) // per_page)
+                current_page = max(1, min(page, total_pages))
+                offset = (current_page - 1) * per_page
+
+                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, REG_DT, MODE_DT FROM pst_notice ORDER BY NOTICE_NO DESC LIMIT %s OFFSET %s", (per_page, offset))
+                items = cur.fetchall() or []
+
+                return {
+                    'items': items,
+                    'total_count': total_count,
+                    'page': current_page,
+                    'per_page': per_page,
+                    'total_pages': total_pages
+                }
+        except Exception as e:
+            print("get_notice_list error:", e)
+            return {'items': [], 'total_count': 0, 'page': 1, 'per_page': per_page, 'total_pages': 1}
+        finally:
+            conn.close()
+
 service = PawStarService()

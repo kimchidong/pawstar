@@ -1,103 +1,184 @@
 {% extends "m_base.html" %}
 
-{% block title %}공지사항 - Paw Star 정식 오픈 안내{% endblock %}
+{% block title %}{% if notice %}{{ notice.TTL|striptags }}{% else %}공지사항 - Paw Star 정식 오픈 안내{% endif %}{% endblock %}
 
 {% block content %}
-<div style="padding: 1rem 0.85rem 2.5rem 0.85rem;">
+<div style="padding: 0.6rem 0.5rem 1.8rem 0.5rem;">
     
-    <!-- 모바일 공지 헤더 카드 -->
-    <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.25rem 1rem; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); margin-bottom: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
-            <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-weight: 800; font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 14px;">공지사항</span>
-            <span style="color: #64748b; font-size: 0.78rem; font-weight: 600;"><i class="fa-regular fa-calendar-check" style="margin-right: 0.2rem;"></i> 2026. 09. 01</span>
+    <!-- 모바일 공지 상단 헤더 카드 (아기자기 컴팩트) -->
+    <div style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 0.75rem 0.7rem; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03); margin-bottom: 0.55rem;">
+        <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+            <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-weight: 800; font-size: 0.62rem; padding: 0.12rem 0.45rem; border-radius: 8px; letter-spacing: -0.2px;">공지사항</span>
+            <span style="color: #64748b; font-size: 0.68rem; font-weight: 600;">
+                <i class="fa-regular fa-calendar-check" style="margin-right: 0.15rem; font-size: 0.65rem;"></i>
+                {% if notice and notice.REG_DT is string %}
+                    {{ notice.REG_DT[:10] }}
+                {% elif notice and notice.REG_DT %}
+                    {{ notice.REG_DT.strftime('%Y. %m. %d') }}
+                {% else %}
+                    2026. 09. 01
+                {% endif %}
+            </span>
         </div>
         
-        <h2 style="font-size: 1.3rem; font-weight: 900; color: #0f172a; margin: 0 0 0.5rem 0; line-height: 1.35;">
-            🎉 Paw Star 정식 오픈 안내! 🌟
+        <h2 style="font-size: 0.92rem; font-weight: 900; color: #0f172a; margin: 0 0 0.25rem 0; line-height: 1.35; letter-spacing: -0.4px;">
+            {% if notice %}{{ notice.TTL_M|safe }}{% else %}🎉 Paw Star 정식 오픈 안내! 🌟{% endif %}
         </h2>
-        <p style="color: #475569; font-size: 0.86rem; line-height: 1.5; margin: 0;">
+        <p style="color: #475569; font-size: 0.72rem; line-height: 1.4; margin: 0; letter-spacing: -0.2px;">
             반려동물이 스타가 되는 공간, <strong>Paw Star</strong>에 오신 것을 환영합니다!
         </p>
     </div>
 
-    <!-- 모바일 공지 본문 내용 카드 -->
-    <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.25rem 1rem; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04); line-height: 1.6; color: #334155;">
+    <!-- 모바일 공지 본문 내용 카드 (아기자기 컴팩트) -->
+    <div style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 0.85rem 0.7rem; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03); line-height: 1.5; color: #334155; margin-bottom: 0.9rem;">
         
-        <!-- 하이라이트 공지 상자 -->
-        <div style="background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%); border: 1px solid #ddd6fe; border-left: 4px solid #7c3aed; border-radius: 14px; padding: 1rem; margin-bottom: 1.25rem;">
-            <h4 style="margin: 0 0 0.35rem 0; color: #6d28d9; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 0.35rem;">
-                <i class="fa-solid fa-crown" style="color: #eab308;"></i>
-                <span>반려동물도 스타가 될 수 있다!</span>
-            </h4>
-            <p style="margin: 0; font-size: 0.84rem; color: #4c1d95; font-weight: 500;">
-                Paw Star는 우리 집 소중한 아이를 자랑하고, 매월 투표를 통해 펫 스타로 등극하는 반려동물 대표 콘테스트 공간입니다.
-            </p>
-        </div>
+        {% if notice and notice.CONT_M %}
+            <div style="font-size: 0.75rem; line-height: 1.5;">
+                {{ notice.CONT_M|safe }}
+            </div>
+        {% else %}
+            <!-- 하이라이트 공지 상자 -->
+            <div style="background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%); border: 1px solid #ddd6fe; border-left: 3px solid #7c3aed; border-radius: 10px; padding: 0.65rem 0.7rem; margin-bottom: 0.8rem;">
+                <h4 style="margin: 0 0 0.2rem 0; color: #6d28d9; font-size: 0.78rem; font-weight: 800; display: flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-crown" style="color: #eab308; font-size: 0.75rem;"></i>
+                    <span>반려동물도 스타가 될 수 있다!</span>
+                </h4>
+                <p style="margin: 0; font-size: 0.7rem; color: #4c1d95; font-weight: 500; line-height: 1.4;">
+                    Paw Star는 우리 집 소중한 아이를 자랑하고, 매월 투표를 통해 펫 스타로 등극하는 반려동물 대표 콘테스트 공간입니다.
+                </p>
+            </div>
 
-        <!-- Section 1 -->
-        <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-size: 0.98rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.4rem; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-sparkles" style="color: #7c3aed;"></i>
-                <span>Paw Star 주요 이용 안내</span>
-            </h4>
-            
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 40px; height: 40px; background: #ede9fe; color: #7c3aed; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-camera"></i>
+            <!-- Section 1 -->
+            <div style="margin-bottom: 0.9rem;">
+                <h4 style="font-size: 0.8rem; font-weight: 800; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-sparkles" style="color: #7c3aed; font-size: 0.75rem;"></i>
+                    <span>Paw Star 주요 이용 안내</span>
+                </h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.5rem 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 26px; height: 26px; background: #ede9fe; color: #7c3aed; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div>
+                            <h5 style="margin: 0 0 0.08rem 0; font-size: 0.75rem; font-weight: 800; color: #0f172a;">01. 출전하기</h5>
+                            <p style="margin: 0; font-size: 0.68rem; color: #64748b; line-height: 1.3;">사랑스러운 아이 사진 및 SNS 링크로 바로 출전하세요.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h5 style="margin: 0 0 0.15rem 0; font-size: 0.88rem; font-weight: 800; color: #0f172a;">01. 출전하기</h5>
-                        <p style="margin: 0; font-size: 0.78rem; color: #64748b;">사랑스러운 아이 사진 및 SNS 링크로 바로 출전하세요.</p>
-                    </div>
-                </div>
 
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 40px; height: 40px; background: #fce7f3; color: #db2777; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-heart"></i>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.5rem 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 26px; height: 26px; background: #fce7f3; color: #db2777; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <div>
+                            <h5 style="margin: 0 0 0.08rem 0; font-size: 0.75rem; font-weight: 800; color: #0f172a;">02. 응원과 투표</h5>
+                            <p style="margin: 0; font-size: 0.68rem; color: #64748b; line-height: 1.3;">원하는 출전작에 투표하고 따뜻하게 응원해보세요.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h5 style="margin: 0 0 0.15rem 0; font-size: 0.88rem; font-weight: 800; color: #0f172a;">02. 응원과 투표</h5>
-                        <p style="margin: 0; font-size: 0.78rem; color: #64748b;">원하는 출전작에 투표하고 따뜻하게 응원해보세요.</p>
-                    </div>
-                </div>
 
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 0.85rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <div style="width: 40px; height: 40px; background: #fef3c7; color: #d97706; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <div>
-                        <h5 style="margin: 0 0 0.15rem 0; font-size: 0.88rem; font-weight: 800; color: #0f172a;">03. 명예의 전당</h5>
-                        <p style="margin: 0; font-size: 0.78rem; color: #64748b;">매월 상위 달성 펫 스타는 명예의 전당에 등재됩니다.</p>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.5rem 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 26px; height: 26px; background: #fef3c7; color: #d97706; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div>
+                            <h5 style="margin: 0 0 0.08rem 0; font-size: 0.75rem; font-weight: 800; color: #0f172a;">03. 명예의 전당</h5>
+                            <p style="margin: 0; font-size: 0.68rem; color: #64748b; line-height: 1.3;">매월 상위 달성 펫 스타는 명예의 전당에 등재됩니다.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Section 2 -->
-        <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-size: 0.98rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.4rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-gift" style="color: #e11d48;"></i>
-                <span>오픈 기념 혜택</span>
-            </h4>
-            <ul style="padding-left: 1.1rem; margin: 0; color: #475569; font-size: 0.82rem;">
-                <li style="margin-bottom: 0.4rem;"><strong>Google 원클릭 가입:</strong> 간편 가입으로 즉시 이용 가능!</li>
-                <li style="margin-bottom: 0.4rem;"><strong>첫 출전 전용 뱃지:</strong> 참가하는 집사님께 프로필 뱃지 수여!</li>
-                <li><strong>SNS 홍보 지원:</strong> 인스타그램, 유튜브 등 내 아이 소셜 채널 등록 가능</li>
-            </ul>
-        </div>
+        {% endif %}
 
-        <!-- 모바일 하단 버튼 -->
-        <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #f1f5f9;">
-            <a href="/m/upload" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.85rem; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-weight: 800; border-radius: 14px; text-decoration: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
-                <i class="fa-solid fa-paw"></i>
+        <!-- 모바일 하단 액션 버튼 (아기자기 컴팩트) -->
+        <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.9rem; padding-top: 0.65rem; border-top: 1px solid #f1f5f9;">
+            <a href="/m/upload" style="display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.55rem; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-weight: 800; border-radius: 8px; text-decoration: none; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.18);">
+                <i class="fa-solid fa-paw" style="font-size: 0.7rem;"></i>
                 <span>지금 아이 자랑하러 가기</span>
             </a>
-            <a href="/m/" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.75rem; background: #f1f5f9; color: #475569; font-weight: 800; border-radius: 14px; text-decoration: none; font-size: 0.85rem;">
-                <i class="fa-solid fa-house"></i>
+            <a href="/m/" style="display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.5rem; background: #f1f5f9; color: #475569; font-weight: 800; border-radius: 8px; text-decoration: none; font-size: 0.7rem;">
+                <i class="fa-solid fa-house" style="font-size: 0.65rem;"></i>
                 <span>메인으로 이동</span>
             </a>
         </div>
+    </div>
+
+    <!-- 모바일 하단 공지사항 목록 & 페이징 카드 (아기자기 컴팩트) -->
+    <div class="notice-list-card" style="padding: 0.75rem 0.65rem; border-radius: 14px;">
+        <div class="notice-list-header" style="margin-bottom: 0.55rem; padding-bottom: 0.35rem;">
+            <h3 style="font-size: 0.82rem;">
+                <i class="fa-solid fa-list-ul" style="color: #7c3aed; font-size: 0.75rem;"></i>
+                <span>공지사항 목록</span>
+            </h3>
+            <span style="font-size: 0.68rem; color: #64748b; font-weight: 600;">전체 {{ total_count or 0 }}건</span>
+        </div>
+
+        <div class="notice-table-wrap">
+            <table class="notice-table" style="font-size: 0.7rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 36px; text-align: center; padding: 0.35rem 0.25rem; font-size: 0.66rem;">번호</th>
+                        <th style="padding: 0.35rem 0.25rem; font-size: 0.66rem;">제목</th>
+                        <th style="width: 75px; text-align: center; padding: 0.35rem 0.25rem; font-size: 0.66rem;">등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if notice_list and notice_list|length > 0 %}
+                        {% for n in notice_list %}
+                            <tr class="{{ 'current-notice-row' if notice and notice.NOTICE_NO == n.NOTICE_NO else '' }}">
+                                <td style="text-align: center; font-weight: 700; color: #64748b; font-size: 0.68rem; padding: 0.45rem 0.25rem;">
+                                    {{ n.NOTICE_NO }}
+                                </td>
+                                <td style="padding: 0.45rem 0.25rem;">
+                                    <a href="/m/notice/{{ n.NOTICE_NO }}?page={{ current_page }}" class="notice-table-title-link" style="font-size: 0.68rem; line-height: 1.3;">
+                                        {{ n.TTL_M|safe }}
+                                    </a>
+                                    {% if notice and notice.NOTICE_NO == n.NOTICE_NO %}
+                                        <span class="notice-current-tag" style="font-size: 0.56rem; padding: 0.05rem 0.25rem; margin-left: 0.15rem; border-radius: 4px;">현재 글</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center; color: #64748b; font-size: 0.64rem; padding: 0.45rem 0.25rem;">
+                                    {% if n.REG_DT is string %}
+                                        {{ n.REG_DT[:10] }}
+                                    {% elif n.REG_DT %}
+                                        {{ n.REG_DT.strftime('%Y-%m-%d') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 1rem; color: #94a3b8; font-size: 0.7rem;">
+                                등록된 공지사항이 없습니다.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 모바일 페이징 컨트롤 (아기자기 미니 버튼) -->
+        {% if total_pages and total_pages > 1 %}
+        <div class="notice-pagination" style="margin-top: 0.65rem; gap: 0.2rem;">
+            {% set target_no = notice_no if notice_no else '' %}
+            
+            <a href="/m/notice/{{ target_no }}?page={{ current_page - 1 }}" class="page-btn {{ 'disabled' if current_page <= 1 else '' }}" style="min-width: 24px; height: 24px; font-size: 0.65rem; border-radius: 6px;" title="이전 페이지">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+
+            {% for p in range(1, total_pages + 1) %}
+                <a href="/m/notice/{{ target_no }}?page={{ p }}" class="page-btn {{ 'active' if p == current_page else '' }}" style="min-width: 24px; height: 24px; font-size: 0.68rem; border-radius: 6px;">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            <a href="/m/notice/{{ target_no }}?page={{ current_page + 1 }}" class="page-btn {{ 'disabled' if current_page >= total_pages else '' }}" style="min-width: 24px; height: 24px; font-size: 0.65rem; border-radius: 6px;" title="다음 페이지">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+        {% endif %}
     </div>
 
 </div>

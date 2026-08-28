@@ -35,6 +35,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260813_15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notice.css') }}?v=20260901_1">
     <script>
         window.isUserLoggedIn = {{ 'true' if is_logged_in else 'false' }};
         window.CURRENT_USER_ID = "{{ current_user.user_id if current_user else '' }}";
@@ -111,14 +112,16 @@
         </div>
     </nav>
 
-    <!-- 사이트 오픈 공지 배너 -->
-    <div class="site-notice-bar" onclick="location.href='/notice';" title="오픈 공지사항 자세히 보기">
+    <!-- 사이트 오픈 공지 배너 (DB 최신 공지 연동) -->
+    {% if latest_notice %}
+    <div class="site-notice-bar" onclick="location.href='/notice/{{ latest_notice.NOTICE_NO }}';" title="공지사항 자세히 보기">
         <div class="site-notice-container">
             <span class="notice-badge">공지</span>
-            <span class="notice-text">🎉 <strong>Paw Star 정식 오픈!</strong> 반려동물도 스타가 될 수 있다! 소중한 아이의 특별한 순간을 공유하고 펫 스타에 도전해 보세요! 🌟</span>
+            <span class="notice-text">{{ latest_notice.TTL|safe }}</span>
             <i class="fa-solid fa-chevron-right" style="font-size: 0.78rem; opacity: 0.85; margin-left: 0.25rem;"></i>
         </div>
     </div>
+    {% endif %}
 
     <!-- Main Content Body -->
     <main>

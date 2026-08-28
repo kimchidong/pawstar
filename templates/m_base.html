@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
     <!-- 모바일 전용 CSS (m_style.css) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/m_style.css') }}?v=20260813_14">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/m_style.css') }}?v=20260813_15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notice.css') }}?v=20260901_1">
     <!-- 모바일/브라우저 전용 앱 로고 아이콘 및 파비콘 설정 -->
     <link rel="manifest" href="/static/manifest.json">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -84,14 +85,16 @@
         </div>
     </header>
 
-    <!-- 모바일 사이트 오픈 공지 배너 -->
-    <div class="m-site-notice-bar" onclick="location.href='/m/notice';" title="오픈 공지사항 자세히 보기">
+    <!-- 모바일 사이트 오픈 공지 배너 (DB 최신 공지 연동) -->
+    {% if latest_notice %}
+    <div class="m-site-notice-bar" onclick="location.href='/m/notice/{{ latest_notice.NOTICE_NO }}';" title="공지사항 자세히 보기">
         <div class="m-site-notice-container">
             <span class="m-notice-badge">공지</span>
-            <span class="m-notice-text">🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟</span>
+            <span class="m-notice-text">{{ latest_notice.TTL_M|safe }}</span>
             <i class="fa-solid fa-chevron-right" style="font-size: 0.72rem; opacity: 0.85; margin-left: 0.2rem; flex-shrink: 0;"></i>
         </div>
     </div>
+    {% endif %}
 
     <!-- 메인 컨텐츠 영역 -->
     <main>

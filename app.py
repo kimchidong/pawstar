@@ -348,13 +348,20 @@ def inject_global_vars():
         print("footer recent rounds error:", e)
         footer_recent_rounds = []
 
+    latest_notice = None
+    try:
+        latest_notice = service.get_latest_notice()
+    except Exception as e:
+        print("inject_global_vars latest_notice error:", e)
+
     return {
         'contests': service.get_contests(),
         'pet_kinds': service.get_pet_kinds(),
         'app_slogan': '반려동물도 스타가 될 수 있다.',
         'current_user': current_user,
         'is_logged_in': is_logged_in,
-        'footer_recent_rounds': footer_recent_rounds
+        'footer_recent_rounds': footer_recent_rounds,
+        'latest_notice': latest_notice
     }
 
 # --- 로그인 / 로그아웃 라우트 ---
@@ -479,14 +486,50 @@ def m_privacy_page():
     return render_template('m_privacy.html')
 
 @app.route('/notice')
-def notice_page():
-    """ PawStar 공지사항 안내 웹 페이지 """
-    return render_template('notice.html')
+@app.route('/notice/<int:notice_no>')
+def notice_page(notice_no=None):
+    """ PawStar 공지사항 안내 웹 페이지 (상세 뷰 & 하단 목록/페이징) """
+    page = request.args.get('page', 1, type=int)
+    
+    if notice_no is None:
+        latest = service.get_latest_notice()
+        notice_no = latest['NOTICE_NO'] if latest else None
+        
+    notice_item = service.get_notice_by_id(notice_no) if notice_no else None
+    notice_list_data = service.get_notice_list(page=page, per_page=5)
+    
+    return render_template(
+        'notice.html',
+        notice=notice_item,
+        notice_no=notice_no,
+        notice_list=notice_list_data['items'],
+        current_page=notice_list_data['page'],
+        total_pages=notice_list_data['total_pages'],
+        total_count=notice_list_data['total_count']
+    )
 
 @app.route('/m/notice')
-def m_notice_page():
-    """ PawStar 공지사항 안내 모바일 페이지 """
-    return render_template('m_notice.html')
+@app.route('/m/notice/<int:notice_no>')
+def m_notice_page(notice_no=None):
+    """ PawStar 공지사항 안내 모바일 페이지 (상세 뷰 & 하단 목록/페이징) """
+    page = request.args.get('page', 1, type=int)
+    
+    if notice_no is None:
+        latest = service.get_latest_notice()
+        notice_no = latest['NOTICE_NO'] if latest else None
+        
+    notice_item = service.get_notice_by_id(notice_no) if notice_no else None
+    notice_list_data = service.get_notice_list(page=page, per_page=5)
+    
+    return render_template(
+        'm_notice.html',
+        notice=notice_item,
+        notice_no=notice_no,
+        notice_list=notice_list_data['items'],
+        current_page=notice_list_data['page'],
+        total_pages=notice_list_data['total_pages'],
+        total_count=notice_list_data['total_count']
+    )
 
 @app.route('/api/auth/login', methods=['POST'])
 def api_auth_login():

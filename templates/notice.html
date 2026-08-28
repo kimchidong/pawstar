@@ -1,85 +1,86 @@
 {% extends "base.html" %}
 
-{% block title %}공지사항 - Paw Star 정식 오픈 안내{% endblock %}
+{% block title %}{% if notice %}{{ notice.TTL|striptags }}{% else %}공지사항 - Paw Star 정식 오픈 안내{% endif %}{% endblock %}
 
 {% block content %}
 <div style="max-width: 900px; margin: 2.5rem auto; padding: 0 1rem;">
     
-    <!-- 공지 상단 헤더 카드 -->
+    <!-- 공지 상단 헤더 카드 (최초 디자인 100% 원복) -->
     <div style="background: #ffffff; border-radius: 24px; border: 1.5px solid var(--border-light); padding: 2rem; box-shadow: var(--shadow-soft); margin-bottom: 1.5rem;">
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
             <span style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-weight: 800; font-size: 0.78rem; padding: 0.25rem 0.75rem; border-radius: 20px;">공지사항</span>
-            <span style="color: #64748b; font-size: 0.85rem; font-weight: 600;"><i class="fa-regular fa-calendar-check" style="margin-right: 0.25rem;"></i> 2026. 09. 01</span>
+            <span style="color: #64748b; font-size: 0.85rem; font-weight: 600;">
+                <i class="fa-regular fa-calendar-check" style="margin-right: 0.25rem;"></i>
+                {% if notice and notice.REG_DT is string %}
+                    {{ notice.REG_DT[:10] }}
+                {% elif notice and notice.REG_DT %}
+                    {{ notice.REG_DT.strftime('%Y. %m. %d') }}
+                {% else %}
+                    2026. 09. 01
+                {% endif %}
+            </span>
         </div>
         
         <h1 style="font-size: 1.75rem; font-weight: 900; color: #0f172a; margin: 0 0 0.8rem 0; line-height: 1.35;">
-            🎉 Paw Star 서비스 정식 오픈 안내! 🌟
+            {% if notice %}{{ notice.TTL|safe }}{% else %}🎉 Paw Star 서비스 정식 오픈 안내! 🌟{% endif %}
         </h1>
         <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin: 0;">
             세상에서 가장 사랑스러운 반려동물이 스타가 되는 공간! <strong>Paw Star</strong>가 여러분을 찾아왔습니다.
         </p>
     </div>
 
-    <!-- 공지 본문 내용 카드 -->
-    <div style="background: #ffffff; border-radius: 24px; border: 1.5px solid var(--border-light); padding: 2.2rem; box-shadow: var(--shadow-soft); line-height: 1.7; color: #334155;">
+    <!-- 공지 본문 내용 카드 (최초 디자인 100% 원복) -->
+    <div style="background: #ffffff; border-radius: 24px; border: 1.5px solid var(--border-light); padding: 2.2rem; box-shadow: var(--shadow-soft); line-height: 1.7; color: #334155; margin-bottom: 2.5rem;">
         
-        <!-- 하이라이트 공지 상자 -->
-        <div style="background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%); border: 1.5px solid #ddd6fe; border-left: 5px solid #7c3aed; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #6d28d9; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-crown" style="color: #eab308;"></i>
-                <span>반려동물도 스타가 될 수 있다!</span>
-            </h3>
-            <p style="margin: 0; font-size: 0.92rem; color: #4c1d95; font-weight: 500;">
-                Paw Star는 세상에 하나뿐인 나의 소중한 반려동물을 마음껏 자랑하고, 매월 투표를 통해 명예의 전당 펫 스타로 선정되는 프리미엄 반려동물 콘테스트 플랫폼입니다.
-            </p>
-        </div>
+        {% if notice and notice.CONT %}
+            {{ notice.CONT|safe }}
+        {% else %}
+            <!-- 하이라이트 공지 상자 -->
+            <div style="background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%); border: 1.5px solid #ddd6fe; border-left: 5px solid #7c3aed; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #6d28d9; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+                    <i class="fa-solid fa-crown" style="color: #eab308;"></i>
+                    <span>반려동물도 스타가 될 수 있다!</span>
+                </h3>
+                <p style="margin: 0; font-size: 0.92rem; color: #4c1d95; font-weight: 500;">
+                    Paw Star는 세상에 하나뿐인 나의 소중한 반려동물을 마음껏 자랑하고, 매월 투표를 통해 명예의 전당 펫 스타로 선정되는 프리미엄 반려동물 콘테스트 플랫폼입니다.
+                </p>
+            </div>
 
-        <!-- Section 1 -->
-        <div style="margin-bottom: 2rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fa-solid fa-sparkles" style="color: #7c3aed;"></i>
-                <span>Paw Star 주요 이용 안내</span>
-            </h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
-                    <div style="width: 48px; height: 48px; background: #ede9fe; color: #7c3aed; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
-                        <i class="fa-solid fa-camera"></i>
+            <!-- Section 1 -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-sparkles" style="color: #7c3aed;"></i>
+                    <span>Paw Star 주요 이용 안내</span>
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
+                        <div style="width: 48px; height: 48px; background: #ede9fe; color: #7c3aed; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">01. 출전하기</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #64748b;">소중한 반려동물의 러블리한 일상 사진 및 SNS 링크(인스타/유튜브 등)로 출전해 보세요.</p>
                     </div>
-                    <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">01. 출전하기</h4>
-                    <p style="margin: 0; font-size: 0.82rem; color: #64748b;">소중한 반려동물의 러블리한 일상 사진 및 SNS 링크(인스타/유튜브 등)로 출전해 보세요.</p>
-                </div>
 
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
-                    <div style="width: 48px; height: 48px; background: #fce7f3; color: #db2777; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
-                        <i class="fa-solid fa-heart"></i>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
+                        <div style="width: 48px; height: 48px; background: #fce7f3; color: #db2777; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">02. 응원과 투표</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #64748b;">마음에 드는 아이에게 하트를 보내고 댓글로 따뜻하게 응원해 보세요.</p>
                     </div>
-                    <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">02. 응원과 투표</h4>
-                    <p style="margin: 0; font-size: 0.82rem; color: #64748b;">마음에 드는 아이에게 하트를 보내고 댓글로 따뜻하게 응원해 보세요.</p>
-                </div>
 
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
-                    <div style="width: 48px; height: 48px; background: #fef3c7; color: #d97706; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
-                        <i class="fa-solid fa-trophy"></i>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.2rem; text-align: center;">
+                        <div style="width: 48px; height: 48px; background: #fef3c7; color: #d97706; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin: 0 auto 0.75rem auto;">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">03. 명예의 전당</h4>
+                        <p style="margin: 0; font-size: 0.82rem; color: #64748b;">매월 상위 랭킹을 달성한 펫 스타들은 명예의 전당에 등재됩니다.</p>
                     </div>
-                    <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; font-weight: 800; color: #0f172a;">03. 명예의 전당</h4>
-                    <p style="margin: 0; font-size: 0.82rem; color: #64748b;">매월 상위 랭킹을 달성한 펫 스타들은 명예의 전당에 등재됩니다.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Section 2 -->
-        <div style="margin-bottom: 2rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fa-solid fa-gift" style="color: #e11d48;"></i>
-                <span>오픈 기념 축하 이벤트</span>
-            </h3>
-            <ul style="padding-left: 1.2rem; margin: 0; color: #475569; font-size: 0.92rem;">
-                <li style="margin-bottom: 0.5rem;"><strong>Google 간편 회원가입:</strong> 복잡한 절차 없이 클릭 한 번으로 빠른 시작!</li>
-                <li style="margin-bottom: 0.5rem;"><strong>첫 출전 뱃지 혜택:</strong> 지금 참가하는 모든 집사님들께 프로필 전용 출전 뱃지를 드립니다.</li>
-                <li><strong>소셜 채널 연동:</strong> 인스타그램, 유튜브, 블로그 등 내 아이의 SNS 채널을 프로필에 자유롭게 홍보할 수 있습니다.</li>
-            </ul>
-        </div>
+        {% endif %}
 
         <!-- 하단 액션 버튼 -->
         <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9;">
@@ -92,6 +93,84 @@
                 <span>지금 아이 자랑하러 가기</span>
             </a>
         </div>
+    </div>
+
+    <!-- 하단 공지사항 목록 & 페이징 카드 -->
+    <div class="notice-list-card">
+        <div class="notice-list-header">
+            <h3>
+                <i class="fa-solid fa-list-ul" style="color: #7c3aed;"></i>
+                <span>공지사항 목록</span>
+            </h3>
+            <span style="font-size: 0.82rem; color: #64748b; font-weight: 600;">전체 {{ total_count or 0 }}건</span>
+        </div>
+
+        <div class="notice-table-wrap">
+            <table class="notice-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">번호</th>
+                        <th>제목</th>
+                        <th style="width: 140px; text-align: center;">등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if notice_list and notice_list|length > 0 %}
+                        {% for n in notice_list %}
+                            <tr class="{{ 'current-notice-row' if notice and notice.NOTICE_NO == n.NOTICE_NO else '' }}">
+                                <td style="text-align: center; font-weight: 700; color: #64748b;">
+                                    {{ n.NOTICE_NO }}
+                                </td>
+                                <td>
+                                    <a href="/notice/{{ n.NOTICE_NO }}?page={{ current_page }}" class="notice-table-title-link">
+                                        {{ n.TTL|safe }}
+                                    </a>
+                                    {% if notice and notice.NOTICE_NO == n.NOTICE_NO %}
+                                        <span class="notice-current-tag">현재 글</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center; color: #64748b; font-size: 0.85rem;">
+                                    {% if n.REG_DT is string %}
+                                        {{ n.REG_DT[:10] }}
+                                    {% elif n.REG_DT %}
+                                        {{ n.REG_DT.strftime('%Y-%m-%d') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                                등록된 공지사항이 없습니다.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이징 컨트롤 -->
+        {% if total_pages and total_pages > 1 %}
+        <div class="notice-pagination">
+            {% set target_no = notice_no if notice_no else '' %}
+            
+            <a href="/notice/{{ target_no }}?page={{ current_page - 1 }}" class="page-btn {{ 'disabled' if current_page <= 1 else '' }}" title="이전 페이지">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+
+            {% for p in range(1, total_pages + 1) %}
+                <a href="/notice/{{ target_no }}?page={{ p }}" class="page-btn {{ 'active' if p == current_page else '' }}">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            <a href="/notice/{{ target_no }}?page={{ current_page + 1 }}" class="page-btn {{ 'disabled' if current_page >= total_pages else '' }}" title="다음 페이지">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+        {% endif %}
     </div>
 
 </div>
