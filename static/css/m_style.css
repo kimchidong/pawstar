@@ -2038,4 +2038,59 @@ body.m-body {
     display: inline-block;
 }
 
+/* 모바일 사이트 오픈 공지 배너 스타일 */
+.m-site-notice-bar {
+    width: calc(100% - 1.5rem);
+    margin: 0.5rem auto 0 auto;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 45%, #e11d48 100%);
+    color: #ffffff;
+    padding: 0.55rem 0.85rem;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(124, 58, 237, 0.15);
+    position: relative;
+    z-index: 99;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.m-site-notice-bar:active {
+    transform: scale(0.98);
+}
+
+.m-site-notice-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.m-notice-badge {
+    background: #fef08a;
+    color: #6b21a8;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 14px;
+    flex-shrink: 0;
+}
+
+.m-notice-text {
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.m-notice-text strong {
+    font-weight: 800;
+    color: #fef08a;
+}
+
+
 

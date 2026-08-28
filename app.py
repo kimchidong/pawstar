@@ -478,6 +478,16 @@ def m_privacy_page():
     """ PawStar 개인정보 처리 안내 모바일 페이지 """
     return render_template('m_privacy.html')
 
+@app.route('/notice')
+def notice_page():
+    """ PawStar 공지사항 안내 웹 페이지 """
+    return render_template('notice.html')
+
+@app.route('/m/notice')
+def m_notice_page():
+    """ PawStar 공지사항 안내 모바일 페이지 """
+    return render_template('m_notice.html')
+
 @app.route('/api/auth/login', methods=['POST'])
 def api_auth_login():
     """ 로그인 API (user_id & password) """
