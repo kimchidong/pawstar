@@ -78,44 +78,47 @@ def init_notice_table():
 
             content_m = """
 <div class="notice-detail-content">
-    <div class="notice-highlight-box">
-        <h3 class="notice-highlight-title">
-            <i class="fa-solid fa-crown"></i>
+    <div class="notice-highlight-box" style="background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%); border: 1.5px solid #e9d5ff; border-radius: 14px; padding: 0.75rem 0.85rem; margin-bottom: 0.85rem;">
+        <h4 class="notice-highlight-title" style="color: #7c3aed; font-size: 0.82rem; font-weight: 900; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.35rem;">
+            <i class="fa-solid fa-crown" style="color: #eab308; font-size: 0.8rem;"></i>
             <span>반려동물도 스타가 될 수 있다!</span>
-        </h3>
-        <p class="notice-highlight-desc">
-            Paw Star는 우리 집 소중한 아이를 자랑하고, 매월 투표를 통해 펫 스타로 등극하는 반려동물 대표 콘테스트 공간입니다.
+        </h4>
+        <p class="notice-highlight-desc" style="color: #581c87; font-size: 0.72rem; line-height: 1.4; margin: 0; font-weight: 600;">
+            Paw Star는 우리 집 소중한 아이를 자랑하고, 매월 투표를 통해 펫 스타로 등극하는 반려동물 대표 콘테스트 공간입니다. 🐾
         </p>
     </div>
 
-    <div class="notice-section">
-        <h3 class="notice-section-title">
-            <i class="fa-solid fa-sparkles"></i>
-            <span>Paw Star 주요 이용 안내</span>
-        </h3>
+    <div class="notice-section" style="margin-bottom: 0.85rem;">
+        <h4 class="notice-section-title" style="font-size: 0.82rem; font-weight: 900; color: #0f172a; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.35rem; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.35rem;">
+            <i class="fa-solid fa-paw" style="color: #7c3aed; font-size: 0.8rem;"></i>
+            <span>Paw Star 200% 즐기는 방법</span>
+        </h4>
         
-        <div style="display: flex; flex-direction: column; gap: 0.45rem;">
-            <div class="notice-card-item" style="display: flex; align-items: center; gap: 0.5rem; text-align: left;">
-                <div class="card-icon violet" style="margin: 0;"><i class="fa-solid fa-camera"></i></div>
-                <div>
-                    <h4 class="card-title">01. 출전하기</h4>
-                    <p class="card-desc">사랑스러운 아이 사진 및 SNS 링크로 바로 출전하세요.</p>
+        <div class="m-notice-card-wrap">
+            <div class="m-notice-step-card purple">
+                <div class="m-step-badge purple"><i class="fa-solid fa-camera"></i></div>
+                <div class="m-step-info">
+                    <span class="m-step-num purple">STEP 01</span>
+                    <span class="m-step-title">출전하기</span>
+                    <span class="m-step-desc">사랑스러운 아이 사진 & SNS 링크로 바로 출전!</span>
                 </div>
             </div>
 
-            <div class="notice-card-item" style="display: flex; align-items: center; gap: 0.5rem; text-align: left;">
-                <div class="card-icon pink" style="margin: 0;"><i class="fa-solid fa-heart"></i></div>
-                <div>
-                    <h4 class="card-title">02. 응원과 투표</h4>
-                    <p class="card-desc">원하는 출전작에 투표하고 따뜻하게 응원해보세요.</p>
+            <div class="m-notice-step-card pink">
+                <div class="m-step-badge pink"><i class="fa-solid fa-heart"></i></div>
+                <div class="m-step-info">
+                    <span class="m-step-num pink">STEP 02</span>
+                    <span class="m-step-title">응원과 투표</span>
+                    <span class="m-step-desc">원하는 출전작에 하트 투표하고 응원 메시지 남기기</span>
                 </div>
             </div>
 
-            <div class="notice-card-item" style="display: flex; align-items: center; gap: 0.5rem; text-align: left;">
-                <div class="card-icon amber" style="margin: 0;"><i class="fa-solid fa-trophy"></i></div>
-                <div>
-                    <h4 class="card-title">03. 명예의 전당</h4>
-                    <p class="card-desc">매월 상위 달성 펫 스타는 명예의 전당에 등재됩니다.</p>
+            <div class="m-notice-step-card amber">
+                <div class="m-step-badge amber"><i class="fa-solid fa-trophy"></i></div>
+                <div class="m-step-info">
+                    <span class="m-step-num amber">STEP 03</span>
+                    <span class="m-step-title">명예의 전당</span>
+                    <span class="m-step-desc">매월 랭킹 상위 달성 펫 스타의 영예 등재!</span>
                 </div>
             </div>
         </div>

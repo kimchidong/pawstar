@@ -404,6 +404,86 @@
 }
 
 /* ==========================================================================
+   5. 모바일 아기자기 귀여운 카드 디자인 스타일 (Paw Star 전용)
+   ========================================================================== */
+.m-notice-card-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.65rem;
+}
+
+.m-notice-step-card {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: 14px;
+    border: 1.5px solid #f1f5f9;
+    background: #ffffff;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);
+    position: relative;
+}
+
+.m-notice-step-card.purple {
+    background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+    border-color: #f3e8ff;
+}
+
+.m-notice-step-card.pink {
+    background: linear-gradient(135deg, #ffffff 0%, #fff1f2 100%);
+    border-color: #ffe4e6;
+}
+
+.m-notice-step-card.amber {
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+    border-color: #fef3c7;
+}
+
+.m-step-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.m-step-badge.purple { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #ffffff; }
+.m-step-badge.pink   { background: linear-gradient(135deg, #fb7185, #e11d48); color: #ffffff; }
+.m-step-badge.amber  { background: linear-gradient(135deg, #fbbf24, #d97706); color: #ffffff; }
+
+.m-step-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.m-step-num {
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+}
+.m-step-num.purple { color: #7c3aed; }
+.m-step-num.pink   { color: #e11d48; }
+.m-step-num.amber  { color: #d97706; }
+
+.m-step-title {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.m-step-desc {
+    font-size: 0.7rem;
+    color: #64748b;
+    line-height: 1.35;
+}
+
+/* ==========================================================================
    4. 오픈 기념 이벤트 프리미엄 미니 카드 스타일
    ========================================================================== */
 .notice-event-section {
