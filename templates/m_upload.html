@@ -445,6 +445,13 @@ function openMobilePreviewModal() {
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // 팝업이 열릴 때 모바일 유튜브 플레이어 자동 재생 세팅
+        const mYtbVal = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
+        const mPreviewYtbId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(mYtbVal) : null;
+        if (typeof setupYouTubePlayerWithEnding === 'function') {
+            setupYouTubePlayerWithEnding('mPreviewYtbContainer', 'mPreviewModalImg', mPreviewYtbId, 'mPreviewYtbFadeTimer', 'mPreviewYtbPlayer', 'mPreviewYtbReplayBtn', 'mPreviewYtbCountdown', 'mPreviewYtbCountNum');
+        }
     }
 }
 
@@ -453,6 +460,22 @@ function closeMobilePreviewModal() {
     if (modal) {
         modal.style.display = 'none';
         document.body.style.overflow = '';
+
+        // 팝업 닫힐 때 모바일 유튜브 비디오 재생 정지 및 초기화
+        if (window.mPreviewYtbPlayer && typeof window.mPreviewYtbPlayer.destroy === 'function') {
+            try { window.mPreviewYtbPlayer.destroy(); } catch(e) {}
+            window.mPreviewYtbPlayer = null;
+        }
+        const container = document.getElementById('mPreviewYtbContainer');
+        if (container) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+        }
+        const imgEl = document.getElementById('mPreviewModalImg');
+        if (imgEl) {
+            imgEl.style.opacity = '1';
+            imgEl.style.pointerEvents = 'auto';
+        }
     }
 }
 
@@ -669,7 +692,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const mYtbVal = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
         const mPreviewYtbId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(mYtbVal) : null;
-        if (typeof setupYouTubePlayerWithEnding === 'function') {
+        const mModal = document.getElementById('mPreviewModalBackdrop');
+        const isMModalOpen = mModal && getComputedStyle(mModal).display !== 'none';
+        if (isMModalOpen && typeof setupYouTubePlayerWithEnding === 'function') {
             setupYouTubePlayerWithEnding('mPreviewYtbContainer', 'mPreviewModalImg', mPreviewYtbId, 'mPreviewYtbFadeTimer', 'mPreviewYtbPlayer', 'mPreviewYtbReplayBtn', 'mPreviewYtbCountdown', 'mPreviewYtbCountNum');
         }
     }
