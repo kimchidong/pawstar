@@ -22,7 +22,7 @@
         </div>
         
         <h2 style="font-size: 0.92rem; font-weight: 900; color: #0f172a; margin: 0 0 0.25rem 0; line-height: 1.35; letter-spacing: -0.4px;">
-            {% if notice %}{{ notice.TTL_M|safe }}{% else %}🎉 Paw Star 정식 오픈 안내! 🌟{% endif %}
+            {% if notice %}{{ (notice.TTL_M or notice.TTL or notice.ttl_m or notice.ttl)|safe }}{% else %}🎉 Paw Star 정식 오픈 안내! 🌟{% endif %}
         </h2>
         <p style="color: #475569; font-size: 0.72rem; line-height: 1.4; margin: 0; letter-spacing: -0.2px;">
             반려동물이 스타가 되는 공간, <strong>Paw Star</strong>에 오신 것을 환영합니다!
@@ -32,9 +32,9 @@
     <!-- 모바일 공지 본문 내용 카드 (아기자기 컴팩트) -->
     <div style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 0.85rem 0.7rem; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03); line-height: 1.5; color: #334155; margin-bottom: 0.9rem;">
         
-        {% if notice and notice.CONT_M %}
+        {% if notice and (notice.CONT_M or notice.CONT or notice.cont_m or notice.cont) %}
             <div style="font-size: 0.75rem; line-height: 1.5;">
-                {{ notice.CONT_M|safe }}
+                {{ (notice.CONT_M or notice.CONT or notice.cont_m or notice.cont)|safe }}
             </div>
         {% else %}
             <!-- 하이라이트 공지 상자 -->

@@ -2633,7 +2633,7 @@ class PawStarService:
             return []
 
     def _get_notice_table_name(self, cur):
-        """ 운영 DB(PST_NOTICE)와 로컬 DB(pst_notice) 간 테이블명 대소문자 감지 자동 호환 """
+        """ 운영 DB(PST_NOTICE) 대문자 테이블명 기본 적용 및 대소문자 호환 """
         try:
             cur.execute("SHOW TABLES LIKE 'PST_NOTICE'")
             if cur.fetchone():
@@ -2645,20 +2645,62 @@ class PawStarService:
             pass
         return 'PST_NOTICE'
 
+    def _normalize_notice_dict(self, row):
+        """ DB 컬럼 대소문자 및 TTL_M / CONT_M 호환성 보장 헬퍼 """
+        if not row or not isinstance(row, dict):
+            return {
+                'NOTICE_NO': 1,
+                'TTL': '🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟',
+                'TTL_M': '🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟',
+                'CONT': '<div class="notice-detail-content"><p>Paw Star 서비스가 정식 오픈되었습니다!</p></div>',
+                'CONT_M': '<div class="notice-detail-content"><p>Paw Star 서비스가 정식 오픈되었습니다!</p></div>',
+                'REG_DT': '2026-09-01 00:00:00',
+                'MODE_DT': '2026-09-01 00:00:00'
+            }
+        
+        # 키 대소문자 흡수
+        res = {}
+        for k, v in row.items():
+            res[k.upper()] = v
+
+        ttl = res.get('TTL') or res.get('TTL_M') or '🎉 Paw Star 정식 오픈! 소중한 아이의 특별한 순간을 공유하세요! 🌟'
+        ttl_m = res.get('TTL_M') or res.get('TTL') or '🎉 Paw Star 정식 오픈! 소중한 아이의 특별한 순간을 공유하세요! 🌟'
+        cont = res.get('CONT') or res.get('CONT_M') or '<p>Paw Star 서비스 정식 오픈!</p>'
+        cont_m = res.get('CONT_M') or res.get('CONT') or '<p>Paw Star 서비스 정식 오픈!</p>'
+
+        res['TTL'] = ttl
+        res['TTL_M'] = ttl_m
+        res['CONT'] = cont
+        res['CONT_M'] = cont_m
+        res['NOTICE_NO'] = res.get('NOTICE_NO', 1)
+        return res
+
     def get_latest_notice(self):
         """ pst_notice/PST_NOTICE 테이블에서 가장 최신 1건 조회 (상단 배너용) """
+        default_notice = {
+            'NOTICE_NO': 1,
+            'TTL': '🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해 보세요! 🌟',
+            'TTL_M': '🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟',
+            'CONT': '<div class="notice-detail-content"><p>Paw Star 서비스가 정식 오픈되었습니다!</p></div>',
+            'CONT_M': '<div class="notice-detail-content"><p>Paw Star 서비스가 정식 오픈되었습니다!</p></div>',
+            'REG_DT': '2026-09-01 00:00:00',
+            'MODE_DT': '2026-09-01 00:00:00'
+        }
+
         conn = self.get_db_connection()
         if not conn:
-            return None
+            return default_notice
         try:
             with conn.cursor() as cur:
                 tbl = self._get_notice_table_name(cur)
-                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT 1")
+                cur.execute(f"SELECT * FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT 1")
                 row = cur.fetchone()
-                return row
+                if row:
+                    return self._normalize_notice_dict(row)
+                return default_notice
         except Exception as e:
             print("get_latest_notice error:", e)
-            return None
+            return default_notice
         finally:
             conn.close()
 
@@ -2666,16 +2708,18 @@ class PawStarService:
         """ pst_notice/PST_NOTICE 테이블에서 특정 NOTICE_NO 공지사항 단건 조회 """
         conn = self.get_db_connection()
         if not conn:
-            return None
+            return self.get_latest_notice()
         try:
             with conn.cursor() as cur:
                 tbl = self._get_notice_table_name(cur)
-                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM `{tbl}` WHERE NOTICE_NO = %s", (notice_no,))
+                cur.execute(f"SELECT * FROM `{tbl}` WHERE NOTICE_NO = %s", (notice_no,))
                 row = cur.fetchone()
-                return row
+                if row:
+                    return self._normalize_notice_dict(row)
+                return self.get_latest_notice()
         except Exception as e:
             print("get_notice_by_id error:", e)
-            return None
+            return self.get_latest_notice()
         finally:
             conn.close()
 
@@ -2683,7 +2727,8 @@ class PawStarService:
         """ pst_notice/PST_NOTICE 공지사항 목록 및 페이징 정보 반환 """
         conn = self.get_db_connection()
         if not conn:
-            return {'items': [], 'total_count': 0, 'page': 1, 'per_page': per_page, 'total_pages': 1}
+            default_item = self.get_latest_notice()
+            return {'items': [default_item], 'total_count': 1, 'page': 1, 'per_page': per_page, 'total_pages': 1}
         try:
             with conn.cursor() as cur:
                 tbl = self._get_notice_table_name(cur)
@@ -2691,12 +2736,17 @@ class PawStarService:
                 res = cur.fetchone()
                 total_count = res['cnt'] if res else 0
 
+                if total_count == 0:
+                    default_item = self.get_latest_notice()
+                    return {'items': [default_item], 'total_count': 1, 'page': 1, 'per_page': per_page, 'total_pages': 1}
+
                 total_pages = max(1, (total_count + per_page - 1) // per_page)
                 current_page = max(1, min(page, total_pages))
                 offset = (current_page - 1) * per_page
 
-                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, REG_DT, MODE_DT FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT %s OFFSET %s", (per_page, offset))
-                items = cur.fetchall() or []
+                cur.execute(f"SELECT * FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT %s OFFSET %s", (per_page, offset))
+                rows = cur.fetchall() or []
+                items = [self._normalize_notice_dict(r) for r in rows]
 
                 return {
                     'items': items,
@@ -2707,7 +2757,8 @@ class PawStarService:
                 }
         except Exception as e:
             print("get_notice_list error:", e)
-            return {'items': [], 'total_count': 0, 'page': 1, 'per_page': per_page, 'total_pages': 1}
+            default_item = self.get_latest_notice()
+            return {'items': [default_item], 'total_count': 1, 'page': 1, 'per_page': per_page, 'total_pages': 1}
         finally:
             conn.close()
 

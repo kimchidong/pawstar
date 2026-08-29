@@ -87,10 +87,10 @@
 
     <!-- 모바일 사이트 오픈 공지 배너 (DB 최신 공지 연동) -->
     {% if latest_notice %}
-    <div class="m-site-notice-bar" onclick="location.href='/m/notice/{{ latest_notice.NOTICE_NO }}';" title="공지사항 자세히 보기">
+    <div class="m-site-notice-bar" onclick="location.href='/m/notice/{{ latest_notice.NOTICE_NO|default(1) }}';" title="공지사항 자세히 보기">
         <div class="m-site-notice-container">
             <span class="m-notice-badge">공지</span>
-            <span class="m-notice-text">{{ latest_notice.TTL_M|safe }}</span>
+            <span class="m-notice-text">{{ (latest_notice.TTL_M or latest_notice.TTL or latest_notice.ttl_m or latest_notice.ttl)|safe }}</span>
             <i class="fa-solid fa-chevron-right" style="font-size: 0.72rem; opacity: 0.85; margin-left: 0.2rem; flex-shrink: 0;"></i>
         </div>
     </div>
