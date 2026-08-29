@@ -40,6 +40,47 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 }
 
 /**
+ * 모바일 전용 유튜브 다시보기 버튼 클릭 핸들러
+ */
+function replayMobileYtbVideo() {
+    const mImgEl = document.getElementById('mDetailImg');
+    const mReplayBtn = document.getElementById('mDetailYtbReplayBtn');
+    const container = document.getElementById('mDetailYtbContainer');
+
+    if (mImgEl) {
+        mImgEl.style.opacity = '0';
+        mImgEl.style.pointerEvents = 'none';
+    }
+    if (mReplayBtn) mReplayBtn.style.display = 'none';
+
+    if (container && window.currentMYtbVideoId) {
+        container.style.display = 'block';
+        setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', window.currentMYtbVideoId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn');
+    }
+}
+window.replayMobileYtbVideo = replayMobileYtbVideo;
+
+function replayMobilePreviewYtbVideo() {
+    const mImgEl = document.getElementById('mPreviewModalImg');
+    const mReplayBtn = document.getElementById('mPreviewYtbReplayBtn');
+    const container = document.getElementById('mPreviewYtbContainer');
+    const mYtbVal = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
+    const vId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(mYtbVal) : null;
+
+    if (mImgEl) {
+        mImgEl.style.opacity = '0';
+        mImgEl.style.pointerEvents = 'none';
+    }
+    if (mReplayBtn) mReplayBtn.style.display = 'none';
+
+    if (container && vId) {
+        container.style.display = 'block';
+        setupYouTubePlayerWithEnding('mPreviewYtbContainer', 'mPreviewModalImg', vId, 'mPreviewYtbFadeTimer', 'mPreviewYtbPlayer', 'mPreviewYtbReplayBtn');
+    }
+}
+window.replayMobilePreviewYtbVideo = replayMobilePreviewYtbVideo;
+
+/**
  * 모바일 전용 YouTube 동영상 재생 [동영상 바로 재생 -> 완료 시 대표 이미지 페이드인 & 다시보기 버튼 표시] 헬퍼
  */
 function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey, replayBtnId) {
@@ -63,7 +104,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     const hideImg = () => {
         if (imgEl) {
             imgEl.style.opacity = '0';
-            imgEl.style.pointerEvents = 'none'; // 모바일 터치로 동영상 컨트롤러(사운드/시간바/재생버튼) 조작 가능하도록 설정
+            imgEl.style.pointerEvents = 'none'; // 모바일 터치로 동영상 컨트롤러 조작 가능
         }
         if (replayBtn) replayBtn.style.display = 'none';
     };
@@ -71,7 +112,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     const showImg = () => {
         if (imgEl) {
             imgEl.style.opacity = '1';
-            imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 터치/포인터 이벤트 복구
+            imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 터치 이벤트 복구
         }
     };
 

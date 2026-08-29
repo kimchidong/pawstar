@@ -101,6 +101,14 @@ function replayYtbVideo(type) {
         imgEl.style.pointerEvents = 'none';
     }
 
+    if (type === 'mobile' || type === 'preview_mobile') {
+        const ytbId = window.currentMYtbVideoId || '';
+        if (typeof setupYouTubePlayerWithEnding === 'function') {
+            setupYouTubePlayerWithEnding(containerId, imgId, ytbId, timerKey, playerKey, btnId);
+        }
+        return;
+    }
+
     let replayed = false;
     const player = window[playerKey];
     if (player && typeof player.seekTo === 'function') {
@@ -114,21 +122,15 @@ function replayYtbVideo(type) {
         }
     }
 
-    // player API가 없거나 재생하지 못했을 경우 대응
-    if (!replayed) {
-        if (type === 'mobile' && window.currentMYtbVideoId) {
-            setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', window.currentMYtbVideoId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn');
-        } else if (container) {
-            const iframe = container.querySelector('iframe');
-            if (iframe) {
-                let src = iframe.src || '';
-                if (src) {
-                    src = src.replace('mute=1', 'mute=0');
-                    if (!src.includes('autoplay=1')) {
-                        src += (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=0&playsinline=1';
-                    }
-                    iframe.src = src;
+    if (!replayed && container) {
+        const iframe = container.querySelector('iframe');
+        if (iframe) {
+            let src = iframe.src || '';
+            if (src) {
+                if (!src.includes('autoplay=1')) {
+                    src += (src.includes('?') ? '&' : '?') + 'autoplay=1&playsinline=1';
                 }
+                iframe.src = src;
             }
         }
     }

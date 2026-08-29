@@ -32,10 +32,11 @@ def test_ytb_embed():
     assert 'mDetailYtbContainer' in m_main_js, "mDetailYtbContainer missing in m_main.js"
 
     # Autoplay, Mute, Playsinline, ending handler check
-    required_params = ['autoplay=1', 'mute=0', 'playsinline=1', 'setupYouTubePlayerWithEnding']
-    for param in required_params:
+    for param in ['autoplay=1', 'playsinline=1', 'setupYouTubePlayerWithEnding']:
         assert param in main_js, f"{param} missing in main.js"
         assert param in m_main_js, f"{param} missing in m_main.js"
+    assert 'mute=0' in main_js, "mute=0 missing in main.js"
+    assert 'mute=0' in m_main_js, "mute=0 missing in m_main.js"
 
     print("[PASS 2] JS YouTube video embed & autoplay logic present in main.js & m_main.js")
     print("ALL YOUTUBE EMBED TESTS PASSED!")
