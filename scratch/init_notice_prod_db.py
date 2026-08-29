@@ -64,7 +64,7 @@ def sync_prod_notice_tables():
 
             content_m = """
 <div class="notice-detail-content">
-    <div class="notice-highlight-box" style="background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%); border: 1.5px solid #e9d5ff; border-radius: 14px; padding: 0.75rem 0.85rem; margin-bottom: 0.85rem;">
+    <div class="notice-highlight-box" style="background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%); border: 1.5px solid #e9d5ff; border-left: 5px solid #7c3aed; border-radius: 14px; padding: 0.75rem 0.85rem; margin-bottom: 0.85rem;">
         <h4 class="notice-highlight-title" style="color: #7c3aed; font-size: 0.82rem; font-weight: 900; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.35rem;">
             <i class="fa-solid fa-crown" style="color: #eab308; font-size: 0.8rem;"></i>
             <span>반려동물도 스타가 될 수 있다!</span>

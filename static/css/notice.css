@@ -441,12 +441,12 @@
         border-radius: 14px;
     }
 
-    /* 보라색 하이라이트 공지 상자 초슬림 미니 튜닝 */
+    /* 보라색 하이라이트 공지 상자 진하고 뚜렷한 PC 스타일 세로 바 적용 */
     .notice-highlight-box {
-        padding: 0.6rem 0.7rem !important;
+        padding: 0.65rem 0.75rem !important;
         margin-bottom: 0.75rem !important;
         border-radius: 10px !important;
-        border-left-width: 3px !important;
+        border-left: 5px solid #7c3aed !important;
     }
     .notice-highlight-title {
         font-size: 0.78rem !important;
