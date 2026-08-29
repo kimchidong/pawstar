@@ -2632,14 +2632,28 @@ class PawStarService:
             print("get_hall_of_fame error:", e)
             return []
 
+    def _get_notice_table_name(self, cur):
+        """ 운영 DB(PST_NOTICE)와 로컬 DB(pst_notice) 간 테이블명 대소문자 감지 자동 호환 """
+        try:
+            cur.execute("SHOW TABLES LIKE 'PST_NOTICE'")
+            if cur.fetchone():
+                return 'PST_NOTICE'
+            cur.execute("SHOW TABLES LIKE 'pst_notice'")
+            if cur.fetchone():
+                return 'pst_notice'
+        except Exception:
+            pass
+        return 'PST_NOTICE'
+
     def get_latest_notice(self):
-        """ pst_notice 테이블에서 가장 최신 1건 조회 (상단 배너용) """
+        """ pst_notice/PST_NOTICE 테이블에서 가장 최신 1건 조회 (상단 배너용) """
         conn = self.get_db_connection()
         if not conn:
             return None
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM pst_notice ORDER BY NOTICE_NO DESC LIMIT 1")
+                tbl = self._get_notice_table_name(cur)
+                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT 1")
                 row = cur.fetchone()
                 return row
         except Exception as e:
@@ -2649,13 +2663,14 @@ class PawStarService:
             conn.close()
 
     def get_notice_by_id(self, notice_no):
-        """ pst_notice 테이블에서 특정 NOTICE_NO 공지사항 단건 조회 """
+        """ pst_notice/PST_NOTICE 테이블에서 특정 NOTICE_NO 공지사항 단건 조회 """
         conn = self.get_db_connection()
         if not conn:
             return None
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM pst_notice WHERE NOTICE_NO = %s", (notice_no,))
+                tbl = self._get_notice_table_name(cur)
+                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT FROM `{tbl}` WHERE NOTICE_NO = %s", (notice_no,))
                 row = cur.fetchone()
                 return row
         except Exception as e:
@@ -2665,13 +2680,14 @@ class PawStarService:
             conn.close()
 
     def get_notice_list(self, page=1, per_page=5):
-        """ pst_notice 공지사항 목록 및 페이징 정보 반환 """
+        """ pst_notice/PST_NOTICE 공지사항 목록 및 페이징 정보 반환 """
         conn = self.get_db_connection()
         if not conn:
             return {'items': [], 'total_count': 0, 'page': 1, 'per_page': per_page, 'total_pages': 1}
         try:
             with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) AS cnt FROM pst_notice")
+                tbl = self._get_notice_table_name(cur)
+                cur.execute(f"SELECT COUNT(*) AS cnt FROM `{tbl}`")
                 res = cur.fetchone()
                 total_count = res['cnt'] if res else 0
 
@@ -2679,7 +2695,7 @@ class PawStarService:
                 current_page = max(1, min(page, total_pages))
                 offset = (current_page - 1) * per_page
 
-                cur.execute("SELECT NOTICE_NO, TTL, TTL_M, REG_DT, MODE_DT FROM pst_notice ORDER BY NOTICE_NO DESC LIMIT %s OFFSET %s", (per_page, offset))
+                cur.execute(f"SELECT NOTICE_NO, TTL, TTL_M, REG_DT, MODE_DT FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT %s OFFSET %s", (per_page, offset))
                 items = cur.fetchall() or []
 
                 return {
