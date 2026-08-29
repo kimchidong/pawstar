@@ -62,10 +62,24 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
         window[playerKey] = null;
     }
 
+    const hideImg = () => {
+        if (imgEl) {
+            imgEl.style.opacity = '0';
+            imgEl.style.pointerEvents = 'none'; // 모바일 터치로 동영상 컨트롤러(사운드/시간바/재생버튼) 조작 가능하도록 설정
+        }
+    };
+
+    const showImg = () => {
+        if (imgEl) {
+            imgEl.style.opacity = '1';
+            imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 터치/포인터 이벤트 복구
+        }
+    };
+
     if (!videoId) {
         container.style.display = 'none';
         container.innerHTML = '';
-        if (imgEl) imgEl.style.opacity = '1';
+        showImg();
         return;
     }
 
@@ -85,35 +99,34 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                     'playsinline': 1,
                     'enablejsapi': 1,
                     'rel': 0,
-                    'controls': 1
+                    'controls': 1,
+                    'fs': 1,
+                    'modestbranding': 1
                 },
                 events: {
                     'onReady': (event) => {
+                        showImg();
                         try { event.target.playVideo(); } catch(e) {}
-                        window[fadeTimerKey] = setTimeout(() => {
-                            if (imgEl) imgEl.style.opacity = '0';
-                        }, 3000);
+                        window[fadeTimerKey] = setTimeout(hideImg, 3000);
                     },
                     'onStateChange': (event) => {
                         // YT.PlayerState.ENDED = 0 (동영상 종료 시 이미지 3초 노출 후 재생 무한 반복)
                         if (event.data === 0 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.ENDED)) {
-                            if (imgEl) imgEl.style.opacity = '1';
+                            showImg();
                             try { event.target.seekTo(0); } catch(e) {}
                             
                             if (window[loopTimerKey]) clearTimeout(window[loopTimerKey]);
                             window[loopTimerKey] = setTimeout(() => {
                                 try { event.target.playVideo(); } catch(e) {}
-                                if (imgEl) imgEl.style.opacity = '0';
+                                hideImg();
                             }, 3000);
                         }
                     }
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
-            window[fadeTimerKey] = setTimeout(() => {
-                if (imgEl) imgEl.style.opacity = '0';
-            }, 3000);
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            window[fadeTimerKey] = setTimeout(hideImg, 3000);
         }
     };
 
@@ -1121,6 +1134,7 @@ function closeMobileDetailModal() {
     if (mImgEl) {
         mImgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
         mImgEl.style.opacity = '1';
+        mImgEl.style.pointerEvents = 'auto';
     }
     const mYtbContainer = document.getElementById('mDetailYtbContainer');
     if (mYtbContainer) {
