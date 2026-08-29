@@ -28,6 +28,112 @@ function getYouTubeVideoId(url) {
     return null;
 }
 
+// YouTube IFrame API 스크립트 자동 로딩
+if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-api-script')) {
+    const tag = document.createElement('script');
+    tag.id = 'youtube-iframe-api-script';
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    if (firstScriptTag && firstScriptTag.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+}
+
+/**
+ * 모바일 전용 YouTube 동영상 재생 및 무한 순환 [이미지 3초 -> 동영상 재생 -> 이미지 3초 -> 동영상 재생] 헬퍼
+ */
+function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey, loopTimerKey) {
+    const container = document.getElementById(containerId);
+    const imgEl = document.getElementById(imgId);
+    if (!container) return;
+
+    if (!loopTimerKey) loopTimerKey = fadeTimerKey + '_loop';
+
+    if (window[fadeTimerKey]) {
+        clearTimeout(window[fadeTimerKey]);
+        window[fadeTimerKey] = null;
+    }
+    if (window[loopTimerKey]) {
+        clearTimeout(window[loopTimerKey]);
+        window[loopTimerKey] = null;
+    }
+    if (window[playerKey] && typeof window[playerKey].destroy === 'function') {
+        try { window[playerKey].destroy(); } catch(e) {}
+        window[playerKey] = null;
+    }
+
+    if (!videoId) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        if (imgEl) imgEl.style.opacity = '1';
+        return;
+    }
+
+    container.style.display = 'block';
+    const iframeId = containerId + '_iframe';
+    container.innerHTML = `<div id="${iframeId}" style="width: 100%; height: 100%;"></div>`;
+
+    const initPlayer = () => {
+        try {
+            window[playerKey] = new YT.Player(iframeId, {
+                width: '100%',
+                height: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'mute': 1,
+                    'playsinline': 1,
+                    'enablejsapi': 1,
+                    'rel': 0,
+                    'controls': 1
+                },
+                events: {
+                    'onReady': (event) => {
+                        try { event.target.playVideo(); } catch(e) {}
+                        window[fadeTimerKey] = setTimeout(() => {
+                            if (imgEl) imgEl.style.opacity = '0';
+                        }, 3000);
+                    },
+                    'onStateChange': (event) => {
+                        // YT.PlayerState.ENDED = 0 (동영상 종료 시 이미지 3초 노출 후 재생 무한 반복)
+                        if (event.data === 0 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.ENDED)) {
+                            if (imgEl) imgEl.style.opacity = '1';
+                            try { event.target.seekTo(0); } catch(e) {}
+                            
+                            if (window[loopTimerKey]) clearTimeout(window[loopTimerKey]);
+                            window[loopTimerKey] = setTimeout(() => {
+                                try { event.target.playVideo(); } catch(e) {}
+                                if (imgEl) imgEl.style.opacity = '0';
+                            }, 3000);
+                        }
+                    }
+                }
+            });
+        } catch(e) {
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            window[fadeTimerKey] = setTimeout(() => {
+                if (imgEl) imgEl.style.opacity = '0';
+            }, 3000);
+        }
+    };
+
+    if (window.YT && window.YT.Player) {
+        initPlayer();
+    } else {
+        let attempts = 0;
+        const timer = setInterval(() => {
+            attempts++;
+            if (window.YT && window.YT.Player) {
+                clearInterval(timer);
+                initPlayer();
+            } else if (attempts > 30) {
+                clearInterval(timer);
+                initPlayer();
+            }
+        }, 100);
+    }
+}
+
 /**
  * 모바일 전용 일자시간 상대시간(방금 전, N초 전, N분 전, N시간 전, N일 전, N달 전, N년 전) 포맷팅
  */
@@ -454,28 +560,10 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
         }
     }
 
-    if (window.mYtbFadeTimer) {
-        clearTimeout(window.mYtbFadeTimer);
-        window.mYtbFadeTimer = null;
-    }
-
-    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (3초 후 이미지가 서서히 페이드아웃 되면서 전환)
-    const mYtbContainer = document.getElementById('mDetailYtbContainer');
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (재생 완료 시 대표 이미지 페이드인 복구)
     const rawYtbMobile = (postData.SNS_YTB || postData.sns_ytb || '').trim();
     const mYtbId = getYouTubeVideoId(rawYtbMobile);
-    if (mYtbContainer) {
-        if (mYtbId) {
-            mYtbContainer.style.display = 'block';
-            mYtbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${mYtbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${mYtbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
-            window.mYtbFadeTimer = setTimeout(() => {
-                if (mImgEl) mImgEl.style.opacity = '0';
-            }, 3000);
-        } else {
-            mYtbContainer.style.display = 'none';
-            mYtbContainer.innerHTML = '';
-            if (mImgEl) mImgEl.style.opacity = '1';
-        }
-    }
+    setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', mYtbId, 'mYtbFadeTimer', 'mYtbPlayer');
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
     
@@ -1013,6 +1101,14 @@ function closeMobileDetailModal() {
     if (window.mYtbFadeTimer) {
         clearTimeout(window.mYtbFadeTimer);
         window.mYtbFadeTimer = null;
+    }
+    if (window.mYtbFadeTimer_loop) {
+        clearTimeout(window.mYtbFadeTimer_loop);
+        window.mYtbFadeTimer_loop = null;
+    }
+    if (window.mYtbPlayer && typeof window.mYtbPlayer.destroy === 'function') {
+        try { window.mYtbPlayer.destroy(); } catch(e) {}
+        window.mYtbPlayer = null;
     }
     const detailModal = document.getElementById('mDetailModal');
     if (detailModal) {
