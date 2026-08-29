@@ -91,7 +91,7 @@ def init_notice_table():
     <div class="notice-section" style="margin-bottom: 0.85rem;">
         <h4 class="notice-section-title" style="font-size: 0.82rem; font-weight: 900; color: #0f172a; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.35rem; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.35rem;">
             <i class="fa-solid fa-paw" style="color: #7c3aed; font-size: 0.8rem;"></i>
-            <span>Paw Star 200% 즐기는 방법</span>
+            <span>Paw Star 주요 이용 안내</span>
         </h4>
         
         <div class="m-notice-card-wrap">

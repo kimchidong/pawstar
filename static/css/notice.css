@@ -16,13 +16,7 @@
     border-radius: 0;
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
     cursor: pointer;
-    transition: all 0.2s ease;
     box-sizing: border-box;
-}
-
-.site-notice-bar:hover {
-    border-color: #818cf8;
-    background: linear-gradient(135deg, #e0e7ff 0%, #f5d0fe 50%, #dbeafe 100%);
 }
 
 .site-notice-container {
