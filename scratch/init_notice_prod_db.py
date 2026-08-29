@@ -24,7 +24,7 @@ def sync_prod_notice_tables():
             content_pc = """
 <div class="notice-detail-content">
     <div class="notice-poster-wrap" style="margin-bottom: 1.75rem; text-align: center;">
-        <img src="/static/image/poster/notice_open_poster.jpg?v=20260901_1" alt="Paw Star 정식 오픈 포스터" style="width: 100%; max-width: 860px; height: auto; border-radius: 16px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15); border: 1px solid #e2e8f0; display: block; margin: 0 auto;">
+        <img src="/static/image/poster/notice_open_poster.jpg?v=20260901_2" alt="Paw Star 정식 오픈 포스터" style="width: 100%; max-width: 860px; height: auto; border-radius: 16px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15); border: 1px solid #e2e8f0; display: block; margin: 0 auto;">
     </div>
 
     <div class="notice-highlight-box">
@@ -69,7 +69,7 @@ def sync_prod_notice_tables():
             content_m = """
 <div class="notice-detail-content">
     <div class="m-notice-poster-wrap" style="margin-bottom: 0.85rem; text-align: center;">
-        <img src="/static/image/poster/notice_open_poster.jpg?v=20260901_1" alt="Paw Star 정식 오픈 포스터" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 3px 12px rgba(124, 58, 237, 0.12); border: 1px solid #e2e8f0; display: block;">
+        <img src="/static/image/poster/notice_open_poster.jpg?v=20260901_2" alt="Paw Star 정식 오픈 포스터" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 3px 12px rgba(124, 58, 237, 0.12); border: 1px solid #e2e8f0; display: block;">
     </div>
     <div class="notice-highlight-box" style="background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%); border: 1.5px solid #e9d5ff; border-left: 5px solid #7c3aed; border-radius: 14px; padding: 0.75rem 0.85rem; margin-bottom: 0.85rem;">
         <h4 class="notice-highlight-title" style="color: #7c3aed; font-size: 0.82rem; font-weight: 900; margin: 0 0 0.25rem 0; display: flex; align-items: center; gap: 0.35rem;">
