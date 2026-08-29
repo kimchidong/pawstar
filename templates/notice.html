@@ -35,6 +35,11 @@
         {% if notice and (notice.CONT or notice.CONT_M or notice.cont or notice.cont_m) %}
             {{ (notice.CONT or notice.CONT_M or notice.cont or notice.cont_m)|safe }}
         {% else %}
+            <!-- 정식 오픈 축하 포스터 이미지 -->
+            <div class="notice-poster-wrap" style="margin-bottom: 1.75rem; text-align: center;">
+                <img src="/static/image/poster/notice_open_poster.jpg?v=20260901_1" alt="Paw Star 정식 오픈 포스터" style="width: 100%; max-width: 860px; height: auto; border-radius: 16px; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15); border: 1px solid #e2e8f0; display: block; margin: 0 auto;">
+            </div>
+
             <!-- 하이라이트 공지 상자 -->
             <div style="background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 100%); border: 1.5px solid #ddd6fe; border-left: 5px solid #7c3aed; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
                 <h3 style="margin: 0 0 0.5rem 0; color: #6d28d9; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
