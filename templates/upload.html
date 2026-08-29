@@ -461,6 +461,10 @@
                 <button id="previewYtbReplayBtn" onclick="if(typeof replayYtbVideo==='function') replayYtbVideo('preview_pc');" title="동영상 다시보기" style="display: none; position: absolute; bottom: 0.85rem; right: 0.75rem; z-index: 25; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; width: 38px; height: 38px; padding: 0; cursor: pointer; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
                     <i class="fa-solid fa-play" style="font-size: 0.9rem; color: #f472b6; transform: translateX(1px);"></i>
                 </button>
+                <!-- 우측 하단 동영상 재생 전 카운트다운 배지 -->
+                <div id="previewYtbCountdown" style="display: none; position: absolute; bottom: 0.85rem; right: 0.75rem; z-index: 25; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50px; padding: 0.35rem 0.75rem; font-size: 0.82rem; font-weight: 800; align-items: center; gap: 0.35rem; box-shadow: 0 4px 14px rgba(0,0,0,0.25); pointer-events: none;">
+                    <i class="fa-solid fa-play" style="font-size: 0.75rem; color: #f472b6;"></i> <span id="previewYtbCountNum" style="color: #f472b6; font-size: 0.95rem; font-weight: 900;">3</span>s
+                </div>
             </div>
 
             <!-- 우측 상세 정보 스크롤 컨테이너 (원본 팝업과 1:1 동일한 구조) -->
@@ -806,7 +810,7 @@ function updatePreview() {
 
     const previewYtbId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(snsYtb) : null;
     if (typeof setupYouTubePlayerWithEnding === 'function') {
-        setupYouTubePlayerWithEnding('previewYtbContainer', 'previewModalImg', previewYtbId, 'previewYtbFadeTimer', 'previewYtbPlayer', 'previewYtbReplayBtn');
+        setupYouTubePlayerWithEnding('previewYtbContainer', 'previewModalImg', previewYtbId, 'previewYtbFadeTimer', 'previewYtbPlayer', 'previewYtbReplayBtn', 'previewYtbCountdown', 'previewYtbCountNum');
     }
 
     updateAllFieldStyles();
