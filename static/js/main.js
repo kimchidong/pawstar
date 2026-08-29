@@ -77,23 +77,22 @@ function replayYtbVideo(type) {
 
     if (container) container.style.display = 'block';
 
-    const player = window[playerKey];
-    if (player && typeof player.playVideo === 'function') {
-        try { player.seekTo(0); } catch(e) {}
-        try { player.playVideo(); } catch(e) {}
-    }
-
     if (window[timerKey]) {
         clearTimeout(window[timerKey]);
         window[timerKey] = null;
     }
 
-    window[timerKey] = setTimeout(() => {
-        if (imgEl) {
-            imgEl.style.opacity = '0';
-            imgEl.style.pointerEvents = 'none';
-        }
-    }, 3000);
+    // 재생 버튼 클릭 시 대기 시간 없이 즉시 대표 이미지 페이드아웃 및 재생 시작
+    if (imgEl) {
+        imgEl.style.opacity = '0';
+        imgEl.style.pointerEvents = 'none';
+    }
+
+    const player = window[playerKey];
+    if (player && typeof player.playVideo === 'function') {
+        try { player.seekTo(0); } catch(e) {}
+        try { player.playVideo(); } catch(e) {}
+    }
 }
 window.replayYtbVideo = replayYtbVideo;
 
