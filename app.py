@@ -2039,6 +2039,42 @@ def close_contest():
     new_winners = service.close_contest_and_award(contest_id)
     return jsonify({'success': True, 'winners': new_winners, 'message': f'제{contest_id}회 콘테스트가 성공적으로 종료되었으며 수상자가 선정되었습니다!'})
 
+@app.route('/api/check_url_status', methods=['GET', 'POST'])
+def check_url_status():
+    """ 입력한 URL의 HTTP 응답 코드 200 OK 여부를 검증하는 API """
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        target_url = (data.get('url') or '').strip()
+    else:
+        target_url = (request.args.get('url') or '').strip()
+
+    if not target_url:
+        return jsonify({'ok': False, 'status': 400, 'message': 'Empty URL'})
+
+    if not (target_url.startswith('http://') or target_url.startswith('https://')):
+        target_url = 'https://' + target_url
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+    }
+
+    try:
+        # 먼저 HEAD 요청 시도
+        res = requests.head(target_url, headers=headers, allow_redirects=True, timeout=3.5)
+        status_code = res.status_code
+        if status_code in (405, 403, 400, 501):
+            # HEAD 미지원/거부 시 GET 요청
+            res_get = requests.get(target_url, headers=headers, stream=True, allow_redirects=True, timeout=3.5)
+            status_code = res_get.status_code
+            res_get.close()
+
+        is_ok = (status_code == 200)
+        return jsonify({'ok': is_ok, 'status': status_code, 'url': target_url})
+    except Exception as e:
+        return jsonify({'ok': False, 'status': 500, 'error': str(e)})
+
 if __name__ == '__main__':
     print("🐾 Paw Star Server Running on http://127.0.0.1:8003")
     app.run(host='0.0.0.0', port=8003, debug=True)

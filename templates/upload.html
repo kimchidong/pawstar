@@ -213,7 +213,12 @@
                                     </label>
                                     <span style="font-size: 0.75rem; font-weight: 700; color: #64748b;"><span id="uploadSnsInstCharCount" style="color: #7c3aed;">0</span>/200</span>
                                 </div>
-                                <input type="text" name="sns_inst" id="uploadSnsInst" class="form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 0.75rem; font-size: 0.84rem;">
+                                <div style="position: relative; width: 100%;">
+                                    <input type="text" name="sns_inst" id="uploadSnsInst" class="form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 2.2rem 0 0.75rem; font-size: 0.84rem;">
+                                    <div id="check_uploadSnsInst" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                                        <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.05rem;"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 0;">
@@ -223,7 +228,12 @@
                                     </label>
                                     <span style="font-size: 0.75rem; font-weight: 700; color: #64748b;"><span id="uploadSnsYtbCharCount" style="color: #7c3aed;">0</span>/200</span>
                                 </div>
-                                <input type="text" name="sns_ytb" id="uploadSnsYtb" class="form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 0.75rem; font-size: 0.84rem;">
+                                <div style="position: relative; width: 100%;">
+                                    <input type="text" name="sns_ytb" id="uploadSnsYtb" class="form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 2.2rem 0 0.75rem; font-size: 0.84rem;">
+                                    <div id="check_uploadSnsYtb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                                        <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.05rem;"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 0;">
@@ -233,7 +243,12 @@
                                     </label>
                                     <span style="font-size: 0.75rem; font-weight: 700; color: #64748b;"><span id="uploadSnsFsbCharCount" style="color: #7c3aed;">0</span>/200</span>
                                 </div>
-                                <input type="text" name="sns_fsb" id="uploadSnsFsb" class="form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 0.75rem; font-size: 0.84rem;">
+                                <div style="position: relative; width: 100%;">
+                                    <input type="text" name="sns_fsb" id="uploadSnsFsb" class="form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 2.2rem 0 0.75rem; font-size: 0.84rem;">
+                                    <div id="check_uploadSnsFsb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                                        <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.05rem;"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 0;">
@@ -243,7 +258,12 @@
                                     </label>
                                     <span style="font-size: 0.75rem; font-weight: 700; color: #64748b;"><span id="uploadSnsBlgCharCount" style="color: #7c3aed;">0</span>/200</span>
                                 </div>
-                                <input type="text" name="sns_blg" id="uploadSnsBlg" class="form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 0.75rem; font-size: 0.84rem;">
+                                <div style="position: relative; width: 100%;">
+                                    <input type="text" name="sns_blg" id="uploadSnsBlg" class="form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; border: 1px solid var(--border-light); padding: 0 2.2rem 0 0.75rem; font-size: 0.84rem;">
+                                    <div id="check_uploadSnsBlg" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                                        <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.05rem;"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -875,8 +895,54 @@ document.addEventListener('DOMContentLoaded', function() {
         const el = document.getElementById(id);
         if (el) {
             ['input', 'change', 'blur'].forEach(ev => el.addEventListener(ev, updatePreview));
+            initUrlStatusChecker(id, 'check_' + id);
         }
     });
+
+function initUrlStatusChecker(inputId, badgeId) {
+    const inputEl = document.getElementById(inputId);
+    const badgeEl = document.getElementById(badgeId);
+    if (!inputEl || !badgeEl) return;
+
+    let timer = null;
+
+    const verifyUrl = () => {
+        const urlVal = (inputEl.value || '').trim();
+        if (!urlVal) {
+            badgeEl.style.display = 'none';
+            return;
+        }
+
+        fetch('/api/check_url_status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: urlVal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.ok && data.status === 200) {
+                badgeEl.style.display = 'flex';
+            } else {
+                badgeEl.style.display = 'none';
+            }
+        })
+        .catch(() => {
+            badgeEl.style.display = 'none';
+        });
+    };
+
+    inputEl.addEventListener('input', () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(verifyUrl, 400);
+    });
+
+    inputEl.addEventListener('change', verifyUrl);
+    inputEl.addEventListener('blur', verifyUrl);
+
+    if (inputEl.value && inputEl.value.trim()) {
+        verifyUrl();
+    }
+}
 
     // 첨부한 예쁜 아이 사진을 미리보기 팝업 이미지(#previewModalImg) & 카드 이미지(#previewCardImg)에 100% 실시간 동기화!
     if (mediaFileInput) {

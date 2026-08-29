@@ -129,7 +129,12 @@
                         </label>
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsInstCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
-                    <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
+                        <div id="check_mUploadSnsInst" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
@@ -139,7 +144,12 @@
                         </label>
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsYtbCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
-                    <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
+                        <div id="check_mUploadSnsYtb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
@@ -149,7 +159,12 @@
                         </label>
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsFsbCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
-                    <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
+                        <div id="check_mUploadSnsFsb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="m-form-group" style="margin-bottom: 0.6rem;">
@@ -159,7 +174,12 @@
                         </label>
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsBlgCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
-                    <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem;">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
+                        <div id="check_mUploadSnsBlg" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                            <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -661,8 +681,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
     ['mUploadSnsInst', 'mUploadSnsYtb', 'mUploadSnsFsb', 'mUploadSnsBlg'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updateMobilePreview);
+        if (el) {
+            ['input', 'change', 'blur'].forEach(ev => el.addEventListener(ev, updateMobilePreview));
+            initUrlStatusChecker(id, 'check_' + id);
+        }
     });
+
+function initUrlStatusChecker(inputId, badgeId) {
+    const inputEl = document.getElementById(inputId);
+    const badgeEl = document.getElementById(badgeId);
+    if (!inputEl || !badgeEl) return;
+
+    let timer = null;
+
+    const verifyUrl = () => {
+        const urlVal = (inputEl.value || '').trim();
+        if (!urlVal) {
+            badgeEl.style.display = 'none';
+            return;
+        }
+
+        fetch('/api/check_url_status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: urlVal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.ok && data.status === 200) {
+                badgeEl.style.display = 'flex';
+            } else {
+                badgeEl.style.display = 'none';
+            }
+        })
+        .catch(() => {
+            badgeEl.style.display = 'none';
+        });
+    };
+
+    inputEl.addEventListener('input', () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(verifyUrl, 400);
+    });
+
+    inputEl.addEventListener('change', verifyUrl);
+    inputEl.addEventListener('blur', verifyUrl);
+
+    if (inputEl.value && inputEl.value.trim()) {
+        verifyUrl();
+    }
+}
 
     // 커스텀 동물 종류 드롭다운 전역 토글 & 옵션 선택 함수
     window.toggleMUploadPetDropdown = function(triggerEl, e) {
