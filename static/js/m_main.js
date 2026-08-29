@@ -459,7 +459,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
         window.mYtbFadeTimer = null;
     }
 
-    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (1초 후 이미지가 페이드아웃 되면서 전환)
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (3초 후 이미지가 서서히 페이드아웃 되면서 전환)
     const mYtbContainer = document.getElementById('mDetailYtbContainer');
     const rawYtbMobile = (postData.SNS_YTB || postData.sns_ytb || '').trim();
     const mYtbId = getYouTubeVideoId(rawYtbMobile);
@@ -469,7 +469,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
             mYtbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${mYtbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${mYtbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             window.mYtbFadeTimer = setTimeout(() => {
                 if (mImgEl) mImgEl.style.opacity = '0';
-            }, 1000);
+            }, 3000);
         } else {
             mYtbContainer.style.display = 'none';
             mYtbContainer.innerHTML = '';
