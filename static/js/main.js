@@ -95,7 +95,7 @@ function replayYtbVideo(type) {
         window[timerKey] = null;
     }
 
-    // 재생 버튼 클릭 시 즉시 대표 이미지 페이드아웃 및 0초 지점부터 확실한 다시 재생 시작
+    // 재생 버튼 클릭 시 즉시 대표 이미지 페이드아웃 및 0초 지점부터 다시 재생 시작
     if (imgEl) {
         imgEl.style.opacity = '0';
         imgEl.style.pointerEvents = 'none';
@@ -106,16 +106,30 @@ function replayYtbVideo(type) {
     if (player && typeof player.seekTo === 'function') {
         try {
             player.seekTo(0, true);
+            try { player.unMute(); } catch(err) {}
             player.playVideo();
             replayed = true;
-        } catch(e) {}
+        } catch(e) {
+            console.log('Player replay error:', e);
+        }
     }
 
-    if (!replayed && container) {
-        const iframe = container.querySelector('iframe');
-        if (iframe && iframe.src) {
-            const currentSrc = iframe.src;
-            iframe.src = currentSrc;
+    // player API가 없거나 재생하지 못했을 경우 대응
+    if (!replayed) {
+        if (type === 'mobile' && window.currentMYtbVideoId) {
+            setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', window.currentMYtbVideoId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn');
+        } else if (container) {
+            const iframe = container.querySelector('iframe');
+            if (iframe) {
+                let src = iframe.src || '';
+                if (src) {
+                    src = src.replace('mute=1', 'mute=0');
+                    if (!src.includes('autoplay=1')) {
+                        src += (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=0&playsinline=1';
+                    }
+                    iframe.src = src;
+                }
+            }
         }
     }
 }
@@ -179,7 +193,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 videoId: videoId,
                 playerVars: {
                     'autoplay': 1,
-                    'mute': 1,
+                    'mute': 0,
                     'playsinline': 1,
                     'enablejsapi': 1,
                     'rel': 0,
@@ -190,6 +204,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
+                        try { event.target.unMute(); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
@@ -202,7 +217,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             hideImg();
         }
     };

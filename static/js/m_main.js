@@ -96,7 +96,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 videoId: videoId,
                 playerVars: {
                     'autoplay': 1,
-                    'mute': 1,
+                    'mute': 0,
                     'playsinline': 1,
                     'enablejsapi': 1,
                     'rel': 0,
@@ -107,6 +107,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
+                        try { event.target.unMute(); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
@@ -119,7 +120,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             hideImg();
         }
     };
@@ -570,6 +571,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (재생 완료 시 대표 이미지 페이드인 복구 & 다시보기 버튼 표시)
     const rawYtbMobile = (postData.SNS_YTB || postData.sns_ytb || '').trim();
     const mYtbId = getYouTubeVideoId(rawYtbMobile);
+    window.currentMYtbVideoId = mYtbId;
     setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', mYtbId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn', 'mDetailYtbCountdown', 'mDetailYtbCountNum');
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
