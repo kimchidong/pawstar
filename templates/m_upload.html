@@ -313,7 +313,7 @@
         <div class="m-modal-scroll-body">
             <!-- 메인 미디어 이미지 뷰어 -->
             <div style="width: 100%; aspect-ratio: 4/3; border-radius: 24px; overflow: hidden !important; background: #0f172a; margin-bottom: 0.95rem; position: relative; box-shadow: 0 10px 30px -5px rgba(244, 114, 182, 0.25); -webkit-mask-image: -webkit-radial-gradient(white, black) !important; isolation: isolate; transform: translateZ(0);">
-                <img id="mPreviewModalImg" src="/static/image/etc/preview_placeholder.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block;">
+                <img id="mPreviewModalImg" src="/static/image/etc/preview_placeholder.jpg" style="position: absolute; inset: 0; z-index: 15; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; transition: opacity 0.6s ease-in-out;">
                 <div id="mPreviewYtbContainer" style="display: none; width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; background: #000000;"></div>
                 <div id="mPreviewMedalsLeft" style="position: absolute; top: 0.65rem; left: 0.65rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; pointer-events: auto;"></div>
                 <div id="mPreviewRankBadge" style="position: absolute; top: 0.65rem; left: 0.65rem; right: auto; z-index: 20; display: flex; align-items: center; justify-content: flex-start; gap: 0.35rem; pointer-events: auto;">
@@ -640,15 +640,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mPreviewModalDate) mPreviewModalDate.textContent = (typeof formatTimeAgo === 'function' ? formatTimeAgo(new Date()) : '방금 전');
 
         const mPreviewYtbContainer = document.getElementById('mPreviewYtbContainer');
+        const mPreviewModalImg = document.getElementById('mPreviewModalImg');
+        if (window.mPreviewYtbFadeTimer) {
+            clearTimeout(window.mPreviewYtbFadeTimer);
+            window.mPreviewYtbFadeTimer = null;
+        }
         if (mPreviewYtbContainer) {
             const mYtbVal = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
             const mPreviewYtbId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(mYtbVal) : null;
             if (mPreviewYtbId) {
                 mPreviewYtbContainer.style.display = 'block';
                 mPreviewYtbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${mPreviewYtbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${mPreviewYtbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+                window.mPreviewYtbFadeTimer = setTimeout(() => {
+                    if (mPreviewModalImg) mPreviewModalImg.style.opacity = '0';
+                }, 1000);
             } else {
                 mPreviewYtbContainer.style.display = 'none';
                 mPreviewYtbContainer.innerHTML = '';
+                if (mPreviewModalImg) mPreviewModalImg.style.opacity = '1';
             }
         }
     }

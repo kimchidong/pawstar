@@ -942,7 +942,12 @@ async function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생
+    if (window.pcYtbFadeTimer) {
+        clearTimeout(window.pcYtbFadeTimer);
+        window.pcYtbFadeTimer = null;
+    }
+
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (1초 후 이미지가 페이드아웃 되면서 전환)
     const ytbContainer = document.getElementById('detailYtbContainer');
     const rawYtb = (post.SNS_YTB || post.sns_ytb || '').trim();
     const ytbId = getYouTubeVideoId(rawYtb);
@@ -950,9 +955,13 @@ async function openDetailModal(post, isHallOfFame = false) {
         if (ytbId) {
             ytbContainer.style.display = 'block';
             ytbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${ytbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            window.pcYtbFadeTimer = setTimeout(() => {
+                if (imgEl) imgEl.style.opacity = '0';
+            }, 1000);
         } else {
             ytbContainer.style.display = 'none';
             ytbContainer.innerHTML = '';
+            if (imgEl) imgEl.style.opacity = '1';
         }
     }
 
@@ -1493,6 +1502,10 @@ if (!window.postsDataStore) {
 
 
 function closeDetailModal() {
+    if (window.pcYtbFadeTimer) {
+        clearTimeout(window.pcYtbFadeTimer);
+        window.pcYtbFadeTimer = null;
+    }
     const modal = document.getElementById('postDetailModal');
     if (modal) {
         modal.classList.remove('show', 'active');
@@ -1503,7 +1516,7 @@ function closeDetailModal() {
     const imgEl = document.getElementById('detailImg');
     if (imgEl) {
         imgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
-        imgEl.style.opacity = '0';
+        imgEl.style.opacity = '1';
     }
     const ytbContainer = document.getElementById('detailYtbContainer');
     if (ytbContainer) {
