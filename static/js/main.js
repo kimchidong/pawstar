@@ -40,22 +40,16 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 }
 
 /**
- * YouTube 동영상 재생 및 무한 순환 [이미지 3초 -> 동영상 재생 -> 이미지 3초 -> 동영상 재생] 헬퍼
+ * YouTube 동영상 재생 [이미지 3초 -> 동영상 1회 재생 -> 이미지 복구 후 계속 유지] 헬퍼
  */
-function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey, loopTimerKey) {
+function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey) {
     const container = document.getElementById(containerId);
     const imgEl = document.getElementById(imgId);
     if (!container) return;
 
-    if (!loopTimerKey) loopTimerKey = fadeTimerKey + '_loop';
-
     if (window[fadeTimerKey]) {
         clearTimeout(window[fadeTimerKey]);
         window[fadeTimerKey] = null;
-    }
-    if (window[loopTimerKey]) {
-        clearTimeout(window[loopTimerKey]);
-        window[loopTimerKey] = null;
     }
     if (window[playerKey] && typeof window[playerKey].destroy === 'function') {
         try { window[playerKey].destroy(); } catch(e) {}
@@ -110,16 +104,13 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                         window[fadeTimerKey] = setTimeout(hideImg, 3000);
                     },
                     'onStateChange': (event) => {
-                        // YT.PlayerState.ENDED = 0 (동영상 종료 시 이미지 3초 노출 후 재생 무한 반복)
+                        // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 이미지로 복구 후 유지)
                         if (event.data === 0 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.ENDED)) {
                             showImg();
-                            try { event.target.seekTo(0); } catch(e) {}
-                            
-                            if (window[loopTimerKey]) clearTimeout(window[loopTimerKey]);
-                            window[loopTimerKey] = setTimeout(() => {
-                                try { event.target.playVideo(); } catch(e) {}
-                                hideImg();
-                            }, 3000);
+                            setTimeout(() => {
+                                container.style.display = 'none';
+                                container.innerHTML = '';
+                            }, 1000);
                         }
                     }
                 }
