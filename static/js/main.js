@@ -14,6 +14,21 @@ function escapeHtml(str) {
 }
 
 /**
+ * YouTube URL 또는 Video ID에서 11자리 비디오 ID 추출
+ */
+function getYouTubeVideoId(url) {
+    if (!url || typeof url !== 'string') return null;
+    url = url.trim();
+    if (!url) return null;
+    if (url.includes('/@') || url.includes('/channel/') || url.includes('/user/')) return null;
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regExp);
+    if (match && match[1]) return match[1];
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+    return null;
+}
+
+/**
  * 일자시간 상대시간(방금 전, N초 전, N분 전, N시간 전, N일 전, N달 전, N년 전) 포맷팅
  */
 function formatTimeAgo(dateInput) {
@@ -927,6 +942,20 @@ async function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생
+    const ytbContainer = document.getElementById('detailYtbContainer');
+    const rawYtb = (post.SNS_YTB || post.sns_ytb || '').trim();
+    const ytbId = getYouTubeVideoId(rawYtb);
+    if (ytbContainer) {
+        if (ytbId) {
+            ytbContainer.style.display = 'block';
+            ytbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${ytbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+        } else {
+            ytbContainer.style.display = 'none';
+            ytbContainer.innerHTML = '';
+        }
+    }
+
     const authorImgEl = document.getElementById('detailAuthorImg');
     if (authorImgEl) authorImgEl.src = post.PROFILE_URL || post.user_profile || '/static/image/profile/default_profile.png';
 
@@ -1475,6 +1504,11 @@ function closeDetailModal() {
     if (imgEl) {
         imgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
         imgEl.style.opacity = '0';
+    }
+    const ytbContainer = document.getElementById('detailYtbContainer');
+    if (ytbContainer) {
+        ytbContainer.innerHTML = '';
+        ytbContainer.style.display = 'none';
     }
 }
 window.closeDetailModal = closeDetailModal;

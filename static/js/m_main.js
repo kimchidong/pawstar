@@ -14,6 +14,21 @@ function escapeHtml(str) {
 }
 
 /**
+ * YouTube URL 또는 Video ID에서 11자리 비디오 ID 추출
+ */
+function getYouTubeVideoId(url) {
+    if (!url || typeof url !== 'string') return null;
+    url = url.trim();
+    if (!url) return null;
+    if (url.includes('/@') || url.includes('/channel/') || url.includes('/user/')) return null;
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regExp);
+    if (match && match[1]) return match[1];
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+    return null;
+}
+
+/**
  * 모바일 전용 일자시간 상대시간(방금 전, N초 전, N분 전, N시간 전, N일 전, N달 전, N년 전) 포맷팅
  */
 function formatTimeAgo(dateInput) {
@@ -436,6 +451,20 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
                 mImgEl.src = mPopupSrc;
                 mImgEl.style.opacity = '1';
             }
+        }
+    }
+
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생
+    const mYtbContainer = document.getElementById('mDetailYtbContainer');
+    const rawYtbMobile = (postData.SNS_YTB || postData.sns_ytb || '').trim();
+    const mYtbId = getYouTubeVideoId(rawYtbMobile);
+    if (mYtbContainer) {
+        if (mYtbId) {
+            mYtbContainer.style.display = 'block';
+            mYtbContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${mYtbId}?autoplay=1&mute=1&playsinline=1&loop=1&playlist=${mYtbId}&enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+        } else {
+            mYtbContainer.style.display = 'none';
+            mYtbContainer.innerHTML = '';
         }
     }
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
@@ -983,6 +1012,11 @@ function closeMobileDetailModal() {
     if (mImgEl) {
         mImgEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
         mImgEl.style.opacity = '0';
+    }
+    const mYtbContainer = document.getElementById('mDetailYtbContainer');
+    if (mYtbContainer) {
+        mYtbContainer.innerHTML = '';
+        mYtbContainer.style.display = 'none';
     }
 }
 
