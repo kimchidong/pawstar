@@ -18,8 +18,8 @@ def sync_prod_notice_tables():
             # 대문자 및 소문자 테이블 목록
             target_tables = ['PST_NOTICE', 'pst_notice']
             
-            title_pc = "🎉 <strong>Paw Star 정식 오픈!</strong> 반려동물도 스타가 될 수 있다! 소중한 아이의 특별한 순간을 공유하고 펫 스타에 도전해 보세요! 🌟"
-            title_m = "🎉 <strong>Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟"
+            title_pc = '🎉 <strong style="color: #4338ca;">Paw Star 정식 오픈!</strong> 반려동물도 스타가 될 수 있다! 소중한 아이의 특별한 순간을 공유하고 펫 스타에 도전해 보세요! 🌟'
+            title_m = '🎉 <strong style="color: #4338ca;">Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟'
 
             content_pc = """
 <div class="notice-detail-content">
