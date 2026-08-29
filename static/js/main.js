@@ -2464,7 +2464,7 @@ function resetOriginalImageZoom() {
 }
 
 function openOriginalImageModal(imgSrc) {
-    if (!imgSrc) return;
+    if (!imgSrc || typeof imgSrc !== 'string' || imgSrc.includes('data:image/svg')) return;
     const modal = document.getElementById('originalImageModal');
     const targetImg = document.getElementById('originalImageViewImg');
     if (!modal || !targetImg) return;
