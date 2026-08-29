@@ -5,6 +5,99 @@
  */
 
 /* ==========================================================================
+   0. 상단 공지사항 배너 (PC & Mobile Self-contained Styles)
+   ========================================================================== */
+.site-notice-bar {
+    width: 1280px;
+    margin: 0.85rem auto 0 auto;
+    padding: 0.65rem 1.25rem;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px -3px rgba(124, 58, 237, 0.35);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.site-notice-bar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -2px rgba(124, 58, 237, 0.45);
+}
+
+.site-notice-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #ffffff;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.notice-badge {
+    background: #ffffff;
+    color: #6d28d9;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.notice-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.2px;
+}
+
+/* 모바일 상단 배너 */
+.m-site-notice-bar {
+    width: calc(100% - 1.2rem);
+    margin: 0.45rem auto 0 auto;
+    padding: 0.45rem 0.85rem;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #e11d48 100%);
+    border-radius: 12px;
+    box-shadow: 0 3px 12px -2px rgba(124, 58, 237, 0.3);
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.m-site-notice-container {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.m-notice-badge {
+    background: #ffffff;
+    color: #6d28d9;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 0.1rem 0.45rem;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.m-notice-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.2px;
+    flex: 1;
+}
+
+@media (max-width: 1320px) {
+    .site-notice-bar {
+        width: calc(100% - 2rem);
+    }
+}
+
+/* ==========================================================================
    1. 공지사항 컨테이너 & 레이아웃
    ========================================================================== */
 .notice-page-container {
