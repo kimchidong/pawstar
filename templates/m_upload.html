@@ -218,16 +218,11 @@
                                 <div class="m-card-badge" style="font-size: 0.56rem; padding: 0.15rem 0.42rem; top: 0.4rem; left: 0.4rem; position: absolute; z-index: 10;">전체 O위 후보</div>
                             </div>
                             <div class="m-card-body">
-                                <!-- 1줄째: 프로필사진 + 작성자 닉네임 + 회차 배지 -->
-                                <div class="m-card-author" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
-                                        <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="m-author-avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
-                                        <span class="m-author-name">{{ current_user.nickname or '집사 닉네임' }}</span>
-                                        <div id="mPreviewCardSnsGroup" style="display: inline-flex; align-items: center;"></div>
-                                    </div>
-                                    <span class="m-round-info-badge" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #334155; border: 1px solid #cbd5e1; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-                                        제{{ current_contest.CONTEST_ROUND or '8' }}회
-                                    </span>
+                                <!-- 1줄째: 프로필사진 + 작성자 닉네임 -->
+                                <div class="m-card-author" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.4rem; width: 100%;">
+                                    <img src="{{ current_user.profile_img or '/static/image/profile/default_profile.png' }}" class="m-author-avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" alt="profile">
+                                    <span class="m-author-name">{{ current_user.nickname or '집사 닉네임' }}</span>
+                                    <div id="mPreviewCardSnsGroup" style="display: inline-flex; align-items: center;"></div>
                                 </div>
 
                                 <!-- 2줄째: 동물유형명 + 동물 닉네임 -->
@@ -1106,7 +1101,7 @@ function initUrlStatusChecker(inputId, badgeId) {
             }
 
             // 10. 유효값 체크 완료 후 최종 출전 확인 컨펌
-            const isConfirmed = confirm('콘테스트 출전 등록 후에는 수정이 불가능하며 삭제만 가능합니다. 출전하시겠습니까?');
+            const isConfirmed = confirm('콘테스트 출전 등록 후에는 삭제만 가능합니다. 출전하시겠습니까?');
             if (!isConfirmed) {
                 return;
             }

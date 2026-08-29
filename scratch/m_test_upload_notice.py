@@ -10,7 +10,7 @@ class TestMobileUploadNoticeAndConfirm(unittest.TestCase):
         self.assertIn('수정 및 삭제 안내', content)
         
         # 2. confirm 팝업 코드 확인
-        target_confirm = "confirm('콘테스트 출전 등록 후에는 수정이 불가능하며 삭제만 가능합니다. 출전하시겠습니까?')"
+        target_confirm = "confirm('콘테스트 출전 등록 후에는 삭제만 가능합니다. 출전하시겠습니까?')"
         self.assertIn(target_confirm, content)
         print("Mobile upload notice & confirm script verified successfully.")
 
