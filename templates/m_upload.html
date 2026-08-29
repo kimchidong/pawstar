@@ -130,10 +130,13 @@
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsInstCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
                     <div style="position: relative; width: 100%;">
-                        <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
-                        <div id="check_mUploadSnsInst" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                        <input type="text" name="sns_inst" id="mUploadSnsInst" class="m-form-control" maxlength="200" placeholder="https://www.instagram.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 3.6rem;">
+                        <div id="check_mUploadSnsInst" class="url-check-badge" style="display: none; position: absolute; right: 2.1rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
                             <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
                         </div>
+                        <button type="button" id="clear_mUploadSnsInst" class="sns-clear-btn" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.15rem; align-items: center; justify-content: center; z-index: 10;" title="전체 지우기" onclick="clearMobileSnsInput('mUploadSnsInst')">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -145,10 +148,13 @@
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsYtbCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
                     <div style="position: relative; width: 100%;">
-                        <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
-                        <div id="check_mUploadSnsYtb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                        <input type="text" name="sns_ytb" id="mUploadSnsYtb" class="m-form-control" maxlength="200" placeholder="https://www.youtube.com/@your_channel" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 3.6rem;">
+                        <div id="check_mUploadSnsYtb" class="url-check-badge" style="display: none; position: absolute; right: 2.1rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
                             <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
                         </div>
+                        <button type="button" id="clear_mUploadSnsYtb" class="sns-clear-btn" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.15rem; align-items: center; justify-content: center; z-index: 10;" title="전체 지우기" onclick="clearMobileSnsInput('mUploadSnsYtb')">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -160,10 +166,13 @@
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsFsbCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
                     <div style="position: relative; width: 100%;">
-                        <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
-                        <div id="check_mUploadSnsFsb" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                        <input type="text" name="sns_fsb" id="mUploadSnsFsb" class="m-form-control" maxlength="200" placeholder="https://www.facebook.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 3.6rem;">
+                        <div id="check_mUploadSnsFsb" class="url-check-badge" style="display: none; position: absolute; right: 2.1rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
                             <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
                         </div>
+                        <button type="button" id="clear_mUploadSnsFsb" class="sns-clear-btn" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.15rem; align-items: center; justify-content: center; z-index: 10;" title="전체 지우기" onclick="clearMobileSnsInput('mUploadSnsFsb')">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -175,10 +184,13 @@
                         <span style="font-size: 0.72rem; font-weight: 700; color: #64748b;"><span id="mUploadSnsBlgCharCount" style="color: #7c3aed;">0</span>/200</span>
                     </div>
                     <div style="position: relative; width: 100%;">
-                        <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 2.2rem;">
-                        <div id="check_mUploadSnsBlg" class="url-check-badge" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
+                        <input type="text" name="sns_blg" id="mUploadSnsBlg" class="m-form-control" maxlength="200" placeholder="https://blog.naver.com/your_id" style="width: 100%; height: 38px; border-radius: 8px; font-size: 0.82rem; padding-right: 3.6rem;">
+                        <div id="check_mUploadSnsBlg" class="url-check-badge" style="display: none; position: absolute; right: 2.1rem; top: 50%; transform: translateY(-50%); pointer-events: none; align-items: center; justify-content: center;" title="200 OK 통과">
                             <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1rem;"></i>
                         </div>
+                        <button type="button" id="clear_mUploadSnsBlg" class="sns-clear-btn" style="display: none; position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.15rem; align-items: center; justify-content: center; z-index: 10;" title="전체 지우기" onclick="clearMobileSnsInput('mUploadSnsBlg')">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -707,10 +719,42 @@ document.addEventListener('DOMContentLoaded', function() {
     ['mUploadSnsInst', 'mUploadSnsYtb', 'mUploadSnsFsb', 'mUploadSnsBlg'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            ['input', 'change', 'blur'].forEach(ev => el.addEventListener(ev, updateMobilePreview));
+            ['input', 'change', 'blur', 'keyup'].forEach(ev => el.addEventListener(ev, () => {
+                updateMobileSnsClearBtnVisibility(id);
+                updateMobilePreview();
+            }));
             initUrlStatusChecker(id, 'check_' + id);
+            updateMobileSnsClearBtnVisibility(id);
         }
     });
+
+function clearMobileSnsInput(inputId) {
+    const inputEl = document.getElementById(inputId);
+    if (inputEl) {
+        inputEl.value = '';
+        inputEl.focus();
+        const clearBtn = document.getElementById('clear_' + inputId);
+        if (clearBtn) clearBtn.style.display = 'none';
+        const checkBadge = document.getElementById('check_' + inputId);
+        if (checkBadge) checkBadge.style.display = 'none';
+        if (typeof updateMobilePreview === 'function') updateMobilePreview();
+    }
+}
+window.clearMobileSnsInput = clearMobileSnsInput;
+window.clearSnsInput = clearMobileSnsInput;
+
+function updateMobileSnsClearBtnVisibility(inputId) {
+    const inputEl = document.getElementById(inputId);
+    const clearBtn = document.getElementById('clear_' + inputId);
+    if (inputEl && clearBtn) {
+        if ((inputEl.value || '').trim() !== '') {
+            clearBtn.style.display = 'inline-flex';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+    }
+}
+window.updateMobileSnsClearBtnVisibility = updateMobileSnsClearBtnVisibility;
 
 function initUrlStatusChecker(inputId, badgeId) {
     const inputEl = document.getElementById(inputId);
@@ -733,6 +777,9 @@ function initUrlStatusChecker(inputId, badgeId) {
         })
         .then(res => res.json())
         .then(data => {
+            if ((inputEl.value || '').trim() !== urlVal) {
+                return;
+            }
             if (data && data.ok && data.status === 200) {
                 badgeEl.style.display = 'flex';
             } else {
@@ -740,7 +787,9 @@ function initUrlStatusChecker(inputId, badgeId) {
             }
         })
         .catch(() => {
-            badgeEl.style.display = 'none';
+            if ((inputEl.value || '').trim() === urlVal) {
+                badgeEl.style.display = 'none';
+            }
         });
     };
 

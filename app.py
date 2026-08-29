@@ -2041,7 +2041,11 @@ def close_contest():
 
 @app.route('/api/check_url_status', methods=['GET', 'POST'])
 def check_url_status():
-    """ 입력한 URL의 HTTP 응답 코드 200 OK 여부를 검증하는 API """
+    """ 입력한 URL의 유효성 및 HTTP 응답 코드 200 OK 여부를 검증하는 API """
+    import re
+    from urllib.parse import urlparse, parse_qs
+    import requests
+
     if request.method == 'POST':
         data = request.get_json(silent=True) or {}
         target_url = (data.get('url') or '').strip()
@@ -2054,6 +2058,55 @@ def check_url_status():
     if not (target_url.startswith('http://') or target_url.startswith('https://')):
         target_url = 'https://' + target_url
 
+    parsed = urlparse(target_url)
+    domain = parsed.netloc.lower()
+    path = parsed.path.strip('/')
+
+    # 1. 인스타그램 (Instagram) 패턴 검증
+    if 'instagram.com' in domain:
+        # 메인/기본 시스템 경로 체크
+        if not path or path in ('', 'explore', 'accounts', 'direct', 'reels', 'stories', 'legal', 'about'):
+            return jsonify({'ok': False, 'status': 400, 'message': 'Instagram username or post link required'})
+        
+        # p/reel/stories 포스트 주소이거나 @username 계정 주소 정규식 패턴
+        inst_pattern = r'^(?:p|reel|reels|stories\/[a-zA-Z0-9._]+)\/([a-zA-Z0-9_-]+)|^[a-zA-Z0-9._]{1,30}$'
+        if not re.match(inst_pattern, path):
+            return jsonify({'ok': False, 'status': 400, 'message': 'Invalid Instagram URL format'})
+
+    # 2. 유튜브 (YouTube) 패턴 검증
+    elif 'youtube.com' in domain or 'youtu.be' in domain:
+        ytb_id = None
+        if 'youtu.be' in domain:
+            ytb_id = path.split('/')[0] if path else None
+        else:
+            if 'watch' in path:
+                query_params = parse_qs(parsed.query)
+                ytb_id = query_params.get('v', [None])[0]
+            elif path.startswith('shorts/'):
+                ytb_id = path.split('/')[1] if len(path.split('/')) > 1 else None
+            elif path.startswith('embed/'):
+                ytb_id = path.split('/')[1] if len(path.split('/')) > 1 else None
+
+        # 비디오 링크인데 ID가 11자리가 아니면 실패
+        if 'watch' in path or 'shorts' in path or 'embed' in path or 'youtu.be' in domain:
+            if not ytb_id or not re.match(r'^[a-zA-Z0-9_-]{11}$', ytb_id):
+                return jsonify({'ok': False, 'status': 400, 'message': 'Invalid YouTube Video ID (must be 11 characters)'})
+        else:
+            # 채널/핸들 URL 패턴 검증 (@handle, channel/UC..., c/..., user/...)
+            if not path or path in ('', 'feed', 'gaming', 'news', 'fashion'):
+                return jsonify({'ok': False, 'status': 400, 'message': 'YouTube channel or video link required'})
+
+    # 3. 네이버 블로그 (Naver Blog) 패턴 검증
+    elif 'blog.naver.com' in domain or 'blog.me' in domain:
+        if not path or path in ('', 'PostList.naver', 'BlogMain.naver'):
+            if not parsed.query or 'blogId' not in parse_qs(parsed.query):
+                return jsonify({'ok': False, 'status': 400, 'message': 'Naver Blog ID or Post link required'})
+
+    # 4. 페이스북 (Facebook) 패턴 검증
+    elif 'facebook.com' in domain or 'fb.com' in domain:
+        if not path or path in ('', 'home.php', 'login', 'recover', 'watch'):
+            return jsonify({'ok': False, 'status': 400, 'message': 'Facebook user or page link required'})
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -2061,17 +2114,67 @@ def check_url_status():
     }
 
     try:
-        # 먼저 HEAD 요청 시도
-        res = requests.head(target_url, headers=headers, allow_redirects=True, timeout=3.5)
+        res = requests.get(target_url, headers=headers, allow_redirects=True, timeout=4.0)
         status_code = res.status_code
-        if status_code in (405, 403, 400, 501):
-            # HEAD 미지원/거부 시 GET 요청
-            res_get = requests.get(target_url, headers=headers, stream=True, allow_redirects=True, timeout=3.5)
-            status_code = res_get.status_code
-            res_get.close()
 
-        is_ok = (status_code == 200)
-        return jsonify({'ok': is_ok, 'status': status_code, 'url': target_url})
+        if status_code != 200:
+            return jsonify({'ok': False, 'status': status_code, 'url': target_url})
+
+        # HTTP status가 200이더라도 HTML 본문 내 404/에러 안내 문구가 포함되어 있는지 검사
+        content_text = res.text.lower() if res.text else ''
+
+        # 1. 인스타그램 (Instagram)
+        if 'instagram.com' in domain:
+            invalid_keywords = [
+                "sorry, this page isn't available",
+                "page not found",
+                "페이지를 찾을 수 없습니다",
+                "link you followed may be broken",
+                "link may be broken",
+                "isn't available"
+            ]
+            if any(kw in content_text for kw in invalid_keywords):
+                return jsonify({'ok': False, 'status': 404, 'url': target_url, 'reason': 'Instagram page not found'})
+
+        # 2. 유튜브 (YouTube)
+        elif 'youtube.com' in domain or 'youtu.be' in domain:
+            invalid_keywords = [
+                "video unavailable",
+                "동영상을 사용할 수 없습니다",
+                "동영상을 재생할 수 없습니다",
+                "동영상이 삭제되었습니다",
+                "this video is unavailable",
+                "this video does not exist",
+                "this channel does not exist",
+                "채널을 찾을 수 없습니다"
+            ]
+            if any(kw in content_text for kw in invalid_keywords):
+                return jsonify({'ok': False, 'status': 404, 'url': target_url, 'reason': 'YouTube video/channel unavailable'})
+
+        # 3. 네이버 블로그 (Naver Blog)
+        elif 'blog.naver.com' in domain or 'naver.com' in domain:
+            invalid_keywords = [
+                "존재하지 않는 블로그",
+                "페이지를 찾을 수 없습니다",
+                "삭제되었거나 존재하지 않는",
+                "블로그 주소가 올바르지 않습니다",
+                "찾으시려는 페이지는"
+            ]
+            if any(kw in content_text for kw in invalid_keywords):
+                return jsonify({'ok': False, 'status': 404, 'url': target_url, 'reason': 'Naver blog not found'})
+
+        # 4. 페이스북 (Facebook)
+        elif 'facebook.com' in domain:
+            invalid_keywords = [
+                "이 콘텐츠를 지금 볼 수 없습니다",
+                "page not found",
+                "this content isn't available right now",
+                "link may be broken"
+            ]
+            if any(kw in content_text for kw in invalid_keywords):
+                return jsonify({'ok': False, 'status': 404, 'url': target_url, 'reason': 'Facebook page not found'})
+
+        return jsonify({'ok': True, 'status': 200, 'url': target_url})
     except Exception as e:
         return jsonify({'ok': False, 'status': 500, 'error': str(e)})
 
