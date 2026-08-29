@@ -2692,6 +2692,7 @@ class PawStarService:
             return default_notice
         try:
             with conn.cursor() as cur:
+                cur.execute("SET NAMES utf8mb4;")
                 tbl = self._get_notice_table_name(cur)
                 cur.execute(f"SELECT * FROM `{tbl}` ORDER BY NOTICE_NO DESC LIMIT 1")
                 row = cur.fetchone()
@@ -2711,6 +2712,7 @@ class PawStarService:
             return self.get_latest_notice()
         try:
             with conn.cursor() as cur:
+                cur.execute("SET NAMES utf8mb4;")
                 tbl = self._get_notice_table_name(cur)
                 cur.execute(f"SELECT * FROM `{tbl}` WHERE NOTICE_NO = %s", (notice_no,))
                 row = cur.fetchone()
@@ -2731,6 +2733,7 @@ class PawStarService:
             return {'items': [default_item], 'total_count': 1, 'page': 1, 'per_page': per_page, 'total_pages': 1}
         try:
             with conn.cursor() as cur:
+                cur.execute("SET NAMES utf8mb4;")
                 tbl = self._get_notice_table_name(cur)
                 cur.execute(f"SELECT COUNT(*) AS cnt FROM `{tbl}`")
                 res = cur.fetchone()

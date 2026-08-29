@@ -1,27 +1,45 @@
 import pymysql
-from datetime import datetime
 import os
 import sys
 
-# 서비스 루트 경로 추가
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from services.contest_service import service
+# 운영 DB (PRD) 및 로컬 DB (LOCAL) 설정
+PRD_DB_CONFIG = {
+    "host": "210.114.22.228",
+    "port": 3361,
+    "user": "kcd",
+    "password": "cdKim3315!",
+    "database": "DB_PST",
+    "charset": "utf8mb4"
+}
 
-def sync_prod_notice_tables():
-    conn = service.get_db_connection()
-    if not conn:
-        print("DB 커넥션 실패")
+LOCAL_DB_CONFIG = {
+    "host": "localhost",
+    "port": 3361,
+    "user": "kcd",
+    "password": "1q2w3e4r5t!",
+    "database": "DB_PST",
+    "charset": "utf8mb4"
+}
+
+def sync_target_db(config, env_name):
+    print(f"\n==================================================")
+    print(f"[{env_name.upper()}] DB 연결을 시도합니다... ({config['host']}:{config['port']})")
+    print(f"==================================================")
+    
+    try:
+        conn = pymysql.connect(**config, cursorclass=pymysql.cursors.DictCursor)
+    except Exception as e:
+        print(f"[{env_name.upper()}] DB 커넥션 실패:", e)
         return
 
     try:
         with conn.cursor() as cur:
-            # 커넥션 캐릭터셋을 4바이트 이모지 지원 utf8mb4로 설정
+            # utf8mb4 세션 캐릭터셋 강제 설정
             cur.execute("SET NAMES utf8mb4;")
             cur.execute("SET CHARACTER SET utf8mb4;")
-            
-            # 대문자 및 소문자 테이블 목록
+
             target_tables = ['PST_NOTICE', 'pst_notice']
-            
+
             title_pc = '🎉 <strong style="color: #4338ca;">Paw Star 정식 오픈!</strong> 반려동물도 스타가 될 수 있다! 소중한 아이의 특별한 순간을 공유하고 펫 스타에 도전해 보세요! 🌟'
             title_m = '🎉 <strong style="color: #4338ca;">Paw Star 정식 오픈!</strong> 소중한 아이의 사랑스러운 순간을 공유하고 펫 스타에 도전해보세요! 🌟'
 
@@ -125,7 +143,6 @@ def sync_prod_notice_tables():
             reg_dt = "2026-09-01 00:00:00"
 
             for tbl in target_tables:
-                print(f"[{tbl}] 테이블 준비 및 데이터 동기화를 시작합니다...")
                 create_sql = f"""
                 CREATE TABLE IF NOT EXISTS `{tbl}` (
                     `NOTICE_NO` int NOT NULL AUTO_INCREMENT,
@@ -141,32 +158,50 @@ def sync_prod_notice_tables():
                 cur.execute(create_sql)
                 conn.commit()
 
-                cur.execute(f"SELECT COUNT(*) AS cnt FROM `{tbl}`")
-                row = cur.fetchone()
-                cnt = row['cnt'] if row else 0
+                # 현재 테이블의 모든 NOTICE_NO 조회
+                cur.execute(f"SELECT NOTICE_NO FROM `{tbl}`")
+                rows = cur.fetchall()
+                notice_nos = [r['NOTICE_NO'] for r in rows] if rows else []
+                
+                print(f" -> [{env_name.upper()}] {tbl} 테이블의 기존 NOTICE_NO 목록: {notice_nos}")
 
-                if cnt == 0:
-                    insert_sql = f"""
-                    INSERT INTO `{tbl}` (TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT)
-                    VALUES (%s, %s, %s, %s, %s, %s);
-                    """
-                    cur.execute(insert_sql, (title_pc, title_m, content_pc, content_m, reg_dt, reg_dt))
-                    conn.commit()
-                    print(f" -> [{tbl}] 신규 데이터 INSERT 완료!")
+                if not notice_nos:
+                    # 데이터가 아예 없으면 1번 및 3번 레코드 신규 인서트
+                    for target_no in [1, 3]:
+                        insert_sql = f"""
+                        INSERT INTO `{tbl}` (NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s);
+                        """
+                        cur.execute(insert_sql, (target_no, title_pc, title_m, content_pc, content_m, reg_dt, reg_dt))
+                        conn.commit()
+                        print(f"    - NOTICE_NO={target_no} 신규 INSERT 완료!")
                 else:
-                    update_sql = f"""
-                    UPDATE `{tbl}`
-                    SET TTL = %s, TTL_M = %s, CONT = %s, CONT_M = %s, REG_DT = %s, MODE_DT = %s
-                    WHERE NOTICE_NO = 1;
-                    """
-                    cur.execute(update_sql, (title_pc, title_m, content_pc, content_m, reg_dt, reg_dt))
-                    conn.commit()
-                    print(f" -> [{tbl}] 기존 데이터 (NOTICE_NO=1) UPDATE 완료!")
+                    # 데이터가 존재하면 3번을 포함한 기존 모든 행을 이모지 포함 최신 데이터로 UPDATE!
+                    for target_no in notice_nos:
+                        update_sql = f"""
+                        UPDATE `{tbl}`
+                        SET TTL = %s, TTL_M = %s, CONT = %s, CONT_M = %s, REG_DT = %s, MODE_DT = %s
+                        WHERE NOTICE_NO = %s;
+                        """
+                        cur.execute(update_sql, (title_pc, title_m, content_pc, content_m, reg_dt, reg_dt, target_no))
+                        conn.commit()
+                        print(f"    - NOTICE_NO={target_no} 레코드 UPDATE 성공! (이모지 반영)")
+                        
+                    # 만약 NOTICE_NO=3 이 목록에 없었다면 NOTICE_NO=3 추가 생성
+                    if 3 not in notice_nos:
+                        insert_sql = f"""
+                        INSERT INTO `{tbl}` (NOTICE_NO, TTL, TTL_M, CONT, CONT_M, REG_DT, MODE_DT)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s);
+                        """
+                        cur.execute(insert_sql, (3, title_pc, title_m, content_pc, content_m, reg_dt, reg_dt))
+                        conn.commit()
+                        print(f"    - NOTICE_NO=3 레코드 추가 INSERT 완료! (이모지 반영)")
 
     except Exception as e:
-        print("[ERROR] 운영 테이블 처리 중 예외 발생:", e)
+        print(f"[{env_name.upper()}] 처리 중 오류 발생:", e)
     finally:
         conn.close()
 
 if __name__ == '__main__':
-    sync_prod_notice_tables()
+    sync_target_db(PRD_DB_CONFIG, "PRD (운영)")
+    sync_target_db(LOCAL_DB_CONFIG, "LOCAL (로컬)")
