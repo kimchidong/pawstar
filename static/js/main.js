@@ -40,11 +40,73 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 }
 
 /**
- * YouTube 동영상 재생 [이미지 3초 -> 동영상 1회 재생 -> 이미지 복구 후 계속 유지] 헬퍼
+ * 다시보기 버튼 클릭 시 동영상 처음부터 다시 재생 헬퍼
  */
-function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey) {
+function replayYtbVideo(type) {
+    let btnId = 'detailYtbReplayBtn';
+    let containerId = 'detailYtbContainer';
+    let imgId = 'detailImg';
+    let timerKey = 'pcYtbFadeTimer';
+    let playerKey = 'pcYtbPlayer';
+
+    if (type === 'mobile') {
+        btnId = 'mDetailYtbReplayBtn';
+        containerId = 'mDetailYtbContainer';
+        imgId = 'mDetailImg';
+        timerKey = 'mYtbFadeTimer';
+        playerKey = 'mYtbPlayer';
+    } else if (type === 'preview_pc') {
+        btnId = 'previewYtbReplayBtn';
+        containerId = 'previewYtbContainer';
+        imgId = 'previewModalImg';
+        timerKey = 'previewYtbFadeTimer';
+        playerKey = 'previewYtbPlayer';
+    } else if (type === 'preview_mobile') {
+        btnId = 'mPreviewYtbReplayBtn';
+        containerId = 'mPreviewYtbContainer';
+        imgId = 'mPreviewModalImg';
+        timerKey = 'mPreviewYtbFadeTimer';
+        playerKey = 'mPreviewYtbPlayer';
+    }
+
+    const btn = document.getElementById(btnId);
+    if (btn) btn.style.display = 'none';
+
     const container = document.getElementById(containerId);
     const imgEl = document.getElementById(imgId);
+
+    if (container) container.style.display = 'block';
+
+    const player = window[playerKey];
+    if (player && typeof player.playVideo === 'function') {
+        try { player.seekTo(0); } catch(e) {}
+        try { player.playVideo(); } catch(e) {}
+    }
+
+    if (window[timerKey]) {
+        clearTimeout(window[timerKey]);
+        window[timerKey] = null;
+    }
+
+    window[timerKey] = setTimeout(() => {
+        if (imgEl) {
+            imgEl.style.opacity = '0';
+            imgEl.style.pointerEvents = 'none';
+        }
+    }, 3000);
+}
+window.replayYtbVideo = replayYtbVideo;
+
+/**
+ * YouTube 동영상 재생 [이미지 3초 -> 동영상 1회 재생 -> 이미지 복구 & 우측 하단 재생버튼 표시] 헬퍼
+ */
+function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey, playerKey, replayBtnId) {
+    const container = document.getElementById(containerId);
+    const imgEl = document.getElementById(imgId);
+    const replayBtn = replayBtnId ? document.getElementById(replayBtnId) : null;
+
+    if (replayBtn) replayBtn.style.display = 'none';
+
     if (!container) return;
 
     if (window[fadeTimerKey]) {
@@ -61,6 +123,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             imgEl.style.opacity = '0';
             imgEl.style.pointerEvents = 'none'; // 동영상 컨트롤러(사운드/시간바/재생버튼) 클릭 조작 가능하도록 설정
         }
+        if (replayBtn) replayBtn.style.display = 'none';
     };
 
     const showImg = () => {
@@ -74,6 +137,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
         container.style.display = 'none';
         container.innerHTML = '';
         showImg();
+        if (replayBtn) replayBtn.style.display = 'none';
         return;
     }
 
@@ -100,24 +164,25 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         showImg();
+                        if (replayBtn) replayBtn.style.display = 'none';
                         try { event.target.playVideo(); } catch(e) {}
                         window[fadeTimerKey] = setTimeout(hideImg, 3000);
                     },
                     'onStateChange': (event) => {
-                        // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 이미지로 복구 후 유지)
+                        // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 이미지 복구 및 우측 하단 재생버튼 표시)
                         if (event.data === 0 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.ENDED)) {
                             showImg();
-                            setTimeout(() => {
-                                container.style.display = 'none';
-                                container.innerHTML = '';
-                            }, 1000);
+                            if (replayBtn) replayBtn.style.display = 'flex';
                         }
                     }
                 }
             });
         } catch(e) {
             container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
-            window[fadeTimerKey] = setTimeout(hideImg, 3000);
+            window[fadeTimerKey] = setTimeout(() => {
+                hideImg();
+                if (replayBtn) replayBtn.style.display = 'flex';
+            }, 3000);
         }
     };
 
@@ -1052,10 +1117,10 @@ async function openDetailModal(post, isHallOfFame = false) {
         }
     }
 
-    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (재생 완료 시 대표 이미지 페이드인 복구)
+    // SNS_YTB 컬럼값이 있을 경우 유튜브 동영상 임베드 및 자동 재생 (재생 완료 시 대표 이미지 페이드인 복구 & 다시보기 버튼 표시)
     const rawYtb = (post.SNS_YTB || post.sns_ytb || '').trim();
     const ytbId = getYouTubeVideoId(rawYtb);
-    setupYouTubePlayerWithEnding('detailYtbContainer', 'detailImg', ytbId, 'pcYtbFadeTimer', 'pcYtbPlayer');
+    setupYouTubePlayerWithEnding('detailYtbContainer', 'detailImg', ytbId, 'pcYtbFadeTimer', 'pcYtbPlayer', 'detailYtbReplayBtn');
 
     const authorImgEl = document.getElementById('detailAuthorImg');
     if (authorImgEl) authorImgEl.src = post.PROFILE_URL || post.user_profile || '/static/image/profile/default_profile.png';
@@ -1619,6 +1684,8 @@ function closeDetailModal() {
         imgEl.style.opacity = '1';
         imgEl.style.pointerEvents = 'auto';
     }
+    const replayBtn = document.getElementById('detailYtbReplayBtn');
+    if (replayBtn) replayBtn.style.display = 'none';
     const ytbContainer = document.getElementById('detailYtbContainer');
     if (ytbContainer) {
         ytbContainer.innerHTML = '';

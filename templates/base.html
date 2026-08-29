@@ -279,6 +279,10 @@
                     <div id="detailEntryNoBadge" class="entry-no-badge" style="position: absolute; left: 0.85rem; bottom: 0.85rem; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; padding: 0.3rem 0.65rem; border-radius: 12px; font-size: 0.78rem; font-weight: 900; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 20; display: inline-flex; align-items: center; gap: 0.25rem; pointer-events: none;">
                         <i class="fa-solid fa-hashtag" style="font-size: 0.72rem; color: #f472b6;"></i> <span id="detailEntryNoText">참가 1번</span>
                     </div>
+                    <!-- 우측 하단 동영상 다시보기 재생버튼 -->
+                    <button id="detailYtbReplayBtn" onclick="if(typeof replayYtbVideo==='function') replayYtbVideo('pc');" title="동영상 다시보기" style="display: none; position: absolute; bottom: 0.85rem; right: 0.75rem; z-index: 25; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; width: 38px; height: 38px; padding: 0; cursor: pointer; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,0,0,0.25);">
+                        <i class="fa-solid fa-play" style="font-size: 0.9rem; color: #f472b6; transform: translateX(1px);"></i>
+                    </button>
                 </div>
 
                 <!-- 우측 상세 정보 스크롤 컨테이너 -->
