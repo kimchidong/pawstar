@@ -278,8 +278,8 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
+                        try { event.target.mute(); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
-                        try { event.target.unMute(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
                         // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 대표 이미지 복구 및 우측 하단 재생버튼 표시)
