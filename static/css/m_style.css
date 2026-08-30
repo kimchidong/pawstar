@@ -846,15 +846,22 @@ body.m-body {
     box-shadow: none;
 }
 
-/* 모바일 피드 갤러리 (카드 가로/세로 사이즈 고정 & 화면 폭 한 라인 최대 자동 채움 auto-fill) */
+/* 모바일 피드 갤러리 (최소 2열 이상 유연 배치 & 이미지 가로세로 4:3 비율 100% 유지) */
 .m-feed-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(194.22px, 1fr));
-    gap: 0.75rem;
-    padding: 0 0.85rem 2rem 0.85rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    padding: 0 0.65rem 2rem 0.65rem;
     width: 100%;
     box-sizing: border-box;
-    justify-content: center;
+}
+
+@media screen and (min-width: 540px) {
+    .m-feed-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+        padding: 0 0.85rem 2rem 0.85rem;
+    }
 }
 
 .m-feed-card {
@@ -868,10 +875,10 @@ body.m-body {
     flex-direction: column;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 194.22px !important;
-    min-width: 194.22px !important;
-    max-width: 194.22px !important;
-    margin: 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     box-sizing: border-box;
 }
 
@@ -881,13 +888,13 @@ body.m-body {
 
 .m-card-thumb {
     position: relative !important;
-    width: 194.22px !important;
-    min-width: 194.22px !important;
-    max-width: 194.22px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     aspect-ratio: 4 / 3 !important;
-    height: 145.66px !important;
-    min-height: 145.66px !important;
-    max-height: 145.66px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     overflow: hidden !important;
     background: transparent !important;
     border-top-left-radius: calc(var(--radius-lg) - 1px) !important;
@@ -896,8 +903,8 @@ body.m-body {
 }
 
 .m-card-thumb img {
-    width: 194.22px !important;
-    height: 145.66px !important;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover !important;
     display: block !important;
     border-top-left-radius: calc(var(--radius-lg) - 1px) !important;
