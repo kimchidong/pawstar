@@ -2380,38 +2380,7 @@ function openGoogleLoginModal() {
 }
 window.openGoogleLoginModal = openGoogleLoginModal;
 
-// 아무런 액션 없이 30분(1800초) 경과 시 클라이언트 세션 자동 만료 모니터링
-(function initInactivityTimer() {
-    if (!window.isUserLoggedIn) return;
 
-    const TIMEOUT_MS = 30 * 60 * 1000; // 30분 (1800초)
-    let lastActionTime = Date.now();
-    let isNotified = false;
-
-    const resetInactivityTimer = () => {
-        lastActionTime = Date.now();
-    };
-
-    ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evtName => {
-        window.addEventListener(evtName, resetInactivityTimer, { passive: true });
-    });
-
-    setInterval(() => {
-        if (!window.isUserLoggedIn || isNotified) return;
-        const idleDuration = Date.now() - lastActionTime;
-        if (idleDuration >= TIMEOUT_MS) {
-            isNotified = true;
-            if (typeof showToast === 'function') {
-                showToast('30분 동안 활동이 없어 세션이 만료되었습니다. 다시 로그인해주세요. 🐾', 'warning');
-            } else {
-                alert('30분 동안 활동이 없어 세션이 만료되었습니다. 다시 로그인해주세요. 🐾');
-            }
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-        }
-    }, 10000);
-})();
 
 // 🏆 메달 / 배지 중앙 확대 라이트박스 팝업 컨트롤러 (Bulletproof Body Lightbox)
 function openBadgeZoomModal(imgSrc, title = '수상 메달 / 배지', petIcon = '') {
