@@ -259,6 +259,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     container.innerHTML = `<div id="${iframeId}" style="width: 100%; height: 100%;"></div>`;
 
     const initPlayer = () => {
+        const curOrigin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
         try {
             window[playerKey] = new YT.Player(iframeId, {
                 width: '100%',
@@ -272,7 +273,8 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                     'rel': 0,
                     'controls': 1,
                     'fs': 1,
-                    'modestbranding': 1
+                    'modestbranding': 1,
+                    'origin': curOrigin
                 },
                 events: {
                     'onReady': (event) => {
@@ -285,11 +287,16 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                             showImg();
                             if (replayBtn) replayBtn.style.display = 'flex';
                         }
+                    },
+                    'onError': (event) => {
+                        // 구글 403 에러 또는 퍼가기 제한 영상 시 대표 출전작 이미지로 자동 복구
+                        showImg();
+                        if (container) container.style.display = 'none';
                     }
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1&origin=${encodeURIComponent(curOrigin)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             hideImg();
         }
     };
