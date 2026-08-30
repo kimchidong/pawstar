@@ -728,6 +728,7 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
     const mYtbId = getYouTubeVideoId(rawYtbMobile);
     window.currentMYtbVideoId = mYtbId;
     setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', mYtbId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn', 'mDetailYtbCountdown', 'mDetailYtbCountNum');
+    window.currentMobileDetailAuthorId = postData.USER_ID || postData.user_id || postData.REG_USER_ID || postData.reg_user_id || postData.PET_STAR_USER_ID || postData.ID || postData.id || '';
     document.getElementById('mDetailAuthorImg').src = postData.PROFILE_URL || postData.user_profile || '/static/image/profile/default_profile.png';
     document.getElementById('mDetailAuthorNickname').textContent = postData.NK_NM || postData.user_nickname || '집사';
     
@@ -1247,6 +1248,12 @@ async function openMobileDetailModal(postData, isHallOfFame = false) {
         const icon = mBtnViewPopup.querySelector('i');
         if (icon) icon.className = isViewAct ? 'fa-solid fa-eye' : 'fa-regular fa-eye';
     }
+
+    window.goToMobileAuthorProfile = function() {
+        if (window.currentMobileDetailAuthorId) {
+            location.href = '/m/profile?user_id=' + encodeURIComponent(window.currentMobileDetailAuthorId);
+        }
+    };
 
     detailModal.classList.add('active');
     document.body.style.overflow = 'hidden';

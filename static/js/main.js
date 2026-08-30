@@ -1248,6 +1248,7 @@ async function openDetailModal(post, isHallOfFame = false) {
     const rawYtb = (post.SNS_YTB || post.sns_ytb || '').trim();
     const ytbId = getYouTubeVideoId(rawYtb);
     setupYouTubePlayerWithEnding('detailYtbContainer', 'detailImg', ytbId, 'pcYtbFadeTimer', 'pcYtbPlayer', 'detailYtbReplayBtn', 'detailYtbCountdown', 'detailYtbCountNum');
+    window.currentDetailAuthorId = post.USER_ID || post.user_id || post.REG_USER_ID || post.reg_user_id || post.PET_STAR_USER_ID || post.ID || post.id || '';
 
     const authorImgEl = document.getElementById('detailAuthorImg');
     if (authorImgEl) authorImgEl.src = post.PROFILE_URL || post.user_profile || '/static/image/profile/default_profile.png';
@@ -1386,6 +1387,12 @@ async function openDetailModal(post, isHallOfFame = false) {
     window.currentDetailPost = post;
     window.currentDetailPostData = post;
     window.currentDetailPostIsCommented = isCommented;
+
+    window.goToAuthorProfile = function() {
+        if (window.currentDetailAuthorId) {
+            location.href = '/profile?user_id=' + encodeURIComponent(window.currentDetailAuthorId);
+        }
+    };
 
     const curUserIdVal = String(window.CURRENT_USER_ID || '').trim();
     const postOwnerIdVal = String(post.ENT_USER_ID || post.user_id || '').trim();

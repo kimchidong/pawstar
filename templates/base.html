@@ -317,15 +317,15 @@
                         </div>
 
                         <!-- 아기자기한 작성자 프로필 카드 -->
-                        <div style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1);">
+                        <div id="detailAuthorCard" onclick="goToAuthorProfile();" style="background: linear-gradient(135deg, #fff5f5 0%, #f3e8ff 100%); padding: 0.75rem 0.95rem; border-radius: 20px; border: 1.5px solid #fbcfe8; margin-bottom: 0.75rem; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.1); cursor: pointer; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';" title="작성자 프로필 페이지로 이동">
                             <div style="display: flex; align-items: center; gap: 0.75rem; width: 100%;">
-                                <img id="detailAuthorImg" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ffffff; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.22); flex-shrink: 0;" alt="profile">
+                                <img id="detailAuthorImg" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ffffff; box-shadow: 0 4px 12px rgba(244, 114, 182, 0.22); flex-shrink: 0; cursor: pointer;" alt="profile">
                                 <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.25rem;">
                                     <!-- 닉네임 수평 라인 (닉네임 + 우측 정렬 SNS 링크 세트) -->
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
-                                        <div id="detailAuthorNickname" style="font-size: 0.88rem; font-weight: 800; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">집사 닉네임</div>
+                                        <div id="detailAuthorNickname" style="font-size: 0.88rem; font-weight: 800; color: #1e293b; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; cursor: pointer;">집사 닉네임</div>
                                         <!-- 출전작 팝업 닉네임 수평선 우측 정렬 소셜 아이콘 영역 -->
-                                        <div id="detailAuthorSnsLinks" style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; margin-left: auto;"></div>
+                                        <div id="detailAuthorSnsLinks" onclick="event.stopPropagation();" style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; margin-left: auto;"></div>
                                     </div>
                                     <div id="detailPetTag" style="font-size: 0.76rem; font-weight: normal; flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; flex-wrap: nowrap; overflow: hidden; max-width: 100%;">반려동물</div>
                                 </div>
@@ -521,7 +521,7 @@
     <!-- Google Identity Services SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260901_99"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20260901_150"></script>
     <script>
     window.openPrivacyNoticeModal = function() {
         if (typeof openPrivacyPolicyModal === 'function') {
