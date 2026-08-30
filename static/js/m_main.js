@@ -92,6 +92,15 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     const imgEl = document.getElementById(imgId);
     const replayBtn = replayBtnId ? document.getElementById(replayBtnId) : null;
 
+    const showImgBtnMap = {
+        'detailYtbReplayBtn': 'detailShowImgBtn',
+        'mDetailYtbReplayBtn': 'mDetailShowImgBtn',
+        'previewYtbReplayBtn': 'previewShowImgBtn',
+        'mPreviewYtbReplayBtn': 'mPreviewShowImgBtn'
+    };
+    const showImgBtnId = showImgBtnMap[replayBtnId] || '';
+    const showImgBtn = showImgBtnId ? document.getElementById(showImgBtnId) : null;
+
     if (replayBtn) replayBtn.style.display = 'none';
 
     if (!container) return;
@@ -111,6 +120,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             imgEl.style.pointerEvents = 'none'; // 모바일 터치로 동영상 컨트롤러 조작 가능
         }
         if (replayBtn) replayBtn.style.display = 'none';
+        if (showImgBtn) showImgBtn.style.display = 'flex'; // 동영상 재생 중엔 이미지 보기 버튼 표시!
     };
 
     const showImg = () => {
@@ -118,6 +128,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             imgEl.style.opacity = '1';
             imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 터치 이벤트 복구
         }
+        if (showImgBtn) showImgBtn.style.display = 'none'; // 이미지 표시 중엔 이미지 보기 버튼 숨김
     };
 
     if (!videoId) {
