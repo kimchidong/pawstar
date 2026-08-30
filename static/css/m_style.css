@@ -34,11 +34,22 @@
     --bottom-nav-height: 64px;
 }
 
+html {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
 }
 
 a {
@@ -54,6 +65,20 @@ body.m-body {
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
+/* 가로 모드(Landscape)에서도 세로 모드(Portrait) 기준 글자 크기와 100% 동일하게 픽셀 고정 */
+@media screen and (orientation: landscape) {
+    html, body, body.m-body, *, p, span, div, h1, h2, h3, h4, h5, h6, a, button, input, label {
+        -webkit-text-size-adjust: 100% !important;
+        -moz-text-size-adjust: 100% !important;
+        -ms-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
 }
 
 /* 모바일 전용 헤더 */
