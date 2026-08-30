@@ -267,7 +267,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 videoId: videoId,
                 playerVars: {
                     'autoplay': 1,
-                    'mute': 0,
+                    'mute': 1,
                     'playsinline': 1,
                     'enablejsapi': 1,
                     'rel': 0,
@@ -278,8 +278,8 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
-                        try { event.target.unMute(); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
+                        try { event.target.unMute(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
                         // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 대표 이미지 복구 및 우측 하단 재생버튼 표시)
@@ -291,7 +291,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             hideImg();
         }
     };
