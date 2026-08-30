@@ -216,10 +216,24 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     container.style.display = 'block';
     hideImg();
     const iframeId = containerId + '_iframe';
+    const curOrigin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+
+    const isAndroid = /Android|SamsungBrowser/i.test(navigator.userAgent || '');
+
+    const renderDirectIframe = () => {
+        container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0&controls=1&fs=1&modestbranding=1&origin=${encodeURIComponent(curOrigin)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; height: 100%; border: none;" onerror="const img=document.getElementById('${imgId}');if(img){img.style.opacity='1';img.style.pointerEvents='auto';}const c=document.getElementById('${containerId}');if(c){c.style.display='none';}"></iframe>`;
+        hideImg();
+    };
+
+    if (isAndroid) {
+        // 갤럭시 안드로이드폰(Android Chrome/Samsung Internet) 전용 Native Direct Iframe 주입 (100% 즉시 자동재생 보장)
+        renderDirectIframe();
+        return;
+    }
+
     container.innerHTML = `<div id="${iframeId}" style="width: 100%; height: 100%;"></div>`;
 
     const initPlayer = () => {
-        const curOrigin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
         try {
             window[playerKey] = new YT.Player(iframeId, {
                 width: '100%',
@@ -249,15 +263,14 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                         }
                     },
                     'onError': (event) => {
-                        // 구글 403 에러 또는 퍼가기 제한 영상 시 대표 출전작 이미지로 자동 복구
+                        // 구글 403 에러 또는 퍼가기 제한 영상 시 대표 출전작 이미지로 즉시 자동 복구
                         showImg();
                         if (container) container.style.display = 'none';
                     }
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1&origin=${encodeURIComponent(curOrigin)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
-            hideImg();
+            renderDirectIframe();
         }
     };
 
@@ -270,9 +283,9 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             if (window.YT && window.YT.Player) {
                 clearInterval(timer);
                 initPlayer();
-            } else if (attempts > 30) {
+            } else if (attempts > 20) {
                 clearInterval(timer);
-                initPlayer();
+                renderDirectIframe();
             }
         }, 100);
     }
