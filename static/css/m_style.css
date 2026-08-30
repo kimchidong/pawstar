@@ -846,11 +846,11 @@ body.m-body {
     box-shadow: none;
 }
 
-/* 모바일 피드 갤러리 (가로/세로 고정 규격 카드 & 최대 4열 고정 그리드) */
+/* 모바일 피드 갤러리 (카드 가로/세로 사이즈 고정 & 화면 폭 한 라인 최대 자동 채움 auto-fill) */
 .m-feed-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
+    grid-template-columns: repeat(auto-fill, minmax(194.22px, 1fr));
+    gap: 0.75rem;
     padding: 0 0.85rem 2rem 0.85rem;
     width: 100%;
     box-sizing: border-box;
@@ -873,21 +873,6 @@ body.m-body {
     max-width: 194.22px !important;
     margin: 0 auto !important;
     box-sizing: border-box;
-}
-
-/* 갤럭시 탭 / 태블릿 모바일 (화면폭 540px 이상) -> 한 줄에 최대 4개 (4열 고정 & 카드 가로세로 규격 고정) */
-@media screen and (min-width: 540px) {
-    .m-feed-grid {
-        grid-template-columns: repeat(4, 194.22px) !important;
-        justify-content: center !important;
-        gap: 0.85rem !important;
-    }
-    .m-feed-card {
-        width: 194.22px !important;
-        min-width: 194.22px !important;
-        max-width: 194.22px !important;
-        margin: 0 auto !important;
-    }
 }
 
 .m-feed-card:active {
