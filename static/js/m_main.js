@@ -40,6 +40,60 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 }
 
 /**
+ * 동영상 재생 중 '출전작 이미지 보기' 버튼 클릭 시 동영상 일시정지/숨김 후 대표 이미지 표시
+ */
+function showPostImage(type) {
+    let showBtnId = 'detailShowImgBtn';
+    let replayBtnId = 'detailYtbReplayBtn';
+    let containerId = 'detailYtbContainer';
+    let imgId = 'detailImg';
+    let playerKey = 'pcYtbPlayer';
+
+    if (type === 'mobile') {
+        showBtnId = 'mDetailShowImgBtn';
+        replayBtnId = 'mDetailYtbReplayBtn';
+        containerId = 'mDetailYtbContainer';
+        imgId = 'mDetailImg';
+        playerKey = 'mYtbPlayer';
+    } else if (type === 'preview_pc') {
+        showBtnId = 'previewShowImgBtn';
+        replayBtnId = 'previewYtbReplayBtn';
+        containerId = 'previewYtbContainer';
+        imgId = 'previewModalImg';
+        playerKey = 'previewYtbPlayer';
+    } else if (type === 'preview_mobile') {
+        showBtnId = 'mPreviewShowImgBtn';
+        replayBtnId = 'mPreviewYtbReplayBtn';
+        containerId = 'mPreviewYtbContainer';
+        imgId = 'mPreviewModalImg';
+        playerKey = 'mPreviewYtbPlayer';
+    }
+
+    const showBtn = document.getElementById(showBtnId);
+    if (showBtn) showBtn.style.display = 'none';
+
+    const imgEl = document.getElementById(imgId);
+    if (imgEl) {
+        imgEl.style.opacity = '1';
+        imgEl.style.pointerEvents = 'auto';
+    }
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.style.display = 'none';
+    }
+
+    const player = window[playerKey];
+    if (player && typeof player.pauseVideo === 'function') {
+        try { player.pauseVideo(); } catch(e) {}
+    }
+
+    const replayBtn = document.getElementById(replayBtnId);
+    if (replayBtn) replayBtn.style.display = 'flex';
+}
+window.showPostImage = showPostImage;
+
+/**
  * 모바일 전용 유튜브 다시보기 버튼 클릭 핸들러
  */
 function replayMobileYtbVideo() {

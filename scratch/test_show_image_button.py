@@ -14,7 +14,8 @@ class TestShowImageButton(unittest.TestCase):
             content = f.read()
         self.assertIn('id="mDetailShowImgBtn"', content)
         self.assertIn("showPostImage('mobile')", content)
-        self.assertIn('z-index: 50;', content)
+        self.assertIn('z-index: 60;', content)
+        self.assertIn('pointer-events: auto !important;', content)
         print("[PASS] m_base.html mDetailShowImgBtn verified!")
 
     def test_upload_html_show_image_btn(self):
@@ -29,7 +30,8 @@ class TestShowImageButton(unittest.TestCase):
             content = f.read()
         self.assertIn('id="mPreviewShowImgBtn"', content)
         self.assertIn("showPostImage('preview_mobile')", content)
-        self.assertIn('z-index: 50;', content)
+        self.assertIn('z-index: 60;', content)
+        self.assertIn('pointer-events: auto !important;', content)
         print("[PASS] m_upload.html mPreviewShowImgBtn verified!")
 
     def test_main_js_show_post_image_func(self):
@@ -39,12 +41,12 @@ class TestShowImageButton(unittest.TestCase):
         self.assertIn('window.showPostImage = showPostImage', content)
         print("[PASS] main.js showPostImage function verified!")
 
-    def test_m_main_js_setup_youtube(self):
+    def test_m_main_js_show_post_image_func(self):
         with open('static/js/m_main.js', 'r', encoding='utf-8') as f:
             content = f.read()
-        self.assertIn('mDetailShowImgBtn', content)
-        self.assertIn('showImgBtn.style.display = \'flex\'', content)
-        print("[PASS] m_main.js setupYouTubePlayerWithEnding verified!")
+        self.assertIn('function showPostImage(type)', content)
+        self.assertIn('window.showPostImage = showPostImage', content)
+        print("[PASS] m_main.js showPostImage function verified!")
 
 if __name__ == '__main__':
     unittest.main()
