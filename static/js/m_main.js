@@ -76,11 +76,13 @@ function showPostImage(type) {
     if (imgEl) {
         imgEl.style.opacity = '1';
         imgEl.style.pointerEvents = 'auto';
+        imgEl.style.zIndex = '35';
     }
 
     const container = document.getElementById(containerId);
     if (container) {
         container.style.display = 'none';
+        container.style.zIndex = '5';
     }
 
     const player = window[playerKey];
@@ -191,18 +193,28 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     const hideImg = () => {
         if (imgEl) {
             imgEl.style.opacity = '0';
-            imgEl.style.pointerEvents = 'none'; // 모바일 터치로 동영상 컨트롤러 조작 가능
+            imgEl.style.pointerEvents = 'none';
+            imgEl.style.zIndex = '5';
+        }
+        if (container) {
+            container.style.display = 'block';
+            container.style.zIndex = '30';
         }
         if (replayBtn) replayBtn.style.display = 'none';
-        if (showImgBtn) showImgBtn.style.display = 'flex'; // 동영상 재생 중엔 이미지 보기 버튼 표시!
+        if (showImgBtn) showImgBtn.style.display = 'flex';
     };
 
     const showImg = () => {
         if (imgEl) {
             imgEl.style.opacity = '1';
-            imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 터치 이벤트 복구
+            imgEl.style.pointerEvents = 'auto';
+            imgEl.style.zIndex = '35';
         }
-        if (showImgBtn) showImgBtn.style.display = 'none'; // 이미지 표시 중엔 이미지 보기 버튼 숨김
+        if (container) {
+            container.style.display = 'none';
+            container.style.zIndex = '5';
+        }
+        if (showImgBtn) showImgBtn.style.display = 'none';
     };
 
     if (!videoId) {
@@ -214,22 +226,15 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     }
 
     container.style.display = 'block';
+    container.style.zIndex = '30';
     hideImg();
     const iframeId = containerId + '_iframe';
     const curOrigin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
 
-    const isAndroid = /Android|SamsungBrowser/i.test(navigator.userAgent || '');
-
     const renderDirectIframe = () => {
-        container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0&controls=1&fs=1&modestbranding=1&origin=${encodeURIComponent(curOrigin)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; height: 100%; border: none;" onerror="const img=document.getElementById('${imgId}');if(img){img.style.opacity='1';img.style.pointerEvents='auto';}const c=document.getElementById('${containerId}');if(c){c.style.display='none';}"></iframe>`;
+        container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0&controls=1&fs=1&modestbranding=1&origin=${encodeURIComponent(curOrigin)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="width: 100%; height: 100%; border: none;" onerror="const img=document.getElementById('${imgId}');if(img){img.style.opacity='1';img.style.pointerEvents='auto';img.style.zIndex='35';}const c=document.getElementById('${containerId}');if(c){c.style.display='none';c.style.zIndex='5';}"></iframe>`;
         hideImg();
     };
-
-    if (isAndroid) {
-        // 갤럭시 안드로이드폰(Android Chrome/Samsung Internet) 전용 Native Direct Iframe 주입 (100% 즉시 자동재생 보장)
-        renderDirectIframe();
-        return;
-    }
 
     container.innerHTML = `<div id="${iframeId}" style="width: 100%; height: 100%;"></div>`;
 
@@ -253,6 +258,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
+                        try { event.target.mute(); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
