@@ -109,8 +109,18 @@ function replayMobileYtbVideo() {
     if (mReplayBtn) mReplayBtn.style.display = 'none';
     if (mShowBtn) mShowBtn.style.display = 'flex';
 
+    const player = window.mYtbPlayer;
+    if (container) container.style.display = 'block';
+
+    if (player && typeof player.seekTo === 'function') {
+        try {
+            player.seekTo(0, true);
+            player.playVideo();
+            return;
+        } catch(e) {}
+    }
+
     if (container && window.currentMYtbVideoId) {
-        container.style.display = 'block';
         setupYouTubePlayerWithEnding('mDetailYtbContainer', 'mDetailImg', window.currentMYtbVideoId, 'mYtbFadeTimer', 'mYtbPlayer', 'mDetailYtbReplayBtn');
     }
 }
@@ -131,8 +141,18 @@ function replayMobilePreviewYtbVideo() {
     if (mReplayBtn) mReplayBtn.style.display = 'none';
     if (mShowBtn) mShowBtn.style.display = 'flex';
 
+    const player = window.mPreviewYtbPlayer;
+    if (container) container.style.display = 'block';
+
+    if (player && typeof player.seekTo === 'function') {
+        try {
+            player.seekTo(0, true);
+            player.playVideo();
+            return;
+        } catch(e) {}
+    }
+
     if (container && vId) {
-        container.style.display = 'block';
         setupYouTubePlayerWithEnding('mPreviewYtbContainer', 'mPreviewModalImg', vId, 'mPreviewYtbFadeTimer', 'mPreviewYtbPlayer', 'mPreviewYtbReplayBtn');
     }
 }
@@ -206,7 +226,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 videoId: videoId,
                 playerVars: {
                     'autoplay': 1,
-                    'mute': 0,
+                    'mute': 1,
                     'playsinline': 1,
                     'enablejsapi': 1,
                     'rel': 0,
@@ -217,15 +237,9 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 events: {
                     'onReady': (event) => {
                         hideImg();
-                        try { event.target.unMute(); } catch(e) {}
-                        try { event.target.setVolume(100); } catch(e) {}
                         try { event.target.playVideo(); } catch(e) {}
                     },
                     'onStateChange': (event) => {
-                        if (event.data === 1 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.PLAYING)) {
-                            try { event.target.unMute(); } catch(e) {}
-                            try { event.target.setVolume(100); } catch(e) {}
-                        }
                         // YT.PlayerState.ENDED = 0 (동영상 1회 재생 완료 시 대표 이미지 복구 및 우측 하단 재생버튼 표시)
                         if (event.data === 0 || (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.ENDED)) {
                             showImg();
@@ -235,7 +249,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
                 }
             });
         } catch(e) {
-            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
+            container.innerHTML = `<iframe id="${iframeId}" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=1&fs=1&modestbranding=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>`;
             hideImg();
         }
     };
