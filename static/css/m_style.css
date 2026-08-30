@@ -1283,7 +1283,7 @@ body.m-body {
 .m-modal-sheet {
     width: 100%;
     max-width: 480px;
-    max-height: 90vh;
+    max-height: 82vh;
     background: #ffffff;
     border-radius: var(--radius-lg);
     padding: 1.25rem 1.25rem 1.5rem 1.25rem;
@@ -1877,7 +1877,7 @@ body.m-body {
 
 /* 모바일 상세 팝업 전용 스크롤 커스텀: 평소엔 숨김/슬림, 위아래 둥근 모서리 안쪽에만 위치 */
 .m-modal-scroll-body {
-    max-height: calc(92vh - 68px);
+    max-height: calc(82vh - 68px);
     overflow-y: auto;
     padding: 0.2rem 1rem 1.5rem 1rem;
     scrollbar-width: thin;
