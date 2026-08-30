@@ -45,6 +45,7 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 function replayMobileYtbVideo() {
     const mImgEl = document.getElementById('mDetailImg');
     const mReplayBtn = document.getElementById('mDetailYtbReplayBtn');
+    const mShowBtn = document.getElementById('mDetailShowImgBtn');
     const container = document.getElementById('mDetailYtbContainer');
 
     if (mImgEl) {
@@ -52,6 +53,7 @@ function replayMobileYtbVideo() {
         mImgEl.style.pointerEvents = 'none';
     }
     if (mReplayBtn) mReplayBtn.style.display = 'none';
+    if (mShowBtn) mShowBtn.style.display = 'flex';
 
     if (container && window.currentMYtbVideoId) {
         container.style.display = 'block';
@@ -63,6 +65,7 @@ window.replayMobileYtbVideo = replayMobileYtbVideo;
 function replayMobilePreviewYtbVideo() {
     const mImgEl = document.getElementById('mPreviewModalImg');
     const mReplayBtn = document.getElementById('mPreviewYtbReplayBtn');
+    const mShowBtn = document.getElementById('mPreviewShowImgBtn');
     const container = document.getElementById('mPreviewYtbContainer');
     const mYtbVal = (document.getElementById('mUploadSnsYtb')?.value || '').trim();
     const vId = (typeof getYouTubeVideoId === 'function') ? getYouTubeVideoId(mYtbVal) : null;
@@ -72,6 +75,7 @@ function replayMobilePreviewYtbVideo() {
         mImgEl.style.pointerEvents = 'none';
     }
     if (mReplayBtn) mReplayBtn.style.display = 'none';
+    if (mShowBtn) mShowBtn.style.display = 'flex';
 
     if (container && vId) {
         container.style.display = 'block';
@@ -1160,6 +1164,8 @@ function closeMobileDetailModal() {
         try { window.mYtbPlayer.destroy(); } catch(e) {}
         window.mYtbPlayer = null;
     }
+    const mShowBtn = document.getElementById('mDetailShowImgBtn');
+    if (mShowBtn) mShowBtn.style.display = 'none';
     const detailModal = document.getElementById('mDetailModal');
     if (detailModal) {
         detailModal.classList.remove('active', 'show');

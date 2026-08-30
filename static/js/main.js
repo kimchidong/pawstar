@@ -40,10 +40,65 @@ if (typeof document !== 'undefined' && !document.getElementById('youtube-iframe-
 }
 
 /**
+ * 동영상 재생 중 '출전작 이미지 보기' 버튼 클릭 시 동영상 일시정지/숨김 후 대표 이미지 표시
+ */
+function showPostImage(type) {
+    let showBtnId = 'detailShowImgBtn';
+    let replayBtnId = 'detailYtbReplayBtn';
+    let containerId = 'detailYtbContainer';
+    let imgId = 'detailImg';
+    let playerKey = 'pcYtbPlayer';
+
+    if (type === 'mobile') {
+        showBtnId = 'mDetailShowImgBtn';
+        replayBtnId = 'mDetailYtbReplayBtn';
+        containerId = 'mDetailYtbContainer';
+        imgId = 'mDetailImg';
+        playerKey = 'mYtbPlayer';
+    } else if (type === 'preview_pc') {
+        showBtnId = 'previewShowImgBtn';
+        replayBtnId = 'previewYtbReplayBtn';
+        containerId = 'previewYtbContainer';
+        imgId = 'previewModalImg';
+        playerKey = 'previewYtbPlayer';
+    } else if (type === 'preview_mobile') {
+        showBtnId = 'mPreviewShowImgBtn';
+        replayBtnId = 'mPreviewYtbReplayBtn';
+        containerId = 'mPreviewYtbContainer';
+        imgId = 'mPreviewModalImg';
+        playerKey = 'mPreviewYtbPlayer';
+    }
+
+    const showBtn = document.getElementById(showBtnId);
+    if (showBtn) showBtn.style.display = 'none';
+
+    const imgEl = document.getElementById(imgId);
+    if (imgEl) {
+        imgEl.style.opacity = '1';
+        imgEl.style.pointerEvents = 'auto';
+    }
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.style.display = 'none';
+    }
+
+    const player = window[playerKey];
+    if (player && typeof player.pauseVideo === 'function') {
+        try { player.pauseVideo(); } catch(e) {}
+    }
+
+    const replayBtn = document.getElementById(replayBtnId);
+    if (replayBtn) replayBtn.style.display = 'flex';
+}
+window.showPostImage = showPostImage;
+
+/**
  * 다시보기 버튼 클릭 시 동영상 처음부터 다시 재생 헬퍼
  */
 function replayYtbVideo(type) {
     let btnId = 'detailYtbReplayBtn';
+    let showBtnId = 'detailShowImgBtn';
     let containerId = 'detailYtbContainer';
     let imgId = 'detailImg';
     let timerKey = 'pcYtbFadeTimer';
@@ -51,18 +106,21 @@ function replayYtbVideo(type) {
 
     if (type === 'mobile') {
         btnId = 'mDetailYtbReplayBtn';
+        showBtnId = 'mDetailShowImgBtn';
         containerId = 'mDetailYtbContainer';
         imgId = 'mDetailImg';
         timerKey = 'mYtbFadeTimer';
         playerKey = 'mYtbPlayer';
     } else if (type === 'preview_pc') {
         btnId = 'previewYtbReplayBtn';
+        showBtnId = 'previewShowImgBtn';
         containerId = 'previewYtbContainer';
         imgId = 'previewModalImg';
         timerKey = 'previewYtbFadeTimer';
         playerKey = 'previewYtbPlayer';
     } else if (type === 'preview_mobile') {
         btnId = 'mPreviewYtbReplayBtn';
+        showBtnId = 'mPreviewShowImgBtn';
         containerId = 'mPreviewYtbContainer';
         imgId = 'mPreviewModalImg';
         timerKey = 'mPreviewYtbFadeTimer';
@@ -71,6 +129,9 @@ function replayYtbVideo(type) {
 
     const btn = document.getElementById(btnId);
     if (btn) btn.style.display = 'none';
+
+    const showImgBtn = document.getElementById(showBtnId);
+    if (showImgBtn) showImgBtn.style.display = 'flex';
 
     const countdownIdMap = {
         'detailYtbReplayBtn': 'detailYtbCountdown',
@@ -145,6 +206,15 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
     const imgEl = document.getElementById(imgId);
     const replayBtn = replayBtnId ? document.getElementById(replayBtnId) : null;
 
+    const showImgBtnMap = {
+        'detailYtbReplayBtn': 'detailShowImgBtn',
+        'mDetailYtbReplayBtn': 'mDetailShowImgBtn',
+        'previewYtbReplayBtn': 'previewShowImgBtn',
+        'mPreviewYtbReplayBtn': 'mPreviewShowImgBtn'
+    };
+    const showImgBtnId = showImgBtnMap[replayBtnId] || '';
+    const showImgBtn = showImgBtnId ? document.getElementById(showImgBtnId) : null;
+
     if (replayBtn) replayBtn.style.display = 'none';
 
     if (!container) return;
@@ -164,6 +234,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             imgEl.style.pointerEvents = 'none'; // 동영상 컨트롤러(사운드/시간바/재생버튼) 클릭 조작 가능하도록 설정
         }
         if (replayBtn) replayBtn.style.display = 'none';
+        if (showImgBtn) showImgBtn.style.display = 'flex'; // 동영상 재생 중엔 이미지 보기 버튼 표시!
     };
 
     const showImg = () => {
@@ -171,6 +242,7 @@ function setupYouTubePlayerWithEnding(containerId, imgId, videoId, fadeTimerKey,
             imgEl.style.opacity = '1';
             imgEl.style.pointerEvents = 'auto'; // 이미지 표시 시 원래 포인터 이벤트 복구
         }
+        if (showImgBtn) showImgBtn.style.display = 'none'; // 이미지 표시 중엔 이미지 보기 버튼 숨김
     };
 
     if (!videoId) {
@@ -1709,6 +1781,8 @@ function closeDetailModal() {
         try { window.pcYtbPlayer.destroy(); } catch(e) {}
         window.pcYtbPlayer = null;
     }
+    const showBtn = document.getElementById('detailShowImgBtn');
+    if (showBtn) showBtn.style.display = 'none';
     const modal = document.getElementById('postDetailModal');
     if (modal) {
         modal.classList.remove('show', 'active');
