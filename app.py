@@ -1734,15 +1734,15 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
 
     try:
         if src_img_path and os.path.exists(src_img_path):
+            from PIL import Image, ImageOps
             with Image.open(src_img_path) as img:
                 if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
                     img_base = img.convert('RGBA')
                 else:
                     img_base = img.convert('RGB')
                 
-                # 1. 목록용 리사이즈 (max 600x600)
-                img_list = img_base.copy()
-                img_list.thumbnail((600, 600), Image.Resampling.LANCZOS)
+                # 1. 목록용 리사이즈 (가로 310, 세로 310 정사각형 꽉 채움, 비율 유지 Center Crop)
+                img_list = ImageOps.fit(img_base, (310, 310), Image.Resampling.LANCZOS)
                 img_list.save(perm_list_path, 'WEBP', quality=85)
 
                 # 2. 팝업용 리사이즈 (max 1200x1200)
