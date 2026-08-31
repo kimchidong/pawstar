@@ -1269,8 +1269,9 @@ def save_uploaded_media(file):
     file_path = os.path.join(upload_dir, unique_name)
 
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
         image = Image.open(file.stream)
+        image = ImageOps.exif_transpose(image)
         if image.mode in ("RGBA", "P"):
             image = image.convert("RGB")
         elif image.mode != "RGB":
@@ -1494,8 +1495,9 @@ def upload_profile():
         
         file_path = os.path.join(temp_dir, unique_name)
         try:
-            from PIL import Image
+            from PIL import Image, ImageOps
             image = Image.open(file.stream)
+            image = ImageOps.exif_transpose(image)
             if image.mode in ("RGBA", "P"):
                 image = image.convert("RGBA")
             
@@ -1736,6 +1738,7 @@ def process_paw_images_dual(src_file_or_path, contest_id, post_id):
         if src_img_path and os.path.exists(src_img_path):
             from PIL import Image, ImageOps
             with Image.open(src_img_path) as img:
+                img = ImageOps.exif_transpose(img)
                 if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
                     img_base = img.convert('RGBA')
                 else:
